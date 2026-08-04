@@ -1,0 +1,314 @@
+/* ══════════════════════════════════════════════════════════
+   FAZENDA — DETALHE CADASTRAL (Jornada Fazendas → Fazenda X). Ficha de
+   consulta da propriedade + gestão de talhões, finalidade exclusivamente
+   cadastral/configuração — distinta da tela operacional
+   (`fazenda-detalhe.html`, Jornada · Caderno de Campo, ver
+   page-fazenda-detalhe.css). Estrutura de página (← Voltar, estado "não
+   encontrada", `.card` + `.cardHeader`/`.title`) copiada do mesmo padrão de
+   `detalhe-estoque.html`/`page-detalhe-estoque.css`.
+   "Editar fazenda" continua flash-disable (formulário de edição de fazenda
+   fica pra uma rodada futura). Ativar/Desativar talhão e os modais de
+   Novo/Editar talhão (round 2026-07-29) já são reais — alteram
+   `fazenda.talhoes` em memória e re-renderizam, sem persistir entre reloads.
+   ══════════════════════════════════════════════════════════ */
+
+.fazenda-cadastro-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Ver nota do mesmo bug em page-detalhe-estoque.css/page-fazenda-detalhe.css:
+   o guard `:not([hidden])` é obrigatório aqui. */
+#fazenda-cadastro-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ── Voltar + estado "não encontrada" ─────────────────────────────────────── */
+
+.fazenda-cadastro-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.fazenda-cadastro-back:hover { color: var(--color-text-primary); }
+
+.fazenda-cadastro-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.fazenda-cadastro-not-found:not([hidden]) { display: flex; }
+.fazenda-cadastro-not-found p { margin: 0; }
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.fazenda-cadastro-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .fazenda-cadastro-title-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.fazenda-cadastro-title-block { display: flex; flex-direction: column; gap: 2px; }
+.fazenda-cadastro-title { color: var(--color-text-primary); margin: 0; }
+
+.fazenda-cadastro-location {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-tertiary);
+}
+.fazenda-cadastro-location svg { flex-shrink: 0; }
+
+#editar-fazenda-cadastro-btn { width: 100%; justify-content: center; flex-shrink: 0; }
+@media (min-width: 640px) {
+  #editar-fazenda-cadastro-btn { width: auto; }
+}
+
+/* ── Identificação da fazenda / Localização (consulta, não formulário) ────
+   Dois `.card` INDEPENDENTES, mesmo padrão exato de
+   `.detalhe-estoque-section`/`.detalhe-estoque-fields`
+   (page-detalhe-estoque.css) — cardHeader+.title próprio de cada um, um `dl`
+   flat de campos (sem sub-título/divisor interno, que era o padrão antigo
+   "Dados da fazenda" com 4 grupos dentro de 1 card só). */
+
+.fazenda-cadastro-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.fazenda-cadastro-section .cardHeader { padding: 0; }
+
+.fazenda-cadastro-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .fazenda-cadastro-fields { grid-template-columns: repeat(3, 1fr); }
+}
+
+.fazenda-cadastro-fields dt {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+.fazenda-cadastro-fields dd {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+.fazenda-cadastro-fields .fazenda-cadastro-field-wide { grid-column: 1 / -1; }
+
+/* Segundo `dl` (Arrendamento) dentro do card de Identificação, some via
+   `hidden` quando a fazenda não tem arrendamento cadastrado — mesmo bug de
+   hidden+display incondicional já documentado várias vezes neste projeto:
+   `.fazenda-cadastro-fields{display:grid}` (regra acima) não tem guard
+   nenhum, então precisa de uma regra por ID pra vencer de vez quando
+   `hidden` está presente (ID bate class independente de ordem/pseudo-classe). */
+#dados-arrendamento-group[hidden] { display: none; }
+#dados-arrendamento-group:not([hidden]) {
+  display: grid;
+  padding-top: var(--spacing-md);
+  margin-top: var(--spacing-xs);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Seção Talhões ─────────────────────────────────────────────────────── */
+
+.talhoes-cadastro-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.talhoes-cadastro-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .talhoes-cadastro-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.talhoes-cadastro-title-block { display: flex; flex-direction: column; gap: 2px; }
+.talhoes-cadastro-title { color: var(--color-text-primary); margin: 0; }
+.talhoes-cadastro-description { color: var(--color-text-tertiary); margin: 0; max-width: 480px; }
+
+/* Small button (`.btn.primary.sm.hasLeft`, ver Button.module.css) — não
+   estica no mobile como os botões `md` de cabeçalho de página faziam antes;
+   um botão compacto flutuando 100% de largura destoaria do próprio padrão
+   `sm` (usado em Estoque só em toolbars/popovers, sempre auto). */
+#novo-talhao-cadastro-btn { flex-shrink: 0; }
+
+/* Tabela (desktop/tablet) — mesmo padrão de `.produtos-table-card` */
+.talhoes-cadastro-table-wrap { display: none; }
+@media (min-width: 768px) {
+  .talhoes-cadastro-table-wrap:not([hidden]) { display: block; }
+}
+
+/* Cabeçalho/zebra/hover/bordas: CÓPIA EXATA das regras de
+   `.estoque-table-card` (page-estoque.css) — pedido explícito do usuário
+   pra ficar visualmente igual à tabela de Estoque, não um padrão novo.
+   Estoque não usa paginação (só a tabela de Cadastro usa), por isso não foi
+   adicionada aqui. */
+.talhoes-cadastro-table-wrap .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: 32px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.talhoes-cadastro-table-wrap .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.talhoes-cadastro-table-wrap .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.talhoes-cadastro-table-wrap .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.talhoes-cadastro-table-wrap .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.talhoes-cadastro-table-wrap .tr:hover .td { filter: brightness(0.97); }
+
+/* Larguras de coluna: mesma disciplina de Estoque (`table-layout:fixed` +
+   `nth-child`, Ações sempre em px fixo pros ícones não quebrarem linha).
+   Talhão é a coluna "fill" — maior `%` do grupo — com `min-width` como piso
+   de legibilidade (requisito específico desta tabela, adicional ao padrão
+   de Estoque, que não precisa disso porque nenhuma coluna lá é texto livre
+   de tamanho variável como um nome de talhão). */
+.talhoes-cadastro-table-wrap .table { table-layout: fixed; }
+.talhoes-cadastro-table-wrap .th:nth-child(1), .talhoes-cadastro-table-wrap .td:nth-child(1) { width: 10%; }  /* Código */
+.talhoes-cadastro-table-wrap .th:nth-child(2), .talhoes-cadastro-table-wrap .td:nth-child(2) { width: 44%; min-width: 160px; } /* Talhão */
+.talhoes-cadastro-table-wrap .th:nth-child(3), .talhoes-cadastro-table-wrap .td:nth-child(3) { width: 16%; } /* Área (ha) */
+.talhoes-cadastro-table-wrap .th:nth-child(4), .talhoes-cadastro-table-wrap .td:nth-child(4) { width: 18%; } /* Status */
+.talhoes-cadastro-table-wrap .th:nth-child(5), .talhoes-cadastro-table-wrap .td:nth-child(5) { width: 120px; } /* Ações — Editar + Ativar/Desativar, mesma largura de Estoque pra 2 ícones */
+
+/* Cards (mobile) — mesmo padrão de `.produtos-mobile-card` */
+.talhoes-cadastro-mobile-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+@media (min-width: 768px) {
+  .talhoes-cadastro-mobile-list { display: none; }
+}
+
+.talhao-cadastro-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.talhao-cadastro-card-header { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-sm); }
+.talhao-cadastro-card-name { color: var(--color-text-primary); }
+.talhao-cadastro-card-fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm) var(--spacing-md); margin: 0; }
+.talhao-cadastro-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.talhao-cadastro-card-fields dd { color: var(--color-text-primary); margin: 0; }
+.talhao-cadastro-card-actions { display: flex; justify-content: flex-end; gap: 4px; padding-top: var(--spacing-xs); border-top: var(--border-width-thin) solid var(--color-border-subtle); }
+
+/* ── Estado vazio de Talhões (mirror de `.talhoes-empty` da operacional) ── */
+.talhoes-cadastro-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.talhoes-cadastro-empty:not([hidden]) { display: flex; }
+
+.talhoes-cadastro-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+
+.talhoes-cadastro-empty-title { color: var(--color-text-primary); margin: 0; }
+.talhoes-cadastro-empty-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 360px; }
+
+/* ── Modal Novo/Editar talhão ──────────────────────────────────────────────
+   Dialog.module.css's `.body` não define gap entre filhos (os modais de
+   Estoque usam `.estoque-modal-grid`, uma grade de 2 colunas — aqui só 3
+   campos empilhados fazem mais sentido, então é só espaçamento vertical). */
+#talhao-dialog-overlay .body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Mesmo bug de hidden+display incondicional já documentado várias vezes
+   neste projeto (page-cadastros.css/page-estoque.css/page-dashboard.css):
+   `Dialog.module.css`'s `.overlay` e `Input.module.css`'s `.errorText` têm
+   `display` sem guard — sem isso o modal (e as mensagens de erro) ficam
+   sempre visíveis mesmo com o atributo `hidden`. */
+.overlay[hidden] { display: none; }
+.errorText[hidden] { display: none; }
+
+/* ── Toast de sucesso (cadastrar/editar/ativar/desativar talhão) ──────────
+   Cópia exata do padrão de `.cadastros-toast-region`/`.cadastros-toast`
+   (page-cadastros.css) — mesmo Feedback (Storybook) reaproveitado como
+   toast, mesma técnica de posicionamento e mesma correção de colisão de 3
+   vias (Feedback × Table × Dialog, os 3 carregados juntos nesta tela). */
+.fazenda-cadastro-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.fazenda-cadastro-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.fazenda-cadastro-toast {
+  box-shadow: var(--shadow-lg);
+  animation: fazenda-cadastro-toast-in 0.25s ease;
+}
+.fazenda-cadastro-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.fazenda-cadastro-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+
+@keyframes fazenda-cadastro-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

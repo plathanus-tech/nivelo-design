@@ -1,0 +1,87 @@
+/* ══════════════════════════════════════════════════════════
+   RELATÓRIOS — Financeiro > Relatórios. Página de entrada, ponto de
+   escolha entre os 4 tipos de relatório disponíveis — nunca uma tela com
+   abas (cada relatório tem filtros/parâmetros próprios, que só aparecem
+   depois de o usuário escolher qual quer gerar). Mobile first.
+   ══════════════════════════════════════════════════════════ */
+
+.rel-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.rel-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+.rel-title { color: var(--color-text-primary); margin: 0; }
+.rel-description { color: var(--color-text-tertiary); margin: 0; }
+
+/* ── Grid de cards: 1 coluna mobile, 2 colunas a partir de 640px ─────────── */
+.rel-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .rel-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+.card.rel-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-lg);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.card.rel-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-default);
+  transform: translateY(-2px);
+}
+.card.rel-card:focus-visible {
+  outline: 2px solid var(--color-action-primary);
+  outline-offset: 2px;
+}
+
+.rel-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+
+.rel-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+.rel-card-title { color: var(--color-text-primary); margin: 0; }
+.rel-card-description { color: var(--color-text-tertiary); margin: 0; }
+
+.rel-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  margin-top: auto;
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+}
+.card.rel-card:hover .rel-card-cta { color: var(--color-action-primary-hover); }

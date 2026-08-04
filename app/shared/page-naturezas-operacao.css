@@ -1,0 +1,256 @@
+/* ══════════════════════════════════════════════════════════
+   NATUREZA DA OPERAÇÃO — Configuração > Fiscal > Natureza da Operação.
+   Mobile first. Mesmos padrões já usados em Categorias/Caixa/Contas a
+   Pagar: `Table` como Card genérico, Dropdown/Input compostos a partir de
+   tokens/componentes reais, `Tab` pras abas Entrada/Saída, banner
+   `alert.warning` (Feedback) fixo no topo — configuração fiscal sensível,
+   não um toast que desaparece.
+   ══════════════════════════════════════════════════════════ */
+
+.nop-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.nop-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .nop-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.nop-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.nop-title { color: var(--color-text-primary); margin: 0; }
+
+#new-natureza-btn { width: 100%; justify-content: center; flex-shrink: 0; }
+@media (min-width: 768px) {
+  #new-natureza-btn { width: auto; }
+}
+
+/* ── Banner de alerta fiscal (persistente, não um toast) ─────────────────── */
+/* Colisão de 3 vias já documentada em rules.md (Feedback × Table × Dialog,
+   `.body`/`.title`): esta tela carrega os 3 `.module.css` juntos (Dialog só
+   por causa do modal de Ativar/Desativar), e como `.body` do Dialog é
+   carregado por último, ele vencia sobre o `.body` do Feedback — empurrando
+   a mensagem com padding de 16/24px de modal e pintando o texto em
+   `text-secondary` (cinza) em vez de herdar a cor semântica do alerta.
+   Mesmo fix já usado no toast de sucesso (`.nop-toast`) e no banner de
+   trial de Criar Conta (`.cadastro-trial-banner`). */
+.nop-warning-banner {
+  margin: 0;
+}
+.nop-warning-banner .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.nop-warning-banner .message {
+  margin: 0;
+}
+
+/* ── Abas Entrada/Saída ───────────────────────────────────────────────────
+   Filtram a MESMA tabela por `data-tipo` (as colunas são idênticas nos dois
+   tipos) — diferente de Estoque, que usa 3 tabelas independentes por ter
+   colunas genuinamente diferentes entre abas. Mesma técnica de filtro de
+   `state.tipo` já usada por Categorias (`state.grupo`)/Contas a Pagar. */
+.nop-tabs {
+  margin-bottom: 0;
+}
+
+/* ── Busca/Filtro fundidos com a tabela (mesmo padrão final já adotado em
+   Categorias/Caixa/Contas a Pagar) ───────────────────────────────────────── */
+.card.nop-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.nop-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.nop-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.nop-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.nop-filter { width: 100%; }
+@media (min-width: 768px) {
+  .nop-filter {
+    width: auto;
+    flex: 0 1 200px;
+    min-width: 160px;
+  }
+  .nop-filter-search {
+    flex: 1 1 280px;
+    min-width: 240px;
+  }
+}
+
+.nop-filters .nop-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+.nop-dropdown .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+.nop-dropdown .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+.nop-dropdown .option { font-size: var(--font-size-sm); }
+
+/* ── Tabela (desktop) / Cards (mobile) ──────────────────────────────────── */
+
+.nop-table-card .tableWrap {
+  display: none;
+  padding-top: 0;
+}
+.nop-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .nop-table-card .tableWrap { display: block; }
+  .nop-cards { display: none; }
+}
+
+.nop-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.nop-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+.nop-table-card .sortIcon { color: var(--color-gray-500); }
+
+.nop-table-card .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.nop-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.nop-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.nop-table-card .tr:hover .td { filter: brightness(0.97); }
+
+/* Colunas em `%`, Ações em `px` fixo — mesma disciplina já usada em
+   Cadastro/Produtos (a soma cabe em 100%, sem precisar de rolagem
+   horizontal, diferente de Categorias/Contas a Pagar que têm mais colunas). */
+.nop-table-card .table {
+  table-layout: fixed;
+  width: 100%;
+}
+.nop-table-card .th:nth-child(1) { width: 38%; } /* Descrição */
+.nop-table-card .th:nth-child(2) { width: 13%; } /* Padrão */
+.nop-table-card .th:nth-child(3) { width: 13%; } /* Série */
+.nop-table-card .th:nth-child(4) { width: 17%; } /* Consumidor Final */
+.nop-table-card .th:nth-child(5) { width: 13%; } /* Status */
+.nop-table-card .th:nth-child(6) { width: 96px; } /* Ações */
+
+.nop-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.nop-empty:not([hidden]) { display: flex; }
+.nop-empty p { margin: 0; }
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.nop-mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+.nop-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.nop-mobile-card-name { color: var(--color-text-primary); }
+.nop-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.nop-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.nop-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+.nop-mobile-card-actions {
+  justify-content: flex-end;
+  padding: var(--spacing-sm) 0 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Toast de sucesso ("Natureza de operação salva com sucesso") ─────────── */
+.nop-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.nop-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+.nop-toast {
+  box-shadow: var(--shadow-lg);
+  animation: nop-toast-in 0.25s ease;
+}
+.nop-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.nop-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+@keyframes nop-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   já documentado dezenas de vezes neste projeto. */
+.overlay[hidden] { display: none; }

@@ -1,0 +1,296 @@
+/* ══════════════════════════════════════════════════════════
+   CANAL DE IDEIAS — feed principal (comunidade de sugestões). Layout em
+   coluna única mobile-first, mesmo padrão de cabeçalho/empty-state já
+   estabelecido em Fazendas/Produtos. O card de ideia é uma composição
+   própria (não reaproveita `.card` de Table.module.css — o layout de
+   voto+conteúdo lado a lado não se encaixa no `cardHeader`/`tableWrap`
+   daquele componente), mas usa os mesmos tokens de borda/radius/sombra pra
+   ler como o mesmo "Card genérico" do resto do sistema.
+   ══════════════════════════════════════════════════════════ */
+
+.ideias-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.ideias-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .ideias-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.ideias-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ideias-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.ideias-description {
+  color: var(--color-text-tertiary);
+  margin: 0;
+  max-width: 480px;
+}
+
+#nova-ideia-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  #nova-ideia-btn {
+    width: auto;
+  }
+}
+
+/* ── Controles: busca + ordenação ──────────────────────────────────────── */
+
+.ideias-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+@media (min-width: 640px) {
+  .ideias-controls {
+    flex-direction: row;
+  }
+}
+
+.ideias-search {
+  flex: 1;
+}
+
+.ideias-sort {
+  flex-shrink: 0;
+}
+
+.ideias-sort .trigger {
+  gap: var(--spacing-xs);
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .ideias-sort {
+    width: 200px;
+  }
+}
+
+/* ── Chips de categoria — fileira com rolagem horizontal (a classe `.row`
+   já vem de Chip.module.css) + setas de navegação nas extremidades quando
+   há itens fora da área visível, e arrastar com mouse/touch (mobile e
+   desktop). Setas escondidas por padrão via `hidden` (JS decide, medindo
+   `scrollWidth`/`clientWidth`) — nunca via `display` incondicional, mesmo
+   padrão hidden+display já documentado dezenas de vezes neste projeto. ── */
+.ideias-chip-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding-bottom: 2px;
+}
+
+.ideias-chip-nav-btn {
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  background: var(--color-bg-surface);
+}
+.ideias-chip-nav-btn[hidden] {
+  display: none;
+}
+
+.ideias-chip-row {
+  flex: 1;
+  min-width: 0;
+  scroll-behavior: smooth;
+  cursor: grab;
+}
+.ideias-chip-row.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
+/* ── Feed ──────────────────────────────────────────────────────────────── */
+
+.ideias-feed {
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+/* Guard obrigatório (padrão recorrente já documentado dezenas de vezes em
+   app/CLAUDE.md): `display` só entra em cena quando o atributo `hidden`
+   (alternado por `canal-ideias.js` no estado sem resultados) não estiver
+   presente — um `display:flex` incondicional venceria `[hidden]` por
+   especificidade empatada + ordem de carga. */
+.ideias-feed:not([hidden]) {
+  display: flex;
+}
+
+.idea-card {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.idea-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-default);
+}
+.idea-card:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* O voto some do fluxo normal de clique/navegação do card — precisa
+   continuar clicável por si só sem herdar o cursor/hover do card pai (o
+   componente já cuida do próprio hover). */
+.idea-card-vote {
+  align-self: flex-start;
+}
+
+.idea-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  flex: 1;
+}
+
+.idea-card-body .badge {
+  align-self: flex-start;
+}
+
+.idea-card-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.idea-card-excerpt {
+  color: var(--color-text-secondary);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.idea-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.idea-card-author {
+  color: var(--color-text-secondary);
+}
+
+.idea-card-dot {
+  color: var(--color-border-default);
+}
+
+.idea-card-comments {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+}
+
+/* ── Estado vazio (mirror de `.fazendas-empty-global`) ────────────────── */
+
+.ideias-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.ideias-empty:not([hidden]) { display: flex; }
+
+.ideias-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+
+.ideias-empty-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.ideias-empty-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0;
+  max-width: 360px;
+}
+
+/* ── Toast de sucesso (mesmo padrão de `.fazendas-toast-region`) ──────── */
+
+.ideias-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.ideias-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.ideias-toast {
+  box-shadow: var(--shadow-lg);
+  animation: ideias-toast-in 0.25s ease;
+}
+.ideias-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.ideias-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0;
+}
+.ideias-toast .message {
+  color: inherit;
+}
+
+@keyframes ideias-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

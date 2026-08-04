@@ -1,0 +1,245 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA NATUREZA DE OPERAÇÃO — formulário de cadastro/edição, dentro de
+   Configuração > Fiscal > Natureza da Operação. Mobile first. Estrutura
+   copiada deliberadamente de page-nova-categoria-financeira.css (mesmo
+   "card com subseções em grid" já aprovado no sistema), com um bloco
+   adicional pro Accordion de Configuração Tributária (`Accordion.module.css`,
+   primeiro uso real do componente neste protótipo).
+   ══════════════════════════════════════════════════════════ */
+
+.nnop-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.nnop-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nnop-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nnop-back:hover { color: var(--color-text-primary); }
+
+.nnop-title { color: var(--color-text-primary); margin: 0; }
+
+#nnop-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.nnop-section-title {
+  margin: 0 0 var(--spacing-2xs);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+.nnop-section-hint {
+  margin: 0 0 var(--spacing-md);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Padrões pré-configurados (atalhos de criação rápida) ─────────────────
+   Cards clicáveis, não `.chip` (que já é reservado pra filtro de categoria
+   no Canal de Ideias) nem `.btn` (a ação aqui é "aplicar um preset", não
+   "confirmar uma ação" — pedia um afordance visual mais leve, parecido com
+   os cards de seleção visual já usados em Nova Anotação/Caderno de Campo). */
+.nnop-presets-card {
+  padding: var(--spacing-lg);
+}
+
+.nnop-presets-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.nnop-preset-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.nnop-preset-btn:hover {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+}
+.nnop-preset-btn:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.nnop-preset-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+/* Estado selecionado — permanece marcado após o clique (não é só um efeito
+   de hover/active momentâneo), com um ícone de check à direita pra deixar
+   claro qual preset está aplicado agora. */
+.nnop-preset-btn.selected {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+  color: var(--color-action-primary);
+}
+.nnop-preset-check {
+  display: none;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--color-action-primary);
+}
+.nnop-preset-btn.selected .nnop-preset-check {
+  display: inline-flex;
+}
+
+/* ── Card "Dados gerais" (1 único `.card` do Table, mesmo padrão de Nova
+   Categoria/Novo Produto) ─────────────────────────────────────────────── */
+.nnop-card {
+  padding: var(--spacing-lg);
+}
+
+.nnop-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .nnop-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .nnop-span-2 {
+    grid-column: span 2;
+  }
+}
+
+.nnop-dropdown { position: relative; }
+
+.nnop-textarea {
+  resize: vertical;
+  min-height: 64px;
+  line-height: var(--line-height-normal);
+}
+
+/* Marcador "(opcional)" — mesmo padrão visual já usado em Novo Cadastro/
+   Step 2 do fluxo de Criar Conta (`.cadastro-optional-tag`), cópia
+   deliberada (esta tela não carrega os arquivos de origem). */
+.nnop-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* ⚠️ Colisão de classes .input/.option com RadioButton.module.css (mesmo
+   padrão já documentado dezenas de vezes em CLAUDE.md/rules.md) — Finalizada/
+   Padrão/Consumidor Final/ICMS DIFAL/Descontar ISS usam RadioButton (Sim/
+   Não), e como os `.module.css` do Storybook são carregados aqui como
+   stylesheets globais, as regras genéricas de RadioButton vazariam pros
+   campos de texto/textarea reais e pros itens `.option` dos Dropdowns.
+   Mesmo fix padrão, aplicado preventivamente — inclui `width` porque o fix
+   original só cobria `position`/`opacity`: RadioButton.module.css também
+   declara `width:1px;height:1px` pro seu `.input` (escondido visualmente),
+   e como não existe nenhuma tag `<textarea>` no restante do sistema que já
+   tivesse essa colisão documentada, ninguém tinha notado que ela também
+   encolhe qualquer `<textarea class="input">` pra 1px de largura — só não
+   quebrava a ALTURA porque `.nnop-textarea` já define `min-height`, que
+   vence sobre um `height` menor. */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+  width: 100%;
+}
+.nnop-grid input.input:not([type="radio"]),
+.nnop-tax-grid input.input:not([type="radio"]) {
+  width: 100%;
+  height: 44px;
+}
+.menu .option {
+  display: block;
+}
+
+/* Mensagem de erro: mesmo padrão de Nova Categoria/Novo Produto —
+   `.errorText` só aparece quando `.wrapper` ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+#finalizada-field .group,
+#padrao-field .group,
+#consumidor-final-field .group,
+#sn-difal-field .group,
+#issqn-desconto-field .group {
+  gap: var(--spacing-lg);
+}
+
+/* ── Configuração tributária (abas, um único card) ───────────────────────
+   Trocou de Accordion pra Tab: mesmo padrão de `.list`/`.tab`/`.panel` já
+   usado nas abas Entrada/Saída da listagem, só que aqui dentro de um único
+   `.card` (não a página inteira) — trocar de aba só troca o `.nnop-tax-panel`
+   visível, sem sair do card. */
+.nnop-tax-card {
+  padding: var(--spacing-lg);
+}
+
+.nnop-tax-tabs {
+  margin-bottom: 0;
+}
+
+.nnop-tax-panel[hidden] {
+  display: none;
+}
+.nnop-tax-panel {
+  padding-top: var(--spacing-md);
+}
+
+.nnop-tax-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .nnop-tax-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.nnop-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .nnop-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .nnop-actions .btn { min-width: 220px; }
+}

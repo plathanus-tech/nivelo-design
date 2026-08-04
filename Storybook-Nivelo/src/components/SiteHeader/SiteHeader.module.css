@@ -1,0 +1,224 @@
+/* ══════════════════════════════════════════════════════════
+   SiteHeader — Navbar da landing page Nivelo
+   Responsivo: mobile (hamburguer + drawer) e desktop (links + CTA)
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Tokens locais ────────────────────────────────────────── */
+.header {
+  --nav-height: 64px;
+  --drawer-backdrop: rgba(3, 13, 32, 0.58);
+}
+
+/* ── Barra de navegação ───────────────────────────────────── */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  background-color: transparent;
+  transition:
+    background-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.header.scrolled {
+  background-color: var(--color-bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Linha interna max-width ──────────────────────────────── */
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 var(--spacing-md);
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Logo ─────────────────────────────────────────────────── */
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logo img {
+  height: 26px;
+  width: auto;
+}
+
+.logoWhite { display: block; }
+.logoColor  { display: none; }
+
+.header.scrolled .logoWhite { display: none; }
+.header.scrolled .logoColor  { display: block; }
+
+/* ── Links desktop (ocultos no mobile) ────────────────────── */
+
+.links {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: var(--spacing-xl);
+}
+
+.links a {
+  /* Tipografia real vem da classe `.text-16-regular` (ver SiteHeader.tsx) */
+  color: var(--color-gray-white);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.links a:hover { color: var(--color-accent-400); }
+
+.header.scrolled .links a       { color: var(--color-text-secondary); }
+.header.scrolled .links a:hover { color: var(--color-text-brand); }
+
+/* ── CTA desktop (oculto no mobile) ──────────────────────── */
+
+.cta { display: none; }
+
+/* ── Hamburguer mobile ────────────────────────────────────── */
+
+.hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  color: var(--color-gray-white);
+  border-radius: var(--radius-xs);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.hamburger:hover { background-color: rgba(255, 255, 255, 0.12); }
+
+.header.scrolled .hamburger       { color: var(--color-text-primary); }
+.header.scrolled .hamburger:hover { background-color: var(--color-bg-subtle); }
+
+/* ══════════════════════════════════════════════════════════
+   DRAWER MOBILE
+   ══════════════════════════════════════════════════════ */
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.drawer.drawerOpen {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Backdrop */
+.drawerOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: var(--drawer-backdrop);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.drawer.drawerOpen .drawerOverlay { opacity: 1; }
+
+/* Painel deslizante */
+.drawerPanel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  background-color: var(--color-bg-surface);
+  padding: var(--spacing-lg) var(--spacing-md);
+  padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  transform: translateX(100%);
+  transition: transform var(--transition-normal);
+  box-shadow: var(--shadow-2xl);
+}
+
+.drawer.drawerOpen .drawerPanel { transform: translateX(0); }
+
+/* Botão fechar */
+.drawerClose {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-xs);
+  transition: background-color var(--transition-fast);
+}
+
+.drawerClose:hover { background-color: var(--color-bg-subtle); }
+
+/* Links do drawer */
+.drawerLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  flex: 1;
+}
+
+.drawerLinks a {
+  display: block;
+  /* Tipografia real vem da classe `.text-18-regular` (ver SiteHeader.tsx) */
+  color: var(--color-text-primary);
+  text-decoration: none;
+  padding: var(--spacing-sm) var(--spacing-xs);
+  border-radius: var(--radius-xs);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.drawerLinks a:hover {
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-brand);
+}
+
+/* CTA do drawer */
+.drawerCta {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ══════════════════════════════════════════════════════════
+   DESKTOP — 768px+
+   ══════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  .inner     { padding: 0 var(--spacing-xl); }
+  .links     { display: flex; }
+  .cta       { display: inline-flex; }
+  .hamburger { display: none; }
+}
+
+@media (min-width: 1280px) {
+  .inner { padding: 0 var(--spacing-2xl); }
+}

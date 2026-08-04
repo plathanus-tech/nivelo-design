@@ -1,0 +1,287 @@
+/* ══════════════════════════════════════════════════════════
+   TALHÃO — DETALHE (Caderno de Campo → Fazenda X → Talhão Y). Status atual,
+   indicadores (área/cultura/safra), totais de despesas/vendas/colheitas
+   registrados no Caderno e a lista de anotações vinculadas a este talhão.
+   Estrutura de página (← Voltar, estado "não encontrado", `.card` +
+   `.cardHeader`/`.title` dos indicadores) copiada do mesmo padrão já usado
+   em fazenda-detalhe (ver page-fazenda-detalhe.css) — mesmo raciocínio,
+   mesmas classes renomeadas pra este contexto.
+   ══════════════════════════════════════════════════════════ */
+
+.talhao-detalhe-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+#talhao-detalhe-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ── Voltar + estado "não encontrado" ──────────────────────────────────── */
+
+.talhao-detalhe-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.talhao-detalhe-back:hover { color: var(--color-text-primary); }
+
+.talhao-detalhe-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.talhao-detalhe-not-found:not([hidden]) { display: flex; }
+.talhao-detalhe-not-found p { margin: 0; }
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.talhao-detalhe-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .talhao-detalhe-title-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.talhao-detalhe-title-block { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+
+.talhao-detalhe-title-line {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+.talhao-detalhe-title { color: var(--color-text-primary); margin: 0; }
+
+.talhao-detalhe-fazenda {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-tertiary);
+}
+.talhao-detalhe-fazenda svg { flex-shrink: 0; }
+
+.talhao-detalhe-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+@media (min-width: 480px) {
+  .talhao-detalhe-actions { flex-direction: row; }
+}
+.talhao-detalhe-actions .btn { justify-content: center; }
+
+/* ── Indicadores (área/cultura/safra + registros do Caderno) ──────────────
+   Cópia deliberada de `.fazenda-resumo-card` (page-fazenda-detalhe.css). */
+.talhao-resumo-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 560px) {
+  .talhao-resumo-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .talhao-resumo-row { gap: var(--spacing-lg); }
+}
+
+.card.talhao-resumo-card {
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.talhao-resumo-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md); }
+
+.talhao-resumo-card .title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.talhao-resumo-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.talhao-resumo-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+.talhao-resumo-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+.talhao-resumo-value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+/* Registros do Caderno: valores um pouco menores (R$/contagens tendem a ser
+   textos mais longos que os indicadores de cima) — evita quebra estranha em
+   telas médias. */
+.talhao-resumo-row-caderno .talhao-resumo-value {
+  font-size: var(--font-size-xl);
+}
+
+/* ── Seção Anotações ───────────────────────────────────────────────────── */
+
+.anotacoes-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.anotacoes-section-title-block { display: flex; flex-direction: column; gap: 2px; }
+.anotacoes-section-title { color: var(--color-text-primary); margin: 0; }
+.anotacoes-section-description { color: var(--color-text-tertiary); margin: 0; max-width: 480px; }
+
+.anotacoes-list { display: flex; flex-direction: column; }
+
+.anotacao-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.anotacoes-list .anotacao-row:first-child { border-top: none; }
+
+.anotacao-row-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-action-primary);
+  flex-shrink: 0;
+}
+.anotacao-row-icon[data-tipo="venda"] { color: var(--color-status-success-fg); }
+.anotacao-row-icon[data-tipo="despesa"] { color: var(--color-status-error-fg); }
+
+.anotacao-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+/* Linha 1: Tipo (esquerda) + valor/quantidade (direita) — ver comentário em
+   talhao-detalhe.js sobre a inversão com a observação. */
+.anotacao-row-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.anotacao-row-tipo { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.anotacao-row-value { flex-shrink: 0; color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+
+.anotacao-row-observacao { color: var(--color-text-secondary); }
+.anotacao-row-meta { color: var(--color-text-tertiary); }
+
+/* ── Estado vazio de Anotações (mirror de `.talhoes-empty`) ──────────────── */
+.anotacoes-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.anotacoes-empty:not([hidden]) { display: flex; }
+
+.anotacoes-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+
+.anotacoes-empty-title { color: var(--color-text-primary); margin: 0; }
+.anotacoes-empty-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 360px; }
+
+/* ── Modal: Alterar status do talhão ─────────────────────────────────────
+   Dialog.module.css's `.overlay` tem `display:flex` sem guard (o componente
+   React resolve com `if (!open) return null`, nunca precisa de `hidden`) —
+   mesmo bug já documentado em page-novo-estoque.css/page-cadastros.css: sem
+   isso, o modal abriria sozinho ao carregar a página. */
+.overlay[hidden] { display: none; }
+
+/* `.wrapper` do Dropdown precisa de `position:relative` (mesmo motivo de
+   `.novo-estoque-dropdown`/`.nova-anotacao-dropdown`) — o `.menu` calcula
+   `position:fixed` via JS, mas o `.wrapper` continua como referência
+   visual do campo dentro do `.body` do Dialog. */
+#status-field { position: relative; }
+
+/* ── Toast de sucesso ─────────────────────────────────────────────────────
+   Cópia exata do padrão de `.fazendas-toast-region`. */
+.talhao-detalhe-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.talhao-detalhe-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.talhao-detalhe-toast {
+  box-shadow: var(--shadow-lg);
+  animation: talhao-detalhe-toast-in 0.25s ease;
+}
+.talhao-detalhe-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.talhao-detalhe-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0;
+}
+
+@keyframes talhao-detalhe-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

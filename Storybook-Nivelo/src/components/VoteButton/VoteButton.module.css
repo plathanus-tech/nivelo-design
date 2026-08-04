@@ -1,0 +1,50 @@
+.voteButton {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    color var(--transition-fast), transform var(--transition-fast);
+}
+.voteButton:hover {
+  border-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+}
+.voteButton:active { transform: scale(0.94); }
+.voteButton:focus-visible { outline: var(--border-width-medium) solid var(--color-border-focus); outline-offset: 2px; }
+
+/* Seletores de 2 classes (`.voteButton.sm`, não `.sm` sozinho) — mesmo
+   motivo do Avatar (ver Avatar.module.css): `Button.module.css`, carregado
+   em quase toda tela, já declara `.sm`/`.lg` soltos. `.icon`/`.count` também
+   escopados por descendência (`.voteButton .icon`), já que `Feedback.
+   module.css` declara um `.icon` bem diferente (ícone de toast) e as duas
+   telas que usam voto (feed + detalhe) também mostram toast de comentário. */
+.voteButton.sm { width: 44px; height: 44px; padding: var(--spacing-xs) 0; }
+.voteButton.md { width: 56px; height: 60px; padding: var(--spacing-sm) 0; }
+
+.voteButton .icon { flex-shrink: 0; }
+
+.voteButton.sm .count { font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); line-height: 1; margin-top: 2px; }
+.voteButton.md .count { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); line-height: 1; margin-top: var(--spacing-2xs); }
+
+/* ── Estado votado — preenchimento de marca sutil (Brand 50 + borda/texto
+   Brand 500), nunca `--color-action-primary` sólido: precisa "chamar
+   atenção sem roubar o foco do conteúdo" (pedido explícito), um botão azul
+   cheio ao lado de cada card competiria demais com título/resumo. ─────── */
+.voted {
+  background: var(--color-bg-brand);
+  border-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+}
+.voted:hover {
+  background: var(--color-brand-100);
+  color: var(--color-action-primary-hover);
+  border-color: var(--color-action-primary-hover);
+}

@@ -1,0 +1,156 @@
+/* ── Base ─────────────────────────────────────────── */
+/* Tipografia (font-family/size/weight/line-height/letter-spacing) idêntica
+   à classe `.text-button-m` de `typography.css` (também aplicada em
+   Button.tsx) — mantida aqui em vez de removida porque este .module.css é
+   carregado como stylesheet global em várias telas estáticas do protótipo
+   (`app/screens/*.html`), que usam `class="btn primary"` etc. direto no
+   HTML sem passar pelo componente React. Ver rules.md, "componentes de
+   consumo duplo". */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;                          /* Figma: gap sem ícone = 10px */
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);   /* 16px */
+  font-weight: var(--font-weight-medium); /* Medium 500 — Figma: Roboto Medium */
+  line-height: 1.5;                   /* 24px / 16px */
+  letter-spacing: 0.5px;
+  padding: 9px 24px;                  /* md = 44px de altura (9*2 + line-height 24 + borda 2) */
+  border-radius: var(--radius-button); /* 12px */
+  border: var(--border-width-thin) solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+/* Quando há ícone, gap e padding do lado do ícone reduzem */
+.btn.hasLeft  { gap: 8px; padding-left: 16px; }   /* Figma: pl=16 com ícone */
+.btn.hasRight { gap: 8px; padding-right: 16px; }  /* Figma: pr=16 com ícone */
+
+.btn:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* ── Icon wrapper ─────────────────────────────────── */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── Variants ─────────────────────────────────────── */
+.primary {
+  background-color: var(--color-action-primary);
+  color: var(--color-gray-white);
+  border-color: var(--color-action-primary);
+}
+.primary:hover:not(:disabled) {
+  background-color: var(--color-action-primary-hover);
+  border-color: var(--color-action-primary-hover);
+}
+.primary:active:not(:disabled) {
+  background-color: var(--color-action-primary-pressed);
+  border-color: var(--color-action-primary-pressed);
+}
+
+.secondary {
+  background-color: transparent;
+  color: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+}
+.secondary:hover:not(:disabled) {
+  background-color: var(--color-bg-brand);
+  border-color: var(--color-action-primary-hover);
+  color: var(--color-action-primary-hover);
+}
+.secondary:active:not(:disabled) {
+  background-color: var(--color-brand-100);
+  border-color: var(--color-action-primary-pressed);
+  color: var(--color-action-primary-pressed);
+}
+
+/* Cancelar em modais de ação destrutiva (mesmo visual já usado no modal
+   "Excluir cadastro") — outline Gray 700 em vez do azul padrão de
+   `.secondary`, pra não competir com o botão `.destructive` ao lado. Padrão
+   pra qualquer modal novo do projeto que confirme uma ação destrutiva. */
+.secondaryGray {
+  background-color: transparent;
+  color: var(--color-gray-700);
+  border-color: var(--color-gray-700);
+}
+.secondaryGray:hover:not(:disabled) {
+  background-color: var(--color-gray-100);
+  border-color: var(--color-gray-700);
+  color: var(--color-gray-700);
+}
+.secondaryGray:active:not(:disabled) {
+  background-color: var(--color-gray-200);
+}
+
+.destructive {
+  background-color: var(--color-action-error);
+  color: var(--color-gray-white);
+  border-color: var(--color-action-error);
+}
+.destructive:hover:not(:disabled) {
+  background-color: var(--color-action-error-hover);
+  border-color: var(--color-action-error-hover);
+}
+.destructive:active:not(:disabled) {
+  background-color: var(--color-action-error-pressed);
+  border-color: var(--color-action-error-pressed);
+}
+
+.ghost {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border-color: transparent;
+}
+.ghost:hover:not(:disabled) { background-color: var(--color-bg-subtle); }
+.ghost:active:not(:disabled) { background-color: var(--color-bg-disabled); }
+
+/* ── Disabled base ────────────────────────────────── */
+.btn:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* ── Sizes ────────────────────────────────────────── */
+/* .sm ≈ `.text-button-s`, .lg ≈ `.text-button-l` (mesmo motivo do .btn acima
+   — consumo duplo, valores mantidos aqui). */
+.sm {
+  font-size: var(--font-size-md);   /* 14px */
+  line-height: 1.71;
+  padding: 5px 16px;                  /* sm = 36px de altura (5*2 + line-height ~24 + borda 2) */
+  border-radius: var(--radius-button);
+}
+.sm.hasLeft  { padding-left: 12px; }
+.sm.hasRight { padding-right: 12px; }
+
+/* .md usa os valores base do .btn */
+
+.lg {
+  font-size: var(--font-size-xl);   /* 20px */
+  line-height: 1.2;
+  padding: 14px 32px;
+}
+.lg.hasLeft  { padding-left: 24px; }
+.lg.hasRight { padding-right: 24px; }
+
+/* ── Icon Only ────────────────────────────────────── */
+.iconOnly         { padding: 12px; gap: 0; }
+.iconOnly.sm      { padding: 8px; }
+.iconOnly.lg      { padding: 14px; }
+.iconOnly.hasLeft,
+.iconOnly.hasRight { padding-left: 12px; padding-right: 12px; }
+.iconOnly.sm.hasLeft,
+.iconOnly.sm.hasRight { padding-left: 8px; padding-right: 8px; }

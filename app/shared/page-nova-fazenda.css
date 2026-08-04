@@ -1,0 +1,347 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA FAZENDA — wizard de 3 etapas (Dados da fazenda → Localização e
+   áreas → Talhões), acessado por "+ Nova fazenda"/"+ Cadastrar primeira
+   fazenda" em fazendas.html. Única tela do sistema com troca de etapa sem
+   reload de página (as 3 `<section data-step-panel>` alternam via `hidden`,
+   controlado por nova-fazenda.js) — grid de campos/ações copiado do padrão
+   de page-novo-produto.css; indicador de etapas copiado de page-cadastro.css
+   (`.cadastro-steps`, auth-only, não carregado aqui).
+   ══════════════════════════════════════════════════════════ */
+
+.nova-fazenda-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.nova-fazenda-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nova-fazenda-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nova-fazenda-back:hover { color: var(--color-text-primary); }
+
+.nova-fazenda-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Indicador de etapas ───────────────────────────────────────────────────
+   Cópia exata de `.cadastro-steps`/`.cadastro-step`/`.cadastro-step-circle`/
+   `.cadastro-step-label`/`.cadastro-step-connector` (page-cadastro.css,
+   fluxo Criar conta) — mesmo padrão visual pedido explicitamente pelo
+   usuário ("usando também o mesmo step de cadastro de conta"). Copiado em
+   vez de compartilhar o arquivo porque page-cadastro.css é auth-only
+   (assume o layout `.login-shell`, que esta tela não usa). */
+.cadastro-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* Guard obrigatório (mesmo bug recorrente já documentado em app/rules.md):
+   sem isso, o stepper continua visível em modo edição mesmo com `hidden`
+   setado via JS, porque o `display:flex` acima não tem especificidade
+   menor que `[hidden]`. */
+.cadastro-steps[hidden] { display: none; }
+.cadastro-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 96px;
+}
+/* Mesmo padrão de `hidden`+`display` incondicional já documentado várias
+   vezes neste projeto (ver app/rules.md) — em modo "Editar fazenda" (Etapa 3
+   escondida), sem este guard a Etapa "Talhões" continuaria visível mesmo
+   com o atributo `hidden` no HTML, porque `display:flex` acima (regra de
+   autor) vence `[hidden]{display:none}` (regra do navegador) em
+   especificidade igual. */
+.cadastro-step[hidden] { display: none; }
+.cadastro-step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-subtle);
+  border: var(--border-width-medium) solid var(--color-border-muted);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+.cadastro-step-label {
+  color: var(--color-text-tertiary);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.cadastro-step-connector {
+  flex: 1 1 32px;
+  height: var(--border-width-medium);
+  background: var(--color-border-muted);
+  margin: 14px var(--spacing-xs) 0;
+}
+.cadastro-step.is-current .cadastro-step-circle {
+  border-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+  background: var(--color-bg-surface);
+}
+.cadastro-step.is-current .cadastro-step-label { color: var(--color-text-primary); }
+.cadastro-step.is-complete .cadastro-step-circle {
+  border-color: var(--color-action-primary);
+  background: var(--color-action-primary);
+  color: var(--color-gray-white);
+}
+.cadastro-step.is-complete .cadastro-step-label { color: var(--color-text-secondary); }
+.cadastro-step.is-complete + .cadastro-step-connector { background: var(--color-action-primary); }
+
+/* ── Etapas (form) ─────────────────────────────────────────────────────── */
+
+#nova-fazenda-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.nova-fazenda-step {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+/* Guard obrigatório (bug recorrente já documentado em app/rules.md):
+   `.card` do Table.module.css não define display incondicional, mas como
+   esta classe soma `display:flex` aqui em cima, o guard evita qualquer
+   regressão futura se outra regra vier a definir display sem guard. */
+.nova-fazenda-step[hidden] { display: none; }
+
+/* ── Modo edição: formulário único, sem stepper (pedido explícito do
+   usuário) ─────────────────────────────────────────────────────────────
+   As 2 seções (Etapa 1/Etapa 2) continuam sendo 2 `<section class="card">`
+   no HTML, mas em modo edição ficam visíveis ao mesmo tempo e a borda entre
+   elas é removida (raio de canto zerado no encontro), lendo como um único
+   card contínuo — mesmo efeito visual de "um card com subseções" já usado
+   em `novo-produto.html`/`novo-cadastro.html`, sem precisar reestruturar o
+   HTML em um card só. */
+.nova-fazenda-step-merge-top {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.nova-fazenda-step-merge-bottom {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  padding-top: var(--spacing-lg);
+}
+.nova-fazenda-step-merge-bottom .nova-fazenda-step-intro {
+  padding-top: var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.nova-fazenda-step-intro { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.nova-fazenda-step-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+.nova-fazenda-step-description { color: var(--color-text-tertiary); margin: 0; }
+
+.nova-fazenda-subsection {
+  padding-top: var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.nova-fazenda-subsection-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* ── Grid de campos (mesmo padrão de .novo-produto-grid) ──────────────── */
+
+.nova-fazenda-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .nova-fazenda-grid { grid-template-columns: 1fr 1fr; }
+  .nova-fazenda-span-2 { grid-column: span 2; }
+}
+
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+.errorText[hidden] { display: none; }
+
+/* Colisão de `.error` (Feedback.module.css × qualquer elemento com essa
+   classe) já documentada em outras telas (`.cadastro-terms-field.error` em
+   page-cadastro.css) — `Feedback.module.css`'s `.error` é uma classe crua
+   (`background:var(--color-status-error-bg); border-color:...`), não
+   escopada a `.alert.error`, carregada globalmente aqui pro toast de
+   sucesso. Sem este reset, `.wrapper.error` herdava o fundo vermelho claro
+   cobrindo o campo inteiro por engano. Padrão oficial de erro de input
+   nesta tela (e a manter nos próximos ajustes): só a borda do `.input`
+   fica vermelha (regra acima), nunca um fundo preenchendo o `.wrapper`. */
+.wrapper.error { background: transparent; border-color: transparent; }
+
+.nova-fazenda-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* Campos lado a lado (Número+Complemento, Cidade+Estado) — mesmo padrão de
+   `.cadastro-field-row` (page-cadastro.css, fluxo Criar conta): empilhados
+   no mobile, uma linha só a partir do breakpoint de tablet. Copiado em vez
+   de compartilhado pelo mesmo motivo do stepper (page-cadastro.css é
+   auth-only). */
+.nova-fazenda-field-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .nova-fazenda-field-row { flex-direction: row; }
+  .nova-fazenda-field-row > .wrapper { flex: 1; }
+}
+
+/* ── Ações do formulário (mesmo padrão de .novo-produto-actions) ───────── */
+
+.nova-fazenda-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+/* Guard obrigatório (bug recorrente já documentado em app/rules.md): sem
+   isso, o atributo `hidden` (usado em modo edição pra esconder a ação da
+   Etapa 1) é derrotado pelo `display:flex` incondicional acima. */
+.nova-fazenda-actions[hidden] { display: none; }
+@media (min-width: 768px) {
+  .nova-fazenda-actions { flex-direction: row; justify-content: flex-end; }
+  .nova-fazenda-actions .btn { min-width: 160px; }
+}
+
+/* ── Etapa 3: lista de talhões ─────────────────────────────────────────── */
+
+.nova-fazenda-talhoes-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .nova-fazenda-talhoes-header { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+.nova-fazenda-talhoes-label { color: var(--color-text-primary); }
+#nova-fazenda-add-talhao-btn { flex-shrink: 0; }
+
+.nova-fazenda-talhoes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.nova-fazenda-talhao-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+}
+.nova-fazenda-talhao-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.nova-fazenda-talhao-name { color: var(--color-text-primary); }
+.nova-fazenda-talhao-meta { color: var(--color-text-tertiary); display: flex; align-items: center; gap: var(--spacing-xs); }
+.nova-fazenda-talhao-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+/* Mensagem de vazio: sempre presente no DOM, alternada via `hidden` conforme
+   a lista tem ou não itens (mesma técnica de `.talhoes-cadastro-empty`). */
+.nova-fazenda-talhoes-empty {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  border: var(--border-width-thin) dashed var(--color-border-muted);
+  border-radius: var(--radius-sm);
+}
+.nova-fazenda-talhoes-empty[hidden] { display: none; }
+.nova-fazenda-talhoes-empty-title { color: var(--color-text-primary); margin: 0 0 var(--spacing-xs); }
+.nova-fazenda-talhoes-empty-subtitle { color: var(--color-text-tertiary); margin: 0; }
+
+/* ── Dialogs (Adicionar/Editar talhão + confirmação de remoção) ─────────── */
+
+/* Mesmo bug de hidden+display incondicional já documentado várias vezes
+   neste projeto (page-cadastros.css/page-estoque.css/
+   page-fazenda-detalhe-cadastro.css). */
+.overlay[hidden] { display: none; }
+
+#talhao-dialog-overlay .body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* ── Toast de sucesso (mesmo padrão de .fazenda-cadastro-toast-region) ──── */
+
+.nova-fazenda-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.nova-fazenda-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.nova-fazenda-toast {
+  box-shadow: var(--shadow-lg);
+  animation: nova-fazenda-toast-in 0.25s ease;
+}
+.nova-fazenda-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.nova-fazenda-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+
+@keyframes nova-fazenda-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

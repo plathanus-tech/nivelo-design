@@ -1,0 +1,634 @@
+/* ══════════════════════════════════════════════════════════
+   SHELL PRINCIPAL — Header + Sidebar (padrão global de navegação)
+   Área logada do produto, DIFERENTE do fluxo de autenticação (que usa
+   `page-login.css`, cartão flutuante sobre imagem institucional). Aqui é
+   o app shell clássico: header fixo no topo + sidebar fixa/retrátil +
+   conteúdo principal. **Light mode apenas** (Dark Mode foi removido por
+   pedido explícito do usuário — todo o sistema é light-only, ver
+   `app/CLAUDE.md`). Ainda assim construído só com tokens (cor/espaçamento/
+   radius/shadow), nunca cores soltas.
+   ══════════════════════════════════════════════════════════ */
+
+/* `--shell-header-height` precisa estar em `:root` (não só em `.app-shell`):
+   é consumida também por `.dashboard-toast-region` (page-dashboard.css), que
+   é IRMÃ de `.app-shell` no HTML, não descendente — uma custom property só
+   é visível dentro do elemento onde foi declarada + seus descendentes.
+   Bug real (2026-07-24): estava só em `.app-shell`, então `var(--shell-
+   header-height)` resolvia pra vazio em `.dashboard-toast-region`, invalidando
+   o `calc()` do `top` inteiro (caía pra `auto` → `0px` em `position:fixed`) —
+   o toast de sucesso nunca de fato saía de trás do Header, mesmo com o CSS
+   parecendo correto na leitura. `--shell-sidebar-width`/`--shell-nav-text-
+   indent` continuam em `.app-shell` porque só são usadas por descendentes
+   dela (Header/Sidebar), sem esse problema. */
+:root {
+  --shell-header-height: 64px;
+}
+
+.app-shell {
+  --shell-sidebar-width: 260px;
+  --shell-sidebar-width-collapsed: 76px;
+  /* Distância entre a borda esquerda da Sidebar e o início do TEXTO dos
+     itens de navegação: padding do corpo (--spacing-sm) + borda do
+     indicador ativo (3px) + padding do item (--spacing-sm) + ícone (20px)
+     + gap até o rótulo (--spacing-sm). Usado abaixo pra alinhar o logo do
+     Header nessa mesma linha vertical no desktop. */
+  --shell-nav-text-indent: calc(var(--spacing-sm) + 3px + var(--spacing-sm) + 20px + var(--spacing-sm));
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg-default);
+}
+
+/* ══════════════════════════════════════════════════════════
+   HEADER
+   ══════════════════════════════════════════════════════════ */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: var(--shell-header-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: 0 var(--spacing-md);
+  background: var(--color-bg-surface);
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+@media (min-width: 768px) {
+  .app-header { padding: 0 var(--spacing-xl); }
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+/* Hamburger: só existe no mobile (a sidebar vira um drawer acionado por
+   ele); a partir do breakpoint de desktop a sidebar já fica sempre
+   visível, então o botão some. */
+.app-header-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+.app-header-hamburger:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.app-header-hamburger:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+@media (min-width: 1024px) {
+  .app-header-hamburger { display: none; }
+}
+
+.app-header-brand {
+  display: flex;
+  flex-direction: column;
+  /* flex-start (não o "stretch" implícito do default): cada filho
+     (logo, tagline) fica do tamanho do próprio conteúdo e os dois
+     começam exatamente na mesma borda esquerda do bloco — não é a mesma
+     coisa que "esticar os dois pra mesma largura", que só por coincidência
+     produzia o mesmo resultado aqui (o texto da tagline tem uma largura
+     natural muito parecida com a da logo). */
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+/* A partir do breakpoint em que a Sidebar fica sempre visível (hamburger
+   some, logo é o elemento mais à esquerda do Header), alinha o início do
+   logo com o início do TEXTO dos itens de navegação logo abaixo dele —
+   sem isso, o logo fica ~15px à esquerda desse ponto (só acompanhando o
+   padding do Header, que não tem relação com o indent da Sidebar). */
+@media (min-width: 1024px) {
+  .app-header-left {
+    margin-left: calc(var(--shell-nav-text-indent) - var(--spacing-xl));
+  }
+}
+
+.app-header-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+  text-align: left;
+}
+
+.app-header-tagline {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+/* Botão "Caderno de campo": reaproveita o Button do Storybook (`.btn
+   secondary`), só o rótulo encolhe no mobile pra caber ao lado do resto. */
+.app-header-notebook-label {
+  white-space: nowrap;
+}
+@media (max-width: 479px) {
+  .app-header-notebook-label { display: none; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   CORPO (Sidebar + conteúdo principal)
+   ══════════════════════════════════════════════════════════ */
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────
+   Mobile first: por padrão é um drawer fixo, fora da tela (some atrás do
+   header, `transform:translateX(-100%)`), acionado pelo hamburger. A
+   partir do breakpoint de desktop vira parte fixa do layout (sticky,
+   sempre visível), com o toggle de retrair/expandir liberado. */
+.app-sidebar {
+  position: fixed;
+  top: var(--shell-header-height);
+  left: 0;
+  z-index: 40;
+  width: var(--shell-sidebar-width);
+  height: calc(100vh - var(--shell-header-height));
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-surface);
+  border-right: var(--border-width-thin) solid var(--color-border-subtle);
+  box-shadow: var(--shadow-xl);
+  transform: translateX(-100%);
+  transition: transform 250ms ease, width 250ms ease;
+}
+
+.app-sidebar.is-mobile-open { transform: translateX(0); }
+
+@media (min-width: 1024px) {
+  .app-sidebar {
+    position: sticky;
+    transform: none;
+    box-shadow: none;
+    flex-shrink: 0;
+  }
+  .app-sidebar.is-collapsed { width: var(--shell-sidebar-width-collapsed); }
+}
+
+/* Fundo escurecido atrás do drawer no mobile — clicar nele fecha o menu. */
+.app-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: var(--shell-header-height);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 35;
+  background: rgba(0, 0, 0, 0.45);
+}
+.app-sidebar-backdrop.is-visible { display: block; }
+@media (min-width: 1024px) {
+  .app-sidebar-backdrop { display: none !important; }
+}
+
+/* Botão de retrair/expandir: só existe no desktop (no mobile a sidebar é
+   um drawer que só abre/fecha, não colapsa pra ícones). Mesma ideia do
+   toggle já usado no prototype-nav (círculo flutuando na borda), com as
+   cores do Design System em vez das cores neutras da ferramenta de dev. */
+.app-sidebar-toggle {
+  display: none;
+  position: absolute;
+  top: var(--spacing-lg);
+  right: -14px;
+  z-index: 5;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.app-sidebar-toggle:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.app-sidebar-toggle:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.app-sidebar-toggle-icon { transition: transform 200ms ease; }
+.app-sidebar.is-collapsed .app-sidebar-toggle-icon { transform: rotate(180deg); }
+
+@media (min-width: 1024px) {
+  .app-sidebar-toggle { display: flex; }
+}
+
+.app-sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--spacing-md) var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  /* Scrollbar fino e discreto — só aparece quando o conteúdo realmente
+     precisa rolar, sem a aparência pesada do scrollbar padrão do navegador. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-muted) transparent;
+}
+.app-sidebar-body::-webkit-scrollbar { width: 6px; }
+.app-sidebar-body::-webkit-scrollbar-track { background: transparent; }
+.app-sidebar-body::-webkit-scrollbar-thumb {
+  background: var(--color-border-muted);
+  border-radius: var(--radius-full);
+}
+.app-sidebar-body::-webkit-scrollbar-thumb:hover { background: var(--color-border-default); }
+
+/* ── Agrupamento visual (Geral / Gestão / Suporte) ──────────
+   Só organiza visualmente — não é um componente interativo. Título
+   discreto (pequeno, maiúsculo, cor terciária); some no modo retraído. */
+.app-nav-section + .app-nav-section {
+  margin-top: var(--spacing-sm);
+}
+.app-nav-section-title {
+  display: block;
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+.app-sidebar.is-collapsed .app-nav-section-title { display: none; }
+
+/* ── Itens de navegação ───────────────────────────────────── */
+.app-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--spacing-sm);
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.app-nav-item:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.app-nav-item:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+.app-nav-item.is-active {
+  background: var(--color-bg-brand);
+  border-left-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.app-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.app-nav-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-nav-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+  transition: transform 200ms ease;
+}
+/* Ícone é sempre "chevron-down"; girar 180° dá o efeito de "chevron-up"
+   quando aberto, com transição suave (troca de ícone não anima). */
+.app-nav-group.is-open > .app-nav-item .app-nav-chevron,
+.app-nav-subgroup.is-open > .app-nav-subitem .app-nav-chevron {
+  transform: rotate(180deg);
+}
+
+/* Indicador discreto de "este item tem submenu" no modo retraído — um
+   pontinho no canto do botão, não um badge, some junto com o texto no
+   modo expandido (o chevron já comunica isso lá). */
+.app-sidebar.is-collapsed .app-nav-group > .app-nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  right: 18px;
+  width: 4px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-tertiary);
+}
+
+/* Ícone do WhatsApp (item Suporte): SVG inline com `fill="currentColor"`
+   (não `mask-image`) — mesma técnica que o próprio Lucide usa nos ícones
+   depois de `lucide.createIcons()` (ele também vira um `<svg>` inline com
+   cor herdada). Tentamos `mask-image` numa rodada anterior e o suporte de
+   `mask` variou entre navegadores/contextos, deixando o ícone sem cor
+   visível em alguns casos — SVG inline elimina esse risco por completo,
+   é o único jeito 100% confiável de herdar `currentColor`. Ver
+   `app/CLAUDE.md` pela exceção documentada à regra "sem SVG inline". */
+
+/* ── Submenus (Financeiro, Vendas, Assistente IA, Configuração) ─────
+   Accordion: abrir um grupo fecha os demais (ver interface-principal.js) —
+   só um pode ficar `is-open` por vez. Uma linha vertical bem discreta liga
+   os subitens ao item pai. */
+.app-nav-submenu {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 32px;
+  margin: 2px 0 4px;
+}
+.app-nav-submenu::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 6px;
+  width: 1px;
+  background: var(--color-border-muted);
+}
+.app-nav-group.is-open > .app-nav-submenu { display: flex; }
+
+/* ── Popover (Sidebar retraída no desktop) ─────────────────
+   Ao clicar (nunca hover) num grupo com a Sidebar retraída, o MESMO
+   elemento `.app-nav-submenu` (reaproveitado, sem duplicar HTML) vira um
+   card flutuante ao lado do ícone clicado, posicionado via JS
+   (`top`/`left` inline, calculados do rect do botão) — `position:fixed`
+   escapa do `overflow-x:hidden` da Sidebar, o que `position:absolute`
+   não conseguiria. Precisa desfazer, só aqui dentro, o que o modo
+   retraído normalmente esconde (rótulo/chevron) e centraliza (subitens). */
+.app-sidebar.is-collapsed .app-nav-group.is-popover-open > .app-nav-submenu {
+  position: fixed;
+  display: flex;
+  margin: 0;
+  padding: 6px;
+  min-width: 220px;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 60;
+}
+.app-sidebar.is-collapsed .app-nav-group.is-popover-open > .app-nav-submenu::before {
+  display: none;
+}
+/* IMPORTANTE: os overrides abaixo são escopados a "dentro do card do
+   Popover" (`> .app-nav-submenu` primeiro, DEPOIS descendente) — nunca um
+   seletor descendente direto a partir de `.is-popover-open`, porque o
+   botão que ABRIU o popover (`.app-nav-item`) é IRMÃO de `.app-nav-submenu`
+   dentro do mesmo `.app-nav-group`, logo também "descendente" dele. Um
+   seletor solto tipo `.is-popover-open .app-nav-label` re-exibiria por
+   engano o rótulo do PRÓPRIO ícone clicado (ex.: a palavra "Financeiro"
+   aparecendo espremida do lado do ícone, na trilha de 76px) — não é isso
+   que o Popover deve fazer; o botão clicado tem que continuar
+   EXATAMENTE como está no resto da Sidebar retraída (só ícone). */
+.app-sidebar.is-collapsed .app-nav-group.is-popover-open > .app-nav-submenu .app-nav-label {
+  display: block;
+}
+.app-sidebar.is-collapsed .app-nav-group.is-popover-open > .app-nav-submenu .app-nav-chevron {
+  display: inline-flex;
+  align-items: center;
+}
+.app-sidebar.is-collapsed .app-nav-group.is-popover-open > .app-nav-submenu .app-nav-subitem {
+  justify-content: flex-start;
+  padding: 0 var(--spacing-sm);
+}
+
+/* ── Tooltip (Sidebar retraída + botão de tema) ────────────
+   Um único elemento reaproveitado (`#app-tooltip`, fora da Sidebar no
+   HTML), posicionado via JS com `position:fixed` a partir do
+   `getBoundingClientRect()` do item sob o mouse/foco — NÃO é mais um
+   `::after` em CSS puro. Motivo: um `::after` do jeito antigo nascia
+   dentro de `.app-sidebar-body`, que tem `overflow-x:hidden` (necessário
+   pra evitar vazamento de conteúdo durante a transição de largura da
+   Sidebar) — e por isso o próprio tooltip, que precisa aparecer À DIREITA
+   da Sidebar, era cortado por esse `overflow`. `position:fixed` escapa
+   desse corte, mesma solução já usada no Popover de subitens. */
+/* Padding/radius/cor alinhados aos MESMOS tokens do componente `Tooltip`
+   real (`Tooltip.module.css`'s `.tip`) — antes usava `6px 10px`/`radius-sm`
+   hardcoded, visualmente parecido mas não os valores de verdade do
+   componente. Continua um elemento próprio (não o `.tip` em si): o `Tooltip`
+   real é filho de um `.wrapper{position:relative}` posicionado por
+   modificador estático (`.top`/`.right`/etc.), enquanto este precisa de
+   `position:fixed` com coordenadas calculadas via JS (`getBoundingClientRect`)
+   pra escapar do `overflow-x:hidden` da Sidebar — arquitetura incompatível
+   com o `.wrapper`/seta do componente, então a seta não foi replicada aqui. */
+.app-tooltip {
+  position: fixed;
+  display: none;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-xs);
+  background: var(--color-gray-900);
+  color: var(--color-gray-white);
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  z-index: 70;
+  pointer-events: none;
+}
+.app-tooltip.is-visible { display: block; }
+
+.app-nav-subitem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--spacing-sm);
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.app-nav-subitem:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.app-nav-subitem:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+.app-nav-subitem.is-active {
+  background: var(--color-bg-brand);
+  border-left-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Subgrupo (Fiscal, dentro de Configuração) ─────────────
+   Mesmo padrão de expand/collapse dos grupos de topo, mais um nível de
+   recuo e uma linha de hierarquia própria — reforça que Fiscal pertence
+   a Configuração e que seus 3 itens pertencem a Fiscal. */
+.app-nav-subsubmenu {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 24px;
+  margin: 2px 0 4px;
+}
+.app-nav-subsubmenu::before {
+  content: '';
+  position: absolute;
+  left: 20px; /* alinhado ao centro do ícone de Fiscal (20x20, mesmo formato dos itens de topo) */
+  top: 0;
+  bottom: 6px;
+  width: 1px;
+  background: var(--color-border-muted);
+}
+.app-nav-subgroup.is-open > .app-nav-subsubmenu { display: flex; }
+
+.app-nav-icon-xs { width: 16px; height: 16px; }
+
+.app-nav-subsubitem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--spacing-sm);
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.app-nav-subsubitem:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.app-nav-subsubitem:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+.app-nav-subsubitem.is-active {
+  background: var(--color-bg-brand);
+  border-left-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* "Sair" separado visualmente do resto da navegação — comunica que é uma
+   ação do sistema, não mais um destino de navegação. */
+.app-nav-item-exit {
+  margin-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Sidebar retraída (só ícones) ──────────────────────────
+   Some com texto/chevron/submenu/versão; itens centralizam o ícone. */
+.app-sidebar.is-collapsed .app-nav-label,
+.app-sidebar.is-collapsed .app-nav-chevron,
+.app-sidebar.is-collapsed .app-nav-submenu,
+.app-sidebar.is-collapsed .app-sidebar-version {
+  display: none;
+}
+.app-sidebar.is-collapsed .app-nav-item,
+.app-sidebar.is-collapsed .app-nav-subitem {
+  justify-content: center;
+  padding: 0;
+}
+
+/* ── Rodapé (versão) ────────────────────────────────────────
+   Discreto de propósito: fonte pequena, cor terciária, sem competir com
+   os itens de navegação acima. */
+.app-sidebar-footer {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.app-sidebar-version {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* ══════════════════════════════════════════════════════════
+   CONTEÚDO PRINCIPAL (placeholder — Dashboard vem numa próxima etapa)
+   ══════════════════════════════════════════════════════════ */
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-lg) var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .app-main { padding: var(--spacing-2xl) var(--spacing-xl); }
+}
+
+.app-main-placeholder {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  text-align: center;
+  border: var(--border-width-thin) dashed var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+}
+.app-main-placeholder-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+.app-main-placeholder-text {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}

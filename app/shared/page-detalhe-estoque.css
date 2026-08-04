@@ -1,0 +1,201 @@
+/* ══════════════════════════════════════════════════════════
+   DETALHES DO REGISTO DE ESTOQUE — página nova (Ver detalhes, a partir da
+   listagem de Estoque). Read-only, exceto a ação contextual (Registrar
+   saída/consumo/abatimento, mesmos modais da listagem — ver estoque.js/
+   page-estoque.css, cujas classes `.overlay`/`.estoque-modal-*`/
+   `.estoque-toast*` também são carregadas aqui e reaproveitadas). Estrutura
+   de seções (`.card` + `.cardHeader`/`.title`) copiada do padrão já usado
+   nos cards de KPI do Dashboard/Estoque.
+   ══════════════════════════════════════════════════════════ */
+
+.detalhe-estoque-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* `#detalhe-content` (Informações principais / específicas / Histórico)
+   não tinha nenhum gap entre os 3 `.card.detalhe-estoque-section` — eles
+   ficavam colados um no outro, só com a margem própria (nenhuma) do
+   `.card`. Ajuste pontual: só o espaçamento entre esses cards, 16px.
+   `:not([hidden])` é obrigatório aqui: `#detalhe-content` some via atributo
+   `hidden` no estado "Registro não encontrado" (ver detalhe-estoque.js) —
+   sem o guard, `display:flex` (id, especificidade maior que `[hidden]`)
+   reaparecia o conteúdo por cima do estado de erro, mesmo bug de
+   hidden+display incondicional já documentado várias vezes neste projeto. */
+#detalhe-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.detalhe-estoque-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.detalhe-estoque-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.detalhe-estoque-back:hover { color: var(--color-text-primary); }
+
+.detalhe-estoque-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .detalhe-estoque-title-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.detalhe-estoque-title-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.detalhe-estoque-title { color: var(--color-text-primary); margin: 0; }
+
+#acao-contextual-btn { width: 100%; justify-content: center; }
+@media (min-width: 640px) {
+  #acao-contextual-btn { width: auto; }
+}
+
+/* ── Estado "não encontrado" ───────────────────────────────────────────── */
+.detalhe-estoque-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.detalhe-estoque-not-found:not([hidden]) { display: flex; }
+.detalhe-estoque-not-found p { margin: 0; }
+
+/* ── Seções (Informações principais/específicas/histórico) ──────────────
+   Mesmo `.card`/`.cardHeader`/`.title` já usado nos cards de KPI (Dashboard/
+   Estoque) — aqui só com um corpo de campos read-only em vez de um valor
+   único em destaque. */
+.detalhe-estoque-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.detalhe-estoque-section .cardHeader { padding: 0; }
+
+.detalhe-estoque-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .detalhe-estoque-fields { grid-template-columns: repeat(3, 1fr); }
+}
+
+.detalhe-estoque-fields dt {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+.detalhe-estoque-fields dd {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+
+/* ── Histórico de movimentações: timeline vertical (não é tabela — os
+   exemplos do pedido usam setas conectando entradas empilhadas) ────────── */
+.detalhe-estoque-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.detalhe-estoque-timeline-item {
+  position: relative;
+  display: flex;
+  gap: var(--spacing-md);
+  padding-bottom: var(--spacing-lg);
+}
+.detalhe-estoque-timeline-item:last-child { padding-bottom: 0; }
+
+.detalhe-estoque-timeline-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-action-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+/* Linha conectora entre os ícones empilhados — some no último item. */
+.detalhe-estoque-timeline-item:not(:last-child) .detalhe-estoque-timeline-icon::after {
+  content: '';
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--border-width-medium);
+  height: calc(100% - 32px + var(--spacing-lg));
+  background: var(--color-border-subtle);
+}
+
+.detalhe-estoque-timeline-body { flex: 1; min-width: 0; padding-top: var(--spacing-xs); }
+
+.detalhe-estoque-timeline-label {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.detalhe-estoque-timeline-meta {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-top: 2px;
+}
+
+.detalhe-estoque-timeline-extra {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  margin-top: 2px;
+}
+
+.detalhe-estoque-nf-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.detalhe-estoque-saldo-final {
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}

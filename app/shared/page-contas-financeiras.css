@@ -1,0 +1,248 @@
+/* ══════════════════════════════════════════════════════════
+   CONTAS FINANCEIRAS — Configuração > Conta Financeira. Mobile first.
+   Cópia estrutural de page-contas-bancarias.css (mesma listagem+busca+
+   paginação+modal de exclusão), só com 2 colunas de dado em vez de 4
+   (entidade bem mais simples: só Código+Nome). Classes próprias `ctf-*`,
+   mesma convenção de duplicar por tela já usada em todo o projeto.
+   ══════════════════════════════════════════════════════════ */
+
+.ctf-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.ctf-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .ctf-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.ctf-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.ctf-title { color: var(--color-text-primary); margin: 0; }
+.ctf-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 560px; }
+
+#new-conta-financeira-btn { width: 100%; justify-content: center; flex-shrink: 0; }
+@media (min-width: 768px) {
+  #new-conta-financeira-btn { width: auto; }
+}
+
+/* ── Busca fundida com a tabela (mesmo padrão final já adotado em
+   Produtos/Cadastro/Estoque/Categorias/Caixa/Contas a Pagar) ────────────── */
+.card.ctf-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.ctf-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.ctf-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+.ctf-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-md); }
+.ctf-filter { width: 100%; }
+@media (min-width: 768px) {
+  .ctf-filter-search { flex: 1 1 320px; min-width: 260px; max-width: 420px; }
+}
+.ctf-filters .ctf-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+/* ── Tabela (desktop) / Cards (mobile) ──────────────────────────────────── */
+
+.ctf-table-card .tableWrap { display: none; padding-top: 0; }
+.ctf-cards { display: flex; flex-direction: column; gap: var(--spacing-md); padding: var(--spacing-md); }
+@media (min-width: 768px) {
+  .ctf-table-card .tableWrap { display: block; }
+  .ctf-cards { display: none; }
+}
+
+.ctf-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ctf-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+.ctf-table-card .sortIcon { color: var(--color-gray-500); }
+
+.ctf-table-card .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.ctf-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.ctf-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.ctf-table-card .tr:hover .td { filter: brightness(0.97); }
+.ctf-table-card .tr[hidden] { display: none; }
+
+/* Colunas em `%`, Ações em `px` fixo — mesma disciplina de Produtos/Cadastro
+   (a soma cabe em 100%, sem precisar de rolagem horizontal). Só 2 colunas
+   de dado (entidade simples: Código+Nome). */
+.ctf-table-card .table { table-layout: fixed; width: 100%; }
+.ctf-table-card .th:nth-child(1) { width: 140px; } /* Código */
+.ctf-table-card .th:nth-child(2) { width: auto; }  /* Nome */
+.ctf-table-card .th:nth-child(3) { width: 96px; }  /* Ações */
+
+.ctf-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.ctf-empty:not([hidden]) { display: flex; }
+.ctf-empty p { margin: 0; }
+
+.ctf-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.ctf-empty-global:not([hidden]) { display: flex; }
+.ctf-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.ctf-empty-global-title { color: var(--color-text-primary); margin: 0; }
+.ctf-empty-global-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 360px; }
+
+/* ── Paginação (composição própria a partir de tokens, mesma exata de
+   Caixa/Contas a Pagar/Cadastro) ────────────────────────────────────────── */
+.ctf-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+.ctf-pagination[hidden] { display: none; }
+.ctf-pagination-info { color: var(--color-text-tertiary); }
+.ctf-pagination-controls { display: flex; align-items: center; gap: var(--spacing-2xs); }
+.ctf-pagination-pages { display: flex; align-items: center; gap: var(--spacing-2xs); }
+
+.ctf-pagination-page {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--spacing-2xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.ctf-pagination-page:hover { background: var(--color-bg-subtle); }
+.ctf-pagination-page.is-active {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+  cursor: default;
+}
+.ctf-pagination-page.is-active:hover { background: var(--color-action-primary); }
+
+@media (max-width: 479px) {
+  .ctf-pagination { flex-direction: column; align-items: stretch; text-align: center; }
+}
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.ctf-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.ctf-mobile-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.ctf-mobile-card-nome { color: var(--color-text-primary); }
+.ctf-mobile-card-codigo { color: var(--color-text-tertiary); flex-shrink: 0; }
+.ctf-mobile-card-actions {
+  display: flex;
+  gap: var(--spacing-2xs);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+/* ── Toast de sucesso ─────────────────────────────────────────────────────
+   Mesma composição já usada em Categorias/Caixa/Contas a Pagar (Feedback
+   reaproveitado como Toast) + fix de colisão Feedback×Table×Dialog (esta
+   tela carrega Dialog.module.css pro modal de exclusão). */
+.ctf-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.ctf-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.ctf-toast { box-shadow: var(--shadow-lg); animation: ctf-toast-in 0.25s ease; }
+.ctf-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.ctf-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes ctf-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   já documentado dezenas de vezes neste projeto. */
+.overlay[hidden] { display: none; }
+
+/* ── Modal: Nova/Editar Conta Financeira (round 60, 2026-08-04) ───────────
+   Cadastro/edição deixou de ser uma página própria (nova-conta-financeira.html)
+   e passou a ser este Dialog reaproveitado — mesmo grid/padrão de erro que
+   o formulário antigo já usava (ver page-nova-conta-financeira.css, mantido
+   como referência histórica, sem mais nenhum link apontando pra ele). */
+.ctf-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+.ctf-form-grid .wrapper .errorText { display: none; }
+.ctf-form-grid .wrapper.error .errorText { display: flex; }
+.ctf-form-grid .wrapper.error .input { border-color: var(--color-action-error); }

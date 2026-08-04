@@ -1,0 +1,33 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  object-fit: cover;
+  user-select: none;
+  line-height: 1;
+}
+
+/* Seletores de 2 classes (`.avatar.sm`, não `.sm` sozinho) de propósito —
+   `Button.module.css` (carregado junto em quase toda tela) já declara `.sm`/
+   `.lg` soltos pro próprio `<button class="btn sm">`; um seletor de 1 classe
+   aqui colidiria (o padding/border-radius de botão vazaria pro círculo do
+   avatar). Ver rules.md, "Colisão de classes entre componentes". */
+.avatar.sm { width: 24px; height: 24px; font-size: var(--font-size-xs); }
+.avatar.md { width: 32px; height: 32px; font-size: var(--font-size-sm); }
+.avatar.lg { width: 48px; height: 48px; font-size: var(--font-size-lg); }
+
+/* ── Círculo de iniciais — 6 cores fixas do design system (mesma paleta
+   já usada pelos 8 status do `.badge` de Table.module.css), escolhidas por
+   `pickAvatarColor()` a partir de um hash do nome, nunca uma cor solta. ── */
+.initials { background: var(--color-brand-100); color: var(--color-brand-700); }
+.initials[data-color="brand"]  { background: var(--color-brand-100);  color: var(--color-brand-700); }
+.initials[data-color="green"]  { background: var(--color-green-100);  color: var(--color-green-700); }
+.initials[data-color="orange"] { background: var(--color-orange-100); color: var(--color-orange-700); }
+.initials[data-color="violet"] { background: var(--color-violet-100); color: var(--color-violet-700); }
+.initials[data-color="pink"]   { background: var(--color-pink-100);   color: var(--color-pink-700); }
+.initials[data-color="indigo"] { background: var(--color-indigo-100); color: var(--color-indigo-700); }

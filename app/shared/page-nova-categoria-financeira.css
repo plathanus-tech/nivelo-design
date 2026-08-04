@@ -1,0 +1,141 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA CATEGORIA — formulário de cadastro/edição de categorias de receitas
+   e despesas, dentro de Configuração > Categorias de receitas e despesas.
+   Mobile first. Estrutura/tokens copiados deliberadamente de
+   page-novo-produto.css (mesmo "card único com subseções + divisor" já
+   aprovado no restante do sistema) — classes próprias (`nova-categoria-*`),
+   não um arquivo compartilhado, mesmo princípio já documentado entre as
+   demais telas.
+   ══════════════════════════════════════════════════════════ */
+
+.nova-categoria-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.nova-categoria-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nova-categoria-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nova-categoria-back:hover { color: var(--color-text-primary); }
+
+.nova-categoria-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Seções (1 único `.card` do Table pra todo o formulário, mesmo padrão
+   de Novo produto/Novo cadastro/Novo registo de estoque) ──────────────── */
+
+#nova-categoria-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.nova-categoria-subsection {
+  padding: var(--spacing-lg);
+}
+.nova-categoria-subsection + .nova-categoria-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.nova-categoria-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.nova-categoria-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .nova-categoria-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .nova-categoria-span-2 {
+    grid-column: span 2;
+  }
+}
+
+.nova-categoria-dropdown { position: relative; }
+
+/* ⚠️ Colisão de classes .input/.option com RadioButton.module.css (mesmo
+   padrão já documentado em page-novo-produto.css/page-novo-estoque.css/
+   CLAUDE.md) — "Considera no DRE"/"Considera no LCDPR" usam RadioButton
+   (Sim/Não), e como os `.module.css` do Storybook são carregados aqui como
+   stylesheets globais, as regras genéricas de RadioButton vazam pros campos
+   de texto reais e pros itens `.option` dos Dropdowns desta mesma tela.
+   Mesmo fix padrão, aplicado preventivamente. */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+}
+.nova-categoria-grid input.input:not([type="radio"]) {
+  width: 100%;
+  height: 44px;
+}
+.menu .option {
+  display: block;
+}
+
+/* Mensagem de erro: mesmo padrão de Novo produto/Novo cadastro — `.errorText`
+   só aparece quando `.wrapper` ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* ── Considera no DRE / Considera no LCDPR (RadioButton) — mesmo
+   espaçamento entre opções do restante do formulário. ──────────────────── */
+#considera-dre-field .group,
+#considera-lcdpr-field .group {
+  gap: var(--spacing-lg);
+}
+
+/* "Classificação no DRE" só é relevante quando "Considera no DRE" = Sim —
+   escondida via `hidden` (ver nova-categoria-financeira.js). Guard padrão
+   contra o bug recorrente de `display` incondicional derrotando `hidden`
+   (documentado extensivamente em CLAUDE.md/rules.md). */
+#classificacao-dre-field[hidden] { display: none; }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.nova-categoria-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+
+@media (min-width: 768px) {
+  .nova-categoria-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .nova-categoria-actions .btn { min-width: 160px; }
+}

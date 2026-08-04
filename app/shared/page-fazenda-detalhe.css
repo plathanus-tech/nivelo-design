@@ -1,0 +1,286 @@
+/* ══════════════════════════════════════════════════════════
+   FAZENDA — DETALHE (Fazendas → Fazenda X). Contexto principal de uma
+   propriedade: dados básicos + gestão dos talhões vinculados. Estrutura de
+   página (← Voltar, estado "não encontrado", `.card` + `.cardHeader`/
+   `.title`) copiada do mesmo padrão já usado em detalhe-estoque — ver
+   page-detalhe-estoque.css. O bloco de Resumo (4 indicadores) é cópia
+   deliberada do `.estoque-summary-card` (Estoque), só com 4 colunas em vez
+   de 3. A lista de Talhões é nova (lista compacta de linhas clicáveis, não
+   tabela nem os cards em grid da Listagem de Fazendas — pedido explícito de
+   manter simples).
+   "Editar fazenda"/"+ Novo talhão"/clique no talhão/"+ Cadastrar primeiro
+   talhão" e o menu secundário (excluir) são flash-disable por enquanto —
+   sem tela de edição de fazenda nem de cadastro/detalhe de talhão ainda
+   (mesma decisão já tomada na Listagem: ficam pra uma rodada futura).
+   ══════════════════════════════════════════════════════════ */
+
+.fazenda-detalhe-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Ver nota do mesmo bug em page-detalhe-estoque.css: `#fazenda-detalhe-content`
+   some via `hidden` no estado "não encontrada" — o guard `:not([hidden])` é
+   obrigatório aqui, senão `display:flex` reaparece o conteúdo por cima do
+   estado de erro. */
+#fazenda-detalhe-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ── Voltar + estado "não encontrada" ─────────────────────────────────────── */
+
+.fazenda-detalhe-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.fazenda-detalhe-back:hover { color: var(--color-text-primary); }
+
+.fazenda-detalhe-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.fazenda-detalhe-not-found:not([hidden]) { display: flex; }
+.fazenda-detalhe-not-found p { margin: 0; }
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.fazenda-detalhe-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .fazenda-detalhe-title-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.fazenda-detalhe-title-block { display: flex; flex-direction: column; gap: 2px; }
+.fazenda-detalhe-title { color: var(--color-text-primary); margin: 0; }
+
+.fazenda-detalhe-location {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-tertiary);
+}
+.fazenda-detalhe-location svg { flex-shrink: 0; }
+
+.fazenda-detalhe-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+#nova-anotacao-fazenda-btn { flex: 1; justify-content: center; }
+@media (min-width: 640px) {
+  #nova-anotacao-fazenda-btn { flex: none; }
+}
+
+/* ── Toast de sucesso (nova anotação) ──────────────────────────────────────
+   Cópia exata do padrão de `.fazendas-toast-region` — mesmo Feedback
+   (Storybook) reaproveitado como toast. */
+.fazenda-detalhe-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.fazenda-detalhe-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.fazenda-detalhe-toast {
+  box-shadow: var(--shadow-lg);
+  animation: fazenda-detalhe-toast-in 0.25s ease;
+}
+.fazenda-detalhe-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.fazenda-detalhe-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0;
+}
+
+@keyframes fazenda-detalhe-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Resumo da fazenda (4 indicadores compactos) ──────────────────────────
+   Cópia deliberada de `.estoque-summary-card` (page-estoque.css), classes
+   próprias, 4 colunas em vez de 3. */
+.fazenda-resumo-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 560px) {
+  .fazenda-resumo-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .fazenda-resumo-row { grid-template-columns: repeat(4, 1fr); gap: var(--spacing-lg); }
+}
+
+.card.fazenda-resumo-card {
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.fazenda-resumo-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md); }
+
+.fazenda-resumo-card .title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.fazenda-resumo-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.fazenda-resumo-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+.fazenda-resumo-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+.fazenda-resumo-value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+/* ── Seção Talhões ─────────────────────────────────────────────────────── */
+
+.talhoes-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.talhoes-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .talhoes-section-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.talhoes-section-title-block { display: flex; flex-direction: column; gap: 2px; }
+.talhoes-section-title { color: var(--color-text-primary); margin: 0; }
+.talhoes-section-description { color: var(--color-text-tertiary); margin: 0; max-width: 480px; }
+
+#novo-talhao-btn { width: 100%; justify-content: center; flex-shrink: 0; }
+@media (min-width: 640px) {
+  #novo-talhao-btn { width: auto; }
+}
+
+.talhoes-list { display: flex; flex-direction: column; }
+
+.talhao-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+  border: none;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+  width: 100%;
+  background: none;
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.talhoes-list .talhao-row:first-child { border-top: none; }
+.talhao-row:hover { background: var(--color-bg-subtle); }
+
+.talhao-row-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-action-primary);
+  flex-shrink: 0;
+}
+
+.talhao-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.talhao-row-name { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.talhao-row-meta { color: var(--color-text-secondary); }
+.talhao-row-status { flex-shrink: 0; }
+.talhao-row-chevron { flex-shrink: 0; color: var(--color-text-tertiary); }
+
+/* ── Estado vazio de Talhões (mirror de `.fazendas-empty-global`) ────────── */
+.talhoes-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.talhoes-empty:not([hidden]) { display: flex; }
+
+.talhoes-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+
+.talhoes-empty-title { color: var(--color-text-primary); margin: 0; }
+.talhoes-empty-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 360px; }

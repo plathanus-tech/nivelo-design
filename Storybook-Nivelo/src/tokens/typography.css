@@ -1,0 +1,77 @@
+/*
+ * Nivelo Design System — Text Styles
+ * Fonte única de verdade: espelha 1:1 o catálogo de text styles do Figma
+ * documentado em `src/stories/Typography.stories.tsx` (a story consome estas
+ * MESMAS classes pra renderizar a prévia — nunca duplica os valores em
+ * estilo inline). Qualquer mudança de text style começa aqui.
+ *
+ * Padrão obrigatório a partir de 2026: qualquer texto novo (heading, corpo,
+ * label, botão, caption) usa uma destas classes em vez de compor
+ * font-size/font-weight/line-height soltos a partir dos tokens de escala
+ * (`--font-size-*`, `--font-weight-*` etc.) — essas tokens de escala
+ * continuam existindo, mas passam a ser "internas" (usadas por ESTE
+ * arquivo e por casos que não são texto, como espaçamento vertical), não a
+ * API pública de tipografia.
+ *
+ * Nomenclatura: `.text-<categoria>-<tamanho>`, gerada a partir do nome do
+ * Figma (`Heading/1-XL` → `.text-heading-1-xl`). Ver `slugify()` em
+ * `Typography.stories.tsx` — mude os dois lugares juntos.
+ */
+
+/* ─── Heading — Helvetica Neue Medium ──────────────────────── */
+.text-heading-1-xl { font-family: var(--font-heading); font-size: 128px; font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: -0.02em; }
+.text-heading-1-l  { font-family: var(--font-heading); font-size: 96px;  font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: -0.02em; }
+.text-heading-1-m  { font-family: var(--font-heading); font-size: 72px;  font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: -0.02em; }
+.text-heading-2    { font-family: var(--font-heading); font-size: 56px;  font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: -0.02em; }
+.text-heading-3    { font-family: var(--font-heading); font-size: 48px;  font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: -0.01em; }
+.text-heading-4    { font-family: var(--font-heading); font-size: 40px;  font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: -0.01em; }
+.text-heading-5    { font-family: var(--font-heading); font-size: 32px;  font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: -0.01em; }
+.text-heading-6    { font-family: var(--font-heading); font-size: 24px;  font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: -0.01em; }
+
+/* ─── Subtitle — Helvetica Neue Medium ──────────────────────── */
+.text-subtitle-xl { font-family: var(--font-heading); font-size: 20px; font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: 0em; }
+.text-subtitle-l  { font-family: var(--font-heading); font-size: 18px; font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: 0em; }
+.text-subtitle-m  { font-family: var(--font-heading); font-size: 16px; font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: 0.01em; }
+.text-subtitle-s  { font-family: var(--font-heading); font-size: 14px; font-weight: var(--font-weight-medium); line-height: 1.1; letter-spacing: 0.01em; }
+
+/* ─── Body — Helvetica Neue Light ───────────────────────────── */
+.text-body-xxxl { font-family: var(--font-body); font-size: 32px; font-weight: var(--font-weight-light); line-height: 1.3; letter-spacing: 0.01em; }
+.text-body-xxl  { font-family: var(--font-body); font-size: 24px; font-weight: var(--font-weight-light); line-height: 1.3; letter-spacing: 0.01em; }
+.text-body-xl   { font-family: var(--font-body); font-size: 20px; font-weight: var(--font-weight-light); line-height: 1.5; letter-spacing: 0.01em; }
+.text-body-l    { font-family: var(--font-body); font-size: 18px; font-weight: var(--font-weight-light); line-height: 1.5; letter-spacing: 0.01em; }
+.text-body-m    { font-family: var(--font-body); font-size: 16px; font-weight: var(--font-weight-light); line-height: 1.4; letter-spacing: 0.01em; }
+.text-body-s    { font-family: var(--font-body); font-size: 14px; font-weight: var(--font-weight-light); line-height: 1.4; letter-spacing: 0.01em; }
+.text-body-xs   { font-family: var(--font-body); font-size: 12px; font-weight: var(--font-weight-light); line-height: 1.4; letter-spacing: 0.02em; }
+.text-body-xxs  { font-family: var(--font-body); font-size: 10px; font-weight: var(--font-weight-light); line-height: 1.4; letter-spacing: 0.02em; }
+
+/* ─── Caption — Helvetica Neue Medium ───────────────────────── */
+.text-caption-m { font-family: var(--font-heading); font-size: 20px; font-weight: var(--font-weight-medium); line-height: 1.0; letter-spacing: 3px; }
+.text-caption-s { font-family: var(--font-heading); font-size: 16px; font-weight: var(--font-weight-medium); line-height: 1.0; letter-spacing: 2px; }
+
+/* ─── Button — Helvetica Neue Medium ────────────────────────── */
+.text-button-xl { font-family: var(--font-heading); font-size: 24px; font-weight: var(--font-weight-medium); line-height: 1.2; letter-spacing: 0.5px; }
+.text-button-l  { font-family: var(--font-heading); font-size: 20px; font-weight: var(--font-weight-medium); line-height: 1.2; letter-spacing: 0.5px; }
+.text-button-m  { font-family: var(--font-heading); font-size: 16px; font-weight: var(--font-weight-medium); line-height: 1.5; letter-spacing: 0.5px; }
+.text-button-s  { font-family: var(--font-heading); font-size: 14px; font-weight: var(--font-weight-medium); line-height: 1.7; letter-spacing: 0.5px; }
+
+/* ═══════════════════════════════════════════════════════════
+ * EXTENDIDOS — fora do catálogo Figma puro (que só define peso
+ * 300/Light pra Body e 500/Medium pra Heading/Subtitle/Caption/Button).
+ * A maior parte dos componentes já usava peso 400 (regular) e 700 (bold)
+ * antes deste sistema existir — em vez de forçar todo mundo pro peso
+ * oficial (mudança visual) ou deixar de fora da migração, essas classes
+ * cobrem os pares tamanho+peso realmente em uso hoje, decisão tomada em
+ * 2026-07-22. Nomeadas por tamanho+peso (não por categoria Heading/Body),
+ * já que não vêm do catálogo do Figma. Migrar pra cá sempre que possível
+ * em vez de criar mais uma variante nova.
+ * ═══════════════════════════════════════════════════════════ */
+.text-10-regular { font-size: 10px; font-weight: var(--font-weight-regular); }
+.text-10-medium  { font-size: 10px; font-weight: var(--font-weight-medium); }
+.text-12-regular { font-size: 12px; font-weight: var(--font-weight-regular); }
+.text-12-bold    { font-size: 12px; font-weight: var(--font-weight-bold); }
+.text-14-regular { font-size: 14px; font-weight: var(--font-weight-regular); }
+.text-14-bold    { font-size: 14px; font-weight: var(--font-weight-bold); }
+.text-16-regular { font-family: var(--font-body); font-size: 16px; font-weight: var(--font-weight-regular); line-height: 1.4; letter-spacing: 0.01em; }
+.text-16-bold    { font-family: var(--font-body); font-size: 16px; font-weight: var(--font-weight-bold);    line-height: 1.4; letter-spacing: 0.01em; }
+.text-18-regular { font-size: 18px; font-weight: var(--font-weight-regular); }
+.text-18-bold    { font-size: 18px; font-weight: var(--font-weight-bold); }

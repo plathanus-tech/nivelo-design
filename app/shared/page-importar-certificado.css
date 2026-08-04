@@ -1,0 +1,163 @@
+/* ══════════════════════════════════════════════════════════
+   IMPORTAR CERTIFICADO — Configuração > Fiscal > Certificado Digital >
+   Importar/Editar. Mobile first. Estrutura copiada deliberadamente de
+   page-nova-natureza-operacao.css (mesmo "card com grid" já aprovado).
+   ══════════════════════════════════════════════════════════ */
+
+.impcert-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+.impcert-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+.impcert-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.impcert-back:hover { color: var(--color-text-primary); }
+.impcert-title { color: var(--color-text-primary); margin: 0; }
+
+#impcert-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.impcert-section-title {
+  margin: 0 0 var(--spacing-2xs);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+.impcert-section-hint {
+  margin: 0 0 var(--spacing-md);
+  color: var(--color-text-tertiary);
+}
+
+.impcert-card { padding: var(--spacing-lg); }
+
+.impcert-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .impcert-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .impcert-span-2 {
+    grid-column: span 2;
+  }
+}
+
+.impcert-textarea {
+  resize: vertical;
+  min-height: 64px;
+  line-height: var(--line-height-normal);
+}
+.impcert-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Upload do arquivo do certificado (sem componente Upload no Storybook —
+   composição a partir de Button + input[type=file] escondido, mesmo
+   raciocínio já usado pra Textarea/Pagination/Popover). ─────────────────── */
+.impcert-upload {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+.impcert-upload-filename {
+  color: var(--color-text-secondary);
+}
+.impcert-upload-filename.has-file {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Senha do certificado (mostrar/ocultar) — mesma técnica de
+   page-login.css's `.login-password-wrap`/`.login-toggle-password`. ─────── */
+.impcert-password-wrap { position: relative; }
+.impcert-password-wrap .input { padding-right: 44px; }
+.impcert-toggle-password {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+.impcert-toggle-password:hover { color: var(--color-text-primary); background-color: var(--color-bg-subtle); }
+.impcert-toggle-password:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* ── Dados extraídos automaticamente ──────────────────────────────────────── */
+/* Bug real, mesmo padrão já documentado dezenas de vezes neste projeto:
+   `Feedback.module.css`'s `.alert{display:flex}` não tem guard de `[hidden]`
+   — sem este fix o banner de "certificado expirado" ficava visível mesmo
+   com o atributo `hidden` presente (achado ao testar o modo de edição de um
+   certificado ativo, que não deveria mostrar o aviso). */
+.impcert-expirado-banner[hidden] { display: none; }
+.impcert-expirado-banner { margin: 0 0 var(--spacing-md); }
+.impcert-expirado-banner .body { padding: 0; color: inherit; line-height: inherit; }
+.impcert-expirado-banner .message { margin: 0; }
+
+.impcert-status-value { display: flex; align-items: center; height: 44px; }
+
+/* Erro de duplicidade de número de série — mesmo padrão visual de
+   `.errorText`, só que fora de um `.wrapper` (não é campo de formulário). */
+#serie-duplicada-error {
+  display: none;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-error);
+}
+#serie-duplicada-error:not([hidden]) { display: flex; }
+
+/* Mensagem de erro dos campos: mesmo padrão de Nova Natureza de Operação. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input { border-color: var(--color-action-error); }
+.impcert-upload.error .btn.secondary { border-color: var(--color-action-error); }
+
+.impcert-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .impcert-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .impcert-actions .btn { min-width: 220px; }
+}

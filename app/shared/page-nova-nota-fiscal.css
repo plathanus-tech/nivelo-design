@@ -1,0 +1,318 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA NOTA FISCAL — criação (padrão), visualização (`?modo=ver`) e
+   correção (`?modo=corrigir`) de notas fiscais de saída, dentro de
+   Vendas > Notas fiscais. Mobile first. Estrutura/tokens copiados
+   deliberadamente de page-nova-categoria-financeira.css/page-novo-produto.css
+   (mesmo "card único com subseções + divisor" já aprovado no resto do
+   sistema) — classes próprias (`nnf-*`), não um arquivo compartilhado.
+   ══════════════════════════════════════════════════════════ */
+
+.nnf-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.nnf-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.nnf-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nnf-back:hover { color: var(--color-text-primary); }
+
+.nnf-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.nnf-title { color: var(--color-text-primary); margin: 0; }
+/* Badge de status (modo=ver) — Table.module.css's `.badge` tem
+   `display:inline-flex` incondicional, mesmo bug de hidden+display já
+   documentado várias vezes neste projeto. */
+#nnf-status-badge[hidden] { display: none; }
+
+/* Alerta de rejeição — Feedback reaproveitado como bloco informativo, mesmo
+   padrão visual dos toasts de sucesso do resto do sistema, só que fixo na
+   página em vez de flutuante. Só aparece em modo=ver/corrigir, nunca na
+   criação (nunca há `editingNota` ali).
+   Bug real recorrente (já documentado várias vezes neste projeto):
+   Feedback.module.css's `.alert` tem `display:flex` incondicional, o que
+   derrota o atributo `hidden` do HTML — sem o guard abaixo, o alerta
+   apareceria sempre, mesmo com `hidden` presente. */
+.nnf-rejection-alert { align-items: flex-start; }
+.nnf-rejection-alert[hidden] { display: none; }
+/* Colisão de classes de 3 vias Feedback × Dialog (mesma já documentada em
+   app/CLAUDE.md, round 7, pro toast do Dashboard): esta tela carrega
+   Dialog.module.css pro modal de Certificado Digital, e `.body`/`.title` do
+   Dialog (padding 16px 24px + cor/tamanho de título de modal) vencem os
+   valores originais do Feedback só por serem declarados depois no `<head>`.
+   Sem este reset, o alerta ganha padding extra (maior que o previsto),
+   além do título/mensagem perderem a cor semântica de erro. */
+.nnf-rejection-alert .body { padding: 0; flex: 1; color: inherit; }
+.nnf-rejection-alert .title { color: inherit; }
+.nnf-rejection-alert .message { color: inherit; }
+
+/* ── Tipo de nota fiscal ──────────────────────────────────────────────── */
+.nnf-tipo-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+}
+.nnf-tipo-card[hidden] { display: none; }
+.nnf-tipo-card .group { gap: var(--spacing-lg); }
+
+/* ── Visualização (modo=ver) — mesmo padrão de detalhe-estoque.html/
+   page-detalhe-estoque.css: `.card`+`.cardHeader`/`.title` por seção, dados
+   como texto (dl/dt/dd), nunca campos de formulário desabilitados. Classes
+   próprias (`nnf-view-*`), não compartilhadas com page-detalhe-estoque.css
+   (mesma independência entre telas já documentada no resto do projeto). */
+#nnf-view-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.nnf-view-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.nnf-view-section .cardHeader { padding: 0; }
+
+.nnf-view-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .nnf-view-fields { grid-template-columns: repeat(3, 1fr); }
+}
+.nnf-view-fields dt {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+.nnf-view-fields dd {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+
+.nnf-view-observacao { margin: 0; color: var(--color-text-primary); }
+
+.nnf-view-section .table { table-layout: fixed; }
+.nnf-view-section .th:nth-child(1),
+.nnf-view-section .td:nth-child(1) { width: 30%; }
+.nnf-view-section .th:nth-child(2),
+.nnf-view-section .td:nth-child(2) { width: 18%; }
+.nnf-view-section .th:nth-child(3),
+.nnf-view-section .td:nth-child(3) { width: 18%; }
+.nnf-view-section .th:nth-child(4),
+.nnf-view-section .td:nth-child(4) { width: 16%; }
+.nnf-view-section .th:nth-child(5),
+.nnf-view-section .td:nth-child(5) { width: 18%; }
+
+/* ── Seções (1 único `.card` do Table pra todo o formulário) ─────────────── */
+
+#nnf-form { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+#nnf-form[hidden] { display: none; }
+
+/* Guard preventivo (mesmo padrão recorrente `hidden`+`display` já
+   documentado várias vezes neste projeto) — as 2 seções alternam via
+   `hidden` conforme o Tipo de nota fiscal selecionado. */
+#nnf-saida-form[hidden],
+#nnf-entrada-form[hidden] { display: none; }
+
+.nnf-subsection { padding: var(--spacing-lg); }
+.nnf-subsection + .nnf-subsection { border-top: var(--border-width-thin) solid var(--color-border-subtle); }
+
+.nnf-subsection-title {
+  margin: 0 0 var(--spacing-2xs);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+.nnf-subsection-hint {
+  margin: 0 0 var(--spacing-md);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.nnf-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .nnf-grid { grid-template-columns: 1fr 1fr; }
+  .nnf-span-2 { grid-column: span 2; }
+}
+
+.nnf-dropdown { position: relative; }
+.nnf-optional-tag { font-weight: var(--font-weight-regular); color: var(--color-text-tertiary); }
+
+/* ⚠️ Colisão de classes .input/.option com RadioButton.module.css (mesmo
+   padrão já documentado em page-nova-categoria-financeira.css/CLAUDE.md) —
+   "Tipo de nota fiscal" usa RadioButton, e como os `.module.css` do
+   Storybook são carregados aqui como stylesheets globais, as regras
+   genéricas de RadioButton vazam pros campos de texto reais e pros itens
+   `.option` dos Dropdowns desta mesma tela. Mesmo fix padrão, aplicado
+   preventivamente. */
+.input:not([type="radio"]) { position: static; opacity: 1; }
+.nnf-grid input.input:not([type="radio"]),
+.nnf-item-grid input.input:not([type="radio"]) { width: 100%; height: 44px; }
+.menu .option { display: block; }
+
+.nnf-textarea {
+  height: auto;
+  min-height: 88px;
+  padding-top: var(--spacing-sm);
+  resize: vertical;
+}
+
+/* Observação: sem label próprio (a indicação "(opcional)" mora no título da
+   seção) — campo ocupa 100% da largura útil do card, fora do `.nnf-grid`
+   de 2 colunas (não faz sentido dividir um único campo de texto livre). */
+.nnf-observacao-field { width: 100%; }
+.nnf-observacao-field textarea.input { width: 100%; }
+
+/* Mensagem de erro: mesmo padrão do resto do sistema — `.errorText` só
+   aparece quando `.wrapper`/campo ganha `.error` via JS. */
+.wrapper .errorText,
+#itens-error { display: none; }
+.wrapper.error .errorText,
+#itens-error[style*="flex"] { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger,
+.nnf-item-produto.error .trigger { border-color: var(--color-action-error); }
+
+/* Campos somente-exibição (Emitente) e modo de visualização/dropdowns
+   travados (`.is-readonly`, aplicado via JS em modo=ver) — visual "campo
+   desabilitado" já usado no resto do sistema (Código auto-gerado etc.),
+   sem inventar uma variante nova de componente. */
+.is-readonly .trigger { cursor: default; }
+
+/* ── Itens da nota ─────────────────────────────────────────────────────── */
+.nnf-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.nnf-item-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-md);
+}
+
+.nnf-item-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nnf-item-row-title { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+
+.nnf-item-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm);
+}
+@media (min-width: 640px) {
+  .nnf-item-grid { grid-template-columns: 2fr 1fr 1fr 1fr; }
+}
+
+.nnf-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.nnf-total-row span:first-child { color: var(--color-text-secondary); }
+.nnf-total-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+/* ── Entrada: upload do XML (mesmo padrão de dropzone já usado em
+   novo-estoque.html/page-novo-estoque.css, classes próprias `nnf-*` já que
+   é uma tela diferente). ─────────────────────────────────────────────── */
+.nnf-dropzone-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+.nnf-dropzone { position: relative; }
+.nnf-dropzone-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.nnf-dropzone-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: var(--border-width-medium) dashed var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.nnf-dropzone-input:focus-visible + .nnf-dropzone-label,
+.nnf-dropzone-label:hover {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+}
+/* Erro do bloco (nenhum arquivo selecionado) — mesmo padrão de
+   `.wrapper.error`, só que `.nnf-dropzone-block` não é um `.wrapper` (não é
+   um campo de Input único), por isso a regra é própria. */
+.nnf-dropzone-block .errorText { display: none; }
+.nnf-dropzone-block.error .errorText { display: flex; }
+.nnf-dropzone-block.error .nnf-dropzone-label { border-color: var(--color-action-error); }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.nnf-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .nnf-actions { flex-direction: row; justify-content: flex-end; }
+  .nnf-actions .btn { min-width: 160px; }
+}
+/* Visualização (`modo=ver`) esconde a barra inteira — mesmo padrão
+   recorrente `hidden`+`display` já documentado várias vezes neste projeto. */
+.nnf-actions[hidden] { display: none; }
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug já
+   documentado em page-categorias-financeiras.css/page-novo-produto.css. */
+.overlay[hidden] { display: none; }

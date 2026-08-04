@@ -1,0 +1,282 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA CONVERSA — Assistente IA > Nova conversa. Mobile first. Interface de
+   chat (2 colunas no desktop: conversa + histórico), seguindo o padrão
+   visual de chats modernos (ChatGPT/Claude) mas 100% composto a partir de
+   tokens/componentes já existentes no sistema — `.card` (Table) como
+   container genérico, `Button`/`Input` reais, sem nenhum componente novo no
+   Storybook.
+   ══════════════════════════════════════════════════════════ */
+
+.nc-page {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  height: calc(100vh - var(--shell-header-height) - var(--spacing-lg) * 2);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+@media (min-width: 1024px) {
+  .nc-page {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+/* ── Área principal (chat) ────────────────────────────────────────────── */
+.nc-chat-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  min-height: 480px;
+  overflow: hidden;
+}
+
+.nc-chat-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+  flex-shrink: 0;
+}
+.nc-chat-title { color: var(--color-text-primary); margin: 0; }
+.nc-chat-origin { color: var(--color-text-tertiary); }
+
+.nc-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+
+.nc-empty {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-tertiary);
+  max-width: 320px;
+}
+.nc-empty p { margin: 0; }
+
+/* ── Bolhas de mensagem ───────────────────────────────────────────────── */
+.nc-message {
+  display: flex;
+  max-width: 78%;
+}
+.nc-message-usuario { align-self: flex-end; }
+.nc-message-assistente { align-self: flex-start; }
+
+.nc-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+.nc-message-usuario .nc-bubble {
+  background: var(--color-action-primary);
+  color: var(--color-gray-white);
+  border-bottom-right-radius: var(--radius-xs);
+}
+.nc-message-assistente .nc-bubble {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+  border-bottom-left-radius: var(--radius-xs);
+}
+.nc-bubble-content { white-space: pre-wrap; word-break: break-word; }
+.nc-bubble-time {
+  align-self: flex-end;
+  font-size: var(--font-size-xs);
+  opacity: 0.7;
+}
+
+/* ── Player de áudio (mock) ───────────────────────────────────────────── */
+.nc-audio-player {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 200px;
+}
+.nc-audio-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.25);
+  color: inherit;
+}
+.nc-message-assistente .nc-audio-toggle { background: var(--color-bg-surface); }
+.nc-audio-progress {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+}
+.nc-message-assistente .nc-audio-progress { background: var(--color-gray-200); }
+.nc-audio-progress-fill {
+  position: absolute;
+  top: 0; left: 0; height: 100%;
+  width: 0%;
+  background: currentColor;
+  transition: width linear;
+}
+.nc-audio-duration { font-size: var(--font-size-xs); flex-shrink: 0; }
+
+/* ── Indicador de digitação ───────────────────────────────────────────── */
+.nc-typing {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-lg) var(--spacing-md);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+.nc-typing[hidden] { display: none; }
+.nc-typing-dots { display: inline-flex; gap: 3px; }
+.nc-typing-dots span {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--color-text-tertiary);
+  animation: nc-typing-bounce 1.2s infinite ease-in-out;
+}
+.nc-typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.nc-typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes nc-typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ── Campo de envio ───────────────────────────────────────────────────── */
+.nc-composer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+  flex-shrink: 0;
+}
+.nc-input-wrap { position: relative; flex: 1; }
+.nc-input { width: 100%; height: 44px; }
+.nc-recording-indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-action-error);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-error);
+  font-size: var(--font-size-sm);
+}
+.nc-recording-indicator[hidden] { display: none; }
+.nc-recording-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-action-error);
+  animation: nc-recording-pulse 1s infinite ease-in-out;
+}
+@keyframes nc-recording-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.nc-mic-btn,
+.nc-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+.nc-mic-btn:hover,
+.nc-send-btn:hover { border-color: var(--color-action-primary); color: var(--color-action-primary); }
+.nc-mic-btn.is-recording {
+  background: var(--color-status-error-bg);
+  border-color: var(--color-action-error);
+  color: var(--color-action-error);
+}
+.nc-send-btn {
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  color: var(--color-gray-white);
+}
+.nc-send-btn:hover { color: var(--color-gray-white); opacity: 0.9; }
+
+/* ── Histórico de conversas ───────────────────────────────────────────── */
+.nc-history-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  min-height: 0;
+}
+#nc-new-btn { width: 100%; justify-content: center; }
+.nc-history-title {
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-medium);
+  margin: var(--spacing-xs) 0 0;
+}
+.nc-history-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-height: 120px;
+}
+.nc-history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+.nc-history-item:hover { background: var(--color-bg-subtle); }
+.nc-history-item.is-active {
+  background: var(--color-bg-brand);
+  border-color: var(--color-action-primary);
+}
+.nc-history-item-title {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nc-history-item-meta { color: var(--color-text-tertiary); }
+
+.nc-loadmore-btn { width: 100%; flex-shrink: 0; }
+.nc-loadmore-btn[hidden] { display: none; }
+
+@media (max-width: 1023px) {
+  .nc-history-card { min-height: 240px; }
+}

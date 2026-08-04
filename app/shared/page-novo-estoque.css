@@ -1,0 +1,389 @@
+/* ══════════════════════════════════════════════════════════
+   NOVO LANÇAMENTO — formulário condicional de Estoque (Vendas/Compras/
+   Comprometido), dentro da Jornada · Estoque (acessado pelo botão "Novo
+   lançamento" de estoque.html). Mobile first. Estrutura/tokens copiados
+   deliberadamente de page-novo-cadastro.css (mesmo "card único com
+   subseções + divisor" já aprovado naquela tela) — classes próprias
+   (`novo-estoque-*`), não um arquivo compartilhado, mesmo princípio já
+   documentado entre as demais telas do sistema. Ver app/rules.md, seção
+   "Estoque", pra detalhes de cada decisão.
+   ══════════════════════════════════════════════════════════ */
+
+.novo-estoque-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard (o componente
+   React resolve com `if (!open) return null`, nunca precisa de `hidden`) —
+   mesmo bug já documentado em page-cadastros.css/page-shell.css: sem isso,
+   o modal "Adicionar novo local" abriria sozinho ao carregar a página. */
+.overlay[hidden] { display: none; }
+
+/* Item fixo "+ Adicionar novo local" ao final do Dropdown de Local de
+   estoque — mesmo tratamento visual já usado pro `.option-create` do
+   combobox de Produto (cor de marca + divisor). */
+.novo-estoque-local-option-create {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.novo-estoque-local-option-create:hover {
+  background: var(--color-bg-brand);
+}
+
+/* Modal "Criar conta a pagar?" (aberto DEPOIS de salvar, não um checkbox
+   dentro do formulário — ver novo-estoque.js) — texto introdutório antes
+   dos 3 campos coletados no próprio modal. */
+.novo-estoque-cp-modal-text {
+  margin: 0 0 var(--spacing-md);
+  color: var(--color-text-secondary);
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.novo-estoque-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.novo-estoque-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.novo-estoque-back:hover { color: var(--color-text-primary); }
+
+.novo-estoque-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Seções (1 único `.card` do Table pra todo o formulário, mesmo padrão
+   de Novo Cadastro) ──────────────────────────────────────────────────── */
+
+#novo-estoque-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.novo-estoque-subsection {
+  padding: var(--spacing-lg);
+}
+.novo-estoque-subsection + .novo-estoque-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.novo-estoque-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+/* Guard obrigatório (mesmo gotcha `hidden`+`display` incondicional já
+   documentado dezenas de vezes neste projeto) — sem `:not([hidden])`,
+   `#conta-pagar-block` (escondido por padrão até o checkbox "Criar também a
+   conta a pagar" ser marcado) reaparecia sempre, ignorando o atributo. */
+.novo-estoque-grid:not([hidden]) {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .novo-estoque-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .novo-estoque-span-2 {
+    grid-column: span 2;
+  }
+}
+
+.novo-estoque-dropdown { position: relative; }
+
+/* ⚠️ Colisão de classes .input com RadioButton.module.css (mesmo padrão já
+   documentado em rules.md pra Input×Checkbox) — RadioButton também declara
+   um `.input{position:absolute;width:1px;height:1px;opacity:0}` genérico
+   pra esconder o radio nativo atrás do círculo/dot customizado ("Forma de
+   entrada" nesta tela); como os `.module.css` do Storybook são carregados
+   aqui como stylesheets globais, essa regra "vaza" pra TODOS os campos de
+   texto/número/data/textarea reais do formulário, não só os 2 radios —
+   sintoma: praticamente todo campo aparecia como label sem nenhum input
+   visível ao lado. `:not([type="radio"])` isola a correção só pros campos
+   de texto reais, sem tocar no radio nativo (que precisa continuar
+   escondido). */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+}
+
+.novo-estoque-grid input.input:not([type="radio"]) {
+  width: 100%;
+  height: 44px;
+}
+
+/* Mesma colisão, mesmo fix — campo "Nome do local" do modal "Adicionar
+   novo local" não vive dentro de `.novo-estoque-grid` (é um único campo no
+   corpo de um Dialog), então nunca recebia a reafirmação de largura/altura
+   acima, ficando com o tamanho residual da colisão com RadioButton (campo
+   visualmente minúsculo, digitação "sumia" da vista mesmo funcionando). */
+#novo-local-overlay input.input:not([type="radio"]) {
+  width: 100%;
+  height: 44px;
+}
+
+/* ⚠️ Colisão de classes .option com RadioButton.module.css — RadioButton
+   declara um `.option{display:inline-flex;align-items:center;gap:...}`
+   genérico pro par label+circle+dot ("Forma de entrada" nesta tela); como
+   os `.module.css` do Storybook são carregados aqui como stylesheets
+   globais, essa regra vaza pros itens `.option` do Dropdown (Tipo de
+   estoque/Depósito/Safra) e do menu de busca de produto (mesmo nome de
+   classe, sem relação nenhuma), fazendo os itens ficarem lado a lado em
+   vez de empilhados verticalmente. Reforça o `display:block` padrão de
+   <div> que já era a intenção. */
+.menu .option,
+.novo-estoque-combobox-menu .option {
+  display: block;
+}
+
+/* Mensagem de erro: mesmo padrão de Novo Cadastro — `.errorText` só aparece
+   quando `.wrapper` ganha `.error` via JS (nunca por padrão). */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+.novo-estoque-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Produto: combobox (busca + cadastro rápido) ──────────────────────────
+   Produto ainda não é um módulo próprio do sistema (ver rules.md) — em vez
+   de um Dropdown fechado (lista fixa), o campo é um Input de busca com um
+   menu de resultados próprio, que também aceita "Cadastrar novo produto"
+   quando a busca não encontra nada. Menu em `position:fixed` (calculado via
+   JS, mesma técnica dos demais Dropdowns do sistema) porque `.card`
+   (Table.module.css) tem `overflow:hidden` — sem isso o menu seria cortado
+   perto da borda do card. */
+.novo-estoque-combobox {
+  position: relative;
+}
+
+.novo-estoque-combobox-menu {
+  position: fixed;
+  z-index: 60;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  max-height: 240px;
+  overflow-y: auto;
+}
+.novo-estoque-combobox-menu[hidden] { display: none; }
+
+.novo-estoque-combobox-menu .option {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.novo-estoque-combobox-menu .option:hover,
+.novo-estoque-combobox-menu .option.active {
+  background: var(--color-bg-subtle);
+}
+
+.novo-estoque-combobox-menu .option-create {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.novo-estoque-combobox-menu .option-create:hover {
+  background: var(--color-bg-brand);
+}
+
+.novo-estoque-combobox-menu .option-empty {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+/* Painel de cadastro rápido de produto: mesmo tom neutro `--color-gray-50`
+   já usado no card de veículo de Novo Cadastro — um bloco "dentro" da
+   seção, não precisa reforçar marca. */
+.novo-estoque-quick-create {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.novo-estoque-quick-create[hidden] { display: none; }
+
+.novo-estoque-quick-create-title {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.novo-estoque-quick-create-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .novo-estoque-quick-create-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.novo-estoque-quick-create-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+}
+
+/* ── Observações (textarea) ────────────────────────────────────────────────
+   Não existe um componente Textarea próprio no Storybook ainda — reaproveita
+   a MESMA classe `.input` do Input (borda/radius/cor/foco idênticos), só
+   ajustando altura/resize pro elemento `<textarea>` em vez de reimplementar
+   a aparência do zero. */
+.novo-estoque-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 88px;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.novo-estoque-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+
+@media (min-width: 768px) {
+  .novo-estoque-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .novo-estoque-actions .btn { min-width: 160px; }
+}
+
+/* ── Forma de entrada (RadioButton) — mesmo espaçamento entre opções do
+   restante do formulário. ─────────────────────────────────────────────── */
+#forma-entrada-field .group { gap: var(--spacing-lg); }
+
+/* ── Compras: Importação de XML (dropzone + conferência mockada) ─────────
+   Sem parsing real (protótipo estático) — "Processar arquivo" só revela uma
+   tabela de conferência mockada, reaproveitando EXATAMENTE as classes de
+   tabela já padronizadas no sistema (`.table`/`.th`/`.td`), nunca um estilo
+   novo. */
+.novo-estoque-xml-block:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.novo-estoque-dropzone {
+  position: relative;
+}
+.novo-estoque-dropzone-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.novo-estoque-dropzone-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: var(--border-width-medium) dashed var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.novo-estoque-dropzone-input:focus-visible + .novo-estoque-dropzone-label,
+.novo-estoque-dropzone-label:hover {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+}
+
+/* Status inline do processamento automático do XML (sem botão) — mesmo par
+   ícone+texto/cor de `.errorText` (Input.module.css) pro estado de erro;
+   spinner reaproveita a MESMA animação já usada em `.dash-refresh-indicator`
+   (page-dashboard.css), portada aqui como classe própria desta tela. */
+.novo-estoque-xml-status:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+}
+.novo-estoque-xml-status.is-loading { color: var(--color-text-brand); }
+.novo-estoque-xml-status.is-error { color: var(--color-text-error); }
+
+.novo-estoque-xml-status-spin {
+  animation: novo-estoque-xml-spin 0.6s linear infinite;
+}
+@keyframes novo-estoque-xml-spin {
+  to { transform: rotate(360deg); }
+}
+
+.novo-estoque-xml-review-title {
+  margin: 0 0 var(--spacing-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+/* Mesma disciplina de coluna já padronizada (table-layout:fixed, Ações
+   sempre px fixo) — cópia da regra de Estoque/Cadastro, não um estilo novo. */
+.novo-estoque-xml-review-table {
+  table-layout: fixed;
+}
+.novo-estoque-xml-review-table .th:nth-child(1),
+.novo-estoque-xml-review-table .td:nth-child(1) { width: 50%; }
+.novo-estoque-xml-review-table .th:nth-child(2),
+.novo-estoque-xml-review-table .td:nth-child(2) { width: 20%; }
+.novo-estoque-xml-review-table .th:nth-child(3),
+.novo-estoque-xml-review-table .td:nth-child(3) { width: 20%; }
+.novo-estoque-xml-review-table .th:nth-child(4),
+.novo-estoque-xml-review-table .td:nth-child(4) { width: 80px; }
+
+/* Erro do bloco XML (nenhum produto conferido) — mesmo padrão de
+   `.wrapper.error`, só que `.novo-estoque-xml-block` não é um `.wrapper`
+   (não é um campo de Input único), por isso a regra é própria. */
+.novo-estoque-xml-block .errorText { display: none; }
+.novo-estoque-xml-block.error .errorText { display: flex; }
+.novo-estoque-xml-block.error .novo-estoque-dropzone-label {
+  border-color: var(--color-action-error);
+}

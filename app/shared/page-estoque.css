@@ -1,0 +1,699 @@
+/* ══════════════════════════════════════════════════════════
+   ESTOQUE — tela de listagem (Vendas / Compras / Comprometido)
+   Mobile first. Estrutura copiada de app/screens/cadastros.html (header +
+   botão primário, Tab, Table `.card`/`.cardHeader`, ações em ícone com
+   Tooltip padrão) e do card de KPI do Dashboard (resumo com ícone+título+
+   valor em destaque) — ver app/rules.md, seção "Estoque", pra detalhes de
+   quais decisões vieram de qual tela. Cadastro de Novo estoque fica fora
+   do escopo desta etapa (ver estoque.js).
+   ══════════════════════════════════════════════════════════ */
+
+.estoque-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+
+.estoque-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .estoque-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.estoque-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+#new-estoque-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  #new-estoque-btn {
+    width: auto;
+  }
+}
+
+/* ── Resumo (3 indicadores independentes) ─────────────────────────────────
+   Mesmo grid responsivo do Dashboard (`.dashboard-row`/`.dashboard-row-3`):
+   1 coluna no mobile, 3 iguais a partir de 1024px. Cópia deliberada (classes
+   próprias `estoque-*`), não um arquivo compartilhado — mesmo princípio já
+   documentado entre Dashboard/Cadastro. */
+.estoque-summary-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+  .estoque-summary-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+.card.estoque-summary-card {
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.estoque-summary-card .cardHeader {
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+}
+
+/* Título igual ao dos cards de KPI do Dashboard ("Safra 2025/2026" etc.):
+   18px/Bold/Gray 900 — não o 24px/Medium/Gray 700 que `.title` (Table)
+   declara sozinho. No Dashboard esse resultado final vem de uma colisão
+   entre `Table.module.css`'s `.title` e `Dialog.module.css`'s `.title`
+   (também 1 classe, carregado DEPOIS no `<head>` por causa do modal de
+   bloqueio de trial daquela tela — vence peso/cor; `.dash-card .title` em
+   page-dashboard.css só reforça o tamanho, que já batia por coincidência).
+   Aqui, sem nenhum Dialog carregado (não tem modal nesta tela), replicado
+   direto com os mesmos tokens em vez de importar Dialog.module.css só pra
+   reproduzir uma colisão não intencional de outra tela. */
+/* Mobile: mesmo par tamanho+peso de `.text-12-bold` (tokens de texto,
+   Storybook-Nivelo/src/tokens/typography.css) — restaurado pro par atual
+   (`.text-18-bold`) a partir de 1024px, ver media query abaixo. */
+.estoque-summary-card .title {
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+/* Ícone do título, proporcional ao tamanho reduzido em mobile — volta a
+   18px (tamanho original do atributo width/height do <i data-lucide>) a
+   partir de 1024px. */
+.estoque-summary-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Ícone e título centralizados verticalmente entre si (pedido explícito) —
+   antes era `flex-start` pra não deixar o ícone descer quando o título
+   quebrava em 2 linhas nos cards estreitos do grid de 3 colunas; com
+   `center`, o ícone fica alinhado ao meio do bloco de texto mesmo em 2
+   linhas, que é o alinhamento pedido agora. */
+.estoque-summary-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.estoque-summary-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+.estoque-summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+/* Mobile: mesmo tamanho de `.text-body-xxl` (24px/font-body), mas em bold
+   (pedido explícito) — o valor numérico principal também fica em negrito
+   igual ao título, não mais light. Restaurado pro tratamento atual
+   (font-heading/30px/medium) a partir de 1024px, ver media query abaixo. */
+.estoque-summary-value {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+/* Mobile: mesmo par de `.text-10-regular` — a legenda já usa
+   `.text-12-regular` via classe HTML (12px/regular), restaurado a partir
+   de 1024px, ver media query abaixo. */
+.estoque-summary-caption {
+  color: var(--color-text-tertiary);
+  font-size: 10px;
+  font-weight: var(--font-weight-regular);
+}
+
+/* Padrão de KPI (2026-08-03): título e valor ficam no MESMO tamanho do
+   mobile em qualquer largura de tela (12px bold / 24px bold) — decisão do
+   usuário depois de comparar visualmente as duas opções em Contas a Pagar,
+   agora aplicada em todas as telas com este padrão de KPI (Estoque/Caixa/
+   Contas a Pagar), exceto o Dashboard, que tem seu próprio padrão de card
+   (`.dash-card`) e não foi tocado por instrução explícita. Bloco antigo de
+   aumento no desktop (18px/30px) removido. A legenda (`.estoque-summary-
+   caption`) não faz parte do padrão de KPI testado — mantém o próprio
+   ajuste de tamanho no desktop. */
+@media (min-width: 1024px) {
+  .estoque-summary-caption {
+    font-size: 12px;
+    font-weight: var(--font-weight-regular);
+  }
+}
+
+/* ── Abas ──────────────────────────────────────────────────────────────── */
+/* Tipografia mobile + scrollbar escondida vêm do próprio Tab.module.css
+   (mobile-first, ver rules.md/CLAUDE.md) — nada específico de Estoque aqui. */
+
+/* ── Busca/Filtros/Exportação fundidos com a tabela ───────────────────────
+   `.estoque-list-card` é o container único (borda/sombra/radius — igual ao
+   tratamento responsivo que `.estoque-table-card` já tinha sozinho: some no
+   mobile, ganha fundo/borda/`--shadow-sm` a partir de 768px, mesmo
+   `.cadastros-table-card`). A barra de busca/filtros/exportação e a tabela
+   viram 2 seções internas deste mesmo container, separadas só por um
+   divisor (border-bottom), sem crescer a altura da barra de controles. */
+.card.estoque-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.estoque-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.estoque-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  /* Padding vertical +8px (era `--spacing-sm`/8px, virou `--spacing-md`/16px) —
+     horizontal mantido igual. */
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+@media (min-width: 768px) {
+  .estoque-filter-bar {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.estoque-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+  flex: 1;
+}
+
+.estoque-filter {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .estoque-filter {
+    width: auto;
+    flex: 0 1 220px;
+    min-width: 180px;
+  }
+  .estoque-filter-search {
+    flex: 1 1 280px;
+    min-width: 240px;
+  }
+}
+
+/* ⚠️ Colisão de classes .input com RadioButton.module.css (mesmo padrão já
+   documentado em rules.md pra Input×Checkbox) — RadioButton também declara
+   um `.input{position:absolute;width:1px;height:1px;opacity:0}` genérico
+   pra esconder o radio nativo atrás do círculo/dot customizado; como os
+   `.module.css` do Storybook são carregados aqui como stylesheets globais
+   (não CSS Modules de verdade), essa regra "vaza" pra QUALQUER <input>/
+   <textarea class="input"> de texto real da página — não só os 2 radios de
+   "Gerar Nota Fiscal". Sintoma: campo de busca e todos os inputs dos 3
+   modais de ação renderizavam com 1px/opacity:0/position:absolute (labels
+   apareciam sem nenhum campo visível ao lado). `:not([type="radio"])`
+   isola a correção só pros campos de texto reais, sem tocar no radio
+   nativo (que precisa continuar escondido). */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+}
+
+/* Mesma altura compacta (28px) do trigger de filtro em Cadastro
+   (`.cad-dropdown .trigger`) — busca e "Filtros" ficam na mesma linha de
+   base visual. */
+.estoque-filters .estoque-filter-search .input {
+  width: 100%;
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+/* Campos de texto/número/data dos 3 modais de ação (Registrar saída/
+   consumo/abatimento) — nenhuma regra própria de largura/altura existia
+   antes (dependiam só do `.input` base, que perdia a batalha de cascata
+   contra o RadioButton acima). Exclui o próprio radio de "Gerar Nota
+   Fiscal" (também descendente de `.estoque-modal-grid`) via `input.input`
+   (seletor de tag, nunca bate com o `<textarea>` da Observação, que já tem
+   seu próprio `min-height` em `.estoque-modal-textarea` mais abaixo). */
+.estoque-modal-grid input.input:not([type="radio"]) {
+  width: 100%;
+  height: 44px;
+}
+
+/* Mesma linguagem visual compacta do trigger "Filtros" logo abaixo (altura
+   28px, borda `--color-border-muted`, radius sm, fonte sm) — continua sendo
+   o Button real (`.btn.secondary`), só com altura/borda/tipografia
+   ajustados pra conviver harmonicamente com "Filtros" na mesma barra. Não
+   precisam ser idênticos em comportamento (um é Button, outro é trigger de
+   Dropdown), só looks compatíveis. */
+#estoque-export-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border-muted);
+  color: var(--color-text-secondary);
+  gap: var(--spacing-xs);
+}
+#estoque-export-btn:hover:not(:disabled) {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-300);
+  color: var(--color-text-primary);
+}
+#estoque-export-btn:active:not(:disabled) {
+  background: var(--color-gray-100);
+}
+@media (min-width: 768px) {
+  #estoque-export-btn {
+    width: auto;
+  }
+}
+
+/* "Filtros" (só Estoque Comprometido): mesmo tratamento do trigger de
+   "Data de cadastro" em Cadastro — ícone à esquerda do texto, altura
+   compacta. */
+#estoque-filtros-trigger-root .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  justify-content: flex-start;
+  gap: var(--spacing-xs);
+}
+.estoque-popover-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+/* ── Popover "Filtros" (Situação + Destinatário) — mesma composição do
+   Popover de "Data de cadastro"/"Período" já usada em Cadastro/Dashboard,
+   `position:fixed` calculado via JS. ─────────────────────────────────────── */
+.estoque-filter-popover:not([hidden]) {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ⚠️ Colisão de classes .option com RadioButton.module.css (mesmo padrão
+   documentado em page-novo-estoque.css) — RadioButton declara um
+   `.option{display:inline-flex}` genérico ("Gerar Nota Fiscal" nos
+   modais desta tela) que vaza pros itens `.option` dos Dropdowns de
+   Situação/Destinatário deste popover de filtro, fazendo os itens
+   ficarem lado a lado em vez de empilhados. */
+.menu .option {
+  display: block;
+}
+
+.estoque-filter-popover .trigger {
+  height: 36px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.estoque-filter-popover .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.estoque-filter-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Tabelas ───────────────────────────────────────────────────────────────
+   Mesmo cabeçalho compacto/uppercase + zebra branco/Gray 50 já usado na
+   tabela final de Cadastro (ver rules.md, "Tabela (Cadastro)") — cópia das
+   regras visuais, não da classe `.table-variant-compact` em si (nome
+   específico daquela tela), pra manter os `page-*.css` independentes.
+   Container (background/border/sombra): agora vem do `.estoque-list-card`
+   que envolve a barra de busca/filtros/exportação + a tabela (ver acima) —
+   cada `.estoque-table-card` é só a seção de tabela em si, sem borda/sombra
+   próprias (evita duplicar o container visual). */
+
+/* ATUALIZAÇÃO: rodadas anteriores foram na direção oposta (0 → 8px → 16px de
+   respiro entre o divisor da barra de busca/filtros e o cabeçalho da
+   tabela). Pedido explícito nesta rodada: colar os labels do cabeçalho no
+   divisor, zerando esse espaço de novo — `.estoque-mobile-cards` (Cards no
+   mobile) NÃO é afetado, só o cabeçalho da tabela real (desktop). */
+.estoque-table-card .tableWrap {
+  padding-top: 0;
+}
+
+.estoque-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: 32px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.estoque-table-card .th.sortable .thInner { gap: var(--spacing-sm); }
+.estoque-table-card .sortIcon { color: var(--color-gray-500); }
+.estoque-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.estoque-table-card .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  /* Mesma cor de borda mais visível de Cadastro (`.table-variant-compact
+     .td`) — antes herdava só o `--color-border-subtle` padrão do Table.
+     module.css, mais claro que o resto do cabeçalho/zebra desta tabela. */
+  border-color: var(--color-gray-200);
+}
+.estoque-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.estoque-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.estoque-table-card .tr:hover .td { filter: brightness(0.97); }
+
+/* 2 ícones por linha em todas as 3 tabelas agora (Ver detalhes + a ação
+   específica de cada estoque) — largura um pouco maior que a versão com 1
+   ícone só. */
+.estoque-table-card .tdActions {
+  width: 120px;
+}
+
+/* ── Larguras de coluna (table-layout:fixed) ───────────────────────────────
+   Mesma disciplina de Cadastro (`.table-variant-compact`): trava a largura
+   de cada coluna via `nth-child`, em vez de deixar o conteúdo decidir o
+   layout (`table-layout:auto`) — evita a tabela estourar/comprimir de forma
+   imprevisível quando um valor é mais longo que o esperado. Ações sempre em
+   px fixo (nunca %), suficiente pros 2 ícones de ação sem quebrar linha. */
+#panel-vendas .table,
+#panel-compras .table {
+  table-layout: fixed;
+}
+#panel-vendas .th:nth-child(1), #panel-vendas .td:nth-child(1),
+#panel-compras .th:nth-child(1), #panel-compras .td:nth-child(1) { width: 40%; }
+#panel-vendas .th:nth-child(2), #panel-vendas .td:nth-child(2),
+#panel-compras .th:nth-child(2), #panel-compras .td:nth-child(2) { width: 20%; }
+#panel-vendas .th:nth-child(3), #panel-vendas .td:nth-child(3),
+#panel-compras .th:nth-child(3), #panel-compras .td:nth-child(3) { width: 20%; }
+#panel-vendas .th:nth-child(4), #panel-vendas .td:nth-child(4),
+#panel-compras .th:nth-child(4), #panel-compras .td:nth-child(4) { width: 120px; }
+
+#panel-comprometido .table {
+  table-layout: fixed;
+}
+#panel-comprometido .th:nth-child(1), #panel-comprometido .td:nth-child(1) { width: 20%; }
+#panel-comprometido .th:nth-child(2), #panel-comprometido .td:nth-child(2) { width: 18%; }
+#panel-comprometido .th:nth-child(3), #panel-comprometido .td:nth-child(3) { width: 14%; }
+#panel-comprometido .th:nth-child(4), #panel-comprometido .td:nth-child(4) { width: 14%; }
+#panel-comprometido .th:nth-child(5), #panel-comprometido .td:nth-child(5) { width: 14%; }
+#panel-comprometido .th:nth-child(6), #panel-comprometido .td:nth-child(6) { width: 12%; }
+#panel-comprometido .th:nth-child(7), #panel-comprometido .td:nth-child(7) { width: 120px; }
+
+/* ── Tabela (desktop) / Cards (mobile) ─────────────────────────────────────
+   Mesmo padrão de Cadastro (ver page-cadastros.css, "Tabela (desktop) /
+   Cards (mobile)"): mobile-first, mostra Cards e esconde a tabela real por
+   padrão (comprimir a tabela inteira numa tela estreita fica ilegível);
+   a partir de 768px volta a mostrar a tabela e esconde os Cards. Cada Card
+   reaproveita `.card` do Table.module.css (mesmo genérico já usado no
+   Dashboard/Cadastro) — nenhum componente novo. Réplica deliberada das
+   classes `.cadastros-mobile-card*` com prefixo `estoque-*` (cópia, não
+   arquivo compartilhado — mesmo princípio já documentado entre as telas). */
+.estoque-table-card .tableWrap {
+  display: none;
+}
+.estoque-mobile-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .estoque-table-card .tableWrap {
+    display: block;
+  }
+  .estoque-mobile-cards {
+    display: none;
+  }
+}
+
+.estoque-mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.estoque-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.estoque-mobile-card-name {
+  color: var(--color-text-primary);
+}
+
+.estoque-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+
+.estoque-mobile-card-fields dt {
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+
+.estoque-mobile-card-fields dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.estoque-mobile-card-actions {
+  justify-content: flex-end;
+  padding: var(--spacing-sm) 0 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* Estado vazio (busca/filtros sem resultado) — mesmo padrão do
+   `.cadastros-empty` de Cadastro. */
+.estoque-table-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.estoque-table-empty:not([hidden]) { display: flex; }
+.estoque-table-empty p { margin: 0; }
+
+/* Situação (Pendente/Quitado): mesmo `.badge` real do Table, mesmo mapeamento
+   semântico já usado no Status de Cadastro (verde = resolvido, amarelo =
+   ainda pendente). */
+
+/* ── Toast de sucesso ("Registo de estoque salvo") ────────────────────────
+   Mesma composição de Cadastro (`.cadastros-toast-region`, Feedback
+   reaproveitado como Toast, ver rules.md) — cópia deliberada, classes
+   próprias. Mostrado ao voltar de Novo Lançamento (ver estoque.js). */
+.estoque-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+
+.estoque-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.estoque-toast {
+  box-shadow: var(--shadow-lg);
+  animation: estoque-toast-in 0.25s ease;
+}
+
+.estoque-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.estoque-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+
+@keyframes estoque-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Modais de ação (Registrar saída/consumo/abatimento) ───────────────────
+   Dialog do Storybook usado pela primeira vez nesta tela (antes só em
+   Cadastro) — `.overlay` tem `display:flex` incondicional no
+   Dialog.module.css, por isso o guard abaixo é obrigatório (mesmo gotcha já
+   documentado em rules.md, "colisão hidden + display incondicional"). Markup
+   idêntico é duplicado em detalhe-estoque.html (sem módulo de estado entre
+   as duas páginas, ver CLAUDE.md). */
+.overlay[hidden] { display: none; }
+
+.estoque-modal-recap {
+  padding: var(--spacing-md);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-md);
+}
+.estoque-modal-recap-title {
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+.estoque-modal-recap-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.estoque-modal-recap-fields dt {
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+.estoque-modal-recap-fields dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.estoque-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 560px) {
+  .estoque-modal-grid { grid-template-columns: 1fr 1fr; }
+  .estoque-modal-span-2 { grid-column: span 2; }
+}
+
+.estoque-modal-dropdown { position: relative; }
+
+/* Modal "Criar conta a receber?" (pós Registrar saída) — mesmo texto de
+   apoio já usado em "Criar conta a pagar?" de Novo registo de estoque. */
+.estoque-cr-modal-text { color: var(--color-text-secondary); margin: 0 0 var(--spacing-md); }
+
+.estoque-modal-nf-block {
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.estoque-modal-nf-block .estoque-modal-recap { margin-bottom: var(--spacing-md); }
+
+.estoque-modal-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+.estoque-modal-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 64px;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* Mensagem de erro dos campos do modal — mesmo padrão já usado em
+   Novo registo de estoque (`.wrapper.error`/`.errorText`). */
+.overlay .wrapper .errorText { display: none; }
+.overlay .wrapper.error .errorText { display: flex; }
+.overlay .wrapper.error .input,
+.overlay .wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* Combobox de Destinatário/Cliente (modal Registrar saída) — mesma técnica
+   já usada pro combobox de Produto em `page-novo-estoque.css` (Input de
+   busca + menu próprio em `position:fixed`, calculado via JS pra escapar do
+   `overflow:hidden` de `.card`/`.dialog`). Cópia própria desta tela, mesmo
+   princípio de não compartilhar CSS de página entre telas. */
+.estoque-combobox {
+  position: relative;
+}
+
+.estoque-combobox-menu {
+  position: fixed;
+  z-index: 60;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  max-height: 240px;
+  overflow-y: auto;
+}
+.estoque-combobox-menu[hidden] { display: none; }
+
+/* Reforça `display:block` contra a colisão .option×RadioButton (mesmo
+   padrão já documentado acima nesta mesma folha de estilos). */
+.estoque-combobox-menu .option {
+  display: block;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.estoque-combobox-menu .option:hover {
+  background: var(--color-bg-subtle);
+}
+
+.estoque-combobox-menu .option-empty {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}

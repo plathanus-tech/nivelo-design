@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-dashboard.css" />
+</head>
+<body>
+
+  <div class="dashboard-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+      <div class="app-header-right">
+        <button type="button" class="btn secondary" id="notebook-btn">
+          <i data-lucide="book-open" width="16" height="16"></i>
+          <span class="app-header-notebook-label">Caderno de campo</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item is-active" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <!-- Cadastros (expansível: Pessoas e empresas / Produtos) -->
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pessoas e empresas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <!-- Financeiro (expansível, independente de Vendas) -->
+                                    <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Vendas (expansível, independente de Financeiro) -->
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Fiscal · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Manifesto</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Assistente IA (expansível, independente dos demais grupos) -->
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="message-square-plus" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Nova conversa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <!-- Configuração (expansível; contém, entre seus subitens, o subgrupo Fiscal) -->
+            <div class="app-nav-group" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
+                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta Financeira</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+
+                <!-- Fiscal (subgrupo dentro de Configuração) -->
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <!-- SVG inline (não Lucide, a marca não existe lá): usa fill="currentColor"
+                   pra herdar cor/hover/active igual a qualquer outro ícone da Sidebar,
+                   mesma técnica que o Lucide usa internamente. Ver page-shell.css. -->
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — DASHBOARD ══════════════════ -->
+      <main class="app-main">
+        <div class="dashboard-grid" id="dashboard-grid">
+
+          <div class="dashboard-topbar">
+            <div class="dashboard-heading-row">
+              <h1 class="dashboard-heading text-heading-6">Dashboard</h1>
+              <div class="dash-trial-stack">
+                <span class="badge dash-trial-badge" id="dash-trial-badge" data-status="info">
+                  <i data-lucide="clock" width="14" height="14"></i>
+                  Teste gratuito · Plano <span id="dash-trial-plan-text">Gestão Completa</span> · <strong id="dash-trial-days-text">5 dias restantes</strong>
+                </span>
+                <button type="button" class="dash-trial-upgrade-btn" id="dash-trial-upgrade-btn">
+                  Contratar agora
+                </button>
+              </div>
+              <span class="dash-refresh-indicator" id="dashboard-refresh-indicator" aria-hidden="true">
+                <i data-lucide="loader-2" width="16" height="16"></i>
+              </span>
+            </div>
+
+            <div class="dashboard-filters" id="dashboard-filters">
+              <!-- Filtro de Fazenda: só aparece quando o usuário tem mais de uma fazenda
+                   cadastrada (ver FARMS em dashboard.js) — escondido por padrão aqui. -->
+              <div class="dash-filter" id="filter-fazenda" hidden>
+                <div class="wrapper dash-dropdown" id="dropdown-fazenda" data-dropdown>
+                  <span class="label">Fazenda</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span class="placeholder" data-dropdown-value>Selecione a fazenda</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" data-dropdown-menu></div>
+                </div>
+              </div>
+
+              <div class="dash-filter" id="filter-periodo">
+                <div class="wrapper dash-dropdown" id="dropdown-periodo" data-dropdown data-value="6m">
+                  <span class="label">Período</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value>Últimos 6 meses</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" data-dropdown-menu>
+                    <div class="option" data-value="3m">Últimos 3 meses</div>
+                    <div class="option selected" data-value="6m">Últimos 6 meses</div>
+                    <div class="option" data-value="12m">Últimos 12 meses</div>
+                    <div class="option" data-value="safra">Safra atual</div>
+                    <div class="option" data-value="custom">Período personalizado</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Popover do período personalizado: fica FORA do fluxo normal
+                   (position:fixed via JS), pra nunca empurrar o cabeçalho/
+                   layout do Dashboard, só sobrepor. Ver dashboard.js. -->
+              <div class="dash-period-popover" id="period-popover" hidden>
+                <div class="dash-period-popover-fields">
+                  <div class="wrapper">
+                    <span class="label">Data inicial</span>
+                    <div class="inputWrap"><input type="date" class="input" id="period-start-input" /></div>
+                  </div>
+                  <div class="wrapper">
+                    <span class="label">Data final</span>
+                    <div class="inputWrap"><input type="date" class="input" id="period-end-input" /></div>
+                  </div>
+                </div>
+
+                <div class="dash-calendar">
+                  <div class="dash-calendar-header">
+                    <button type="button" class="actionBtn" data-cal-prev aria-label="Mês anterior">
+                      <i data-lucide="chevron-left" width="16" height="16"></i>
+                    </button>
+                    <span class="dash-calendar-label" data-cal-label></span>
+                    <button type="button" class="actionBtn" data-cal-next aria-label="Próximo mês">
+                      <i data-lucide="chevron-right" width="16" height="16"></i>
+                    </button>
+                  </div>
+                  <div class="dash-calendar-weekdays">
+                    <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+                  </div>
+                  <div class="dash-calendar-grid" data-cal-grid></div>
+                </div>
+
+                <div class="dash-period-popover-actions">
+                  <button type="button" class="btn secondary sm" data-period-cancel>Cancelar</button>
+                  <button type="button" class="btn primary sm" data-period-apply>Aplicar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Linha 1: Safra · Estoque de grãos · Saldo em contas ── -->
+          <div class="dashboard-row dashboard-row-3">
+
+            <section class="card dash-card" aria-labelledby="card-safra-title">
+              <div class="cardHeader">
+                <div class="dash-card-title-row">
+                  <span class="dash-card-icon"><i data-lucide="sprout" width="18" height="18"></i></span>
+                  <h2 class="title" id="card-safra-title">Safra 2025/2026</h2>
+                </div>
+              </div>
+              <div class="dash-card-body">
+                <div class="dash-headline" data-content>
+                  <span class="dash-headline-value">100 ha</span>
+                  <span class="dash-headline-caption text-12-regular">Área total plantada</span>
+                </div>
+                <div class="dash-stat-list" data-content>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Soja</span>
+                      <span class="dash-stat-sub text-12-regular">média 62 sc/ha</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">60 ha</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Milho</span>
+                      <span class="dash-stat-sub text-12-regular">média 140 sc/ha</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">30 ha</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Trigo</span>
+                      <span class="dash-stat-sub text-12-regular">média 55 sc/ha</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">10 ha</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dash-empty" data-empty hidden>
+                  <i data-lucide="sprout" width="28" height="28"></i>
+                  <p class="text-14-regular">Nenhuma safra cadastrada ainda.</p>
+                  <a href="cadastro-endereco.html" class="dash-empty-link">Cadastrar safra</a>
+                </div>
+                <a href="#" class="dash-card-footer-link" data-content>Ver detalhes<i data-lucide="arrow-right" width="14" height="14"></i></a>
+              </div>
+            </section>
+
+            <section class="card dash-card" aria-labelledby="card-estoque-title">
+              <div class="cardHeader">
+                <div class="dash-card-title-row">
+                  <span class="dash-card-icon"><i data-lucide="warehouse" width="18" height="18"></i></span>
+                  <h2 class="title" id="card-estoque-title">Estoque de grãos</h2>
+                </div>
+              </div>
+              <div class="dash-card-body">
+                <div class="dash-headline">
+                  <span class="dash-headline-value" id="estoque-headline-value">2.430 sc</span>
+                  <span class="dash-headline-caption text-12-regular">Total em estoque</span>
+                  <!-- Total comprometido agregado, logo abaixo do total de sacas — mesma
+                       dimensão que cada linha por cultura já mostra individualmente, só
+                       resumida aqui pra dar uma leitura rápida sem precisar somar as 3 linhas. -->
+                  <span class="dash-comprometido-total text-12-regular" id="estoque-comprometido-total">450 sc comprometidas de 2.430 sc (18%)</span>
+                </div>
+                <div class="dash-stat-list" data-content>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Soja</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">1.240 sc</span>
+                      <div class="dash-comprometido-bar" data-comprometido="300" data-total="1240" role="img" aria-label="300 de 1.240 sacas comprometidas">
+                        <div class="dash-comprometido-bar-fill"></div>
+                      </div>
+                      <span class="dash-comprometido-label text-12-regular">300 sc comprometidas (24%)</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Milho</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">980 sc</span>
+                      <div class="dash-comprometido-bar" data-comprometido="150" data-total="980" role="img" aria-label="150 de 980 sacas comprometidas">
+                        <div class="dash-comprometido-bar-fill"></div>
+                      </div>
+                      <span class="dash-comprometido-label text-12-regular">150 sc comprometidas (15%)</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Trigo</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">210 sc</span>
+                      <div class="dash-comprometido-bar" data-comprometido="0" data-total="210" role="img" aria-label="0 de 210 sacas comprometidas">
+                        <div class="dash-comprometido-bar-fill"></div>
+                      </div>
+                      <span class="dash-comprometido-label text-12-regular">Nenhuma saca comprometida</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dash-empty" data-empty hidden>
+                  <i data-lucide="package" width="28" height="28"></i>
+                  <p class="text-14-regular">Nenhum grão em estoque no momento.</p>
+                  <a href="#" class="dash-empty-link">Registrar estoque</a>
+                </div>
+                <a href="#" class="dash-card-footer-link" data-content>Ver detalhes<i data-lucide="arrow-right" width="14" height="14"></i></a>
+              </div>
+            </section>
+
+            <section class="card dash-card" aria-labelledby="card-saldo-title">
+              <div class="cardHeader">
+                <div class="dash-card-title-row">
+                  <span class="dash-card-icon"><i data-lucide="wallet" width="18" height="18"></i></span>
+                  <h2 class="title" id="card-saldo-title">Saldo em contas</h2>
+                </div>
+              </div>
+              <div class="dash-card-body">
+                <div class="dash-headline">
+                  <span class="dash-headline-value" id="saldo-headline-value">R$ 119.500,00</span>
+                  <span class="dash-headline-caption text-12-regular">Saldo total</span>
+                </div>
+                <div class="dash-stat-list" data-content>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Sicredi</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 84.200,00</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Banco do Brasil</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 31.500,00</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Caixa físico</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 3.800,00</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dash-empty" data-empty hidden>
+                  <i data-lucide="landmark" width="28" height="28"></i>
+                  <p class="text-14-regular">Nenhuma conta bancária cadastrada.</p>
+                  <a href="#" class="dash-empty-link">Cadastrar conta</a>
+                </div>
+                <a href="#" class="dash-card-footer-link" data-content>Ver detalhes<i data-lucide="arrow-right" width="14" height="14"></i></a>
+              </div>
+            </section>
+
+          </div>
+
+          <!-- ── Linha 2: Contas a pagar · Contas a receber ── -->
+          <div class="dashboard-row dashboard-row-2">
+
+            <section class="card dash-card" aria-labelledby="card-pagar-title">
+              <div class="cardHeader">
+                <div class="dash-card-title-row">
+                  <span class="dash-card-icon"><i data-lucide="arrow-up-circle" width="18" height="18"></i></span>
+                  <h2 class="title" id="card-pagar-title">Contas a pagar</h2>
+                </div>
+                <p class="subtitle dash-card-meta">
+                  <span class="dash-card-meta-value out" id="pagar-meta-value">R$ 99.500,00</span> · <span data-period-text>Últimos 6 meses</span>
+                </p>
+              </div>
+              <div class="dash-table-body" data-content>
+                <div class="tableWrap">
+                  <table class="table">
+                    <thead>
+                      <tr class="headerRow">
+                        <th class="th">Vencto.</th>
+                        <th class="th">Descrição</th>
+                        <th class="th th-right">Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="tr">
+                        <td class="td">Abr/25</td>
+                        <td class="td">Financiamento Sicredi</td>
+                        <td class="td td-right">R$ 28.400,00</td>
+                      </tr>
+                      <tr class="tr">
+                        <td class="td">Mai/25</td>
+                        <td class="td">Insumos, Soja</td>
+                        <td class="td td-right">R$ 14.200,00</td>
+                      </tr>
+                      <tr class="tr">
+                        <td class="td">Jun/25</td>
+                        <td class="td">Arrendamento 40 ha</td>
+                        <td class="td td-right">R$ 22.000,00</td>
+                      </tr>
+                      <tr class="tr">
+                        <td class="td">Jul/25</td>
+                        <td class="td">Financiamento BB</td>
+                        <td class="td td-right">R$ 18.600,00</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <a href="#" class="dash-card-footer-link">Ver todas as contas<i data-lucide="arrow-right" width="14" height="14"></i></a>
+              </div>
+              <div class="dash-empty" data-empty hidden>
+                <i data-lucide="arrow-up-circle" width="28" height="28"></i>
+                <p class="text-14-regular">Nenhuma conta a pagar nos últimos 6 meses.</p>
+              </div>
+            </section>
+
+            <section class="card dash-card" aria-labelledby="card-receber-title">
+              <div class="cardHeader">
+                <div class="dash-card-title-row">
+                  <span class="dash-card-icon"><i data-lucide="arrow-down-circle" width="18" height="18"></i></span>
+                  <h2 class="title" id="card-receber-title">Contas a receber</h2>
+                </div>
+                <p class="subtitle dash-card-meta">
+                  <span class="dash-card-meta-value in" id="receber-meta-value">R$ 274.350,00</span> · <span data-period-text>Últimos 6 meses</span>
+                </p>
+              </div>
+              <div class="dash-table-body" data-content>
+                <div class="tableWrap">
+                  <table class="table">
+                    <thead>
+                      <tr class="headerRow">
+                        <th class="th">Vencto.</th>
+                        <th class="th">Descrição</th>
+                        <th class="th th-right">Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="tr">
+                        <td class="td">Abr/25</td>
+                        <td class="td">Venda de Soja, Lote 1</td>
+                        <td class="td td-right">R$ 82.000,00</td>
+                      </tr>
+                      <tr class="tr">
+                        <td class="td">Mai/25</td>
+                        <td class="td">Venda de Soja, Lote 2</td>
+                        <td class="td td-right">R$ 64.000,00</td>
+                      </tr>
+                      <tr class="tr">
+                        <td class="td">Jun/25</td>
+                        <td class="td">Venda de Milho, Lote 1</td>
+                        <td class="td td-right">R$ 31.200,00</td>
+                      </tr>
+                      <tr class="tr">
+                        <td class="td">Jul/25</td>
+                        <td class="td">Venda de Trigo, Lote 1</td>
+                        <td class="td td-right">R$ 22.050,00</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <a href="#" class="dash-card-footer-link">Ver todas as contas<i data-lucide="arrow-right" width="14" height="14"></i></a>
+              </div>
+              <div class="dash-empty" data-empty hidden>
+                <i data-lucide="arrow-down-circle" width="28" height="28"></i>
+                <p class="text-14-regular">Nenhuma conta a receber nos últimos 6 meses.</p>
+              </div>
+            </section>
+
+          </div>
+
+          <!-- ── Linha 3: Clima ── -->
+          <div class="dashboard-row dashboard-row-1">
+
+            <section class="card dash-card dash-card-weather" aria-labelledby="card-clima-title">
+              <div class="cardHeader">
+                <div class="dash-card-title-row">
+                  <span class="dash-card-icon"><i data-lucide="cloud-sun" width="18" height="18"></i></span>
+                  <h2 class="title" id="card-clima-title">Clima</h2>
+                </div>
+                <p class="subtitle">Região da Fazenda São João</p>
+              </div>
+              <div class="dash-weather">
+
+                <div class="dash-weather-current">
+                  <span class="dash-weather-icon"><i data-lucide="cloud-sun" width="40" height="40"></i></span>
+                  <div class="dash-weather-current-main">
+                    <span class="dash-weather-temp">27°C</span>
+                    <span class="dash-weather-condition text-14-regular">Sol entre nuvens</span>
+                  </div>
+                  <ul class="dash-weather-details text-12-regular">
+                    <li><i data-lucide="thermometer" width="14" height="14"></i> Mín 18° / Máx 29°</li>
+                    <li><i data-lucide="droplets" width="14" height="14"></i> Umidade 58%</li>
+                    <li><i data-lucide="wind" width="14" height="14"></i> Vento 12 km/h</li>
+                    <li><i data-lucide="cloud-rain" width="14" height="14"></i> Chuva 10%</li>
+                  </ul>
+                </div>
+
+                <ul class="dash-weather-forecast">
+                  <li class="dash-forecast-day">
+                    <span class="dash-forecast-label">Seg</span>
+                    <i data-lucide="sun" width="22" height="22"></i>
+                    <span class="dash-forecast-temps text-12-regular"><strong>29°</strong> 16°</span>
+                  </li>
+                  <li class="dash-forecast-day">
+                    <span class="dash-forecast-label">Ter</span>
+                    <i data-lucide="cloud-sun" width="22" height="22"></i>
+                    <span class="dash-forecast-temps text-12-regular"><strong>27°</strong> 15°</span>
+                  </li>
+                  <li class="dash-forecast-day">
+                    <span class="dash-forecast-label">Qua</span>
+                    <i data-lucide="cloud-rain" width="22" height="22"></i>
+                    <span class="dash-forecast-temps text-12-regular"><strong>22°</strong> 14°</span>
+                  </li>
+                  <li class="dash-forecast-day">
+                    <span class="dash-forecast-label">Qui</span>
+                    <i data-lucide="cloud-sun" width="22" height="22"></i>
+                    <span class="dash-forecast-temps text-12-regular"><strong>25°</strong> 15°</span>
+                  </li>
+                  <li class="dash-forecast-day">
+                    <span class="dash-forecast-label">Sex</span>
+                    <i data-lucide="sun" width="22" height="22"></i>
+                    <span class="dash-forecast-temps text-12-regular"><strong>30°</strong> 17°</span>
+                  </li>
+                </ul>
+
+              </div>
+            </section>
+
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída: fica FORA do `.app-shell` de
+       propósito, pra nunca cair dentro de um ancestral com `overflow:hidden`
+       ou `transform` que atrapalhe o `position:fixed` calculado via JS. -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <!-- Modal de bloqueio (fim do período de teste) — mesma composição do
+       Dialog do Storybook (overlay > dialog > header/body/footer), mas
+       DELIBERADAMENTE sem botão de fechar (X) e sem fechar ao clicar fora/
+       Esc: é um bloqueio de verdade, não uma confirmação dispensável. O
+       conteúdo do Dashboard continua visível (e "desabilitado") atrás,
+       através do próprio scrim semi-transparente do `.overlay` — nenhum
+       CSS extra de opacidade precisa ser aplicado no grid do Dashboard. -->
+  <div class="overlay" id="trial-block-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="trial-block-title">
+      <div class="header">
+        <h2 class="title" id="trial-block-title">Seu período de teste terminou</h2>
+      </div>
+      <div class="body">
+        <p class="text-body-s">Seu teste gratuito de 7 dias chegou ao fim. Para continuar usando o sistema, fale com o administrador da conta ou realize o pagamento.</p>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondary" id="trial-block-contact">Falar com administrador</button>
+        <button type="button" class="btn primary" id="trial-block-pay">Realizar pagamento</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/dashboard.js"></script>
+</body>
+</html>

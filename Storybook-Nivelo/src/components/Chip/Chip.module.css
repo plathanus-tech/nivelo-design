@@ -1,0 +1,47 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 var(--spacing-md);
+  border-radius: var(--radius-full);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.chip svg { flex-shrink: 0; }
+.chip:hover { background: var(--color-bg-subtle); border-color: var(--color-border-default); }
+.chip:focus-visible { outline: var(--border-width-medium) solid var(--color-border-focus); outline-offset: 2px; }
+
+/* `.chip.selected` (2 classes), não `.selected` sozinho — `Dropdown.
+   module.css` já usa `.option.selected`; um seletor de 1 classe aqui, ainda
+   que hoje sem conflito real (a especificidade de 2 classes do Dropdown
+   ganharia mesmo assim), fica inconsistente com o padrão defensivo adotado
+   pros outros componentes novos desta rodada (Avatar/VoteButton). */
+.chip.selected {
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  color: var(--color-text-inverse);
+}
+.chip.selected:hover { background: var(--color-action-primary-hover); border-color: var(--color-action-primary-hover); }
+
+/* ── Fileira — rolagem horizontal sem scrollbar visível ────────────────
+   Mesma técnica de Tab.module.css's `.list`: o eixo transbordante rola por
+   toque/wheel, mas a barra de rolagem do SO nunca aparece. `gap` entre
+   chips, sem quebra de linha (mobile e desktop usam a mesma fileira única,
+   só o desktop normalmente não precisa rolar por caber tudo). ────────── */
+.row {
+  display: flex;
+  gap: var(--spacing-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.row::-webkit-scrollbar { display: none; }

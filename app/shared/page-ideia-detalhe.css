@@ -1,0 +1,243 @@
+/* ══════════════════════════════════════════════════════════
+   IDEIA — DETALHE. Coluna única (sem sidebar de conteúdo, pedido explícito
+   do usuário) — mesma leitura em mobile/desktop, só o `max-width` centraliza
+   a coluna no desktop. O corpo da ideia usa o mesmo `.card` branco (Table.
+   module.css) do resto do sistema; os comentários ficam fora do card, com
+   um divisor sutil (`border-top`) separando as duas seções.
+   ══════════════════════════════════════════════════════════ */
+
+.ideia-detalhe-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.ideia-detalhe-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  align-self: flex-start;
+}
+.ideia-detalhe-back:hover {
+  color: var(--color-action-primary);
+}
+
+/* ── Estado "não encontrada" (mirror do padrão já usado em Estoque/Contas
+   a Pagar) ────────────────────────────────────────────────────────────── */
+.ideia-detalhe-not-found {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.ideia-detalhe-not-found:not([hidden]) { display: flex; }
+.ideia-detalhe-not-found p { margin: 0 0 var(--spacing-sm); }
+
+/* ── Corpo da ideia ────────────────────────────────────────────────────── */
+
+.ideia-detalhe-article {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+
+.ideia-detalhe-vote {
+  align-self: flex-start;
+}
+
+.ideia-detalhe-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+  flex: 1;
+}
+
+.ideia-detalhe-body .badge {
+  align-self: flex-start;
+}
+
+.ideia-detalhe-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.ideia-detalhe-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-tertiary);
+}
+
+.ideia-detalhe-author {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.ideia-detalhe-dot {
+  color: var(--color-border-default);
+}
+
+.ideia-detalhe-description {
+  color: var(--color-text-secondary);
+  margin: var(--spacing-xs) 0 0;
+  white-space: pre-wrap;
+}
+
+/* ── Comentários ───────────────────────────────────────────────────────── */
+
+.ideia-comentarios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.ideia-comentarios-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.ideia-comment-form {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+/* Botão "Comentar" MOVIDO pra dentro do próprio campo (canto inferior
+   direito da textarea), pedido explícito — `position:relative` no wrapper
+   ancora o botão `position:absolute`. `padding-right` na textarea abre
+   espaço pro botão não ficar por cima do texto digitado. */
+.ideia-comment-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.ideia-comment-input-wrap .input {
+  resize: vertical;
+  min-height: 100px;
+  padding: calc(var(--spacing-sm) + 4px) 120px calc(var(--spacing-sm) + 4px) calc(var(--spacing-md) + 4px);
+  line-height: var(--line-height-normal);
+}
+
+/* +8px de distância do botão pras bordas do campo (pedido explícito) —
+   antes ficava colado em `--spacing-xs` (4px); `padding-right` da textarea
+   sobe junto pra manter a mesma folga entre o texto e o botão. */
+.ideia-comment-submit {
+  position: absolute;
+  right: calc(var(--spacing-xs) + 8px);
+  bottom: calc(var(--spacing-xs) + 8px);
+}
+
+.ideia-comment-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ideia-comment {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+.ideia-comment:first-child {
+  padding-top: 0;
+}
+/* Linha divisória entre comentários — mesmo token já usado pro divisor
+   corpo-da-ideia/comentários acima (`--color-border-subtle`), nunca antes
+   do primeiro comentário. */
+.ideia-comment + .ideia-comment {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.ideia-comment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ideia-comment-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.ideia-comment-author {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.ideia-comment-date {
+  color: var(--color-text-tertiary);
+}
+
+.ideia-comment-text {
+  color: var(--color-text-secondary);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.ideia-comentarios-empty {
+  color: var(--color-text-tertiary);
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+.ideia-comentarios-empty p {
+  margin: 0;
+}
+
+/* ── Toast de sucesso (mesmo padrão de `.ideias-toast-region`, ver
+   page-canal-ideias.css) — duplicado aqui de propósito: as duas telas
+   carregam CSS independentes, mesma convenção já usada em Estoque/Detalhe
+   do Estoque. ──────────────────────────────────────────────────────────── */
+.ideias-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.ideias-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.ideias-toast {
+  box-shadow: var(--shadow-lg);
+  animation: ideias-toast-in 0.25s ease;
+}
+.ideias-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.ideias-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0;
+}
+.ideias-toast .message {
+  color: inherit;
+}
+
+@keyframes ideias-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

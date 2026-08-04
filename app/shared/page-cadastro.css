@@ -1,0 +1,287 @@
+/* ══════════════════════════════════════════════════════════
+   CRIAR CONTA — fluxo de cadastro em 3 steps + validação de telefone
+   Compartilhado pelas 4 telas do fluxo (cadastro.html,
+   cadastro-validar-telefone.html, cadastro-endereco.html,
+   cadastro-planos.html), do mesmo jeito que `page-login.css` é
+   compartilhado por todo o fluxo de autenticação. Reaproveita o
+   shell/card/tipografia de `page-login.css`; aqui só o indicador de
+   steps, o checkbox de termos + modal, os cards de plano e as notas de
+   desenvolvimento (específicos deste fluxo).
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Banner de trial (Escolha seu plano) ─────────────────
+   Destaque dos 7 dias de teste gratuito sem cartão de crédito, acima do
+   formulário de planos — reaproveita `.alert.info` (Feedback.module.css),
+   já carregado nesta tela pro Feedback de segurança do OTP. */
+.cadastro-trial-banner {
+  margin-bottom: var(--spacing-lg);
+}
+/* Colisão de 3 vias já documentada em app/rules.md (Feedback × Table ×
+   Dialog): `Dialog.module.css`'s `.title`/`.body` são carregados DEPOIS de
+   `Feedback.module.css` nesta tela (pro modal de Termos) e venciam por
+   especificidade igual + ordem de carga, deixando o banner com o tamanho/
+   peso/cor de TÍTULO DE MODAL (18px/bold/preto) e o `.body` com o padding
+   interno de modal (16px/24px), em vez do padrão real de alerta
+   (16px/medium/cor semântica + sem padding próprio). Mesmo fix de sempre:
+   seletor composto restaurando os valores originais do Feedback. */
+.cadastro-trial-banner .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+.cadastro-trial-banner .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+
+/* ── Indicador de steps ──────────────────────────────────
+   Composição própria de página (não existe um componente "Stepper" no
+   Storybook-Nivelo) a partir de tokens do design system, mesmo raciocínio
+   já usado pro OTP e pela lista de critérios de senha: reaproveitar
+   tokens/padrões visuais existentes em vez de inventar um componente. */
+.cadastro-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  list-style: none;
+  margin: 0 0 var(--spacing-lg);
+  padding: 0;
+}
+
+.cadastro-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 64px;
+}
+
+.cadastro-step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-subtle);
+  border: var(--border-width-medium) solid var(--color-border-muted);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+/* `letter-spacing:0.03em` é próprio desta tela (mais espaçado que o
+   `.text-10-medium` puro, pra dar ar de "rótulo" ao texto uppercase) —
+   fica declarado aqui em cima do que a classe já resolve (tamanho/peso). */
+.cadastro-step-label {
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.cadastro-step-connector {
+  flex: 0 0 32px;
+  height: var(--border-width-medium);
+  background: var(--color-border-muted);
+  margin: 14px var(--spacing-xs) 0;
+}
+
+/* Step atual: contorno azul preenchido, texto em destaque. */
+.cadastro-step.is-current .cadastro-step-circle {
+  border-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+  background: var(--color-bg-surface);
+}
+.cadastro-step.is-current .cadastro-step-label { color: var(--color-text-primary); }
+
+/* Step concluído: preenchido em azul sólido com check, conector também
+   avança de cor pra reforçar o progresso já percorrido. */
+.cadastro-step.is-complete .cadastro-step-circle {
+  border-color: var(--color-action-primary);
+  background: var(--color-action-primary);
+  color: var(--color-gray-white);
+}
+.cadastro-step.is-complete .cadastro-step-label { color: var(--color-text-secondary); }
+.cadastro-step.is-complete + .cadastro-step-connector { background: var(--color-action-primary); }
+
+/* ── Checkbox de termos (Step 3) ──────────────────────────
+   Mesma base do `.login-checkbox` já usado no Lembrar-me do Login, só que
+   o texto do label carrega dois links clicáveis (abrem o modal) no meio
+   da frase em vez de um texto plano. */
+.cadastro-terms {
+  align-items: flex-start;
+}
+.cadastro-terms .box { margin-top: 1px; }
+.cadastro-terms .label {
+  white-space: normal;
+  line-height: var(--line-height-normal);
+}
+
+.cadastro-terms-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-link);
+  cursor: pointer;
+}
+.cadastro-terms-link:hover { color: var(--color-text-link-hover); text-decoration: underline; }
+.cadastro-terms-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* Termos não aceitos ainda: mesma lógica de erro já usada no `.otp-error`
+   (escondido por padrão, aparece só quando a classe de erro é ligada). Só a
+   mensagem de erro aparece e o quadrado do checkbox ganha contorno vermelho
+   (mesma regra global de erro do restante do fluxo: nunca fundo vermelho
+   preenchido, só contorno + texto) — o texto principal do label NÃO muda de
+   cor, de propósito. */
+.cadastro-terms-error { display: none; }
+.cadastro-terms-field.error .cadastro-terms-error { display: flex; }
+.cadastro-terms-field.error .cadastro-terms .box { border-color: var(--color-action-error); }
+
+/* Mesma colisão de `.error` (Feedback × qualquer elemento com essa classe)
+   já documentada em `page-login.css`/`page-codigo-verificacao.css`: sem
+   isso, `.cadastro-terms-field.error` herdava o fundo/borda vermelhos do
+   alerta Feedback por engano (o quadrado vermelho atrás do campo). */
+.cadastro-terms-field.error { background: transparent; border-color: transparent; }
+
+/* ── Modal de Termos/Política (Dialog do Storybook) ──────
+   Markup/classes exatamente como `Dialog.tsx` monta (overlay > dialog >
+   header/body/footer) — só o conteúdo (título + corpo) troca via JS
+   conforme qual link foi clicado. `Dialog.module.css`'s `.overlay` já
+   define `display:flex` incondicional (no componente React o próprio
+   `if (!open) return null` cuida disso) — aqui, como controlamos
+   visibilidade via atributo `hidden` no HTML estático, essa regra do
+   componente vence o `[hidden]{display:none}` da UA stylesheet (mesma
+   especificidade, CSS de autor ganha), então precisa do mesmo padrão de
+   override já usado em `.login-alert[hidden]` (`page-login.css`). */
+.overlay[hidden] { display: none; }
+
+.cadastro-dialog-body p { margin: 0 0 var(--spacing-md); }
+.cadastro-dialog-body p:last-child { margin-bottom: 0; }
+.cadastro-dialog-body h3 {
+  color: var(--color-text-primary);
+  margin: var(--spacing-md) 0 var(--spacing-xs);
+}
+.cadastro-dialog-body h3:first-child { margin-top: 0; }
+
+/* Marcador "(opcional)" ao lado de um label (ex: Complemento no Step 2):
+   mais leve e mais claro que o texto principal do label (que é bold/
+   text-primary), pra ficar claramente secundário sem precisar de um texto
+   de apoio à parte. */
+.cadastro-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Step 2: campos lado a lado (Número + Complemento) ───
+   Mobile first: empilhados por padrão, viram uma linha só a partir do
+   breakpoint de tablet, igual ao resto do fluxo. */
+.cadastro-field-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .cadastro-field-row { flex-direction: row; }
+  .cadastro-field-row > .wrapper { flex: 1; }
+}
+
+/* ── Step 3: cards de plano (RadioButton do Storybook) ───
+   Reaproveita exatamente as classes de estado do RadioButton (`.input`,
+   `.circle`, `.dot`, `.checked`) pra manter o mesmo visual/comportamento
+   de seleção do componente real; só o layout do "option" (inline, texto
+   único) é substituído por um card com nome/preço/descrição, via este
+   compound selector (mesmo padrão de override já usado em `.wrapper.
+   login-field` pra Input/Checkbox). */
+.option.cadastro-plan-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.option.cadastro-plan-card:hover { border-color: var(--color-border-default); }
+.option.cadastro-plan-card.checked {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+}
+.option.cadastro-plan-card .circle { margin-top: 2px; }
+
+.cadastro-plan-info { flex: 1; min-width: 0; }
+
+.cadastro-plan-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.cadastro-plan-name {
+  color: var(--color-text-primary);
+}
+
+
+.cadastro-plan-tagline {
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+.cadastro-plans-fieldset { border: none; padding: 0; margin: 0; }
+
+.cadastro-plans {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: calc(var(--spacing-sm) * -1) 0 0;
+}
+
+/* Plano ainda não selecionado ao tentar avançar: mesmo padrão de erro do
+   restante do fluxo, só que no grupo inteiro em vez de um input só. */
+.cadastro-plans-error { display: none; }
+.cadastro-plans.error + .cadastro-plans-error { display: flex; }
+.cadastro-plans.error .option.cadastro-plan-card { border-color: var(--color-action-error); }
+
+/* ── Notas para desenvolvimento ───────────────────────────
+   Anotações visíveis só pro time de desenvolvimento (nunca pro cliente
+   final) — escondidas por padrão, controladas por `dev-notes.js` via uma
+   classe no <html>. Visual propositalmente distinto de qualquer Feedback
+   real (borda tracejada, sem ícone de alerta) pra não ser confundido com
+   um estado de erro/aviso do produto. */
+.dev-note {
+  display: none;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: var(--border-width-thin) dashed var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+}
+html.dev-notes-on .dev-note { display: block; }
+
+.dev-note-tag {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-action-warning);
+  margin-bottom: var(--spacing-xs);
+}
+
+.dev-note-text {
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+.dev-note-text ul { margin: var(--spacing-xs) 0 0; padding-left: var(--spacing-md); }

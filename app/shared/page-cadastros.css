@@ -1,0 +1,625 @@
+/* ══════════════════════════════════════════════════════════
+   CADASTRO DE PESSOAS E EMPRESAS — tela de listagem/gestão (Jornada ·
+   Cadastro). Mobile first. Mesmos padrões já usados no Dashboard: `Table`
+   como Card genérico, Dropdown/Input/Popover+calendário compostos a partir
+   de tokens. Ver app/rules.md.
+
+   Nota: o padrão de filtro (`.cad-filter`/`.cad-dropdown`) duplica de
+   propósito o equivalente `.dash-*` de `page-dashboard.css` em vez de
+   compartilhar um arquivo comum — mantém as duas telas independentes
+   (nenhuma referencia o CSS/JS da outra) e evita mexer no Dashboard já
+   aprovado só para extrair uma camada compartilhada. Se um terceiro
+   consumidor precisar do mesmo padrão, aí sim vale consolidar num arquivo
+   `filters.css` comum.
+   ══════════════════════════════════════════════════════════ */
+
+.cadastros-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.cadastros-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  /* Restaura o respiro que o header tinha antes de `.cadastros-page` virar
+     `gap:var(--spacing-sm)` (pedido explícito: só o espaço ENTRE
+     abas/card de filtros/card da tabela precisa ficar pequeno) — soma com
+     o gap do pai (8px) pra voltar aos mesmos 24px de antes só nesse par. */
+  margin-bottom: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .cadastros-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.cadastros-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+#add-cadastro-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  #add-cadastro-btn {
+    width: auto;
+  }
+}
+
+/* ── Busca/Filtros fundidos com a tabela (novo padrão do sistema) ─────────
+   REVERSÃO explícita de uma decisão anterior ("Filtros e tabela": card de
+   filtros SEPARADO do card da tabela, ver histórico logo abaixo na seção
+   "Tabela — versão final") — por pedido do usuário, a arquitetura fundida
+   já usada em Estoque (`.estoque-list-card`) vira o padrão oficial de
+   qualquer tabela do sistema, Cadastro incluído. `.cadastros-list-card` é
+   o container único (borda/sombra do Table.module.css `.card`, some no
+   mobile igual `.cadastros-table-card` já fazia sozinho); a barra de busca/
+   filtros vira só uma seção interna, com um divisor (`border-bottom`) em
+   vez de borda/sombra/fundo próprios. */
+.card.cadastros-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.cadastros-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.cadastros-filter-bar {
+  /* Padding vertical +8px (era `--spacing-sm`/8px, virou `--spacing-md`/16px) —
+     horizontal mantido igual. */
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+/* ── Pesquisa + Filtros (Data de cadastro / Situação) — mesma linha,
+   alinhados horizontalmente e com a mesma altura de campo. ──────────────── */
+
+.cadastros-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.cad-filter {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .cad-filter {
+    width: auto;
+    flex: 0 1 220px;
+    min-width: 180px;
+  }
+}
+
+/* Pesquisa entra como mais um item do mesmo flex row dos filtros, só que
+   proporcionalmente mais larga (é o campo mais usado) e capaz de crescer
+   pra ocupar o espaço sobrando. */
+@media (min-width: 768px) {
+  .cad-filter-search {
+    flex: 1 1 280px;
+    min-width: 240px;
+  }
+}
+
+/* Mesma altura do trigger do Dropdown usado nos filtros (28px, ver
+   `.cad-dropdown .trigger` abaixo) — só ajusta altura/fonte/padding
+   vertical, preserva o `padding-left:40px` do `.hasLeft` (ícone de busca)
+   já definido em Input.module.css, não reseta o padding inteiro.
+   Seletor com 4 classes de propósito: precisa vencer `.cadastros-filters
+   .cad-filter .input` (3 classes, mais abaixo neste arquivo, usada pelo
+   campo "Inativo/Excluído desde") em especificidade — como este elemento
+   também é `.cad-filter`, aquela regra bateria por igual/mais especificidade
+   e venceria por ordem de declaração se esta regra ficasse só com 2 ou 3
+   classes. */
+.cadastros-filters .cad-filter.cad-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  /* `padding-left` explícito (não só herdado do `.hasLeft` do Input.module.css):
+     a regra de 3 classes logo abaixo (`.cadastros-filters .cad-filter .input`,
+     usada pelo campo de data "Inativo desde") usa o shorthand `padding`, que
+     bate mais específico que `.hasLeft .input{padding-left:40px}` (3 classes
+     vs 2) e reduzia o espaço do ícone de busca pra 8px — texto do placeholder
+     colado no ícone. Precisa ficar aqui, não lá embaixo, porque este seletor
+     (4 classes) é o único mais específico que o de 3 classes. */
+  padding-left: 40px;
+}
+
+/* Dropdown/trigger reaproveitado como filtro: versão compacta, sem alterar
+   a lógica real do componente (mesmo tratamento já usado no Dashboard). */
+.cad-dropdown .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+.cad-dropdown .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+.cad-dropdown .option {
+  font-size: var(--font-size-sm);
+}
+
+/* ── Situação contextual (data "desde") ────────────────────────────────── */
+
+.cadastros-filters .cad-filter .input {
+  height: 36px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.cadastros-filters .cad-filter .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Abas ──────────────────────────────────────────────────────────────── */
+
+.cadastros-tabs {
+  gap: 0;
+}
+
+/* Tipografia mobile reduzida (font-size/padding) + scrollbar escondida:
+   era um override só de Cadastro, promovido pro próprio Tab.module.css
+   (agora mobile-first, sobe pro tamanho desktop a partir de 768px) — todo
+   uso de Tab no sistema (Cadastro, Estoque, ...) já ganha isso sem
+   precisar de regra própria por tela. Nada a fazer aqui. */
+
+/* ── Tabela (desktop) / Cards (mobile) ────────────────────────────────────
+   Mobile-first: por padrão mostra os Cards e esconde a tabela (comprimir a
+   tabela inteira numa tela estreita fica ilegível); a partir de 768px volta
+   a mostrar a tabela de verdade e esconde os Cards. Cada Card reaproveita
+   `.card` do próprio Table.module.css (mesmo "Card genérico" já usado no
+   Dashboard) — nenhum componente novo. */
+
+/* Container visual (background/border/sombra) agora vem do
+   `.cadastros-list-card` que envolve a barra de busca/filtros + esta seção
+   (ver acima) — `.cadastros-table-card` é só a seção de tabela em si, sem
+   border/shadow/background próprios (evita duplicar o container). */
+
+.cadastros-table-card .tableWrap {
+  display: none;
+}
+
+/* ATUALIZAÇÃO: rodadas anteriores foram na direção oposta (0 → 8px → 16px de
+   respiro entre o divisor da barra de busca/filtros e o cabeçalho da
+   tabela). Pedido explícito nesta rodada: colar os labels do cabeçalho no
+   divisor, zerando esse espaço de novo (mesmo ajuste replicado em Estoque).
+   `.cadastros-cards` (Cards no mobile) NÃO é afetado — mantém o respiro,
+   já que o pedido é especificamente sobre o cabeçalho da tabela real. */
+.cadastros-table-card .tableWrap {
+  padding-top: 0;
+}
+.cadastros-cards {
+  padding-top: var(--spacing-md);
+}
+
+/* Zebra/cabeçalho da tabela igual ao Dashboard (mesmas cores, mesma
+   hierarquia) — override sobre o zebra padrão do Table (`bg-subtle`/
+   `bg-default`) via seletor composto, cópia EXATA do padrão já usado em
+   `.dash-table-body` (ver page-dashboard.css/rules.md). O hover não
+   redeclara `background` de propósito: a regra de 1 classe do próprio
+   Table (`.tr:hover .td`) continua vencendo pra essa propriedade (menos
+   específica em geral, mas é a única que declara `background` no hover),
+   então o `filter:brightness()` daqui só escurece o `--color-bg-subtle`
+   que ela aplica — mesmo comportamento do Dashboard, não uma escolha nova. */
+.cadastros-table-card .th { background: var(--color-gray-100); }
+.cadastros-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.cadastros-table-card .tr:nth-child(even) .td { background: var(--color-gray-100); }
+.cadastros-table-card .tr:hover .td { filter: brightness(0.97); }
+
+/* ── Tabela — versão final (2026-07-24) ───────────────────────────────────
+   `.table-variant-compact` é a única versão da tabela; as demais opções
+   testadas em rodadas anteriores (header White/Gray 700 Semibold, header
+   Gray 100/Bold sem paginação) foram descartadas e removidas do protótipo.
+   Cabeçalho compacto/uppercase + paginação, zebra White/Gray 50, bordas
+   Gray 200. */
+
+.table-variant-compact .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm); /* 12px, "Text XS" — já era o padrão do Table, mantido */
+  /* Semibold (600) escolhido depois de comparar com Medium (500): em
+     CAIXA ALTA e 12px, Semibold lê melhor sem precisar aumentar o
+     letter-spacing além do already-estabelecido 0.06em (mesmo valor já
+     usado em `.app-nav-section-title`, ver page-shell.css) — Medium ficava
+     visualmente fraco demais perto do peso Regular do conteúdo abaixo. */
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.table-variant-compact .headerRow {
+  border-bottom-color: var(--color-gray-200);
+}
+.table-variant-compact .sortIcon {
+  color: var(--color-gray-500);
+}
+
+.table-variant-compact .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.table-variant-compact .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.table-variant-compact .td {
+  border-color: var(--color-gray-200);
+}
+.table-variant-compact .tr:hover .td { filter: brightness(0.97); }
+
+/* Linhas um pouco mais compactas: `.th`/`.td` do Table.module.css têm
+   `height` FIXO (37px/52px) — só reduzir o padding não encolhe a linha
+   (a altura explícita continua mandando), então os dois precisam mudar
+   junto. Redução leve (37→32px cabeçalho, 52→44px corpo), não agressiva. */
+.table-variant-compact .th {
+  height: 32px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.table-variant-compact .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* Larguras fixas (`table-layout:fixed`) cobrindo 100% da largura do card,
+   sem sobrar espaço que force `.tableWrap{overflow-x:auto}` a aparecer.
+   Versão FINAL (2026-07-24, revisão pós-teste): a rodada anterior tinha
+   `overflow-wrap:break-word` em `.td` como rede de segurança genérica —
+   isso permite o navegador quebrar QUALQUER string no meio (inclusive uma
+   palavra única como "Transportadora") sempre que a coluna for mais
+   estreita que o conteúdo, o que é exatamente o que não queremos.
+   Removido: cada coluna agora recebe largura calculada pro conteúdo real
+   que ela carrega, e só CPF/CNPJ e Contato (as duas colunas com strings
+   sem espaço, que nunca podem quebrar no meio de forma legível) usam
+   `nowrap` + `text-overflow:ellipsis` como fallback — nunca `break-word`.
+
+   Revisão seguinte (2026-07-24): coluna Contato REMOVIDA por completo (o
+   telefone/e-mail de cada cadastro passou pro `data-record` JSON, só usado
+   pela tela de edição — deixou de precisar de espaço na listagem). Tabela
+   final com 7 colunas: Nome/Código/Tipo/Status/CPF-CNPJ/Cidade/Ações.
+   Prioridade de espaço pra Nome, Tipo e CPF/CNPJ (pedido explícito).
+   Código mantém largura + padding-right próprios (respiro antes do ícone
+   de ordenação e da borda da próxima coluna). */
+.table-variant-compact .table {
+  table-layout: fixed;
+}
+
+.table-variant-compact .th:nth-child(1) { width: 24%; }   /* Nome (prioridade) */
+.table-variant-compact .th:nth-child(2) { width: 11%; }   /* Código (respiro antes do ícone de ordenação) */
+.table-variant-compact .th:nth-child(3) { width: 18%; }   /* Tipo (prioridade, cabe "Transportadora" inteiro) */
+.table-variant-compact .th:nth-child(4) { width: 10%; }   /* Status */
+.table-variant-compact .th:nth-child(5) { width: 20%; }   /* CPF/CNPJ (prioridade, cabe o documento inteiro) */
+.table-variant-compact .th:nth-child(6) { width: 14%; }   /* Cidade */
+/* Ações em px fixo (não %): precisa caber os 3 `actionBtn` de 32px + gaps +
+   padding do `.cellActions` (~112px de conteúdo real, medido via
+   `getBoundingClientRect()`) — uma % ficava estreita demais e forçava
+   scroll horizontal na tabela, exatamente o que esta variante quer evitar. */
+.table-variant-compact .th:nth-child(7) { width: 120px; }  /* Ações (compacta) */
+
+/* Espaçamento interno entre o conteúdo do cabeçalho e o ícone de ordenação
+   (`.thInner` do Table.module.css só tem 4px de gap por padrão) — em
+   colunas estreitas como Código, o ícone ficava praticamente colado no
+   texto e perto demais da borda com a próxima coluna. */
+.table-variant-compact .th.sortable .thInner {
+  gap: var(--spacing-sm);
+}
+.table-variant-compact .th:nth-child(2) {
+  padding-right: var(--spacing-md);
+}
+
+/* Tipo: "Transportadora" sozinho (a palavra mais longa que aparece nessa
+   coluna) tem que caber inteiro numa linha — a combinação tripla ("Cliente,
+   Fornecedor, Transportadora") ainda pode quebrar em mais de uma linha,
+   mas SÓ na vírgula/espaço (comportamento padrão de word-wrap), nunca no
+   meio de uma palavra. Nome/Cidade seguem o mesmo padrão (quebra normal,
+   nunca `break-word`). */
+.table-variant-compact .td:nth-child(3) {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Código: string curta e sem espaço (ex. "CFT-7001") — nunca precisa
+   quebrar, então fica numa linha só por padrão (coluna já dimensionada
+   folgada o bastante). */
+.table-variant-compact .td:nth-child(2) {
+  white-space: nowrap;
+}
+
+/* CPF/CNPJ: a única coluna restante com string SEM espaço que pode
+   realmente estourar a largura em algum caso extremo. Prioridade explícita
+   do usuário: documento completo numa linha sempre que couber (coluna já
+   alargada o bastante pra isso no caso comum); quando não couber, ellipsis
+   + tooltip nativo (`title`, preenchido via JS em `cadastros.js`) em vez de
+   quebrar no meio — nunca `break-word`. */
+.table-variant-compact .td:nth-child(5) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Paginação (composição própria a partir de tokens — sem componente
+   Pagination dedicado no Storybook ainda, mesmo raciocínio já aplicado ao
+   Popover+calendário) ─────────────────────────────────────────────────── */
+.cad-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+.cad-pagination[hidden] { display: none; }
+
+.cad-pagination-info {
+  color: var(--color-text-tertiary);
+}
+
+.cad-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+}
+
+.cad-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+}
+
+/* Botão de página: mesmo tratamento visual do dia selecionado no
+   calendário de "Data de cadastro" (`is-start`/`is-end` em
+   `.cad-calendar-day`) — fundo `--color-action-primary` + texto invertido
+   quando é a página atual, transparente/hover sutil quando não é. */
+.cad-pagination-page {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--spacing-2xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.cad-pagination-page:hover { background: var(--color-bg-subtle); }
+.cad-pagination-page.is-active {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+  cursor: default;
+}
+.cad-pagination-page.is-active:hover { background: var(--color-action-primary); }
+
+@media (max-width: 479px) {
+  .cad-pagination {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+}
+
+.cadastros-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .cadastros-table-card .tableWrap {
+    display: block;
+  }
+  .cadastros-cards {
+    display: none;
+  }
+}
+
+.cadastros-mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.cadastros-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.cadastros-mobile-card-name {
+  color: var(--color-text-primary);
+}
+
+.cadastros-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+
+.cadastros-mobile-card-fields dt {
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+
+.cadastros-mobile-card-fields dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.cadastros-mobile-card-actions {
+  justify-content: flex-end;
+  padding: var(--spacing-sm) 0 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* Nome fantasia: segunda linha discreta abaixo da razão social, dentro da
+   mesma célula (Nome fantasia entra na busca mas não vira coluna própria). */
+.cadastros-fantasia {
+  display: block;
+  color: var(--color-text-tertiary);
+}
+
+/* Modal de exclusão (Dialog do Storybook) — `Dialog.module.css`'s `.overlay`
+   define `display:flex` incondicional (no componente React o `if (!open)
+   return null` cuida disso); aqui a visibilidade é via atributo `hidden` no
+   HTML estático, que perde para essa regra em especificidade igual (CSS de
+   autor vence a UA stylesheet). Mesmo override já usado no Modal de Termos
+   em page-cadastro.css. */
+.overlay[hidden] { display: none; }
+
+/* Modal de exclusão — botões do rodapé dividem a largura igualmente;
+   Cancelar usa Outline com Gray 700 (não a cor de marca padrão do
+   `.secondary`, só a ESTRUTURA outline dele: fundo transparente + borda),
+   Excluir mantém `.btn.destructive` (Fill, já é o tratamento destrutivo
+   padrão do Design System). */
+#delete-dialog-overlay .footer {
+  justify-content: stretch;
+}
+#delete-dialog-overlay .footer .btn {
+  flex: 1;
+}
+#delete-dialog-cancel {
+  background-color: transparent;
+  color: var(--color-gray-700);
+  border-color: var(--color-gray-700);
+}
+#delete-dialog-cancel:hover:not(:disabled) {
+  background-color: var(--color-gray-100);
+  border-color: var(--color-gray-700);
+  color: var(--color-gray-700);
+}
+#delete-dialog-cancel:active:not(:disabled) {
+  background-color: var(--color-gray-200);
+}
+
+.cadastros-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.cadastros-empty:not([hidden]) { display: flex; }
+
+.cadastros-empty p {
+  margin: 0;
+}
+
+/* ── Estado vazio "nenhum cadastro" (2026-07-24) ──────────────────────────
+   Variante de demonstração (`#state=empty`, ver cadastros.js) pra quando o
+   usuário ainda não tem NENHUM cadastro — diferente de `.cadastros-empty`
+   acima (que é sobre um filtro sem resultado, com dados já existentes).
+   `.is-demo-empty` (adicionada em `.cadastros-table-card` só nesse estado)
+   esconde tabela/cards/paginação/empty-de-filtro e mostra este bloco maior
+   e centralizado no lugar, mantendo Search+filtros no topo intocados. */
+.cadastros-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.cadastros-table-card.is-demo-empty .tableWrap,
+.cadastros-table-card.is-demo-empty .cadastros-cards,
+.cadastros-table-card.is-demo-empty .cadastros-empty,
+.cadastros-table-card.is-demo-empty #cad-pagination {
+  display: none;
+}
+.cadastros-table-card.is-demo-empty .cadastros-empty-global {
+  display: flex;
+}
+
+.cadastros-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+
+.cadastros-empty-global-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.cadastros-empty-global-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--spacing-sm);
+  max-width: 360px;
+}
+
+/* ── Toast de sucesso ("Cadastro incluído com sucesso") ──────────────────
+   Mesma composição já usada no Dashboard (Feedback reaproveitado como
+   Toast, `--shell-header-height` já vive em `:root` desde a correção do
+   round anterior, ver rules.md) — cópia deliberada, não compartilhada,
+   mesmo motivo dos demais padrões `cad-*`/`dash-*` duplicados nesta tela. */
+.cadastros-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+
+.cadastros-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.cadastros-toast {
+  box-shadow: var(--shadow-lg);
+  animation: cadastros-toast-in 0.25s ease;
+}
+
+/* Mesma colisão de 3 vias já documentada em rules.md (Feedback × Table ×
+   Dialog, os 3 carregados juntos nesta tela) — `.body`/`.title` do Dialog
+   venceriam por serem carregados depois, quebrando alinhamento/cor do
+   toast. Seletor composto restaura os valores originais do Feedback. */
+.cadastros-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.cadastros-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+
+@keyframes cadastros-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

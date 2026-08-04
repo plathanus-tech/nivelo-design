@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "nivelo-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "Storybook-Nivelo", "-p", "7777", "--no-clipboard"],
+      "port": 7777
+    },
+    {
+      "name": "landing",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "-p", "3400", "--no-clipboard"],
+      "port": 3400
+    },
+    {
+      "name": "app-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", ".", "-p", "8090", "-c-1"],
+      "port": 8090
+    },
+    {
+      "name": "app-preview-2",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", ".", "-p", "8091", "-c-1"],
+      "port": 8091
+    },
+    {
+      "name": "storybook-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "Storybook-Nivelo", "run", "storybook", "--", "--ci"],
+      "port": 6006
+    }
+  ]
+}

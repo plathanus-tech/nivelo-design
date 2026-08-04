@@ -1,0 +1,233 @@
+/* ══════════════════════════════════════════════════════════
+   FAZENDAS — Configuração > Cadastro de fazenda. Listagem em cards (não
+   tabela, pedido explícito do usuário: público-alvo tem normalmente 1-2
+   propriedades). Mobile first. Header/empty-state seguem o mesmo padrão já
+   estabelecido em Produtos/Cadastro; o grid de cards é responsivo via
+   `auto-fill` (técnica nova neste arquivo — necessária porque é a primeira
+   lista de tamanho VARIÁVEL em cards do sistema; os grids fixos de
+   Dashboard/Estoque são sempre 3 colunas fixas).
+   ══════════════════════════════════════════════════════════ */
+
+.fazendas-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.fazendas-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .fazendas-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.fazendas-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.fazendas-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.fazendas-description {
+  color: var(--color-text-tertiary);
+  margin: 0;
+  max-width: 480px;
+}
+
+#new-fazenda-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  #new-fazenda-btn {
+    width: auto;
+  }
+}
+
+/* ── Grid de cards ─────────────────────────────────────────────────────── */
+
+.fazendas-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+  .fazendas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+  }
+}
+
+.card.fazenda-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.card.fazenda-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-default);
+}
+
+.fazenda-card .cardHeader {
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+}
+
+.fazenda-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-lg);
+  flex: 1;
+}
+
+.fazenda-card-location {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+}
+.fazenda-card-location svg {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+.fazenda-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.fazenda-card-stats dt {
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+.fazenda-card-stats dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.fazenda-card-updated {
+  color: var(--color-text-tertiary);
+}
+
+.fazenda-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.fazenda-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.fazenda-card-link:hover {
+  color: var(--color-action-primary-hover);
+}
+
+/* ── Estado vazio (mirror exato de `.produtos-empty-global`) ──────────────
+   Mostrado quando `NiveloFazendas.list()` está vazio ou via `#state=empty`. */
+.fazendas-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.fazendas-empty-global:not([hidden]) { display: flex; }
+
+.fazendas-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+
+.fazendas-empty-global-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.fazendas-empty-global-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--spacing-sm);
+  max-width: 360px;
+}
+
+/* ── Toast de sucesso (cadastro de nova fazenda) ──────────────────────────
+   Cópia exata do padrão de `.fazenda-cadastro-toast-region`
+   (page-fazenda-detalhe-cadastro.css) — mesmo Feedback (Storybook)
+   reaproveitado como toast, mesma correção de colisão com `.card`
+   (Table.module.css, carregado nesta tela pros cards de fazenda). */
+.fazendas-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.fazendas-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.fazendas-toast {
+  box-shadow: var(--shadow-lg);
+  animation: fazendas-toast-in 0.25s ease;
+}
+.fazendas-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.fazendas-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0;
+}
+
+@keyframes fazendas-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

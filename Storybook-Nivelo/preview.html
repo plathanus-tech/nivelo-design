@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Nivelo Design System</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+/* ── Fonts ── */
+@font-face{font-family:'HN';src:url('./public/fonts/helveticaneue-light.otf') format('opentype');font-weight:300}
+@font-face{font-family:'HN';src:url('./public/fonts/helveticaneue.otf') format('opentype');font-weight:400}
+@font-face{font-family:'HN';src:url('./public/fonts/helveticaneue-medium.otf') format('opentype');font-weight:500}
+@font-face{font-family:'HN';src:url('./public/fonts/helveticaneue-bold.otf') format('opentype');font-weight:700}
+
+/* ── Tokens ── */
+:root{
+  --fh:'HN',Arial,sans-serif; --fb:'HN',Arial,sans-serif;
+  --fw-light:300; --fw-reg:400; --fw-med:500; --fw-bold:700;
+  --b50:#EEF3FB;--b100:#D4E1F5;--b200:#A9C3EB;--b300:#7EA5E1;--b400:#5387D7;--b500:#1752B0;--b600:#12449A;--b700:#0E3680;--b800:#0A2860;--b900:#061A40;--b950:#030D20;
+  --a50:#FEFAE8;--a100:#FDF4C5;--a200:#FBE98B;--a300:#F9DC51;--a400:#EFCB34;--a500:#D4B01A;--a600:#B09010;
+  --g0:#FFFFFF;--g50:#FAFAFA;--g100:#F5F5F5;--g200:#E5E5E5;--g300:#D4D4D4;--g400:#A3A3A3;--g500:#737373;--g600:#525252;--g700:#404040;--g800:#262626;--g900:#171717;--g950:#0A0A0A;
+  --red6:#DC2626;--red7:#B91C1C;--red5:#EF4444;--red50:#FEF2F2;--red2:#FECACA;
+  --grn6:#16A34A;--grn7:#15803D;--grn50:#F0FDF4;--grn2:#BBF7D0;
+  --ylw6:#CA8A04;--ylw7:#A16207;--ylw50:#FEFCE8;--ylw3:#FDE047;
+  --tp:var(--g900);--ts:var(--g700);--tt:var(--g500);--td:var(--g400);
+  --bg:var(--g50);--surf:var(--g0);
+  --brd:var(--g300);--brds:var(--g100);
+  --focus:0 0 0 3px rgba(23,82,176,.18);
+  --sh-sm:0 1px 3px rgba(23,82,176,.08),0 1px 2px rgba(0,0,0,.06);
+  --sh-md:0 2px 6px rgba(23,82,176,.10),0 4px 8px rgba(0,0,0,.06);
+  --sh-lg:0 4px 14px rgba(23,82,176,.13),0 8px 24px rgba(0,0,0,.08);
+}
+
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);font-weight:300;font-size:15px;color:var(--tp);background:var(--bg);display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,h5,h6{font-family:var(--fh);font-weight:500}
+a{color:var(--b500);text-decoration:none}
+button{cursor:pointer;font-family:var(--fb)}
+
+/* ── Layout ── */
+.sidebar{width:232px;min-width:232px;background:var(--surf);border-right:1px solid var(--brd);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--brds)}
+.sb-logo-name{font-size:17px;font-weight:500;color:var(--b500)}
+.sb-logo-sub{font-size:11px;color:var(--tt);margin-top:2px;font-weight:300}
+.sb-section{padding:14px 20px 4px;font-size:10px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--tt);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.sb-section .chevron{font-size:9px;transition:transform 200ms}
+.sb-section.collapsed .chevron{transform:rotate(-90deg)}
+.sb-group{overflow:hidden;transition:max-height 300ms ease}
+.sb-group.collapsed{max-height:0!important}
+.sb-link{display:flex;align-items:center;gap:8px;padding:6px 20px 6px 28px;font-size:13px;font-weight:300;color:var(--ts);text-decoration:none;border-left:2px solid transparent;transition:all 120ms}
+.sb-link:hover{background:var(--g50);color:var(--tp)}
+.sb-link.active{color:var(--b500);border-left-color:var(--b500);background:var(--b50);font-weight:400}
+.sb-link-dot{width:6px;height:6px;border-radius:50%;background:var(--g300);flex-shrink:0}
+.sb-link.active .sb-link-dot{background:var(--b400)}
+
+.main{flex:1;overflow-y:auto;height:100vh}
+
+/* ── Page ── */
+.page{display:none;padding:48px 56px 80px;max-width:980px}
+.page.active{display:block}
+.page-header{margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--brd)}
+.page-title{font-size:30px;font-weight:500;color:var(--tp);margin-bottom:6px}
+.page-desc{font-size:14px;font-weight:300;color:var(--ts);line-height:1.65;max-width:640px}
+
+/* ── A11y badge ── */
+.a11y-bar{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 32px}
+.a11y-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:9999px;border:1px solid}
+.a11y-pill.pass{background:#F0FDF4;color:#15803D;border-color:#BBF7D0}
+.a11y-pill.warn{background:#FEFCE8;color:#A16207;border-color:#FDE047}
+.a11y-pill.info{background:var(--b50);color:var(--b700);border-color:var(--b200)}
+
+/* ── Story block ── */
+.story{margin-bottom:32px}
+.story-title{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--tt);margin-bottom:10px}
+.canvas{background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:none;border-radius:10px 10px 0 0}
+.canvas.col{flex-direction:column;align-items:flex-start}
+.canvas.pad-lg{padding:40px}
+.code-bar{display:flex;align-items:center;justify-content:space-between;background:var(--g900);border:1px solid var(--g800);border-top:none;border-radius:0 0 10px 10px;padding:8px 14px}
+.code-toggle-btn{font-size:11px;font-weight:500;color:var(--g400);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color 120ms}
+.code-toggle-btn:hover{color:var(--g0)}
+.code-copy-btn{font-size:11px;color:var(--g500);background:none;border:1px solid var(--g700);border-radius:5px;padding:3px 10px;cursor:pointer;transition:all 120ms}
+.code-copy-btn:hover{color:var(--g0);border-color:var(--g500)}
+.code-block{display:none;background:var(--g950);border:1px solid var(--g800);border-top:none;border-radius:0 0 10px 10px;padding:20px;overflow-x:auto}
+.code-block.open{display:block}
+.code-block pre{font-family:'Courier New',monospace;font-size:12px;line-height:1.65;color:#e2e8f0;white-space:pre}
+.code-block .kw{color:#93c5fd} /* keyword / tag */
+.code-block .at{color:#86efac} /* attribute */
+.code-block .st{color:#fde68a} /* string */
+.code-block .cm{color:#6b7280} /* comment */
+
+/* ── Subsection ── */
+.sub-title{font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--tt);margin:36px 0 12px}
+
+/* ── Collapsible foundation block ── */
+.found-block{border:1px solid var(--brd);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.found-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--surf);cursor:pointer;user-select:none;font-weight:500;font-size:14px;color:var(--tp);border:none;width:100%;text-align:left}
+.found-toggle:hover{background:var(--g50)}
+.found-toggle .fchev{transition:transform 200ms;font-size:11px;color:var(--tt)}
+.found-toggle.open .fchev{transform:rotate(180deg)}
+.found-body{padding:20px;border-top:1px solid var(--brds);display:none}
+.found-body.open{display:block}
+
+/* ── Swatches ── */
+.swatches{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.sw{display:flex;flex-direction:column;align-items:center;gap:4px}
+.sw-box{width:52px;height:52px;border-radius:10px;border:1px solid rgba(0,0,0,.07);box-shadow:0 1px 3px rgba(0,0,0,.07);transition:transform 120ms;cursor:default}
+.sw-box:hover{transform:scale(1.08)}
+.sw-lbl{font-size:9px;color:var(--tt);font-family:monospace}
+
+/* ── Semantic grid ── */
+.sem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px}
+.sem-card{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1px solid var(--brds);border-radius:8px;background:var(--surf)}
+.sem-dot{width:30px;height:30px;border-radius:7px;flex-shrink:0;border:1px solid rgba(0,0,0,.08)}
+.sem-name{font-size:11px;font-weight:500;color:var(--tp)}
+.sem-token{font-size:10px;font-family:monospace;color:var(--tt)}
+
+/* ── Type rows ── */
+.type-table{display:flex;flex-direction:column;gap:4px}
+.type-head{display:grid;grid-template-columns:150px 1fr 58px 60px 70px;gap:12px;padding:0 14px 8px;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--tt)}
+.type-row{display:grid;grid-template-columns:150px 1fr 58px 60px 70px;align-items:center;gap:12px;padding:11px 14px;border:1px solid var(--brds);border-radius:8px;background:var(--surf)}
+.type-meta-name{font-size:12px;font-weight:500;color:var(--tp)}
+.type-meta-sub{font-size:10px;color:var(--tt);margin-top:2px}
+.type-preview{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--tp)}
+.type-stat{font-size:11px;font-family:monospace;color:var(--ts);text-align:right}
+
+/* ── Spacing ── */
+.sp-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--brds)}
+.sp-name{font-size:12px;font-weight:500;color:var(--tp);min-width:76px}
+.sp-bar{background:var(--b200);border-radius:4px;height:20px;flex-shrink:0}
+.sp-val{font-size:11px;font-family:monospace;color:var(--tt)}
+
+/* ── Radius ── */
+.rad-grid{display:flex;gap:14px;flex-wrap:wrap}
+.rad-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;border:1px solid var(--brds);border-radius:10px;background:var(--surf)}
+.rad-box{width:56px;height:56px;background:var(--b100);border:2px solid var(--b300)}
+.rad-name{font-size:11px;font-weight:500;color:var(--tp)}
+.rad-val{font-size:10px;font-family:monospace;color:var(--tt)}
+
+/* ── Shadow ── */
+.sh-grid{display:flex;gap:20px;flex-wrap:wrap;padding:16px 0}
+.sh-card{display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px;border:1px solid var(--brds);border-radius:10px;background:var(--surf);min-width:100px}
+.sh-box{width:56px;height:56px;background:var(--surf);border-radius:10px}
+.sh-name{font-size:11px;font-weight:500;color:var(--tp)}
+
+/* ── Components ── */
+/* Button */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--fh);font-weight:500;font-size:14px;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;transition:all 150ms;white-space:nowrap;line-height:1}
+.btn:focus-visible{outline:none;box-shadow:var(--focus)}
+.btn-primary{background:var(--b500);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--b600);box-shadow:var(--sh-sm)}
+.btn-secondary{background:var(--b50);color:var(--b600);border:1px solid var(--b200)}
+.btn-secondary:hover:not(:disabled){background:var(--b100)}
+.btn-accent{background:var(--a400);color:#1a1200;font-weight:500}
+.btn-accent:hover:not(:disabled){background:var(--a500)}
+.btn-ghost{background:transparent;color:var(--b500);border:1px solid var(--brd)}
+.btn-ghost:hover:not(:disabled){background:var(--g50)}
+.btn-danger{background:var(--red6);color:#fff}
+.btn-danger:hover:not(:disabled){background:var(--red7)}
+.btn-sm{font-size:12px;padding:6px 14px}
+.btn-lg{font-size:16px;padding:14px 28px;border-radius:10px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Input */
+.field{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:13px;font-weight:500;color:var(--tp)}
+.field-hint{font-size:11px;font-weight:300;color:var(--tt)}
+.field-hint.err{color:var(--red6)}
+.input{font-family:var(--fb);font-weight:300;font-size:14px;padding:10px 14px;border:1px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--tp);outline:none;transition:border-color 150ms,box-shadow 150ms;width:220px}
+.input:focus{border-color:var(--b500);box-shadow:var(--focus)}
+.input.err-state{border-color:var(--red6)}
+.input:disabled{background:var(--g100);color:var(--td);cursor:not-allowed}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;gap:10px;cursor:pointer}
+.toggle{position:relative;width:44px;height:24px;background:var(--g300);border-radius:9999px;transition:background 200ms;flex-shrink:0;border:none;padding:0}
+.toggle:focus-visible{outline:none;box-shadow:var(--focus)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:9999px;transition:transform 200ms;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle[aria-checked="true"]{background:var(--b500)}
+.toggle[aria-checked="true"]::after{transform:translateX(20px)}
+.toggle-lbl{font-size:14px;font-weight:300;color:var(--tp);user-select:none}
+
+/* Checkbox */
+.cb-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+.cb{width:18px;height:18px;border:1.5px solid var(--brd);border-radius:4px;background:var(--surf);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 150ms}
+.cb:focus-visible{outline:none;box-shadow:var(--focus)}
+.cb[aria-checked="true"]{background:var(--b500);border-color:var(--b500)}
+.cb[aria-checked="true"]::after{content:'✓';color:#fff;font-size:11px;font-weight:700;line-height:1}
+.cb:disabled,.cb[aria-disabled="true"]{opacity:.4;cursor:not-allowed}
+.cb-lbl{font-size:14px;font-weight:300;color:var(--tp);user-select:none}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:9999px;white-space:nowrap}
+.badge-brand  {background:var(--b50);color:var(--b700);border:1px solid var(--b200)}
+.badge-accent {background:var(--a50);color:var(--a600);border:1px solid var(--a300)}
+.badge-success{background:var(--grn50);color:var(--grn7);border:1px solid var(--grn2)}
+.badge-error  {background:var(--red50);color:var(--red7);border:1px solid var(--red2)}
+.badge-warning{background:var(--ylw50);color:var(--ylw7);border:1px solid var(--ylw3)}
+.badge-neutral{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}
+
+/* Feedback / Alert */
+.alert{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;font-size:13px;font-weight:300;line-height:1.55;border:1px solid}
+.alert-icon{font-size:15px;flex-shrink:0;display:flex;align-items:center}
+.alert strong{font-weight:500}
+.alert-info   {background:var(--b50);color:var(--b800);border-color:var(--b200)}
+.alert-success{background:var(--grn50);color:#166534;border-color:var(--grn2)}
+.alert-warning{background:var(--ylw50);color:#854D0E;border-color:var(--ylw3)}
+.alert-error  {background:var(--red50);color:#991B1B;border-color:var(--red2)}
+
+/* Card */
+.card{background:var(--surf);border:1px solid var(--brds);border-radius:12px;padding:24px;box-shadow:var(--sh-sm);max-width:280px}
+.card-title{font-size:15px;font-weight:500;color:var(--tp);margin-bottom:8px}
+.card-body{font-size:13px;font-weight:300;color:var(--ts);line-height:1.55}
+.card-footer{margin-top:16px;display:flex;gap:8px}
+
+/* Tab */
+.tabs{display:flex;flex-direction:column;gap:0;width:100%}
+.tab-list{display:flex;border-bottom:2px solid var(--brd);gap:0}
+.tab-btn{font-family:var(--fh);font-size:13px;font-weight:500;padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--tt);cursor:pointer;transition:all 150ms}
+.tab-btn:hover{color:var(--tp)}
+.tab-btn[aria-selected="true"]{color:var(--b500);border-bottom-color:var(--b500)}
+.tab-btn:focus-visible{outline:none;box-shadow:var(--focus)}
+.tab-panel{padding:16px 0;font-size:13px;font-weight:300;color:var(--ts);display:none}
+.tab-panel.active{display:block}
+
+/* Accordion */
+.accordion{border:1px solid var(--brd);border-radius:10px;overflow:hidden;width:100%}
+.acc-item{border-bottom:1px solid var(--brds)}
+.acc-item:last-child{border-bottom:none}
+.acc-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 18px;background:var(--surf);border:none;font-family:var(--fh);font-size:14px;font-weight:500;color:var(--tp);cursor:pointer;text-align:left;transition:background 120ms}
+.acc-btn:hover{background:var(--g50)}
+.acc-btn:focus-visible{outline:none;box-shadow:inset var(--focus)}
+.acc-btn .acc-chev{font-size:11px;color:var(--tt);transition:transform 200ms;flex-shrink:0}
+.acc-btn[aria-expanded="true"] .acc-chev{transform:rotate(180deg)}
+.acc-panel{padding:0 18px;max-height:0;overflow:hidden;transition:max-height 250ms ease,padding 250ms ease}
+.acc-panel.open{max-height:200px;padding:14px 18px}
+.acc-panel p{font-size:13px;font-weight:300;color:var(--ts);line-height:1.55}
+
+/* Tooltip wrapper */
+.tooltip-wrap{position:relative;display:inline-flex}
+.tooltip-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--g900);color:#fff;font-size:12px;font-weight:300;padding:5px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 150ms;z-index:10}
+.tooltip-wrap:hover .tooltip-tip,.tooltip-wrap:focus-within .tooltip-tip{opacity:1}
+.tooltip-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--g900)}
+
+/* Dropdown */
+.select-wrap{position:relative;display:inline-flex;flex-direction:column;gap:5px}
+.select{font-family:var(--fb);font-weight:300;font-size:14px;padding:10px 36px 10px 14px;border:1px solid var(--brd);border-radius:8px;background:var(--surf);color:var(--tp);appearance:none;cursor:pointer;outline:none;width:220px;transition:border-color 150ms,box-shadow 150ms}
+.select:focus{border-color:var(--b500);box-shadow:var(--focus)}
+.select-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--tt);font-size:12px}
+
+/* Lucide icons */
+[data-lucide]{display:inline-block;vertical-align:middle;flex-shrink:0}
+.btn [data-lucide]{width:15px;height:15px;margin-top:-1px}
+.alert-icon [data-lucide]{width:16px;height:16px}
+.app-sb-link [data-lucide]{width:14px;height:14px;opacity:.75}
+/* Icon gallery */
+.icon-grid{display:flex;flex-wrap:wrap;gap:8px}
+.icon-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;border:1px solid var(--brds);border-radius:10px;background:var(--surf);cursor:pointer;transition:all 120ms;min-width:84px}
+.icon-card:hover{border-color:var(--b300);background:var(--b50)}
+.icon-card svg{width:22px;height:22px;color:var(--tp);transition:color 120ms}
+.icon-card:hover svg{color:var(--b500)}
+.icon-card-name{font-size:10px;font-family:monospace;color:var(--tt);text-align:center;line-height:1.3}
+.icon-card:hover .icon-card-name{color:var(--b500)}
+.icon-size-row{display:flex;align-items:center;gap:24px;padding:20px;border:1px solid var(--brds);border-radius:10px;background:var(--surf);margin-bottom:8px}
+.icon-size-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.icon-size-label{font-size:10px;font-family:monospace;color:var(--tt)}
+/* Breadcrumb */
+.breadcrumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.bc-item{font-size:13px;font-weight:300;color:var(--b500)}
+.bc-item:last-child{color:var(--tt);pointer-events:none}
+.bc-sep{color:var(--g400);font-size:12px}
+
+/* Table */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--tt);border-bottom:2px solid var(--brd);background:var(--g50)}
+.data-table td{padding:12px 14px;border-bottom:1px solid var(--brds);font-weight:300;color:var(--tp);vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--g50)}
+
+/* Sidebar component preview */
+.app-sidebar{width:200px;background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:16px 0;font-size:13px}
+.app-sb-section{padding:10px 16px 4px;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--tt)}
+.app-sb-link{display:flex;align-items:center;gap:8px;padding:8px 16px;color:var(--ts);font-weight:300;border-left:2px solid transparent;cursor:pointer;transition:all 120ms}
+.app-sb-link:hover{background:var(--g50);color:var(--tp)}
+.app-sb-link.active{color:var(--b500);border-left-color:var(--b500);background:var(--b50);font-weight:400}
+
+/* App header */
+.app-header{background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;width:100%}
+.app-header-brand{font-size:16px;font-weight:500;color:var(--b500)}
+.app-header-nav{display:flex;gap:20px}
+.app-header-link{font-size:13px;font-weight:300;color:var(--ts);cursor:pointer;transition:color 120ms}
+.app-header-link:hover{color:var(--tp)}
+.app-header-actions{display:flex;gap:8px}
+
+/* ── Breakpoints token table ── */
+.bp-table{width:100%;border-collapse:collapse;font-size:13px}
+.bp-table th{text-align:left;padding:9px 14px;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--tt);border-bottom:2px solid var(--brd);background:var(--g50)}
+.bp-table td{padding:11px 14px;border-bottom:1px solid var(--brds);font-weight:300;color:var(--tp);vertical-align:middle}
+.bp-table tr:last-child td{border-bottom:none}
+.bp-pill{display:inline-block;font-size:10px;font-weight:500;font-family:monospace;padding:2px 8px;border-radius:5px;background:var(--b50);color:var(--b700);border:1px solid var(--b200)}
+
+/* ── Hamburger / mobile sidebar ── */
+.sb-hamburger{display:none;position:fixed;top:12px;left:12px;z-index:200;background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:8px 10px;cursor:pointer;box-shadow:var(--sh-sm);align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--ts)}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:150;backdrop-filter:blur(2px)}
+.sb-overlay.open{display:block}
+
+/* ── Responsive ── */
+@media(max-width:767px){
+  body{flex-direction:column}
+  .sidebar{position:fixed;left:0;top:0;height:100vh;z-index:160;transform:translateX(-100%);transition:transform 280ms ease;width:240px;min-width:240px;box-shadow:var(--sh-lg)}
+  .sidebar.open{transform:translateX(0)}
+  .sb-hamburger{display:flex}
+  .main{height:100vh;width:100%}
+  .page{padding:64px 20px 60px}
+  .canvas{padding:20px}
+  .type-head,.type-row{grid-template-columns:120px 1fr 50px}
+  .type-head span:nth-child(n+4),.type-row span:nth-child(n+4){display:none}
+  .page-title{font-size:22px}
+  .data-table th:nth-child(n+4),.data-table td:nth-child(n+4){display:none}
+  .app-header-nav{display:none}
+}
+@media(min-width:768px) and (max-width:1023px){
+  .sidebar{width:200px;min-width:200px}
+  .page{padding:40px 32px 60px}
+  .canvas{padding:24px}
+}
+@media(min-width:1024px){
+  /* desktop — defaults apply */
+}
+</style>
+</head>
+<body>
+
+<!-- ── MOBILE OVERLAY ── -->
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+<button class="sb-hamburger" id="sb-hamburger" aria-label="Abrir menu" onclick="openSidebar()">
+  <i data-lucide="menu"></i> Menu
+</button>
+
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar" id="sidebar" aria-label="Design System Navigation">
+  <div class="sb-logo">
+    <svg viewBox="235 330 1120 310" width="104" height="29" xmlns="http://www.w3.org/2000/svg" aria-label="Nivelo" role="img">
+      <path d="M1113.55 594.61L1179.23 573.54C1208.09 600.01 1265.55 595.91 1277.86 554.53C1305.95 460.15 1138.12 453.42 1166.34 550.84L1097.01 568.89C1086.64 539.95 1085.01 511.03 1101.74 484C1157.69 393.57 1358.38 423.9 1351.91 544.12C1345.9 655.85 1173.78 665.62 1113.54 594.61H1113.55Z" fill="#1752B0"/>
+      <path d="M458.95 620.24H392.59V506.36C392.59 504.94 388.48 493.99 387.39 491.95C373.07 465.18 328.05 474.48 311.14 494.29V620.23H243.27V433.2H308.13V455.82C341.94 421.94 411.32 414.03 443 454.44C450.29 463.74 458.96 485.64 458.96 497.3V620.23L458.95 620.24Z" fill="#1752B0"/>
+      <path d="M845.07 541.8C853.57 586.56 909.85 584.89 944.64 575.76C951.01 574.09 960.44 568.88 965.63 568.04C967.27 567.77 968.76 569.06 968.76 569.71V611.19C904.95 637.39 797.42 632.36 780.89 549.44C764.39 466.65 839.55 406.18 917.81 433.64C946.56 443.73 976.3 477.92 976.3 509.39V539.56C976.3 539.72 974.2 541.82 974.04 541.82H845.08L845.07 541.8ZM918.98 504.1C916.37 479.39 902.7 467.16 877.44 469.35C858.16 471.02 846.18 485.75 843.57 504.1H918.98Z" fill="#1752B0"/>
+      <path d="M637.68 433.21L684.44 562.94L722.9 433.21H787.76L716.17 620.34L645.2 618.75L570.56 433.21H637.68Z" fill="#1752B0"/>
+      <path d="M1062.27 359.3H997.35V620.24H1062.27V359.3Z" fill="#1752B0"/>
+      <path d="M557.06 433.21H490.62V620.24H557.06V433.21Z" fill="#1752B0"/>
+      <path d="M522.76 414.16C543.874 414.16 560.99 397.044 560.99 375.93C560.99 354.816 543.874 337.7 522.76 337.7C501.646 337.7 484.53 354.816 484.53 375.93C484.53 397.044 501.646 414.16 522.76 414.16Z" fill="#1752B0"/>
+    </svg>
+    <div class="sb-logo-sub">Design System v0.1</div>
+  </div>
+
+  <button class="sb-section" aria-expanded="true" data-group="foundations">
+    Foundations <span class="chevron">▾</span>
+  </button>
+  <div class="sb-group" id="group-foundations">
+    <a class="sb-link active" href="#intro" data-page="intro"><span class="sb-link-dot"></span>Introdução</a>
+    <a class="sb-link" href="#colors" data-page="colors"><span class="sb-link-dot"></span>Cores</a>
+    <a class="sb-link" href="#typography" data-page="typography"><span class="sb-link-dot"></span>Tipografia</a>
+    <a class="sb-link" href="#spacing" data-page="spacing"><span class="sb-link-dot"></span>Espaçamento</a>
+    <a class="sb-link" href="#radius" data-page="radius"><span class="sb-link-dot"></span>Border Radius</a>
+    <a class="sb-link" href="#shadows" data-page="shadows"><span class="sb-link-dot"></span>Sombras</a>
+    <a class="sb-link" href="#opacity" data-page="opacity"><span class="sb-link-dot"></span>Opacidade</a>
+    <a class="sb-link" href="#logo" data-page="logo"><span class="sb-link-dot"></span>Logo</a>
+    <a class="sb-link" href="#breakpoints" data-page="breakpoints"><span class="sb-link-dot"></span>Breakpoints</a>
+    <a class="sb-link" href="#icons" data-page="icons"><span class="sb-link-dot"></span>Ícones</a>
+  </div>
+
+  <button class="sb-section" aria-expanded="true" data-group="components">
+    Components <span class="chevron">▾</span>
+  </button>
+  <div class="sb-group" id="group-components">
+    <a class="sb-link" href="#button" data-page="button"><span class="sb-link-dot"></span>Button</a>
+    <a class="sb-link" href="#input" data-page="input"><span class="sb-link-dot"></span>Input</a>
+    <a class="sb-link" href="#select" data-page="select"><span class="sb-link-dot"></span>Select / Dropdown</a>
+    <a class="sb-link" href="#checkbox" data-page="checkbox"><span class="sb-link-dot"></span>Checkbox</a>
+    <a class="sb-link" href="#toggle" data-page="toggle"><span class="sb-link-dot"></span>Toggle</a>
+    <a class="sb-link" href="#badge" data-page="badge"><span class="sb-link-dot"></span>Badge</a>
+    <a class="sb-link" href="#feedback" data-page="feedback"><span class="sb-link-dot"></span>Feedback / Alert</a>
+    <a class="sb-link" href="#tab" data-page="tab"><span class="sb-link-dot"></span>Tab</a>
+    <a class="sb-link" href="#accordion" data-page="accordion"><span class="sb-link-dot"></span>Accordion</a>
+    <a class="sb-link" href="#tooltip" data-page="tooltip"><span class="sb-link-dot"></span>Tooltip</a>
+    <a class="sb-link" href="#table" data-page="table"><span class="sb-link-dot"></span>Table</a>
+    <a class="sb-link" href="#breadcrumb" data-page="breadcrumb"><span class="sb-link-dot"></span>Breadcrumb</a>
+    <a class="sb-link" href="#appheader" data-page="appheader"><span class="sb-link-dot"></span>App Header</a>
+    <a class="sb-link" href="#sidebar-comp" data-page="sidebar-comp"><span class="sb-link-dot"></span>Sidebar</a>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main" id="main">
+
+<!-- INTRO -->
+<section class="page active" id="page-intro">
+  <div class="page-header">
+    <h1 class="page-title">Nivelo Design System</h1>
+    <p class="page-desc">Biblioteca de componentes e tokens de design que padroniza a experiência visual dos produtos Nivelo. Todos os componentes utilizam CSS custom properties definidas em <code>tokens.css</code> e seguem as diretrizes WCAG 2.1 AA.</p>
+  </div>
+  <div class="sub-title">Tipografia</div>
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:500px">
+    <div style="padding:14px 18px;border:1px solid var(--brds);border-radius:10px;background:var(--surf);display:flex;align-items:baseline;justify-content:space-between;gap:16px">
+      <div>
+        <div style="font-size:22px;font-weight:500;color:var(--tp);line-height:1.1;margin-bottom:5px">Helvetica Neue</div>
+        <div style="font-size:11px;font-weight:400;color:var(--tt);letter-spacing:.04em">MEDIUM 500 · Headings, Subtítulos, Botões</div>
+      </div>
+      <code style="font-size:10px;color:var(--tt);white-space:nowrap">font-weight:500</code>
+    </div>
+    <div style="padding:14px 18px;border:1px solid var(--brds);border-radius:10px;background:var(--surf);display:flex;align-items:baseline;justify-content:space-between;gap:16px">
+      <div>
+        <div style="font-size:22px;font-weight:300;color:var(--tp);line-height:1.1;margin-bottom:5px">Helvetica Neue</div>
+        <div style="font-size:11px;font-weight:400;color:var(--tt);letter-spacing:.04em">LIGHT 300 · Body, UI, Textos corridos</div>
+      </div>
+      <code style="font-size:10px;color:var(--tt);white-space:nowrap">font-weight:300</code>
+    </div>
+  </div>
+  <div class="sub-title">Cores principais</div>
+  <div class="sem-grid" style="max-width:500px">
+    <div class="sem-card"><div class="sem-dot" style="background:#1752B0"></div><div><div class="sem-name">Brand Blue #1752B0</div><div class="sem-token">Cor principal do produto</div></div></div>
+    <div class="sem-card"><div class="sem-dot" style="background:#EFCB34;border:1px solid #d4b01a"></div><div><div class="sem-name">Accent Gold #EFCB34</div><div class="sem-token">Uso pontual / destaques</div></div></div>
+    <div class="sem-card"><div class="sem-dot" style="background:#FFFFFF;border:1px solid var(--g300)"></div><div><div class="sem-name">White #FFFFFF</div><div class="sem-token">Superfícies e fundos</div></div></div>
+  </div>
+</section>
+
+<!-- COLORS -->
+<section class="page" id="page-colors">
+  <div class="page-header">
+    <h1 class="page-title">Cores</h1>
+    <p class="page-desc">Paletas globais e tokens semânticos. Use sempre os alias tokens nos componentes — as paletas brutas existem apenas para criar novos aliases.</p>
+  </div>
+
+  <div class="found-block">
+    <button class="found-toggle open" aria-expanded="true" data-found="brand">Brand Blue — RGB(23, 82, 176) <span class="fchev">▾</span></button>
+    <div class="found-body open" id="found-brand">
+      <div class="swatches" id="sw-brand"></div>
+    </div>
+  </div>
+  <div class="found-block">
+    <button class="found-toggle open" aria-expanded="true" data-found="accent">Accent Gold — RGB(239, 203, 52) · uso pontual <span class="fchev">▾</span></button>
+    <div class="found-body open" id="found-accent">
+      <div class="swatches" id="sw-accent"></div>
+    </div>
+  </div>
+  <div class="found-block">
+    <button class="found-toggle" aria-expanded="false" data-found="gray">Gray <span class="fchev">▾</span></button>
+    <div class="found-body" id="found-gray">
+      <div class="swatches" id="sw-gray"></div>
+    </div>
+  </div>
+  <div class="found-block">
+    <button class="found-toggle" aria-expanded="false" data-found="semantic">Tokens Semânticos <span class="fchev">▾</span></button>
+    <div class="found-body" id="found-semantic">
+      <div class="sub-title" style="margin-top:0">Texto</div>
+      <div class="sem-grid" id="sem-text"></div>
+      <div class="sub-title">Background</div>
+      <div class="sem-grid" id="sem-bg"></div>
+      <div class="sub-title">Border</div>
+      <div class="sem-grid" id="sem-border"></div>
+      <div class="sub-title">Ações</div>
+      <div class="sem-grid" id="sem-action"></div>
+      <div class="sub-title">Status</div>
+      <div class="sem-grid" id="sem-status"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TYPOGRAPHY -->
+<section class="page" id="page-typography">
+  <div class="page-header">
+    <h1 class="page-title">Tipografia</h1>
+    <p class="page-desc"><strong>Helvetica Neue Medium (500)</strong> para headings e subtítulos. <strong>Helvetica Neue Light (300)</strong> para body e textos corridos.</p>
+  </div>
+
+  <div class="found-block">
+    <button class="found-toggle open" aria-expanded="true" data-found="t-head">Headings — Medium 500 <span class="fchev">▾</span></button>
+    <div class="found-body open" id="found-t-head">
+      <div class="type-head"><span>Estilo</span><span>Prévia</span><span style="text-align:right">Size</span><span style="text-align:right">Weight</span><span style="text-align:right">Line-h</span></div>
+      <div class="type-table" id="type-headings"></div>
+    </div>
+  </div>
+  <div class="found-block">
+    <button class="found-toggle open" aria-expanded="true" data-found="t-body">Body — Light 300 <span class="fchev">▾</span></button>
+    <div class="found-body open" id="found-t-body">
+      <div class="type-head"><span>Estilo</span><span>Prévia</span><span style="text-align:right">Size</span><span style="text-align:right">Weight</span><span style="text-align:right">Line-h</span></div>
+      <div class="type-table" id="type-body"></div>
+    </div>
+  </div>
+  <div class="found-block">
+    <button class="found-toggle" aria-expanded="false" data-found="t-btn">Button & Caption — Medium 500 <span class="fchev">▾</span></button>
+    <div class="found-body" id="found-t-btn">
+      <div class="type-head"><span>Estilo</span><span>Prévia</span><span style="text-align:right">Size</span><span style="text-align:right">Weight</span><span style="text-align:right">Line-h</span></div>
+      <div class="type-table" id="type-btn"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPACING -->
+<section class="page" id="page-spacing">
+  <div class="page-header">
+    <h1 class="page-title">Espaçamento</h1>
+    <p class="page-desc">Escala de 9 valores para padding, margin e gap. Sempre use tokens — nunca valores arbitrários.</p>
+  </div>
+  <div id="spacing-rows"></div>
+</section>
+
+<!-- RADIUS -->
+<section class="page" id="page-radius">
+  <div class="page-header">
+    <h1 class="page-title">Border Radius</h1>
+    <p class="page-desc">8 valores de arredondamento do estilo reto (none) até o circular (full).</p>
+  </div>
+  <div class="rad-grid" id="rad-grid"></div>
+</section>
+
+<!-- SHADOWS -->
+<section class="page" id="page-shadows">
+  <div class="page-header">
+    <h1 class="page-title">Sombras</h1>
+    <p class="page-desc">Sombras tintadas com Brand Blue para reforçar a identidade visual.</p>
+  </div>
+  <div class="sh-grid" id="sh-grid"></div>
+</section>
+
+<!-- OPACITY -->
+<section class="page" id="page-opacity">
+  <div class="page-header">
+    <h1 class="page-title">Opacidade</h1>
+    <p class="page-desc">Escala de opacidade para estados disabled, overlay e camadas visuais.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:4px" id="op-rows"></div>
+</section>
+
+<!-- LOGO -->
+<section class="page" id="page-logo">
+  <div class="page-header">
+    <h1 class="page-title">Logo</h1>
+    <p class="page-desc">As três variantes oficiais do logotipo Nivelo. Use sempre o arquivo SVG original — nunca recrie o logo manualmente.</p>
+  </div>
+
+  <div class="sub-title">NIVELO Azul</div>
+  <div class="story">
+    <div class="canvas pad-lg" style="background:#F7F9FD;justify-content:center;border-radius:10px 10px 0 0">
+      <svg viewBox="235 330 1120 310" width="180" height="50" xmlns="http://www.w3.org/2000/svg" aria-label="Nivelo" role="img">
+        <path d="M1113.55 594.61L1179.23 573.54C1208.09 600.01 1265.55 595.91 1277.86 554.53C1305.95 460.15 1138.12 453.42 1166.34 550.84L1097.01 568.89C1086.64 539.95 1085.01 511.03 1101.74 484C1157.69 393.57 1358.38 423.9 1351.91 544.12C1345.9 655.85 1173.78 665.62 1113.54 594.61H1113.55Z" fill="#1752B0"/>
+        <path d="M458.95 620.24H392.59V506.36C392.59 504.94 388.48 493.99 387.39 491.95C373.07 465.18 328.05 474.48 311.14 494.29V620.23H243.27V433.2H308.13V455.82C341.94 421.94 411.32 414.03 443 454.44C450.29 463.74 458.96 485.64 458.96 497.3V620.23L458.95 620.24Z" fill="#1752B0"/>
+        <path d="M845.07 541.8C853.57 586.56 909.85 584.89 944.64 575.76C951.01 574.09 960.44 568.88 965.63 568.04C967.27 567.77 968.76 569.06 968.76 569.71V611.19C904.95 637.39 797.42 632.36 780.89 549.44C764.39 466.65 839.55 406.18 917.81 433.64C946.56 443.73 976.3 477.92 976.3 509.39V539.56C976.3 539.72 974.2 541.82 974.04 541.82H845.08L845.07 541.8ZM918.98 504.1C916.37 479.39 902.7 467.16 877.44 469.35C858.16 471.02 846.18 485.75 843.57 504.1H918.98Z" fill="#1752B0"/>
+        <path d="M637.68 433.21L684.44 562.94L722.9 433.21H787.76L716.17 620.34L645.2 618.75L570.56 433.21H637.68Z" fill="#1752B0"/>
+        <path d="M1062.27 359.3H997.35V620.24H1062.27V359.3Z" fill="#1752B0"/>
+        <path d="M557.06 433.21H490.62V620.24H557.06V433.21Z" fill="#1752B0"/>
+        <path d="M522.76 414.16C543.874 414.16 560.99 397.044 560.99 375.93C560.99 354.816 543.874 337.7 522.76 337.7C501.646 337.7 484.53 354.816 484.53 375.93C484.53 397.044 501.646 414.16 522.76 414.16Z" fill="#1752B0"/>
+      </svg>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">▶ Código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="cm">&lt;!-- Use o arquivo SVG diretamente --&gt;</span>
+<span class="kw">&lt;img</span> <span class="at">src</span>=<span class="st">"/public/logo-azul.svg"</span> <span class="at">alt</span>=<span class="st">"Nivelo"</span> <span class="at">width</span>=<span class="st">"120"</span> <span class="at">height</span>=<span class="st">"33"</span><span class="kw">/&gt;</span></pre></div>
+  </div>
+
+  <div class="sub-title">NIVELO Preto</div>
+  <div class="story">
+    <div class="canvas pad-lg" style="background:#FAFAFA;justify-content:center;border-radius:10px 10px 0 0">
+      <svg viewBox="235 330 1120 310" width="180" height="50" xmlns="http://www.w3.org/2000/svg" aria-label="Nivelo" role="img">
+        <path d="M1113.55 594.61L1179.23 573.54C1208.09 600.01 1265.55 595.91 1277.86 554.53C1305.95 460.15 1138.12 453.42 1166.34 550.84L1097.01 568.89C1086.64 539.95 1085.01 511.03 1101.74 484C1157.69 393.57 1358.38 423.9 1351.91 544.12C1345.9 655.85 1173.78 665.62 1113.54 594.61H1113.55Z" fill="#111111"/>
+        <path d="M458.95 620.24H392.59V506.36C392.59 504.94 388.48 493.99 387.39 491.95C373.07 465.18 328.05 474.48 311.14 494.29V620.23H243.27V433.2H308.13V455.82C341.94 421.94 411.32 414.03 443 454.44C450.29 463.74 458.96 485.64 458.96 497.3V620.23L458.95 620.24Z" fill="#111111"/>
+        <path d="M845.07 541.8C853.57 586.56 909.85 584.89 944.64 575.76C951.01 574.09 960.44 568.88 965.63 568.04C967.27 567.77 968.76 569.06 968.76 569.71V611.19C904.95 637.39 797.42 632.36 780.89 549.44C764.39 466.65 839.55 406.18 917.81 433.64C946.56 443.73 976.3 477.92 976.3 509.39V539.56C976.3 539.72 974.2 541.82 974.04 541.82H845.08L845.07 541.8ZM918.98 504.1C916.37 479.39 902.7 467.16 877.44 469.35C858.16 471.02 846.18 485.75 843.57 504.1H918.98Z" fill="#111111"/>
+        <path d="M637.68 433.21L684.44 562.94L722.9 433.21H787.76L716.17 620.34L645.2 618.75L570.56 433.21H637.68Z" fill="#111111"/>
+        <path d="M1062.27 359.3H997.35V620.24H1062.27V359.3Z" fill="#111111"/>
+        <path d="M557.06 433.21H490.62V620.24H557.06V433.21Z" fill="#111111"/>
+        <path d="M522.76 414.16C543.874 414.16 560.99 397.044 560.99 375.93C560.99 354.816 543.874 337.7 522.76 337.7C501.646 337.7 484.53 354.816 484.53 375.93C484.53 397.044 501.646 414.16 522.76 414.16Z" fill="#111111"/>
+      </svg>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">▶ Código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;img</span> <span class="at">src</span>=<span class="st">"/public/logo-preto.svg"</span> <span class="at">alt</span>=<span class="st">"Nivelo"</span> <span class="at">width</span>=<span class="st">"120"</span> <span class="at">height</span>=<span class="st">"33"</span><span class="kw">/&gt;</span></pre></div>
+  </div>
+
+  <div class="sub-title">NIVELO Branco</div>
+  <div class="story">
+    <div class="canvas pad-lg" style="background:#1752B0;justify-content:center;border-radius:10px 10px 0 0">
+      <svg viewBox="235 330 1120 310" width="180" height="50" xmlns="http://www.w3.org/2000/svg" aria-label="Nivelo" role="img">
+        <path d="M1113.55 594.61L1179.23 573.54C1208.09 600.01 1265.55 595.91 1277.86 554.53C1305.95 460.15 1138.12 453.42 1166.34 550.84L1097.01 568.89C1086.64 539.95 1085.01 511.03 1101.74 484C1157.69 393.57 1358.38 423.9 1351.91 544.12C1345.9 655.85 1173.78 665.62 1113.54 594.61H1113.55Z" fill="#FFFFFF"/>
+        <path d="M458.95 620.24H392.59V506.36C392.59 504.94 388.48 493.99 387.39 491.95C373.07 465.18 328.05 474.48 311.14 494.29V620.23H243.27V433.2H308.13V455.82C341.94 421.94 411.32 414.03 443 454.44C450.29 463.74 458.96 485.64 458.96 497.3V620.23L458.95 620.24Z" fill="#FFFFFF"/>
+        <path d="M845.07 541.8C853.57 586.56 909.85 584.89 944.64 575.76C951.01 574.09 960.44 568.88 965.63 568.04C967.27 567.77 968.76 569.06 968.76 569.71V611.19C904.95 637.39 797.42 632.36 780.89 549.44C764.39 466.65 839.55 406.18 917.81 433.64C946.56 443.73 976.3 477.92 976.3 509.39V539.56C976.3 539.72 974.2 541.82 974.04 541.82H845.08L845.07 541.8ZM918.98 504.1C916.37 479.39 902.7 467.16 877.44 469.35C858.16 471.02 846.18 485.75 843.57 504.1H918.98Z" fill="#FFFFFF"/>
+        <path d="M637.68 433.21L684.44 562.94L722.9 433.21H787.76L716.17 620.34L645.2 618.75L570.56 433.21H637.68Z" fill="#FFFFFF"/>
+        <path d="M1062.27 359.3H997.35V620.24H1062.27V359.3Z" fill="#FFFFFF"/>
+        <path d="M557.06 433.21H490.62V620.24H557.06V433.21Z" fill="#FFFFFF"/>
+        <path d="M522.76 414.16C543.874 414.16 560.99 397.044 560.99 375.93C560.99 354.816 543.874 337.7 522.76 337.7C501.646 337.7 484.53 354.816 484.53 375.93C484.53 397.044 501.646 414.16 522.76 414.16Z" fill="#FFFFFF"/>
+      </svg>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">▶ Código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;img</span> <span class="at">src</span>=<span class="st">"/public/logo-branco.svg"</span> <span class="at">alt</span>=<span class="st">"Nivelo"</span> <span class="at">width</span>=<span class="st">"120"</span> <span class="at">height</span>=<span class="st">"33"</span><span class="kw">/&gt;</span></pre></div>
+  </div>
+
+  <div class="sub-title">Uso correto</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:600px">
+    <div style="padding:14px 16px;border:1px solid var(--grn2);border-radius:8px;background:var(--grn50)">
+      <div style="font-size:11px;font-weight:500;color:var(--grn7);margin-bottom:8px">✓ Correto</div>
+      <div style="font-size:12px;font-weight:300;color:var(--tp);line-height:1.6">Usar o SVG original sem alterar proporções ou cores. Manter área de respiro ao redor do logo.</div>
+    </div>
+    <div style="padding:14px 16px;border:1px solid var(--red2);border-radius:8px;background:var(--red50)">
+      <div style="font-size:11px;font-weight:500;color:var(--red7);margin-bottom:8px">✕ Incorreto</div>
+      <div style="font-size:12px;font-weight:300;color:var(--tp);line-height:1.6">Recolorizar, distorcer, adicionar efeitos, recriar a tipografia manualmente ou usar em fundos com baixo contraste.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BREAKPOINTS -->
+<section class="page" id="page-breakpoints">
+  <div class="page-header">
+    <h1 class="page-title">Breakpoints</h1>
+    <p class="page-desc">O sistema é <strong>mobile-first</strong>: os estilos base são para telas pequenas e os breakpoints aumentam progressivamente. Use os tokens CSS custom properties ou as media queries abaixo nos componentes.</p>
+  </div>
+
+  <div class="sub-title">Escala de breakpoints</div>
+  <table class="bp-table" style="margin-bottom:32px">
+    <thead>
+      <tr><th>Token</th><th>Min-width</th><th>Dispositivo alvo</th><th>Colunas (grid)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code class="bp-pill">xs</code></td><td>0px</td><td>Telefone pequeno</td><td>4</td></tr>
+      <tr><td><code class="bp-pill">sm</code></td><td>480px</td><td>Telefone grande</td><td>4</td></tr>
+      <tr><td><code class="bp-pill">md</code></td><td>768px</td><td>Tablet</td><td>8</td></tr>
+      <tr><td><code class="bp-pill">lg</code></td><td>1024px</td><td>Desktop pequeno / laptop</td><td>12</td></tr>
+      <tr><td><code class="bp-pill">xl</code></td><td>1280px</td><td>Desktop</td><td>12</td></tr>
+      <tr><td><code class="bp-pill">2xl</code></td><td>1536px</td><td>Desktop largo</td><td>12</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sub-title">CSS Custom Properties</div>
+  <div style="background:var(--g950);border-radius:10px;padding:20px;font-family:monospace;font-size:12px;line-height:1.8;color:#e2e8f0;margin-bottom:32px;overflow-x:auto">
+    <span style="color:#6b7280">/* tokens de breakpoint — use em JS e media queries */</span><br>
+    <span style="color:#93c5fd">:root</span> {<br>
+    &nbsp;&nbsp;<span style="color:#86efac">--bp-sm</span>: <span style="color:#fde68a">480px</span>;<br>
+    &nbsp;&nbsp;<span style="color:#86efac">--bp-md</span>: <span style="color:#fde68a">768px</span>;<br>
+    &nbsp;&nbsp;<span style="color:#86efac">--bp-lg</span>: <span style="color:#fde68a">1024px</span>;<br>
+    &nbsp;&nbsp;<span style="color:#86efac">--bp-xl</span>: <span style="color:#fde68a">1280px</span>;<br>
+    &nbsp;&nbsp;<span style="color:#86efac">--bp-2xl</span>: <span style="color:#fde68a">1536px</span>;<br>
+    }<br>
+    <br>
+    <span style="color:#6b7280">/* mobile-first media queries */</span><br>
+    <span style="color:#93c5fd">@media</span>(<span style="color:#86efac">min-width</span>: <span style="color:#fde68a">768px</span>) { <span style="color:#6b7280">/* tablet+ */</span> }<br>
+    <span style="color:#93c5fd">@media</span>(<span style="color:#86efac">min-width</span>: <span style="color:#fde68a">1024px</span>) { <span style="color:#6b7280">/* desktop+ */</span> }
+  </div>
+
+  <div class="sub-title">Visualização de breakpoints</div>
+  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px" id="bp-bars"></div>
+  <script>
+    (function(){
+      var bps=[{name:'xs / base',w:320,max:1536},{name:'sm · 480px',w:480,max:1536},{name:'md · 768px',w:768,max:1536},{name:'lg · 1024px',w:1024,max:1536},{name:'xl · 1280px',w:1280,max:1536},{name:'2xl · 1536px',w:1536,max:1536}];
+      var el=document.getElementById('bp-bars');
+      if(!el)return;
+      bps.forEach(function(b){
+        var pct=Math.round(b.w/b.max*100);
+        el.innerHTML+='<div style="display:flex;align-items:center;gap:12px"><div style="min-width:120px;font-size:11px;font-weight:500;color:var(--tp)">'+b.name+'</div><div style="flex:1;background:var(--g100);border-radius:5px;height:12px;overflow:hidden"><div style="width:'+pct+'%;background:var(--b300);height:100%;border-radius:5px;transition:width 400ms"></div></div><div style="font-size:10px;font-family:monospace;color:var(--tt);min-width:36px;text-align:right">'+b.w+'</div></div>';
+      });
+    })();
+  </script>
+</section>
+
+<!-- BUTTON -->
+<section class="page" id="page-button">
+  <div class="page-header">
+    <h1 class="page-title">Button</h1>
+    <p class="page-desc">Aciona uma ação imediata. Use <strong>Primary</strong> para a ação principal, <strong>Secondary</strong> para ações secundárias, <strong>Ghost</strong> para ações terciárias. <strong>Accent</strong> apenas em CTAs de destaque máximo.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ WCAG 2.1 AA</span>
+    <span class="a11y-pill pass">✓ Keyboard navigable</span>
+    <span class="a11y-pill pass">✓ Focus visible</span>
+    <span class="a11y-pill pass">✓ Disabled state</span>
+    <span class="a11y-pill info">ℹ Use type="button" fora de forms</span>
+  </div>
+
+  <div class="story">
+    <div class="story-title">Variantes</div>
+    <div class="canvas">
+      <button class="btn btn-primary" type="button">Primary</button>
+      <button class="btn btn-secondary" type="button">Secondary</button>
+      <button class="btn btn-accent" type="button">Accent ✦</button>
+      <button class="btn btn-ghost" type="button">Ghost</button>
+      <button class="btn btn-danger" type="button">Danger</button>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-primary"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>Primary<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-secondary"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>Secondary<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-accent"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>Accent ✦<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-ghost"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>Ghost<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-danger"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>Danger<span class="kw">&lt;/button&gt;</span></pre></div>
+  </div>
+
+  <div class="story">
+    <div class="story-title">Tamanhos</div>
+    <div class="canvas">
+      <button class="btn btn-primary btn-sm" type="button">Small</button>
+      <button class="btn btn-primary" type="button">Medium</button>
+      <button class="btn btn-primary btn-lg" type="button">Large</button>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-primary btn-sm"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>Small<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-primary"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>Medium<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-primary btn-lg"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>Large<span class="kw">&lt;/button&gt;</span></pre></div>
+  </div>
+
+  <div class="story">
+    <div class="story-title">Desabilitado</div>
+    <div class="canvas">
+      <button class="btn btn-primary" type="button" disabled aria-disabled="true">Primary</button>
+      <button class="btn btn-secondary" type="button" disabled aria-disabled="true">Secondary</button>
+      <button class="btn btn-ghost" type="button" disabled aria-disabled="true">Ghost</button>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-primary"</span> <span class="at">type</span>=<span class="st">"button"</span> <span class="at">disabled</span> <span class="at">aria-disabled</span>=<span class="st">"true"</span><span class="kw">&gt;</span>Primary<span class="kw">&lt;/button&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- INPUT -->
+<section class="page" id="page-input">
+  <div class="page-header">
+    <h1 class="page-title">Input</h1>
+    <p class="page-desc">Campo de texto. Todo input deve ter um <code>&lt;label&gt;</code> associado via <code>for</code>/<code>id</code> — nunca use apenas placeholder como label.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ Label obrigatória</span>
+    <span class="a11y-pill pass">✓ aria-describedby para hints</span>
+    <span class="a11y-pill pass">✓ aria-invalid no estado de erro</span>
+    <span class="a11y-pill pass">✓ Focus visible</span>
+  </div>
+
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas col">
+      <div class="field">
+        <label class="field-label" for="inp-default">Nome completo</label>
+        <input class="input" id="inp-default" type="text" placeholder="Ex: João Silva" aria-describedby="inp-default-hint"/>
+        <span class="field-hint" id="inp-default-hint">Conforme documento oficial</span>
+      </div>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"field"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;label</span> <span class="at">class</span>=<span class="st">"field-label"</span> <span class="at">for</span>=<span class="st">"inp"</span><span class="kw">&gt;</span>Nome completo<span class="kw">&lt;/label&gt;</span>
+  <span class="kw">&lt;input</span> <span class="at">class</span>=<span class="st">"input"</span> <span class="at">id</span>=<span class="st">"inp"</span> <span class="at">type</span>=<span class="st">"text"</span>
+         <span class="at">placeholder</span>=<span class="st">"Ex: João Silva"</span>
+         <span class="at">aria-describedby</span>=<span class="st">"inp-hint"</span><span class="kw">/&gt;</span>
+  <span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"field-hint"</span> <span class="at">id</span>=<span class="st">"inp-hint"</span><span class="kw">&gt;</span>Conforme documento oficial<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/div&gt;</span></pre></div>
+  </div>
+
+  <div class="story">
+    <div class="story-title">Estados</div>
+    <div class="canvas col">
+      <div class="field">
+        <label class="field-label" for="inp-err">E-mail</label>
+        <input class="input err-state" id="inp-err" type="email" value="invalido@" aria-invalid="true" aria-describedby="inp-err-msg"/>
+        <span class="field-hint err" id="inp-err-msg" role="alert">E-mail inválido</span>
+      </div>
+      <div class="field">
+        <label class="field-label" for="inp-dis" style="color:var(--td)">Campo desabilitado</label>
+        <input class="input" id="inp-dis" type="text" placeholder="Não disponível" disabled aria-disabled="true"/>
+      </div>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="cm">&lt;!-- Erro --&gt;</span>
+<span class="kw">&lt;input</span> <span class="at">class</span>=<span class="st">"input err-state"</span> <span class="at">type</span>=<span class="st">"email"</span>
+       <span class="at">aria-invalid</span>=<span class="st">"true"</span> <span class="at">aria-describedby</span>=<span class="st">"msg"</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;span</span> <span class="at">id</span>=<span class="st">"msg"</span> <span class="at">role</span>=<span class="st">"alert"</span><span class="kw">&gt;</span>E-mail inválido<span class="kw">&lt;/span&gt;</span>
+
+<span class="cm">&lt;!-- Desabilitado --&gt;</span>
+<span class="kw">&lt;input</span> <span class="at">class</span>=<span class="st">"input"</span> <span class="at">disabled</span> <span class="at">aria-disabled</span>=<span class="st">"true"</span><span class="kw">/&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- SELECT -->
+<section class="page" id="page-select">
+  <div class="page-header">
+    <h1 class="page-title">Select / Dropdown</h1>
+    <p class="page-desc">Seleção de uma opção dentro de uma lista. Sempre associe um <code>&lt;label&gt;</code> via <code>for</code>/<code>id</code>.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ Label obrigatória</span>
+    <span class="a11y-pill pass">✓ Keyboard navigable nativo</span>
+    <span class="a11y-pill pass">✓ aria-invalid no erro</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas col">
+      <div class="field">
+        <label class="field-label" for="sel-default">Categoria</label>
+        <div class="select-wrap">
+          <select class="select" id="sel-default">
+            <option value="">Selecione...</option>
+            <option>Financeiro</option>
+            <option>Operacional</option>
+            <option>Recursos Humanos</option>
+          </select>
+          <span class="select-icon" aria-hidden="true">▾</span>
+        </div>
+      </div>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;label</span> <span class="at">for</span>=<span class="st">"sel"</span><span class="kw">&gt;</span>Categoria<span class="kw">&lt;/label&gt;</span>
+<span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"select-wrap"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;select</span> <span class="at">class</span>=<span class="st">"select"</span> <span class="at">id</span>=<span class="st">"sel"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;option</span> <span class="at">value</span>=<span class="st">""</span><span class="kw">&gt;</span>Selecione...<span class="kw">&lt;/option&gt;</span>
+    <span class="kw">&lt;option&gt;</span>Financeiro<span class="kw">&lt;/option&gt;</span>
+  <span class="kw">&lt;/select&gt;</span>
+  <span class="kw">&lt;span</span> <span class="at">aria-hidden</span>=<span class="st">"true"</span><span class="kw">&gt;</span>▾<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/div&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- CHECKBOX -->
+<section class="page" id="page-checkbox">
+  <div class="page-header">
+    <h1 class="page-title">Checkbox</h1>
+    <p class="page-desc">Seleção múltipla independente. Use <code>role="checkbox"</code> e <code>aria-checked</code> em implementações customizadas.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ role="checkbox"</span>
+    <span class="a11y-pill pass">✓ aria-checked</span>
+    <span class="a11y-pill pass">✓ Keyboard: Space para toggle</span>
+    <span class="a11y-pill pass">✓ aria-disabled</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Estados</div>
+    <div class="canvas col" style="gap:12px">
+      <label class="cb-wrap">
+        <div class="cb" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCb(this)" onkeydown="if(event.key===' ')toggleCb(this)"></div>
+        <span class="cb-lbl">Desmarcado</span>
+      </label>
+      <label class="cb-wrap">
+        <div class="cb" role="checkbox" aria-checked="true" tabindex="0" onclick="toggleCb(this)" onkeydown="if(event.key===' ')toggleCb(this)"></div>
+        <span class="cb-lbl">Marcado</span>
+      </label>
+      <label class="cb-wrap">
+        <div class="cb" role="checkbox" aria-checked="false" aria-disabled="true" tabindex="-1" style="opacity:.4;cursor:not-allowed"></div>
+        <span class="cb-lbl" style="color:var(--td);cursor:not-allowed">Desabilitado</span>
+      </label>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;label</span> <span class="at">class</span>=<span class="st">"cb-wrap"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"cb"</span> <span class="at">role</span>=<span class="st">"checkbox"</span> <span class="at">aria-checked</span>=<span class="st">"false"</span> <span class="at">tabindex</span>=<span class="st">"0"</span><span class="kw">&gt;&lt;/div&gt;</span>
+  <span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"cb-lbl"</span><span class="kw">&gt;</span>Opção<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/label&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- TOGGLE -->
+<section class="page" id="page-toggle">
+  <div class="page-header">
+    <h1 class="page-title">Toggle</h1>
+    <p class="page-desc">Ativa/desativa uma configuração imediatamente. Use <code>role="switch"</code> para comunicar o estado liga/desliga a leitores de tela.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ role="switch"</span>
+    <span class="a11y-pill pass">✓ aria-checked</span>
+    <span class="a11y-pill pass">✓ Keyboard: Space/Enter</span>
+    <span class="a11y-pill pass">✓ aria-label descritivo</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Estados</div>
+    <div class="canvas col" style="gap:14px">
+      <label class="toggle-wrap">
+        <button class="toggle" role="switch" aria-checked="false" aria-label="Notificações por e-mail" onclick="toggleSwitch(this)"></button>
+        <span class="toggle-lbl">Desligado</span>
+      </label>
+      <label class="toggle-wrap">
+        <button class="toggle" role="switch" aria-checked="true" aria-label="Notificações push" onclick="toggleSwitch(this)"></button>
+        <span class="toggle-lbl">Ligado</span>
+      </label>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;label</span> <span class="at">class</span>=<span class="st">"toggle-wrap"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"toggle"</span> <span class="at">role</span>=<span class="st">"switch"</span>
+          <span class="at">aria-checked</span>=<span class="st">"false"</span>
+          <span class="at">aria-label</span>=<span class="st">"Notificações por e-mail"</span><span class="kw">&gt;
+  &lt;/button&gt;</span>
+  <span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"toggle-lbl"</span><span class="kw">&gt;</span>Notificações por e-mail<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/label&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- BADGE -->
+<section class="page" id="page-badge">
+  <div class="page-header">
+    <h1 class="page-title">Badge</h1>
+    <p class="page-desc">Rótulo de status ou categoria. Não use sozinho para comunicar informação crítica — sempre acompanhe de texto visível.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ Contraste AA garantido</span>
+    <span class="a11y-pill warn">⚠ Não use cor como único indicador</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Variantes</div>
+    <div class="canvas">
+      <span class="badge badge-brand">Brand</span>
+      <span class="badge badge-accent">Accent ✦</span>
+      <span class="badge badge-success">Sucesso</span>
+      <span class="badge badge-error">Erro</span>
+      <span class="badge badge-warning">Aviso</span>
+      <span class="badge badge-neutral">Neutro</span>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"badge badge-brand"</span><span class="kw">&gt;</span>Brand<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"badge badge-success"</span><span class="kw">&gt;</span>Sucesso<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"badge badge-error"</span><span class="kw">&gt;</span>Erro<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"badge badge-warning"</span><span class="kw">&gt;</span>Aviso<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"badge badge-neutral"</span><span class="kw">&gt;</span>Neutro<span class="kw">&lt;/span&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- FEEDBACK -->
+<section class="page" id="page-feedback">
+  <div class="page-header">
+    <h1 class="page-title">Feedback / Alert</h1>
+    <p class="page-desc">Mensagens de feedback contextual. Use <code>role="alert"</code> para mensagens que surgem dinamicamente — o leitor de tela as anuncia automaticamente.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ role="alert" para erros</span>
+    <span class="a11y-pill pass">✓ role="status" para info/sucesso</span>
+    <span class="a11y-pill pass">✓ Ícone com aria-hidden</span>
+    <span class="a11y-pill pass">✓ Contraste AA garantido</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Variantes</div>
+    <div class="canvas col" style="gap:8px;max-width:560px">
+      <div class="alert alert-info" role="status">
+        <span class="alert-icon" aria-hidden="true"><i data-lucide="info"></i></span>
+        <div><strong>Informação</strong> — Sua solicitação está sendo processada.</div>
+      </div>
+      <div class="alert alert-success" role="status">
+        <span class="alert-icon" aria-hidden="true"><i data-lucide="check-circle-2"></i></span>
+        <div><strong>Sucesso</strong> — Dados salvos com sucesso.</div>
+      </div>
+      <div class="alert alert-warning" role="alert">
+        <span class="alert-icon" aria-hidden="true"><i data-lucide="triangle-alert"></i></span>
+        <div><strong>Atenção</strong> — Esta ação não pode ser desfeita.</div>
+      </div>
+      <div class="alert alert-error" role="alert">
+        <span class="alert-icon" aria-hidden="true"><i data-lucide="circle-x"></i></span>
+        <div><strong>Erro</strong> — Não foi possível completar a operação.</div>
+      </div>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"alert alert-error"</span> <span class="at">role</span>=<span class="st">"alert"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;span</span> <span class="at">aria-hidden</span>=<span class="st">"true"</span><span class="kw">&gt;</span>🚫<span class="kw">&lt;/span&gt;</span>
+  <span class="kw">&lt;div&gt;&lt;strong&gt;</span>Erro<span class="kw">&lt;/strong&gt;</span> — Mensagem.<span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;/div&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- TAB -->
+<section class="page" id="page-tab">
+  <div class="page-header">
+    <h1 class="page-title">Tab</h1>
+    <p class="page-desc">Navegação entre conteúdos relacionados no mesmo nível. Use <code>role="tablist"</code>, <code>role="tab"</code> e <code>role="tabpanel"</code>.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ role="tablist/tab/tabpanel"</span>
+    <span class="a11y-pill pass">✓ aria-selected</span>
+    <span class="a11y-pill pass">✓ aria-controls / aria-labelledby</span>
+    <span class="a11y-pill pass">✓ Keyboard: ←→ para navegar</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas">
+      <div class="tabs" style="width:100%">
+        <div class="tab-list" role="tablist" aria-label="Seções">
+          <button class="tab-btn" role="tab" aria-selected="true" aria-controls="tp1" id="t1" onclick="selectTab(this,'tp1')">Visão Geral</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tp2" id="t2" tabindex="-1" onclick="selectTab(this,'tp2')">Detalhes</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tp3" id="t3" tabindex="-1" onclick="selectTab(this,'tp3')">Histórico</button>
+        </div>
+        <div class="tab-panel active" id="tp1" role="tabpanel" aria-labelledby="t1">Conteúdo da aba Visão Geral.</div>
+        <div class="tab-panel" id="tp2" role="tabpanel" aria-labelledby="t2">Conteúdo da aba Detalhes.</div>
+        <div class="tab-panel" id="tp3" role="tabpanel" aria-labelledby="t3">Conteúdo da aba Histórico.</div>
+      </div>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;div</span> <span class="at">role</span>=<span class="st">"tablist"</span> <span class="at">aria-label</span>=<span class="st">"Seções"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;button</span> <span class="at">role</span>=<span class="st">"tab"</span> <span class="at">aria-selected</span>=<span class="st">"true"</span> <span class="at">aria-controls</span>=<span class="st">"tp1"</span><span class="kw">&gt;</span>Visão Geral<span class="kw">&lt;/button&gt;</span>
+  <span class="kw">&lt;button</span> <span class="at">role</span>=<span class="st">"tab"</span> <span class="at">aria-selected</span>=<span class="st">"false"</span> <span class="at">aria-controls</span>=<span class="st">"tp2"</span> <span class="at">tabindex</span>=<span class="st">"-1"</span><span class="kw">&gt;</span>Detalhes<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;div</span> <span class="at">id</span>=<span class="st">"tp1"</span> <span class="at">role</span>=<span class="st">"tabpanel"</span><span class="kw">&gt;</span>Conteúdo.<span class="kw">&lt;/div&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- ACCORDION -->
+<section class="page" id="page-accordion">
+  <div class="page-header">
+    <h1 class="page-title">Accordion</h1>
+    <p class="page-desc">Exibe e oculta conteúdo sob demanda. Use <code>aria-expanded</code> no botão e <code>aria-controls</code> apontando para o painel.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ aria-expanded no botão</span>
+    <span class="a11y-pill pass">✓ aria-controls / id no painel</span>
+    <span class="a11y-pill pass">✓ Keyboard: Enter/Space</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas">
+      <div class="accordion" style="width:100%">
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="true" aria-controls="acc1" onclick="toggleAcc(this,'acc1')">O que é o Nivelo? <span class="acc-chev" aria-hidden="true">▾</span></button>
+          <div class="acc-panel open" id="acc1" role="region"><p>O Nivelo é uma plataforma de gestão financeira para empresas, centralizando dados e automatizando processos.</p></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false" aria-controls="acc2" onclick="toggleAcc(this,'acc2')">Como funciona o plano? <span class="acc-chev" aria-hidden="true">▾</span></button>
+          <div class="acc-panel" id="acc2" role="region"><p>O plano é cobrado mensalmente por usuário. Sem contratos longos ou taxas de cancelamento.</p></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false" aria-controls="acc3" onclick="toggleAcc(this,'acc3')">Há suporte disponível? <span class="acc-chev" aria-hidden="true">▾</span></button>
+          <div class="acc-panel" id="acc3" role="region"><p>Sim, suporte via chat e e-mail em horário comercial, com SLA de resposta de até 4 horas.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"acc-btn"</span> <span class="at">aria-expanded</span>=<span class="st">"false"</span> <span class="at">aria-controls</span>=<span class="st">"panel1"</span><span class="kw">&gt;</span>
+  Pergunta <span class="kw">&lt;span</span> <span class="at">aria-hidden</span>=<span class="st">"true"</span><span class="kw">&gt;</span>▾<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;div</span> <span class="at">id</span>=<span class="st">"panel1"</span> <span class="at">role</span>=<span class="st">"region"</span><span class="kw">&gt;</span>Resposta.<span class="kw">&lt;/div&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- TOOLTIP -->
+<section class="page" id="page-tooltip">
+  <div class="page-header">
+    <h1 class="page-title">Tooltip</h1>
+    <p class="page-desc">Informação complementar ao hover/focus. Nunca coloque conteúdo essencial só no tooltip — o usuário pode não descobri-lo.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ role="tooltip"</span>
+    <span class="a11y-pill pass">✓ aria-describedby no trigger</span>
+    <span class="a11y-pill pass">✓ Visível no foco do teclado</span>
+    <span class="a11y-pill warn">⚠ Não use para conteúdo essencial</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas" style="justify-content:center;padding:48px 32px">
+      <div class="tooltip-wrap">
+        <button class="btn btn-primary" type="button" aria-describedby="tt1">Salvar</button>
+        <div class="tooltip-tip" id="tt1" role="tooltip">Ctrl + S</div>
+      </div>
+      <div class="tooltip-wrap">
+        <button class="btn btn-ghost" type="button" aria-describedby="tt2">Ajuda</button>
+        <div class="tooltip-tip" id="tt2" role="tooltip">Abrir documentação</div>
+      </div>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"tooltip-wrap"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;button</span> <span class="at">type</span>=<span class="st">"button"</span> <span class="at">aria-describedby</span>=<span class="st">"tt"</span><span class="kw">&gt;</span>Salvar<span class="kw">&lt;/button&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">id</span>=<span class="st">"tt"</span> <span class="at">role</span>=<span class="st">"tooltip"</span><span class="kw">&gt;</span>Ctrl + S<span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;/div&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section class="page" id="page-table">
+  <div class="page-header">
+    <h1 class="page-title">Table</h1>
+    <p class="page-desc">Exibe dados tabulares. Use <code>&lt;thead&gt;</code>, <code>&lt;th scope="col"&gt;</code> e <code>caption</code> para que leitores de tela naveguem corretamente.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ th scope="col"</span>
+    <span class="a11y-pill pass">✓ caption descritivo</span>
+    <span class="a11y-pill pass">✓ Semântica HTML nativa</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas" style="padding:0;display:block;border-radius:10px;overflow:hidden">
+      <table class="data-table" aria-label="Transações recentes">
+        <caption style="display:none">Transações recentes</caption>
+        <thead>
+          <tr>
+            <th scope="col">Descrição</th>
+            <th scope="col">Categoria</th>
+            <th scope="col">Data</th>
+            <th scope="col">Valor</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fornecedor XYZ</td><td>Operacional</td><td>24 jun 2026</td><td>R$ 4.200,00</td>
+            <td><span class="badge badge-success">Pago</span></td>
+          </tr>
+          <tr>
+            <td>Assinatura SaaS</td><td>Tecnologia</td><td>23 jun 2026</td><td>R$ 890,00</td>
+            <td><span class="badge badge-warning">Pendente</span></td>
+          </tr>
+          <tr>
+            <td>Reembolso viagem</td><td>RH</td><td>22 jun 2026</td><td>R$ 1.350,00</td>
+            <td><span class="badge badge-error">Vencido</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;table</span> <span class="at">aria-label</span>=<span class="st">"Transações recentes"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;thead&gt;&lt;tr&gt;</span>
+    <span class="kw">&lt;th</span> <span class="at">scope</span>=<span class="st">"col"</span><span class="kw">&gt;</span>Descrição<span class="kw">&lt;/th&gt;</span>
+    <span class="kw">&lt;th</span> <span class="at">scope</span>=<span class="st">"col"</span><span class="kw">&gt;</span>Status<span class="kw">&lt;/th&gt;</span>
+  <span class="kw">&lt;/tr&gt;&lt;/thead&gt;</span>
+  <span class="kw">&lt;tbody&gt;&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>Fornecedor XYZ<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;&lt;span</span> <span class="at">class</span>=<span class="st">"badge badge-success"</span><span class="kw">&gt;</span>Pago<span class="kw">&lt;/span&gt;&lt;/td&gt;</span>
+  <span class="kw">&lt;/tr&gt;&lt;/tbody&gt;</span>
+<span class="kw">&lt;/table&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- BREADCRUMB -->
+<section class="page" id="page-breadcrumb">
+  <div class="page-header">
+    <h1 class="page-title">Breadcrumb</h1>
+    <p class="page-desc">Indica a posição na hierarquia de navegação. Use <code>&lt;nav aria-label="Breadcrumb"&gt;</code> e marque o item atual com <code>aria-current="page"</code>.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ nav aria-label="Breadcrumb"</span>
+    <span class="a11y-pill pass">✓ aria-current="page" no item atual</span>
+    <span class="a11y-pill pass">✓ ol semântico</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas">
+      <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb" style="list-style:none">
+          <li><a class="bc-item" href="#">Início</a></li>
+          <li><span class="bc-sep" aria-hidden="true">/</span></li>
+          <li><a class="bc-item" href="#">Financeiro</a></li>
+          <li><span class="bc-sep" aria-hidden="true">/</span></li>
+          <li><span class="bc-item" aria-current="page">Transações</span></li>
+        </ol>
+      </nav>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;nav</span> <span class="at">aria-label</span>=<span class="st">"Breadcrumb"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;ol&gt;</span>
+    <span class="kw">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="st">"/"</span><span class="kw">&gt;</span>Início<span class="kw">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="kw">&lt;li&gt;&lt;a</span> <span class="at">href</span>=<span class="st">"/financeiro"</span><span class="kw">&gt;</span>Financeiro<span class="kw">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="kw">&lt;li&gt;&lt;span</span> <span class="at">aria-current</span>=<span class="st">"page"</span><span class="kw">&gt;</span>Transações<span class="kw">&lt;/span&gt;&lt;/li&gt;</span>
+  <span class="kw">&lt;/ol&gt;</span>
+<span class="kw">&lt;/nav&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- APP HEADER -->
+<section class="page" id="page-appheader">
+  <div class="page-header">
+    <h1 class="page-title">App Header</h1>
+    <p class="page-desc">Barra de navegação principal do produto. Use <code>&lt;header&gt;</code> e <code>&lt;nav&gt;</code> com <code>aria-label</code>.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ header landmark</span>
+    <span class="a11y-pill pass">✓ nav aria-label</span>
+    <span class="a11y-pill pass">✓ aria-current="page" no item ativo</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas" style="padding:20px;display:block">
+      <header class="app-header">
+        <span class="app-header-brand">Nivelo</span>
+        <nav class="app-header-nav" aria-label="Navegação principal">
+          <span class="app-header-link" style="color:var(--b500);font-weight:400" aria-current="page">Dashboard</span>
+          <span class="app-header-link">Financeiro</span>
+          <span class="app-header-link">Relatórios</span>
+        </nav>
+        <div class="app-header-actions">
+          <button class="btn btn-secondary btn-sm" type="button">Conta</button>
+          <button class="btn btn-primary btn-sm" type="button">+ Novo</button>
+        </div>
+      </header>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;header</span> <span class="at">class</span>=<span class="st">"app-header"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;span</span> <span class="at">class</span>=<span class="st">"app-header-brand"</span><span class="kw">&gt;</span>Nivelo<span class="kw">&lt;/span&gt;</span>
+  <span class="kw">&lt;nav</span> <span class="at">aria-label</span>=<span class="st">"Navegação principal"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;a</span> <span class="at">aria-current</span>=<span class="st">"page"</span><span class="kw">&gt;</span>Dashboard<span class="kw">&lt;/a&gt;</span>
+    <span class="kw">&lt;a</span><span class="kw">&gt;</span>Financeiro<span class="kw">&lt;/a&gt;</span>
+  <span class="kw">&lt;/nav&gt;</span>
+<span class="kw">&lt;/header&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- SIDEBAR COMP -->
+<section class="page" id="page-sidebar-comp">
+  <div class="page-header">
+    <h1 class="page-title">Sidebar</h1>
+    <p class="page-desc">Navegação lateral do produto. Use <code>&lt;nav&gt;</code> com <code>aria-label</code> e marque o link ativo com <code>aria-current="page"</code>.</p>
+  </div>
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ nav landmark</span>
+    <span class="a11y-pill pass">✓ aria-current="page"</span>
+    <span class="a11y-pill pass">✓ Keyboard navigable</span>
+  </div>
+  <div class="story">
+    <div class="story-title">Default</div>
+    <div class="canvas">
+      <nav class="app-sidebar" aria-label="Menu lateral">
+        <div class="app-sb-section">Principal</div>
+        <div class="app-sb-link active" aria-current="page"><i data-lucide="layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+        <div class="app-sb-link"><i data-lucide="bar-chart-2" aria-hidden="true"></i> Financeiro</div>
+        <div class="app-sb-link"><i data-lucide="file-bar-chart" aria-hidden="true"></i> Relatórios</div>
+        <div class="app-sb-section">Configurações</div>
+        <div class="app-sb-link"><i data-lucide="settings" aria-hidden="true"></i> Preferências</div>
+        <div class="app-sb-link"><i data-lucide="users" aria-hidden="true"></i> Usuários</div>
+      </nav>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;nav</span> <span class="at">aria-label</span>=<span class="st">"Menu lateral"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;a</span> <span class="at">href</span>=<span class="st">"/"</span> <span class="at">aria-current</span>=<span class="st">"page"</span><span class="kw">&gt;</span>Dashboard<span class="kw">&lt;/a&gt;</span>
+  <span class="kw">&lt;a</span> <span class="at">href</span>=<span class="st">"/financeiro"</span><span class="kw">&gt;</span>Financeiro<span class="kw">&lt;/a&gt;</span>
+<span class="kw">&lt;/nav&gt;</span></pre></div>
+  </div>
+</section>
+
+<!-- ICONS -->
+<section class="page" id="page-icons">
+  <div class="page-header">
+    <h1 class="page-title">Ícones</h1>
+    <p class="page-desc">Biblioteca de ícones: <strong>Lucide Icons</strong>. Use sempre via <code>&lt;i data-lucide="nome"&gt;&lt;/i&gt;</code> — os SVGs são injetados automaticamente e herdam a cor do elemento pai via <code>currentColor</code>.</p>
+  </div>
+
+  <div class="a11y-bar">
+    <span class="a11y-pill pass">✓ SVG inline via currentColor</span>
+    <span class="a11y-pill pass">✓ aria-hidden em ícones decorativos</span>
+    <span class="a11y-pill pass">✓ aria-label em ícones standalone</span>
+    <span class="a11y-pill info">ℹ lucide.dev/icons — MIT License</span>
+  </div>
+
+  <div class="story">
+    <div class="story-title">Tamanhos</div>
+    <div class="canvas">
+      <div class="icon-size-row">
+        <div class="icon-size-item"><i data-lucide="bell" style="width:14px;height:14px;color:var(--tp)"></i><span class="icon-size-label">14px · sm</span></div>
+        <div class="icon-size-item"><i data-lucide="bell" style="width:16px;height:16px;color:var(--tp)"></i><span class="icon-size-label">16px · md</span></div>
+        <div class="icon-size-item"><i data-lucide="bell" style="width:20px;height:20px;color:var(--tp)"></i><span class="icon-size-label">20px · lg</span></div>
+        <div class="icon-size-item"><i data-lucide="bell" style="width:24px;height:24px;color:var(--tp)"></i><span class="icon-size-label">24px · xl</span></div>
+        <div class="icon-size-item"><i data-lucide="bell" style="width:32px;height:32px;color:var(--tp)"></i><span class="icon-size-label">32px · 2xl</span></div>
+      </div>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="cm">&lt;!-- Decorativo: aria-hidden --&gt;</span>
+<span class="kw">&lt;i</span> <span class="at">data-lucide</span>=<span class="st">"bell"</span> <span class="at">aria-hidden</span>=<span class="st">"true"</span> <span class="at">style</span>=<span class="st">"width:20px;height:20px"</span><span class="kw">&gt;&lt;/i&gt;</span>
+
+<span class="cm">&lt;!-- Standalone (sem texto ao lado): aria-label --&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">aria-label</span>=<span class="st">"Notificações"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;i</span> <span class="at">data-lucide</span>=<span class="st">"bell"</span> <span class="at">aria-hidden</span>=<span class="st">"true"</span><span class="kw">&gt;&lt;/i&gt;</span>
+<span class="kw">&lt;/button&gt;</span></pre></div>
+  </div>
+
+  <div class="story">
+    <div class="story-title">Ícones com botão</div>
+    <div class="canvas" style="gap:10px">
+      <button class="btn btn-primary" type="button"><i data-lucide="plus" aria-hidden="true"></i> Novo</button>
+      <button class="btn btn-secondary" type="button"><i data-lucide="download" aria-hidden="true"></i> Exportar</button>
+      <button class="btn btn-ghost" type="button"><i data-lucide="settings" aria-hidden="true"></i> Configurar</button>
+      <button class="btn btn-danger" type="button"><i data-lucide="trash-2" aria-hidden="true"></i> Excluir</button>
+      <button class="btn btn-ghost btn-sm" type="button" aria-label="Filtrar"><i data-lucide="filter" aria-hidden="true"></i></button>
+      <button class="btn btn-ghost btn-sm" type="button" aria-label="Pesquisar"><i data-lucide="search" aria-hidden="true"></i></button>
+    </div>
+    <div class="code-bar">
+      <button class="code-toggle-btn" onclick="toggleCode(this)">◇ Mostrar código</button>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <div class="code-block"><pre><span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-primary"</span> <span class="at">type</span>=<span class="st">"button"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;i</span> <span class="at">data-lucide</span>=<span class="st">"plus"</span> <span class="at">aria-hidden</span>=<span class="st">"true"</span><span class="kw">&gt;&lt;/i&gt;</span> Novo
+<span class="kw">&lt;/button&gt;</span>
+
+<span class="cm">&lt;!-- Icon-only: obrigatório aria-label no botão --&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"btn btn-ghost btn-sm"</span> <span class="at">aria-label</span>=<span class="st">"Filtrar"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;i</span> <span class="at">data-lucide</span>=<span class="st">"filter"</span> <span class="at">aria-hidden</span>=<span class="st">"true"</span><span class="kw">&gt;&lt;/i&gt;</span>
+<span class="kw">&lt;/button&gt;</span></pre></div>
+  </div>
+
+  <div class="sub-title">Galeria — Ícones do sistema</div>
+  <div class="icon-grid" id="icon-gallery"></div>
+</section>
+
+</main><!-- /main -->
+
+<script>
+// ── Router ─────────────────────────────────────────────
+const pages = document.querySelectorAll('.page');
+const links  = document.querySelectorAll('.sb-link');
+
+function showPage(id) {
+  pages.forEach(p => p.classList.remove('active'));
+  links.forEach(l => l.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) { pg.classList.add('active'); document.getElementById('main').scrollTop = 0; }
+  const lk = document.querySelector(`.sb-link[data-page="${id}"]`);
+  if (lk) lk.classList.add('active');
+  // Re-render any newly visible lucide icons
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+links.forEach(l => {
+  l.addEventListener('click', e => {
+    e.preventDefault();
+    showPage(l.dataset.page);
+    history.replaceState(null,'','#'+l.dataset.page);
+    closeSidebar(); // fechar drawer no mobile
+  });
+});
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('open');
+  document.getElementById('sb-hamburger').setAttribute('aria-expanded','true');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
+  document.getElementById('sb-hamburger').setAttribute('aria-expanded','false');
+}
+
+const hash = location.hash.replace('#','');
+if (hash) showPage(hash); else showPage('intro');
+
+// ── Sidebar collapse ───────────────────────────────────
+document.querySelectorAll('.sb-section').forEach(btn => {
+  const grp = document.getElementById('group-' + btn.dataset.group);
+  grp.style.maxHeight = grp.scrollHeight + 'px';
+  btn.addEventListener('click', () => {
+    const open = !btn.classList.contains('collapsed');
+    btn.classList.toggle('collapsed', open);
+    btn.setAttribute('aria-expanded', String(!open));
+    grp.style.maxHeight = open ? '0' : grp.scrollHeight + 'px';
+  });
+});
+
+// ── Foundation collapse ────────────────────────────────
+document.querySelectorAll('.found-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const body = document.getElementById('found-' + btn.dataset.found);
+    const isOpen = body.classList.contains('open');
+    btn.classList.toggle('open', !isOpen);
+    btn.setAttribute('aria-expanded', String(!isOpen));
+    body.classList.toggle('open', !isOpen);
+  });
+});
+
+// ── Code toggle ────────────────────────────────────────
+function toggleCode(btn) {
+  const bar   = btn.closest('.code-bar');
+  const block = bar.nextElementSibling;
+  const open  = block.classList.toggle('open');
+  btn.textContent = open ? '◆ Ocultar código' : '◇ Mostrar código';
+}
+
+function copyCode(btn) {
+  const bar   = btn.closest('.code-bar');
+  const block = bar.nextElementSibling;
+  const text  = block.querySelector('pre').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 1800);
+  });
+}
+
+// ── Component interactions ─────────────────────────────
+function toggleSwitch(btn) {
+  const checked = btn.getAttribute('aria-checked') === 'true';
+  btn.setAttribute('aria-checked', String(!checked));
+}
+function toggleCb(el) {
+  if (el.getAttribute('aria-disabled') === 'true') return;
+  const checked = el.getAttribute('aria-checked') === 'true';
+  el.setAttribute('aria-checked', String(!checked));
+}
+function toggleAcc(btn, panelId) {
+  const panel  = document.getElementById(panelId);
+  const isOpen = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', String(!isOpen));
+  panel.classList.toggle('open', !isOpen);
+}
+function selectTab(btn, panelId) {
+  const list = btn.closest('[role="tablist"]');
+  list.querySelectorAll('[role="tab"]').forEach(t => {
+    t.setAttribute('aria-selected','false');
+    t.setAttribute('tabindex','-1');
+  });
+  btn.setAttribute('aria-selected','true');
+  btn.setAttribute('tabindex','0');
+  const tabs = btn.closest('.tabs');
+  tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── Color swatches ─────────────────────────────────────
+const brandColors  = {50:'#EEF3FB',100:'#D4E1F5',200:'#A9C3EB',300:'#7EA5E1',400:'#5387D7',500:'#1752B0',600:'#12449A',700:'#0E3680',800:'#0A2860',900:'#061A40',950:'#030D20'};
+const accentColors = {50:'#FEFAE8',100:'#FDF4C5',200:'#FBE98B',300:'#F9DC51',400:'#EFCB34',500:'#D4B01A',600:'#B09010',700:'#8C720D',800:'#68540A',900:'#443607',950:'#221B03'};
+const grayColors   = {'white':'#FFFFFF',50:'#FAFAFA',100:'#F5F5F5',200:'#E5E5E5',300:'#D4D4D4',400:'#A3A3A3',500:'#737373',600:'#525252',700:'#404040',800:'#262626',900:'#171717',950:'#0A0A0A'};
+
+function makeSwatch(bg, label) {
+  return `<div class="sw"><div class="sw-box" style="background:${bg}" title="${label}: ${bg}"></div><span class="sw-lbl">${label}</span></div>`;
+}
+function fillSwatches(id, map) {
+  document.getElementById(id).innerHTML = Object.entries(map).map(([k,v]) => makeSwatch(v,k)).join('');
+}
+fillSwatches('sw-brand', brandColors);
+fillSwatches('sw-accent', accentColors);
+fillSwatches('sw-gray', grayColors);
+
+// Semantic tokens
+function semCard(dot, name, token) {
+  return `<div class="sem-card"><div class="sem-dot" style="background:${dot};${dot==='#FFFFFF'?'border:1px solid #e5e5e5':''}"></div><div><div class="sem-name">${name}</div><div class="sem-token">${token}</div></div></div>`;
+}
+document.getElementById('sem-text').innerHTML = [
+  semCard('#171717','text-primary','Gray/900'),
+  semCard('#404040','text-secondary','Gray/700'),
+  semCard('#737373','text-tertiary','Gray/500'),
+  semCard('#A3A3A3','text-disabled','Gray/400'),
+  semCard('#FFFFFF','text-inverse','White'),
+  semCard('#1752B0','text-brand','Brand/500'),
+  semCard('#DC2626','text-error','Red/600'),
+  semCard('#15803D','text-success','Green/700'),
+  semCard('#A16207','text-warning','Yellow/700'),
+].join('');
+document.getElementById('sem-bg').innerHTML = [
+  semCard('#FAFAFA','bg-default','Gray/50'),
+  semCard('#F5F5F5','bg-subtle','Gray/100'),
+  semCard('#FFFFFF','bg-surface','White'),
+  semCard('#E5E5E5','bg-disabled','Gray/200'),
+  semCard('#EEF3FB','bg-brand','Brand/50'),
+  semCard('#1752B0','bg-brand-strong','Brand/500'),
+].join('');
+document.getElementById('sem-border').innerHTML = [
+  semCard('#D4D4D4','border-default','Gray/300'),
+  semCard('#F5F5F5','border-subtle','Gray/100'),
+  semCard('#E5E5E5','border-muted','Gray/200'),
+  semCard('#1752B0','border-focus','Brand/500'),
+].join('');
+document.getElementById('sem-action').innerHTML = [
+  semCard('#1752B0','action-primary','Brand/500'),
+  semCard('#12449A','action-primary-hover','Brand/600'),
+  semCard('#D4E1F5','action-secondary','Brand/100'),
+  semCard('#EFCB34','action-accent','Accent/400 ✦'),
+  semCard('#DC2626','action-error','Red/600'),
+  semCard('#16A34A','action-success','Green/600'),
+  semCard('#CA8A04','action-warning','Yellow/600'),
+].join('');
+document.getElementById('sem-status').innerHTML = [
+  semCard('#F0FDF4','status-success-bg','Green/50'),semCard('#15803D','status-success-fg','Green/700'),
+  semCard('#FEF2F2','status-error-bg','Red/50'),semCard('#B91C1C','status-error-fg','Red/700'),
+  semCard('#FEFCE8','status-warning-bg','Yellow/50'),semCard('#A16207','status-warning-fg','Yellow/700'),
+  semCard('#EEF3FB','status-info-bg','Brand/50'),semCard('#0E3680','status-info-fg','Brand/700'),
+].join('');
+
+// ── Typography ─────────────────────────────────────────
+function typeRow(name, size, weight, lh, styleName) {
+  const preview = Math.min(size, 42);
+  return `<div class="type-row">
+    <div><div class="type-meta-name">${name}</div><div class="type-meta-sub">${styleName}</div></div>
+    <div class="type-preview" style="font-size:${preview}px;font-weight:${weight};line-height:${lh}">Nivelo</div>
+    <span class="type-stat">${size}px</span>
+    <span class="type-stat">${weight}</span>
+    <span class="type-stat">${Math.round(lh*100)}%</span>
+  </div>`;
+}
+document.getElementById('type-headings').innerHTML = [
+  typeRow('Heading/1-XL',128,500,1.1,'Medium'),typeRow('Heading/1-L',96,500,1.1,'Medium'),
+  typeRow('Heading/1-M',72,500,1.1,'Medium'),typeRow('Heading/2',56,500,1.1,'Medium'),
+  typeRow('Heading/3',48,500,1.1,'Medium'),typeRow('Heading/4',40,500,1.1,'Medium'),
+  typeRow('Heading/5',32,500,1.1,'Medium'),typeRow('Heading/6',24,500,1.1,'Medium'),
+].join('');
+document.getElementById('type-body').innerHTML = [
+  typeRow('Body/XXXL',32,300,1.3,'Light'),typeRow('Body/XXL',24,300,1.3,'Light'),
+  typeRow('Body/XL',20,300,1.5,'Light'),typeRow('Body/L',18,300,1.5,'Light'),
+  typeRow('Body/M',16,300,1.4,'Light'),typeRow('Body/S',14,300,1.4,'Light'),
+  typeRow('Body/XS',12,300,1.4,'Light'),typeRow('Body/XXS',10,300,1.4,'Light'),
+].join('');
+document.getElementById('type-btn').innerHTML = [
+  typeRow('Button/XL',24,500,1.2,'Medium'),typeRow('Button/L',20,500,1.2,'Medium'),
+  typeRow('Button/M',16,500,1.5,'Medium'),typeRow('Button/S',14,500,1.7,'Medium'),
+  typeRow('Caption/M',20,500,1.0,'Medium'),typeRow('Caption/S',16,500,1.0,'Medium'),
+].join('');
+
+// ── Spacing ────────────────────────────────────────────
+const spacings = [['2xs','2px'],['xs','4px'],['sm','8px'],['md','16px'],['lg','24px'],['xl','32px'],['2xl','48px'],['3xl','64px'],['4xl','96px']];
+document.getElementById('spacing-rows').innerHTML = spacings.map(([n,v]) =>
+  `<div class="sp-row"><span class="sp-name">--sp-${n}</span><div class="sp-bar" style="width:${v}"></div><span class="sp-val">${v}</span></div>`
+).join('');
+
+// ── Radius ─────────────────────────────────────────────
+const radii = [['none','0px'],['xs','4px'],['sm','8px'],['md','16px'],['lg','24px'],['xl','32px'],['2xl','48px'],['full','9999px']];
+document.getElementById('rad-grid').innerHTML = radii.map(([n,v]) =>
+  `<div class="rad-card"><div class="rad-box" style="border-radius:${v}"></div><span class="rad-name">--r-${n}</span><span class="rad-val">${v}</span></div>`
+).join('');
+
+// ── Shadows ────────────────────────────────────────────
+const shadows = [
+  ['xs','0 1px 4px rgba(23,82,176,.05)'],['sm','0 1px 2px rgba(23,82,176,.08),0 1px 2px rgba(0,0,0,.06)'],
+  ['md','0 2px 4px rgba(23,82,176,.10),0 4px 8px rgba(0,0,0,.06)'],
+  ['lg','0 4px 12px rgba(23,82,176,.12),0 8px 24px rgba(0,0,0,.08)'],
+  ['xl','0 6px 16px rgba(23,82,176,.16),0 12px 24px rgba(0,0,0,.10)'],
+  ['2xl','0 10px 28px rgba(23,82,176,.18),0 16px 40px rgba(0,0,0,.12)'],
+];
+document.getElementById('sh-grid').innerHTML = shadows.map(([n,v]) =>
+  `<div class="sh-card"><div class="sh-box" style="box-shadow:${v}"></div><span class="sh-name">shadow-${n}</span></div>`
+).join('');
+
+// ── Opacity ────────────────────────────────────────────
+const ops = [[0,'0%'],[5,'5%'],[10,'10%'],[20,'20%'],[25,'25%'],[50,'50%'],[75,'75%'],[90,'90%'],[100,'100%']];
+document.getElementById('op-rows').innerHTML = ops.map(([n,v]) =>
+  `<div class="sp-row"><span class="sp-name">--opacity-${n}</span><div style="height:20px;width:120px;border-radius:4px;background:var(--b500);opacity:${n/100}"></div><span class="sp-val">${v}</span></div>`
+).join('');
+
+// ── Icon gallery ───────────────────────────────────────
+const systemIcons = [
+  // Navigation
+  'home','layout-dashboard','menu','chevron-right','chevron-left','chevron-down','chevron-up',
+  'arrow-right','arrow-left','arrow-up','arrow-down','external-link','link','corner-up-left',
+  // Actions
+  'plus','minus','x','check','search','filter','sort-asc','sort-desc','refresh-cw',
+  'edit-2','edit-3','trash-2','copy','clipboard','download','upload','share-2','send',
+  'save','printer','eye','eye-off','lock','unlock','key',
+  // Status & Feedback
+  'info','check-circle-2','triangle-alert','circle-x','circle-check','alert-circle',
+  'loader-2','clock','timer','calendar','calendar-check',
+  // UI Elements
+  'bell','bell-off','star','heart','bookmark','tag','flag','pin','map-pin',
+  'grid-2x2','list','columns-2','layout-list','table-2','rows-2',
+  // Files & Data
+  'file','file-text','file-plus','file-minus','folder','folder-open',
+  'bar-chart-2','bar-chart-3','line-chart','pie-chart','file-bar-chart','trending-up','trending-down',
+  // People & Org
+  'user','user-plus','user-minus','user-check','users','building-2','briefcase',
+  // Finance
+  'banknote','credit-card','wallet','receipt','coins','dollar-sign','percent','calculator',
+  // Settings & Config
+  'settings','settings-2','sliders-horizontal','toggle-left','toggle-right','code-2',
+  'wrench','zap','shield','shield-check',
+  // Misc
+  'mail','message-circle','phone','globe','wifi','package','layers','cpu',
+];
+
+const gallery = document.getElementById('icon-gallery');
+gallery.innerHTML = systemIcons.map(name =>
+  `<div class="icon-card" title="${name}" onclick="navigator.clipboard.writeText('${name}').then(()=>{this.style.borderColor='var(--b500)';setTimeout(()=>this.style.borderColor='',1200)})">
+    <i data-lucide="${name}" aria-hidden="true"></i>
+    <span class="icon-card-name">${name}</span>
+  </div>`
+).join('');
+
+// ── Init Lucide ────────────────────────────────────────
+lucide.createIcons();
+</script>
+</body>
+</html>

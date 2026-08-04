@@ -1,0 +1,448 @@
+/* ══════════════════════════════════════════════════════════
+   CAIXA — Financeiro > Caixa. Mobile first. Mesmos padrões já usados em
+   Categorias/Notas fiscais/Cadastro: `Table` como Card genérico, Dropdown/
+   Input compostos a partir de tokens/componentes reais, FilterPopover pro
+   Agrupamento de Filtros, Período (range picker) copiado de
+   page-notas-fiscais.css, paginação copiada de page-cadastros.css.
+
+   Nota: os padrões de filtro/tabela/paginação (`.caixa-*`) duplicam de
+   propósito os equivalentes de outras telas em vez de compartilhar um
+   arquivo comum — mesma convenção já estabelecida entre todas as telas
+   deste projeto (cada `page-*.css` fica independente).
+   ══════════════════════════════════════════════════════════ */
+
+.caixa-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.caixa-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .caixa-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.caixa-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.caixa-title { color: var(--color-text-primary); margin: 0; }
+.caixa-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 560px; }
+
+#new-lancamento-btn { width: 100%; justify-content: center; flex-shrink: 0; }
+@media (min-width: 768px) {
+  #new-lancamento-btn { width: auto; }
+}
+
+/* ── Busca/Filtros fundidos com a tabela (mesmo padrão final já adotado em
+   Produtos/Cadastro/Estoque/Categorias) ─────────────────────────────────── */
+.card.caixa-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.caixa-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.caixa-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.caixa-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.caixa-filter { width: 100%; }
+@media (min-width: 768px) {
+  .caixa-filter { width: auto; flex: 0 1 220px; min-width: 180px; }
+  .caixa-filter-search { flex: 1 1 320px; min-width: 260px; }
+}
+
+.caixa-filters .caixa-filter.caixa-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+.caixa-dropdown .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+.caixa-dropdown .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
+.caixa-dropdown .option { font-size: var(--font-size-sm); }
+
+/* ── Agrupamento de Filtros (FilterPopover) ──────────────────────────────── */
+#caixa-filtros-trigger-root .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  justify-content: flex-start;
+  gap: var(--spacing-xs);
+}
+.caixa-filtros-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-tertiary); }
+
+.caixa-filter-popover:not([hidden]) {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+.caixa-filter-popover .trigger { height: 36px; font-size: var(--font-size-sm); padding: var(--spacing-xs) var(--spacing-sm); }
+.caixa-filter-popover .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
+
+.caixa-filter-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Período (range picker aninhado dentro do Filtros, mesma composição de
+   Notas fiscais/Dashboard) — z-index maior que o Filtros (60) já que abre
+   por cima dele. ───────────────────────────────────────────────────────── */
+.caixa-period-field { position: relative; }
+.caixa-period-placeholder { color: var(--color-text-tertiary); }
+
+.caixa-period-popover:not([hidden]) {
+  position: fixed;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.caixa-period-inputs { display: flex; gap: var(--spacing-sm); }
+.caixa-period-inputs .wrapper { flex: 1; }
+.caixa-period-inputs .input { height: 36px; font-size: var(--font-size-sm); }
+.caixa-period-inputs .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
+
+.caixa-period-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.caixa-period-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+.caixa-period-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.caixa-period-day,
+.caixa-period-day-empty {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.caixa-period-day {
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.caixa-period-day:hover { background: var(--color-bg-subtle); }
+.caixa-period-day.is-in-range { background: var(--color-bg-brand); }
+.caixa-period-day.is-start,
+.caixa-period-day.is-end {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+
+.caixa-period-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Resumo (Total de Entradas/Saídas/Saldo Atual), acima da tabela — reflete
+   sempre os filtros aplicados no momento (busca/categoria/período), nunca o
+   dataset inteiro. Cópia estrutural EXATA de `.estoque-summary-row`/
+   `.estoque-summary-card` (page-estoque.css) — mesmo grid responsivo,
+   cardHeader com ícone+título, valor em destaque abaixo — pedido explícito
+   do usuário de manter a mesma aparência dos totais de Estoque. Classes
+   próprias `caixa-summary-*`, mesma convenção de duplicar por tela já usada
+   em todo o projeto (nenhum arquivo CSS compartilhado entre telas). */
+.caixa-summary-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: var(--spacing-md);
+}
+@media (min-width: 1024px) {
+  .caixa-summary-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+.card.caixa-summary-card {
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.caixa-summary-card .cardHeader {
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+}
+
+.caixa-summary-card .title {
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.caixa-summary-icon svg { width: 14px; height: 14px; }
+
+.caixa-summary-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.caixa-summary-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+.caixa-summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+.caixa-summary-value {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+/* Padrão de KPI (2026-08-03): título e valor ficam no MESMO tamanho do
+   mobile em qualquer largura de tela (12px bold / 24px bold) — ver
+   page-contas-a-pagar.css/page-estoque.css, mesma decisão aplicada aqui.
+   Bloco antigo de aumento no desktop (18px/30px) removido. */
+
+/* ── Tabela (desktop) / Cards (mobile) ──────────────────────────────────── */
+
+.caixa-table-card .tableWrap { display: none; padding-top: 0; }
+.caixa-cards { display: flex; flex-direction: column; gap: var(--spacing-md); padding: var(--spacing-md); }
+@media (min-width: 768px) {
+  .caixa-table-card .tableWrap { display: block; }
+  .caixa-cards { display: none; }
+}
+
+.caixa-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.caixa-table-card .sortIcon { color: var(--color-gray-500); }
+.caixa-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.caixa-table-card .td { border-color: var(--color-gray-200); }
+.caixa-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.caixa-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.caixa-table-card .tr:hover .td { filter: brightness(0.97); }
+.caixa-table-card .tr.is-filtered-out { display: none; }
+
+.caixa-table-card .table { table-layout: fixed; }
+.caixa-table-card .th:nth-child(1) { width: 11%; }  /* Data */
+.caixa-table-card .th:nth-child(2) { width: 28%; }  /* Histórico */
+.caixa-table-card .th:nth-child(3) { width: 21%; }  /* Cliente ou Fornecedor */
+.caixa-table-card .th:nth-child(4) { width: 17%; }  /* Categoria */
+.caixa-table-card .th:nth-child(5) { width: 11%; }  /* Tipo */
+.caixa-table-card .th:nth-child(6) { width: 12%; }  /* Valor */
+
+/* ── Valor: cor conforme o sinal (Entrada verde, Saída vermelho) — mesmos
+   tokens de status já usados em badges/toasts do sistema. ────────────────── */
+.caixa-valor-entrada { color: var(--color-status-success-fg); }
+.caixa-valor-saida { color: var(--color-status-error-fg); }
+/* Peso extra só na tabela/cards (célula de texto corrido) — o valor de
+   destaque dos cards de resumo já tem seu próprio peso responsivo definido
+   em `.caixa-summary-value`/media query acima, que não pode ser sobrescrito
+   por esta classe de cor reaproveitada nos dois contextos. */
+.caixa-table-card .caixa-valor-entrada,
+.caixa-table-card .caixa-valor-saida,
+.caixa-mobile-card-fields .caixa-valor-entrada,
+.caixa-mobile-card-fields .caixa-valor-saida {
+  font-weight: var(--font-weight-medium);
+}
+
+.caixa-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.caixa-empty:not([hidden]) { display: flex; }
+.caixa-empty p { margin: 0; }
+
+.caixa-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.caixa-empty-global:not([hidden]) { display: flex; }
+.caixa-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.caixa-empty-global-title { color: var(--color-text-primary); margin: 0; }
+.caixa-empty-global-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 360px; }
+
+/* ── Paginação (composição própria a partir de tokens, mesma exata de
+   Cadastro) ─────────────────────────────────────────────────────────────── */
+.caixa-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+.caixa-pagination[hidden] { display: none; }
+.caixa-pagination-info { color: var(--color-text-tertiary); }
+.caixa-pagination-controls { display: flex; align-items: center; gap: var(--spacing-2xs); }
+.caixa-pagination-pages { display: flex; align-items: center; gap: var(--spacing-2xs); }
+
+.caixa-pagination-page {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--spacing-2xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.caixa-pagination-page:hover { background: var(--color-bg-subtle); }
+.caixa-pagination-page.is-active {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+  cursor: default;
+}
+.caixa-pagination-page.is-active:hover { background: var(--color-action-primary); }
+
+@media (max-width: 479px) {
+  .caixa-pagination { flex-direction: column; align-items: stretch; text-align: center; }
+}
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.caixa-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.caixa-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.caixa-mobile-card-historico { color: var(--color-text-primary); }
+.caixa-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.caixa-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.caixa-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+.caixa-mobile-card-fields dd .badge { font-size: var(--font-size-sm); }
+
+/* ── Toast de sucesso ("Lançamento salvo com sucesso") ────────────────────
+   Mesma composição já usada em Categorias/Notas fiscais (Feedback
+   reaproveitado como Toast) + o mesmo fix de colisão Feedback×Dialog (esta
+   tela não carrega Dialog.module.css, mas o padrão é aplicado por segurança
+   e consistência com as demais telas). */
+.caixa-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.caixa-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.caixa-toast { box-shadow: var(--shadow-lg); animation: caixa-toast-in 0.25s ease; }
+.caixa-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.caixa-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes caixa-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

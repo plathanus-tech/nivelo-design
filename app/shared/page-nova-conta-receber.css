@@ -1,0 +1,109 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA CONTA A RECEBER — formulário de criação/edição/visualização de
+   contas a receber, dentro de Financeiro > Contas a receber. Mobile
+   first. Mesma cópia estrutural exata de page-nova-conta-pagar.css
+   (pedido explícito de mesma arquitetura/usabilidade) — classes próprias
+   (`ncr-*`), sem o bloco de Competência (não pedido no formulário de
+   Contas a Receber).
+   ══════════════════════════════════════════════════════════ */
+
+.ncr-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.ncr-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.ncr-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.ncr-back:hover { color: var(--color-text-primary); }
+.ncr-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Seções (1 único `.card` do Table pra todo o formulário) ─────────────── */
+
+#ncr-form { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+.ncr-subsection { padding: var(--spacing-lg); }
+.ncr-subsection + .ncr-subsection { border-top: var(--border-width-thin) solid var(--color-border-subtle); }
+
+.ncr-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.ncr-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .ncr-grid { grid-template-columns: 1fr 1fr; }
+  .ncr-span-2 { grid-column: span 2; }
+}
+
+.ncr-dropdown { position: relative; }
+.ncr-optional-tag { font-weight: var(--font-weight-regular); color: var(--color-text-tertiary); }
+
+.ncr-grid input.input { width: 100%; height: 44px; }
+.menu .option { display: block; }
+
+/* Mensagem de erro: mesmo padrão do resto do sistema. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.ncr-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .ncr-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .ncr-actions .btn { min-width: 160px; }
+  #ncr-cancelar-conta-btn { margin-right: auto; min-width: 0; }
+}
+
+/* ── Modais (Nova categoria / Cancelar conta) ─────────────────────────────
+   `.overlay` tem `display:flex` incondicional no Dialog.module.css — guard
+   obrigatório (mesmo gotcha documentado dezenas de vezes em CLAUDE.md). */
+.overlay[hidden] { display: none; }
+.btn[hidden] { display: none; }
+
+/* Item fixo de ação no fim do menu (Categoria: "+ Nova categoria";
+   Cliente: "+ Cadastrar novo cliente") — mesmo padrão de Nova Conta a Pagar. */
+.option.ncr-dropdown-action-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-medium);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}

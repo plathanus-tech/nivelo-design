@@ -1,0 +1,125 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA CONTA A PAGAR — formulário de criação/edição/visualização de contas
+   a pagar, dentro de Financeiro > Contas a pagar. Mobile first. Estrutura/
+   tokens copiados deliberadamente de page-novo-lancamento-caixa.css (mesmo
+   "card único com subseções + divisor" já aprovado no restante do sistema)
+   — classes próprias (`ncp-*`), não um arquivo compartilhado.
+   ══════════════════════════════════════════════════════════ */
+
+.ncp-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.ncp-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.ncp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.ncp-back:hover { color: var(--color-text-primary); }
+.ncp-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Seções (1 único `.card` do Table pra todo o formulário) ─────────────── */
+
+#ncp-form { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+.ncp-subsection { padding: var(--spacing-lg); }
+.ncp-subsection + .ncp-subsection { border-top: var(--border-width-thin) solid var(--color-border-subtle); }
+
+.ncp-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.ncp-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .ncp-grid { grid-template-columns: 1fr 1fr; }
+  .ncp-span-2 { grid-column: span 2; }
+}
+
+.ncp-dropdown { position: relative; }
+.ncp-optional-tag { font-weight: var(--font-weight-regular); color: var(--color-text-tertiary); }
+
+.ncp-grid input.input { width: 100%; height: 44px; }
+.menu .option { display: block; }
+
+/* Mensagem de erro: mesmo padrão do resto do sistema — `.errorText` só
+   aparece quando `.wrapper`/campo ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* ── Competência: padrão oficial de calendário do sistema (mês/ano) — CSS
+   agora vive em Storybook-Nivelo/.../DatePicker/DatePicker.module.css
+   (dpTriggerRow/dpClearBtn/dpMonthGrid/dpMonth/dpMonthSelected), nada
+   específico desta página. ─────────────────────────────────────────────── */
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.ncp-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .ncp-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .ncp-actions .btn { min-width: 160px; }
+  /* "Cancelar conta" (ação de negócio, só no modo Editar) fica isolada à
+     esquerda, separada de Cancelar/Salvar (navegação do formulário) —
+     evita a leitura errada de que são 2 variações do mesmo botão. */
+  #ncp-cancelar-conta-btn { margin-right: auto; min-width: 0; }
+}
+
+/* ── Modais (Nova categoria / Cancelar conta) ─────────────────────────────
+   `.overlay` tem `display:flex` incondicional no Dialog.module.css — guard
+   obrigatório (mesmo gotcha documentado dezenas de vezes em CLAUDE.md). */
+.overlay[hidden] { display: none; }
+
+/* Mesmo gotcha, desta vez em `.btn` (Button.module.css) — `display:flex`
+   incondicional derrota o atributo `hidden` usado em "Salvar" (modo=ver) e
+   "Cancelar conta" (só visível em modo=editar para contas ainda não pagas/
+   canceladas). */
+.btn[hidden] { display: none; }
+
+/* Item fixo de ação no fim do menu (Categoria: "+ Nova categoria";
+   Fornecedor: "+ Cadastrar novo fornecedor") — mesmo raciocínio de
+   "+ Adicionar nova safra" (nova-anotacao.js), cor de destaque (brand) +
+   ícone alinhado ao texto, separado do resto das opções por uma borda
+   superior sutil. Classe genérica, reaproveitada pelos dois dropdowns. */
+.option.ncp-dropdown-action-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-medium);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}

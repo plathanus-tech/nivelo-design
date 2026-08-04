@@ -1,0 +1,115 @@
+/* ══════════════════════════════════════════════════════════
+   DETALHE DO MANIFESTO — Fiscal > Manifesto > Ver detalhes. Mesmo padrão
+   já usado em Estoque/Talhão/Contas a Pagar/Certificado Digital (tela
+   própria de leitura, nunca reaproveitar o form de criação/edição em modo
+   disabled). Estrutura copiada de page-certificado-detalhe.css.
+   ══════════════════════════════════════════════════════════ */
+
+.manidet-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.manidet-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.manidet-back:hover { color: var(--color-text-primary); }
+
+.manidet-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .manidet-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+.manidet-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.manidet-title { color: var(--color-text-primary); margin: 0; }
+.manidet-actions { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+/* Bug real recorrente já documentado dezenas de vezes neste projeto:
+   `Button.module.css`'s `.btn{display:inline-flex}` não tem guard de
+   `[hidden]` — sem isto, Editar/Cancelar continuavam visíveis mesmo com
+   `hidden` num manifesto já cancelado. */
+#manidet-editar-btn[hidden],
+#manidet-cancelar-btn[hidden] { display: none; }
+
+.manidet-section { padding: var(--spacing-lg); }
+.manidet-section-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.manidet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin: 0;
+}
+@media (max-width: 480px) {
+  .manidet-grid { grid-template-columns: 1fr; }
+}
+.manidet-grid .manidet-span-2 { grid-column: span 2; }
+.manidet-grid dt {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  margin: 0 0 2px;
+}
+.manidet-grid dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.manidet-documentos-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.manidet-documento-item {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.manidet-documento-chave {
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  word-break: break-all;
+}
+.manidet-documento-trajeto {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+.manidet-not-found {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.manidet-not-found:not([hidden]) { display: flex; }
+
+.overlay[hidden] { display: none; }

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funcionalidades — Proposta 3 · Showcase (Tab)</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tab/Tab.module.css" />
+  <link rel="stylesheet" href="../shared/funcionalidades-explore.css" />
+</head>
+<body class="layout-screen">
+
+  <span class="fx-draft-label">V3 · Showcase (Tab)</span>
+
+  <section class="fx3-section" aria-labelledby="fx3-headline">
+    <div class="fx3-inner">
+
+      <header class="section-header">
+        <span class="section-tag">Plataforma</span>
+        <h2 class="section-headline" id="fx3-headline">Um módulo para cada parte da gestão rural</h2>
+        <p class="section-sub">Do estoque ao financeiro, tudo pensado para ser simples de usar no dia a dia da fazenda.</p>
+      </header>
+
+      <!-- Componente Tab do Storybook-Nivelo, reutilizado exatamente
+           (classes wrapper/list/tab/active/panel de Tab.module.css) -->
+      <div class="wrapper" id="fx3-tab">
+        <div class="list" role="tablist">
+          <button class="tab active" role="tab" aria-selected="true"  aria-controls="fx3-panel" data-tab="0">Estoque</button>
+          <button class="tab"        role="tab" aria-selected="false" aria-controls="fx3-panel" data-tab="1">Financeiro</button>
+          <button class="tab"        role="tab" aria-selected="false" aria-controls="fx3-panel" data-tab="2">Relatórios</button>
+          <button class="tab"        role="tab" aria-selected="false" aria-controls="fx3-panel" data-tab="3">Cadastro Rural</button>
+          <button class="tab"        role="tab" aria-selected="false" aria-controls="fx3-panel" data-tab="4">WhatsApp</button>
+        </div>
+
+        <div class="panel" id="fx3-panel" role="tabpanel">
+
+          <div class="fx3-showcase" data-panel="0">
+            <div class="fx3-frame"><i data-lucide="package" width="88" height="88"></i></div>
+            <div class="fx3-panel-text">
+              <h3 class="fx3-panel-title">Estoque</h3>
+              <p class="fx3-panel-desc">Controle seu estoque com precisão, desde o cadastro dos produtos até toda a movimentação.</p>
+              <ul class="fx3-panel-bullets">
+                <li><i data-lucide="check" width="16" height="16"></i>Cadastro de produtos</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Controle de saldo inicial</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Movimentações de estoque</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Estoque por locais e grãos</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="fx3-showcase" data-panel="1" hidden>
+            <div class="fx3-frame"><i data-lucide="wallet" width="88" height="88"></i></div>
+            <div class="fx3-panel-text">
+              <h3 class="fx3-panel-title">Financeiro</h3>
+              <p class="fx3-panel-desc">Organize as finanças da propriedade em um único lugar.</p>
+              <ul class="fx3-panel-bullets">
+                <li><i data-lucide="check" width="16" height="16"></i>Controle de caixa</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Contas a pagar</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Contas a receber</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Emissão de nota fiscal</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="fx3-showcase" data-panel="2" hidden>
+            <div class="fx3-frame"><i data-lucide="bar-chart-3" width="88" height="88"></i></div>
+            <div class="fx3-panel-text">
+              <h3 class="fx3-panel-title">Relatórios</h3>
+              <p class="fx3-panel-desc">Tenha informações claras para acompanhar a saúde financeira da propriedade.</p>
+              <ul class="fx3-panel-bullets">
+                <li><i data-lucide="check" width="16" height="16"></i>Balancete</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Fluxo de entradas e saídas</li>
+                <li><i data-lucide="check" width="16" height="16"></i>LCDPR</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Relatórios para tomada de decisão</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="fx3-showcase" data-panel="3" hidden>
+            <div class="fx3-frame"><i data-lucide="map" width="88" height="88"></i></div>
+            <div class="fx3-panel-text">
+              <h3 class="fx3-panel-title">Cadastro Rural</h3>
+              <p class="fx3-panel-desc">Centralize todas as informações da sua propriedade.</p>
+              <ul class="fx3-panel-bullets">
+                <li><i data-lucide="check" width="16" height="16"></i>Cadastro de fazendas</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Cadastro de talhões</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Histórico de alterações</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Organização da propriedade</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="fx3-showcase" data-panel="4" hidden>
+            <div class="fx3-frame fx3-frame--whatsapp"><img src="../shared/icons/whatsapp.svg" alt="" width="88" height="88" /></div>
+            <div class="fx3-panel-text">
+              <h3 class="fx3-panel-title">WhatsApp</h3>
+              <p class="fx3-panel-desc">Utilize o WhatsApp para executar tarefas do sistema de forma rápida e prática.</p>
+              <ul class="fx3-panel-bullets">
+                <li><i data-lucide="check" width="16" height="16"></i>Solicite documentos</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Emita nota fiscal</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Cadastre informações</li>
+                <li><i data-lucide="check" width="16" height="16"></i>Conte com um agente inteligente</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons();</script>
+
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('#fx3-tab .tab');
+      var panels = document.querySelectorAll('#fx3-tab [data-panel]');
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var index = tab.dataset.tab;
+          tabs.forEach(function (t) {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          panels.forEach(function (panel) {
+            panel.hidden = panel.dataset.panel !== index;
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+/* ══════════════════════════════════════════════════════════
+   CRIAR NOVA SENHA — tela 3 do fluxo de recuperação de senha
+   Reaproveita o shell/card/tipografia/campos de senha de
+   `page-login.css` (mesmo `.login-password-wrap`/`.login-toggle-password`
+   do campo Senha do Login). Específico daqui: lista de critérios de
+   segurança, exibida dinamicamente conforme o usuário digita.
+   ══════════════════════════════════════════════════════════ */
+
+/* Lista de critérios: reforça o campo "Nova senha" logo acima, por isso
+   fica mais próxima dele (8px = gap do form (16) - 8, mesma lógica do
+   bloco de opções do Login) em vez do gap padrão de 16px entre campos. */
+.pwd-criteria {
+  list-style: none;
+  margin: calc(var(--spacing-sm) * -1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.pwd-criteria-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.pwd-criteria-icon { display: flex; align-items: center; flex-shrink: 0; }
+.pwd-criteria-icon--unmet { color: var(--color-text-tertiary); }
+.pwd-criteria-icon--met { display: none; color: var(--color-status-success-fg); }
+
+.pwd-criteria-item.met { color: var(--color-status-success-fg); }
+.pwd-criteria-item.met .pwd-criteria-icon--unmet { display: none; }
+.pwd-criteria-item.met .pwd-criteria-icon--met { display: flex; }
+
+/* Campos de senha destacados quando não coincidem (mesma lógica visual do
+   `.error` do Input, aplicada nos dois campos ao mesmo tempo). */
+.wrapper.login-field.mismatch .input { border-color: var(--color-action-error); }

@@ -1,0 +1,432 @@
+/* Sidebar — navegação principal do shell da área logada (Nivelo).
+   Portado do protótipo em app/shared/page-shell.css + interface-principal.js.
+   Mobile first: drawer fixo fora da tela por padrão (translateX -100%),
+   acionado pelo hamburger do AppHeader; a partir de 1024px vira coluna fixa
+   (sticky), com toggle de retrair/expandir liberado. Light only — ver
+   app/CLAUDE.md: Dark Mode foi removido por pedido explícito do usuário. */
+
+.sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  z-index: 40;
+  width: 260px;
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-surface);
+  border-right: var(--border-width-thin) solid var(--color-border-subtle);
+  box-shadow: var(--shadow-xl);
+  transform: translateX(-100%);
+  transition: transform 250ms ease, width 250ms ease;
+}
+
+.mobileOpen { transform: translateX(0); }
+
+@media (min-width: 1024px) {
+  .sidebar {
+    position: sticky;
+    transform: none;
+    box-shadow: none;
+    flex-shrink: 0;
+  }
+  .collapsed { width: 76px; }
+}
+
+/* Fundo escurecido atrás do drawer no mobile — clicar nele fecha o menu. */
+.backdrop {
+  display: none;
+  position: fixed;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 35;
+  background: rgba(0, 0, 0, 0.45);
+}
+.backdropVisible { display: block; }
+@media (min-width: 1024px) {
+  .backdrop { display: none !important; }
+}
+
+/* Botão de retrair/expandir: só existe no desktop (no mobile a Sidebar é
+   um drawer que só abre/fecha, não colapsa pra ícones). */
+.collapseToggle {
+  display: none;
+  position: absolute;
+  top: var(--spacing-lg);
+  right: -14px;
+  z-index: 5;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.collapseToggle:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.collapseToggle:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.collapseToggleIcon { transition: transform 200ms ease; }
+.collapsed .collapseToggleIcon { transform: rotate(180deg); }
+
+@media (min-width: 1024px) {
+  .collapseToggle { display: flex; }
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--spacing-md) var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  /* Scrollbar fino e discreto — só aparece quando o conteúdo realmente
+     precisa rolar, sem a aparência pesada do scrollbar padrão do navegador. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-muted) transparent;
+}
+.body::-webkit-scrollbar { width: 6px; }
+.body::-webkit-scrollbar-track { background: transparent; }
+.body::-webkit-scrollbar-thumb {
+  background: var(--color-border-muted);
+  border-radius: var(--radius-full);
+}
+.body::-webkit-scrollbar-thumb:hover { background: var(--color-border-default); }
+
+/* ── Agrupamento visual (Geral / Gestão / Suporte) ──────────
+   Só organiza visualmente — não é interativo. Título discreto (pequeno,
+   maiúsculo, cor terciária); some no modo retraído. */
+.section + .section {
+  margin-top: var(--spacing-sm);
+}
+.sectionTitle {
+  /* Tamanho/peso vêm da classe `.text-10-medium` (ver Sidebar.tsx); só o
+     letter-spacing de rótulo maiúsculo fica local (não faz parte do text
+     style compartilhado). */
+  display: block;
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+.collapsed .sectionTitle { display: none; }
+
+/* ── Itens de navegação (nível 0) ───────────────────────────
+   16px, Medium — reforçado também por indentação/ícone/cor, não só o
+   tamanho da fonte (ver níveis 1 e 2 mais abaixo). */
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--spacing-sm);
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  /* Tipografia real vem da classe `.text-subtitle-m` (ver Sidebar.tsx) */
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.navItem:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.navItem:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+.navItemActive {
+  background: var(--color-bg-brand);
+  border-left-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.navIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.navIconXs { width: 16px; height: 16px; }
+
+.navLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navChevron {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+  transition: transform 200ms ease;
+  display: inline-flex;
+  align-items: center;
+}
+/* Ícone é sempre "chevron-down"; girar 180° dá o efeito de "chevron-up"
+   quando aberto, com transição suave (troca de ícone não anima). */
+.navGroupOpen > .navItem .navChevron,
+.navSubgroupOpen > .navSubitem .navChevron {
+  transform: rotate(180deg);
+}
+
+/* Indicador discreto de "este item tem submenu" no modo retraído — um
+   pontinho no canto do botão, não um badge, some junto com o texto no
+   modo expandido (o chevron já comunica isso lá). */
+.collapsed .navGroup > .navItem::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  right: 18px;
+  width: 4px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-tertiary);
+}
+
+/* ── Submenus (Financeiro, Vendas, Assistente IA, Configuração) ─────
+   Accordion: abrir um grupo fecha os demais (estado em Sidebar.tsx) — só
+   um pode ficar aberto por vez. Uma linha vertical bem discreta liga os
+   subitens ao item pai. */
+.navSubmenu {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 32px;
+  margin: 2px 0 4px;
+}
+.navSubmenu::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 6px;
+  width: 1px;
+  background: var(--color-border-muted);
+}
+.navGroupOpen > .navSubmenu { display: flex; }
+
+/* ── Popover (Sidebar retraída no desktop) ─────────────────
+   Ao clicar (nunca hover) num grupo com a Sidebar retraída, o MESMO
+   elemento .navSubmenu (sem duplicar JSX) vira um card flutuante ao lado
+   do ícone clicado, posicionado via `top`/`left` inline (calculados do
+   rect do botão em Sidebar.tsx) — `position:fixed` escapa do
+   `overflow-x:hidden` do .body, o que `position:absolute` não conseguiria.
+   Precisa desfazer, só aqui dentro, o que o modo retraído normalmente
+   esconde (rótulo/chevron) e centraliza (subitens).
+   IMPORTANTE (bug real, corrigido): `.navSubmenuPopover` sozinho (1 classe)
+   tem a MESMA especificidade que `.collapsed .navSubmenu` (2 classes,
+   regra mais abaixo que esconde o submenu no modo retraído) só se essa
+   última também fosse 1 classe — só que ela é 2, então venceria mesmo
+   assim, e testando ao vivo `.collapsed .navSubmenuPopover` (também 2
+   classes) ainda perdia por vir ANTES da regra de esconder no arquivo
+   (mesma especificidade = a última declarada no CSS vence, não a mais
+   "certa" semanticamente). Fix real: `.sidebar.collapsed
+   .navSubmenuPopover` (2 classes no MESMO elemento + 1 descendente = mais
+   específico que qualquer uma das duas regras concorrentes), garantindo
+   que o popover sempre vence não importa a ordem no arquivo. */
+.sidebar.collapsed .navSubmenuPopover {
+  position: fixed;
+  display: flex;
+  margin: 0;
+  padding: 6px;
+  min-width: 220px;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 60;
+}
+.sidebar.collapsed .navSubmenuPopover::before {
+  display: none;
+}
+/* IMPORTANTE: os overrides abaixo são escopados a "dentro do card do
+   Popover" (`.navSubmenuPopover` no próprio elemento, filhos via
+   descendente) — nunca um seletor a partir de `.navGroup` genérico,
+   porque o botão que ABRIU o popover (`.navItem`) é IRMÃO de
+   `.navSubmenu` dentro do mesmo `.navGroup`. Um seletor solto reexibiria
+   por engano o rótulo do PRÓPRIO ícone clicado (ex.: "Financeiro"
+   aparecendo espremido do lado do ícone, na trilha de 76px) — o botão
+   clicado tem que continuar EXATAMENTE como está no resto da Sidebar
+   retraída (só ícone, ver bug documentado em app/CLAUDE.md). */
+.sidebar.collapsed .navSubmenuPopover .navLabel {
+  display: block;
+}
+.sidebar.collapsed .navSubmenuPopover .navChevron {
+  display: inline-flex;
+  align-items: center;
+}
+.sidebar.collapsed .navSubmenuPopover .navSubitem {
+  justify-content: flex-start;
+  padding: 0 var(--spacing-sm);
+}
+
+/* ── Itens de navegação (nível 1) ───────────────────────────
+   14px, Regular — um degrau mais discreto que o nível 0 (ícone/fonte
+   menores, sem chegar a ficar ilegível: nunca menor que 12px). */
+.navSubitem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--spacing-sm);
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  /* Tipografia real vem da classe `.text-body-s` (ver Sidebar.tsx) */
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.navSubitem:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.navSubitem:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+.navSubitemActive {
+  background: var(--color-bg-brand);
+  border-left-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Subgrupo (Fiscal, dentro de Configuração) ─────────────
+   Mesmo padrão de expand/collapse dos grupos de topo, mais um nível de
+   recuo e uma linha de hierarquia própria — reforça que Fiscal pertence
+   a Configuração e que seus 3 itens pertencem a Fiscal. Não entra no
+   accordion de topo (é o único subgrupo do próprio nível). */
+.navSubgroup {
+  position: relative;
+}
+.navSubsubmenu {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 24px;
+  margin: 2px 0 4px;
+}
+.navSubsubmenu::before {
+  content: '';
+  position: absolute;
+  left: 20px; /* alinhado ao centro do ícone de Fiscal (20x20, mesmo formato dos itens de topo) */
+  top: 0;
+  bottom: 6px;
+  width: 1px;
+  background: var(--color-border-muted);
+}
+.navSubgroupOpen > .navSubsubmenu { display: flex; }
+
+/* ── Itens de navegação (nível 2, dentro de Fiscal) ─────────
+   12px, Regular, cor terciária — nunca menor que isso. */
+.navSubsubitem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--spacing-sm);
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  /* Tipografia real vem da classe `.text-body-xs` (ver Sidebar.tsx) */
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+.navSubsubitem:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.navSubsubitem:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+.navSubsubitemActive {
+  background: var(--color-bg-brand);
+  border-left-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* "Sair" separado visualmente do resto da navegação — comunica que é uma
+   ação do sistema, não mais um destino de navegação. */
+.navItemExit {
+  margin-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Sidebar retraída (só ícones) ──────────────────────────
+   Some com texto/chevron/submenu/versão; itens centralizam o ícone. */
+.collapsed .navLabel,
+.collapsed .navChevron,
+.collapsed .navSubmenu,
+.collapsed .version {
+  display: none;
+}
+.collapsed .navItem,
+.collapsed .navSubitem {
+  justify-content: center;
+  padding: 0;
+}
+
+/* ── Rodapé (versão) ────────────────────────────────────────
+   Discreto de propósito: fonte pequena, cor terciária, sem competir com
+   os itens de navegação acima. */
+.footer {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.version {
+  /* Tipografia real vem da classe `.text-10-regular` (ver Sidebar.tsx) */
+  color: var(--color-text-tertiary);
+}
+
+/* ── Tooltip (Sidebar retraída) ─────────────────────────────
+   position:fixed calculado via JS (getBoundingClientRect do alvo, ver
+   Sidebar.tsx) — não um ::after em CSS puro: o ::after nasceria dentro de
+   .body, que tem overflow-x:hidden (necessário pra evitar vazamento de
+   conteúdo durante a transição de largura da Sidebar), e isso CORTARIA o
+   próprio tooltip, que precisa aparecer à direita da Sidebar. */
+/* Padding/radius/cor alinhados aos mesmos tokens do componente `Tooltip`
+   real (`Tooltip.module.css`'s `.tip`) — antes usava `6px 10px`/`radius-sm`
+   hardcoded. Continua um elemento próprio, não o `.tip` em si: precisa de
+   `position:fixed` com coordenadas calculadas via JS pra escapar do
+   `overflow-x:hidden` da Sidebar, incompatível com o `.wrapper`/seta do
+   componente real (por isso a seta não foi replicada aqui). */
+.tooltip {
+  position: fixed;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-xs);
+  background: var(--color-gray-900);
+  color: var(--color-gray-white);
+  /* Tipografia real vem da classe `.text-12-regular` (ver Sidebar.tsx) */
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  z-index: 70;
+  pointer-events: none;
+}

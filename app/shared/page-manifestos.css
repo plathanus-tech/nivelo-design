@@ -1,0 +1,229 @@
+/* ══════════════════════════════════════════════════════════
+   MANIFESTOS — Fiscal > Manifesto. Mobile first. Mesmos padrões já usados
+   em Contas Bancárias/Notas Fiscais: `Table` como Card genérico, busca+
+   tabela fundidos num único `.card`, paginação composta a partir de
+   tokens (10/página), Cards no mobile, modal de cancelamento (Dialog sm,
+   Cancelar cinza + Cancelar destrutivo). Classes próprias `man-*`.
+   ══════════════════════════════════════════════════════════ */
+
+.man-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.man-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .man-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.man-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.man-title { color: var(--color-text-primary); margin: 0; }
+.man-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 560px; }
+
+#new-manifesto-btn { width: 100%; justify-content: center; flex-shrink: 0; }
+@media (min-width: 768px) {
+  #new-manifesto-btn { width: auto; }
+}
+
+/* ── Busca fundida com a tabela ───────────────────────────────────────── */
+.card.man-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.man-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.man-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+.man-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-md); }
+.man-filter { width: 100%; }
+@media (min-width: 768px) {
+  .man-filter-search { flex: 1 1 320px; min-width: 260px; max-width: 420px; }
+}
+.man-filters .man-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+/* ── Tabela (desktop) / Cards (mobile) ──────────────────────────────────── */
+
+.man-table-card .tableWrap { display: none; padding-top: 0; }
+.man-cards { display: flex; flex-direction: column; gap: var(--spacing-md); padding: var(--spacing-md); }
+@media (min-width: 768px) {
+  .man-table-card .tableWrap { display: block; }
+  .man-cards { display: none; }
+}
+
+.man-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.man-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+.man-table-card .sortIcon { color: var(--color-gray-500); }
+
+.man-table-card .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.man-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.man-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.man-table-card .tr:hover .td { filter: brightness(0.97); }
+.man-table-card .tr[hidden] { display: none; }
+
+.man-table-card .table { table-layout: fixed; width: 100%; }
+.man-table-card .th:nth-child(1) { width: 16%; } /* Número */
+.man-table-card .th:nth-child(2) { width: 26%; } /* Motorista */
+.man-table-card .th:nth-child(3) { width: 32%; } /* Origem → Destino */
+.man-table-card .th:nth-child(4) { width: 14%; } /* Status */
+.man-table-card .th:nth-child(5) { width: 96px; } /* Ações */
+
+.man-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.man-empty:not([hidden]) { display: flex; }
+.man-empty p { margin: 0; }
+
+.man-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.man-empty-global:not([hidden]) { display: flex; }
+.man-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.man-empty-global-title { color: var(--color-text-primary); margin: 0; }
+.man-empty-global-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 360px; }
+
+/* ── Paginação ───────────────────────────────────────────────────────── */
+.man-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+.man-pagination[hidden] { display: none; }
+.man-pagination-info { color: var(--color-text-tertiary); }
+.man-pagination-controls { display: flex; align-items: center; gap: var(--spacing-2xs); }
+.man-pagination-pages { display: flex; align-items: center; gap: var(--spacing-2xs); }
+
+.man-pagination-page {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--spacing-2xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.man-pagination-page:hover { background: var(--color-bg-subtle); }
+.man-pagination-page.is-active {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+  cursor: default;
+}
+.man-pagination-page.is-active:hover { background: var(--color-action-primary); }
+
+@media (max-width: 479px) {
+  .man-pagination { flex-direction: column; align-items: stretch; text-align: center; }
+}
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.man-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.man-mobile-card-header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-sm); }
+.man-mobile-card-numero { color: var(--color-text-primary); }
+.man-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.man-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.man-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+.man-mobile-card-actions {
+  display: flex;
+  gap: var(--spacing-2xs);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+/* ── Toast de sucesso ─────────────────────────────────────────────────── */
+.man-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.man-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.man-toast { box-shadow: var(--shadow-lg); animation: man-toast-in 0.25s ease; }
+.man-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.man-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes man-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   já documentado dezenas de vezes neste projeto. */
+.overlay[hidden] { display: none; }

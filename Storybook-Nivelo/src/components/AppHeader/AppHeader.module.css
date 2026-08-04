@@ -1,0 +1,115 @@
+/* AppHeader — cabeçalho fixo no topo do shell principal (área logada).
+   Portado do protótipo em app/shared/page-shell.css (Header). Light only —
+   ver app/CLAUDE.md: Dark Mode foi removido por pedido explícito do usuário,
+   não reintroduzir aqui. */
+
+.header {
+  --nav-text-indent: calc(var(--spacing-sm) + 3px + var(--spacing-sm) + 20px + var(--spacing-sm));
+
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: 0 var(--spacing-md);
+  background: var(--color-bg-surface);
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+@media (min-width: 768px) {
+  .header { padding: 0 var(--spacing-xl); }
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+/* A partir do breakpoint em que a Sidebar (componente irmão) fica sempre
+   visível, alinha o início do logo com o início do TEXTO dos itens de
+   navegação da Sidebar — mesma fórmula usada no padding/ícone/gap de cada
+   item da Sidebar (ver Sidebar.module.css .navItem). Sem isso o logo fica
+   ~15px à esquerda desse ponto (só acompanhando o padding do Header, que
+   não tem relação com o indent da Sidebar). */
+@media (min-width: 1024px) {
+  .left {
+    margin-left: calc(var(--nav-text-indent) - var(--spacing-xl));
+  }
+}
+
+/* Hamburger: só existe no mobile (a Sidebar vira um drawer acionado por
+   ele); a partir do breakpoint de desktop a Sidebar já fica sempre
+   visível, então o botão some. */
+.hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+.hamburger:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.hamburger:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+@media (min-width: 1024px) {
+  .hamburger { display: none; }
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  /* flex-start (não o "stretch" implícito do default): cada filho (logo,
+     tagline) fica do tamanho do próprio conteúdo e os dois começam
+     exatamente na mesma borda esquerda do bloco. */
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.logo {
+  height: 32px;
+  width: auto;
+  display: block;
+  text-align: left;
+}
+
+.tagline {
+  /* Tipografia real vem da classe `.text-10-regular` (ver AppHeader.tsx) —
+     ver rules.md, padrão de text styles obrigatório a partir de 2026-07-22. */
+  color: var(--color-text-tertiary);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+/* Rótulo do botão "Caderno de campo" encolhe no mobile pra caber ao lado
+   do resto (o botão em si é o componente Button real, ver AppHeader.tsx). */
+.notebookLabel {
+  white-space: nowrap;
+}
+@media (max-width: 479px) {
+  .notebookLabel { display: none; }
+}

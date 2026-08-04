@@ -1,0 +1,342 @@
+/* ══════════════════════════════════════════════════════════
+   NOTAS FISCAIS — Central de Notas Fiscais (Vendas > Notas fiscais).
+   Mobile first. Mesmos padrões já usados em Categorias/Produtos/Cadastro/
+   Estoque: `Table`/`Tab` como componentes reais, FilterPopover pro
+   Agrupamento de Filtros, Popover+calendário (Dashboard) pro filtro de
+   Período. Duas abas com TABELAS DIFERENTES (Cliente vs. Fornecedor) —
+   mesma arquitetura de Estoque (3 abas, 3 `<section data-panel>` com
+   `hidden` alternado via JS), não a de Cadastro (1 tabela só, linhas
+   filtradas). */
+
+.nf-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.nf-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+@media (min-width: 768px) {
+  .nf-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.nf-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+
+.nf-title { color: var(--color-text-primary); margin: 0; }
+.nf-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 620px; }
+
+#new-nota-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+}
+@media (min-width: 768px) {
+  #new-nota-btn { width: auto; }
+}
+
+/* ── Abas ──────────────────────────────────────────────────────────────── */
+
+.nf-tabs { margin-bottom: 0; }
+
+/* ── Busca/Filtros fundidos com a tabela (mesmo padrão final já adotado em
+   Produtos/Categorias/Cadastro/Estoque) ─────────────────────────────────── */
+.card.nf-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.nf-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.nf-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.nf-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.nf-filter { width: 100%; }
+@media (min-width: 768px) {
+  .nf-filter { width: auto; flex: 0 1 220px; min-width: 180px; }
+  .nf-filter-search { flex: 1 1 320px; min-width: 260px; }
+}
+
+.nf-filters .nf-filter.nf-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+.nf-dropdown .trigger { height: 28px; padding: var(--spacing-xs) var(--spacing-sm); font-size: var(--font-size-sm); }
+.nf-dropdown .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
+
+/* ── Agrupamento de Filtros (FilterPopover) ──────────────────────────────── */
+#nf-filtros-trigger-root .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  justify-content: flex-start;
+  gap: var(--spacing-xs);
+}
+.nf-filtros-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-tertiary); }
+
+.nf-filter-popover:not([hidden]) {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+.nf-filter-popover .trigger { height: 36px; font-size: var(--font-size-sm); padding: var(--spacing-xs) var(--spacing-sm); }
+.nf-filter-popover .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
+
+.nf-filter-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Período (intervalo de datas) — trigger dentro do Agrupamento de
+   Filtros, popover+calendário aninhado (mesma composição do Período
+   personalizado do Dashboard, z-index maior pra ficar sobre o próprio
+   Agrupamento de Filtros). ──────────────────────────────────────────────── */
+.nf-period-field { position: relative; }
+.nf-period-placeholder { color: var(--color-text-tertiary); }
+
+.nf-period-popover:not([hidden]) {
+  position: fixed;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.nf-period-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+.nf-period-inputs .input { height: 36px; font-size: var(--font-size-sm); }
+
+.nf-period-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nf-period-weekdays,
+.nf-period-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.nf-period-weekdays { text-align: center; color: var(--color-text-tertiary); margin-bottom: var(--spacing-2xs); }
+
+.nf-period-day,
+.nf-period-day-empty {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+.nf-period-day:hover { background: var(--color-bg-subtle); }
+.nf-period-day.is-in-range { background: var(--color-bg-brand); border-radius: 0; }
+.nf-period-day.is-start,
+.nf-period-day.is-end {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+
+.nf-period-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Tabela (desktop) / Cards (mobile), uma por aba ──────────────────────── */
+
+.nf-table-card .tableWrap { display: none; padding-top: 0; }
+.nf-mobile-cards { display: flex; flex-direction: column; gap: var(--spacing-md); padding-top: var(--spacing-md); }
+
+@media (min-width: 768px) {
+  .nf-table-card .tableWrap { display: block; }
+  .nf-mobile-cards { display: none; }
+}
+
+.nf-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: 32px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.nf-table-card .th.sortable .thInner { gap: var(--spacing-sm); }
+.nf-table-card .sortIcon { color: var(--color-gray-500); }
+.nf-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.nf-table-card .td {
+  height: 48px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+  vertical-align: middle;
+}
+.nf-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.nf-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.nf-table-card .tr:hover .td { filter: brightness(0.97); }
+
+.nf-table-card .table { table-layout: fixed; }
+.nf-table-card .th:nth-child(1) { width: 9%; }   /* Nº */
+.nf-table-card .th:nth-child(2) { width: 12%; }  /* Emissão */
+.nf-table-card .th:nth-child(3) { width: 23%; }  /* Cliente/Fornecedor */
+.nf-table-card .th:nth-child(4) { width: 8%; }   /* UF */
+.nf-table-card .th:nth-child(5) { width: 13%; }  /* Valor */
+.nf-table-card .th:nth-child(6) { width: 19%; }  /* Status */
+.nf-table-card .th:nth-child(7) { width: 120px; } /* Ações — Ver detalhes + Baixar PDF (+ Corrigir nota quando rejeitada) */
+
+/* Pendência que exige atenção (nota rejeitada/com erro): motivo sempre
+   visível abaixo do badge, não só num tooltip — mais simples e mais
+   acessível pra uma informação já relevante o bastante pra aparecer direto
+   na tabela. */
+.nf-status-cell { }
+.nf-status-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: var(--spacing-2xs);
+  color: var(--color-status-error-fg);
+  max-width: 240px;
+}
+.nf-status-note i { flex-shrink: 0; margin-top: 2px; }
+
+.nf-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.nf-empty:not([hidden]) { display: flex; }
+.nf-empty p { margin: 0; }
+
+.nf-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.nf-empty-global:not([hidden]) { display: flex; }
+.nf-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.nf-empty-global-title { color: var(--color-text-primary); margin: 0; }
+.nf-empty-global-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 360px; }
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.nf-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.nf-mobile-card-header { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-sm); }
+.nf-mobile-card-numero { color: var(--color-text-primary); }
+
+.nf-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.nf-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.nf-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+
+.nf-mobile-card-actions {
+  justify-content: flex-end;
+  padding: var(--spacing-sm) 0 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Toast de sucesso ("Nota fiscal emitida com sucesso") ────────────────── */
+.nf-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.nf-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.nf-toast { box-shadow: var(--shadow-lg); animation: nf-toast-in 0.25s ease; }
+.nf-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.nf-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes nf-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug já
+   documentado em page-produtos.css/page-categorias-financeiras.css. */
+.overlay[hidden] { display: none; }

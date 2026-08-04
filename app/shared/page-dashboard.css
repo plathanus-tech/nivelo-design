@@ -1,0 +1,789 @@
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD — conteúdo real (Safra, Estoque, Saldo, Contas a pagar/
+   receber, Clima). Mobile first. Reaproveita a `Table` do Storybook como
+   o "Card" genérico do sistema (não existe um componente Card dedicado
+   ainda): `.card`/`.cardHeader`/`.title`/`.subtitle` vêm de
+   `Table.module.css`, aqui só recebem um leve reforço visual
+   (`.dash-card`, sombra sutil) via seletor composto — mesmo padrão de
+   correção já usado pra colisões Input×Checkbox (ver rules.md). Filtros
+   (Fazenda/Período) reaproveitam `Dropdown`/`Input.module.css` da mesma
+   forma — conferido que `.wrapper`/`.label`/`.errorText`/`.msgIcon` têm
+   regras idênticas nos dois arquivos, sem colisão real.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Toast de sucesso (herdado do placeholder anterior) ──────────────── */
+
+/* `top` soma a altura do Header (fixo, `--shell-header-height`) + um
+   respiro — sem isso o toast nascia colado no topo da viewport, embaixo do
+   próprio Header sticky (que pinta por cima, `z-index` maior), ficando
+   invisível pro usuário logo após o login. Resultado fica alinhado
+   aproximadamente à altura do título principal da página (`h1.dashboard-
+   heading`, que começa logo depois do Header + padding do `.app-main`). */
+.dashboard-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 32;
+  width: calc(100% - var(--spacing-2xl));
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.dashboard-toast {
+  box-shadow: var(--shadow-lg);
+  animation: dashboard-toast-in 0.25s ease;
+}
+
+/* Colisão de classes — 3 vias (Feedback × Table × Dialog, todos carregados
+   como stylesheet global neste HTML): o toast usa `.icon`/`.body`/`.title`/
+   `.message`/`.dismiss` de `Feedback.module.css`, mas `.body` e `.title`
+   também existem em `Table.module.css` (cabeçalho de card) e/ou
+   `Dialog.module.css` (corpo/título do modal) — mesma especificidade
+   (1 classe), quem carrega por ÚLTIMO no `<head>` vence. Como Dialog é o
+   último dos três, o corpo do toast ganhava o padding/cor do CORPO DO
+   MODAL (empurrando título/mensagem 16px pra baixo, sem alinhar com
+   ícone/botão de fechar) e o título ganhava o tamanho/peso/cor do TÍTULO
+   DO MODAL (18px/bold/cinza) em vez do 16px/medium herdando a cor
+   semântica de `.alert.success/.error/...`. Mesmo padrão de colisão já
+   documentado em `rules.md` pra `.wrapper`/`.label`/`.input`/`.error` — fix
+   é o mesmo: seletor composto (2 classes) pra vencer as regras de 1 classe
+   dos outros componentes, restaurando os valores originais do Feedback. */
+.dashboard-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.dashboard-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+
+@keyframes dashboard-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Grid geral ───────────────────────────────────────────────────────── */
+
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.dashboard-topbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Desktop: título alinhado à esquerda, filtros no lado oposto da MESMA
+   linha (não colados ao título) — `justify-content:space-between` com só
+   esses 2 filhos (`h1` + `.dashboard-filters`) empurra cada um pra uma
+   ponta, deixando o espaço disponível entre eles. */
+@media (min-width: 1024px) {
+  .dashboard-topbar {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.dashboard-heading {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ── Indicador de período de teste ────────────────────────────────────────
+   `.dashboard-heading-row` agrupa título + badge NUM ÚNICO filho de
+   `.dashboard-topbar`, preservando o layout de 2 filhos (título/filtros)
+   com `justify-content:space-between` já estabelecido acima — o badge
+   nunca vira um terceiro item disputando esse espaço. */
+.dashboard-heading-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+/* Forma/cor da tag vêm de verdade do componente `.badge` do Table
+   (`data-status="info"`/`"warning"`, o mesmo já usado no Status do
+   Cadastro) — carregado via `Table.module.css`, já no `<head>` do
+   Dashboard. `.dash-trial-badge` aqui só acrescenta o que o `.badge`
+   genérico não cobre: o dia em destaque (negrito) e não deixar o texto
+   quebrar linha. Trocar de variante é só `dashboard.js` alternando o
+   atributo `data-status`, nunca uma classe/cor própria desta tela. */
+.dash-trial-badge {
+  white-space: nowrap;
+}
+.dash-trial-badge strong {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Agrupa a badge + "Contratar agora" em 2 linhas (o link ficou de volta FORA
+   da badge, pedido explícito do usuário — só passou por dentro dela numa
+   rodada intermediária) — `.dashboard-heading-row` continua recebendo este
+   grupo como UM filho só (title/grupo/refresh-indicator), preservando o
+   `flex-wrap` já existente ali. */
+.dash-trial-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+/* "Contratar agora" tem aparência de link, não de botão (pedido explícito
+   do usuário) — reset de todo o visual de `.btn.primary.sm` (fundo, borda,
+   padding, altura, sombra), mantendo só a cor/sublinhado de link e o
+   elemento `<button>` em si (comportamento de clique intocado). */
+.dash-trial-upgrade-btn {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  height: auto;
+  min-width: 0;
+  color: var(--color-action-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.dash-trial-upgrade-btn:hover {
+  color: var(--color-action-primary-hover);
+}
+
+/* Spinner discreto de "atualizando" (Fazenda/Período) — mora ao lado da tag
+   de teste, dentro do mesmo `.dashboard-heading-row`, pra não virar um 3º
+   filho de `.dashboard-topbar` (que já depende de ter só 2 filhos pro
+   `justify-content:space-between`, ver comentário acima). Escondido por
+   padrão; `dashboard.js` alterna `.is-visible` por ~450ms a cada troca de
+   filtro. */
+.dash-refresh-indicator {
+  display: none;
+  align-items: center;
+  color: var(--color-text-brand);
+}
+
+.dash-refresh-indicator.is-visible {
+  display: inline-flex;
+  animation: dash-refresh-spin 0.6s linear infinite;
+}
+
+@keyframes dash-refresh-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Feedback de carregamento: dim breve e rápido no conteúdo dos cards e das
+   tabelas, o suficiente pro usuário perceber que o Dashboard reagiu à troca
+   de filtro sem parecer uma tela travada. */
+.dashboard-grid.is-refreshing .dash-card-body,
+.dashboard-grid.is-refreshing .dash-weather {
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+/* Modal de bloqueio (fim do teste) — mesmo bug recorrente de `hidden`+
+   `display` incondicional (ver rules.md): `Dialog.module.css`'s `.overlay`
+   tem `display:flex` sem guarda, então precisa deste override sempre que o
+   Dialog é reaproveitado em HTML estático controlado por `hidden`. */
+.overlay[hidden] { display: none; }
+
+/* Blur no conteúdo do Dashboard atrás do modal de bloqueio (teste expirado) —
+   aplicado no `#app-shell` (não no `<body>`): o próprio `.overlay` é irmão
+   dele no HTML, fora do elemento borrado, então nunca borra a si mesmo. Só
+   reforça visualmente o bloqueio (o scrim do `.overlay` já dim/desabilita
+   visualmente); `pointer-events:none` impede qualquer interação por trás do
+   modal mesmo que o clique escape da área do overlay. */
+#app-shell.is-trial-blocked {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Os 2 botões do rodapé ("Falar com administrador" + "Realizar
+   pagamento") não cabiam lado a lado no Dialog `sm` (mesmo bug de overflow
+   já corrigido no modal de exclusão do Cadastro — rótulos "vazavam" pela
+   margem esquerda do footer, ver rules.md); resolvido em parte trocando
+   pro Dialog `md` (markup em dashboard.html), que dá espaço de sobra no
+   desktop. No mobile o Dialog já fica limitado pela largura da viewport
+   (não pelo `max-width` da classe), então continua precisando empilhar os
+   botões em largura total abaixo de 480px. */
+@media (max-width: 480px) {
+  #trial-block-overlay .footer {
+    flex-direction: column;
+  }
+  #trial-block-overlay .footer .btn {
+    width: 100%;
+  }
+}
+
+/* ── Filtros (Fazenda / Período) ──────────────────────────────────────── */
+
+.dashboard-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+/* Com Fazenda + Período visíveis juntos (usuário com mais de uma fazenda,
+   ver `dashboard.js`), os dois ficam lado a lado numa grid de 2 colunas
+   iguais em qualquer largura — sem isso, `.dash-filter{width:100%}`
+   (mobile-first, abaixo) empilharia os dois verticalmente até 1024px. Cada
+   `.dash-filter` já é `width:100%`; dentro da grid isso só preenche a
+   própria coluna, então nenhuma regra de largura precisa mudar. Abaixo de
+   380px (telas muito estreitas) volta a empilhar, pra não espremer demais
+   os dois triggers de Dropdown lado a lado. */
+.dashboard-filters.has-farm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 320px) {
+  .dashboard-filters.has-farm {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile: cada filtro ocupa 100% da largura do conteúdo (mesmo padding
+   lateral do resto do Dashboard, herdado de `.app-main`/`.dashboard-grid`).
+   Desktop: volta a ter uma largura compacta, lado a lado. */
+.dash-filter {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .dash-filter {
+    width: auto;
+    flex: 0 1 220px;
+    min-width: 180px;
+  }
+}
+
+/* Dropdown reaproveitado como filtro: mais compacto que o tamanho padrão
+   do componente (pensado pra formulários largos), sem alterar sua lógica. */
+.dash-dropdown .trigger {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+.dash-dropdown .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+.dash-dropdown .option {
+  font-size: var(--font-size-sm);
+}
+
+/* ── Popover de período personalizado ─────────────────────────────────── */
+/* Mesma linguagem visual do Popover da Sidebar retraída (superfície +
+   borda sutil + radius-md + shadow-lg) — não é um componente dedicado no
+   Storybook ainda, mas já é o padrão de "card flutuante" estabelecido
+   neste sistema, reaproveitado aqui em vez de inventar um novo. Posição
+   (`top`/`left`/`width`) é sempre inline, calculada via JS
+   (`getBoundingClientRect()` do filtro) — nunca no fluxo normal do
+   documento, por isso não afeta a altura/posição do cabeçalho. */
+.dash-period-popover:not([hidden]) {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.dash-period-popover-fields {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.dash-period-popover-fields .wrapper {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.dash-period-popover-fields .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.dash-period-popover-fields .input {
+  height: 36px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.dash-period-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Calendário (composição própria a partir de tokens — sem componente
+   dedicado no Storybook ainda, ver rules.md) ─────────────────────────── */
+
+.dash-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dash-calendar-label {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.dash-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding-bottom: var(--spacing-xs);
+}
+
+.dash-calendar-weekdays span {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+}
+
+.dash-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.dash-calendar-day,
+.dash-calendar-day-empty {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dash-calendar-day {
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.dash-calendar-day:hover {
+  background: var(--color-bg-subtle);
+}
+
+.dash-calendar-day.is-in-range {
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-xs);
+}
+
+.dash-calendar-day.is-in-range:hover {
+  filter: brightness(0.97);
+}
+
+.dash-calendar-day.is-start,
+.dash-calendar-day.is-end {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+
+.dash-calendar-day.is-start:hover,
+.dash-calendar-day.is-end:hover {
+  background: var(--color-action-primary-hover);
+}
+
+.dashboard-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-row-3 { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+  .dashboard-row-2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Card (reforço sobre o `.card`/`.cardHeader` da Table) ───────────── */
+
+.card.dash-card {
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dash-card .cardHeader {
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+}
+
+.dash-card .title {
+  font-size: var(--font-size-lg);
+}
+
+.dash-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.dash-card-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+/* Corpo do card em coluna flexível: com `.dashboard-row-3` esticando os 3
+   cards pra mesma altura, isso empurra `.dash-card-footer-link` pro rodapé
+   mesmo quando o conteúdo é mais curto que o card vizinho — sem scrollbar
+   interna, só espaço em branco controlado. */
+.dash-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+.dash-card-footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-link);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.dash-card-footer-link:hover {
+  color: var(--color-text-link-hover);
+  text-decoration: underline;
+}
+
+/* ── Número de destaque (headline) — Safra / Estoque / Saldo ──────────── */
+
+.dash-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.dash-headline-value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: 1.15;
+}
+
+.dash-headline-caption {
+  color: var(--color-text-tertiary);
+}
+
+/* ── Estoque de grãos: comprometido (total agregado no headline + barra/
+   rótulo por cultura, dentro de cada `.dash-stat-value`) — card promovido
+   da versão alternativa de teste (round 2026-08-03), que substituiu de vez
+   o card antigo baseado em valor estimado (R$). ─────────────────────────── */
+.dash-comprometido-total {
+  color: var(--color-text-tertiary);
+}
+.dash-comprometido-bar {
+  width: 96px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-100);
+  overflow: hidden;
+  margin-top: 2px;
+}
+.dash-comprometido-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-action-primary);
+}
+.dash-comprometido-label {
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+}
+
+/* ── Linhas de estatística (breakdown por cultura/conta) ──────────────── */
+
+.dash-stat-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-stat-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.dash-stat-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dash-stat-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dash-stat-label {
+  color: var(--color-text-secondary);
+}
+
+.dash-stat-sub {
+  color: var(--color-text-tertiary);
+}
+
+.dash-stat-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.dash-stat-value-main {
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.dash-stat-value-sub {
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+}
+
+/* ── Cabeçalho com total em destaque — Contas a pagar / a receber ─────── */
+
+.dash-card-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.dash-card-meta-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.dash-card-meta-value.out { color: var(--color-text-error); }
+.dash-card-meta-value.in  { color: var(--color-text-success); }
+
+/* ── Tabelas (Contas a pagar / a receber) ─────────────────────────────── */
+
+.th-right,
+.td-right {
+  text-align: right;
+}
+
+/* O início da tabela precisa ficar alinhado com o título/ícone do card
+   (mesmo padding horizontal de `.cardHeader`) — sem isso a tabela parece
+   deslocada pra esquerda em relação ao resto do card. */
+.dash-table-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+/* Zebra striping específico do Dashboard: alterna entre o fundo do próprio
+   card (`bg-surface`, "invisível") e `gray-100` (mais perceptível que
+   `gray-50`, testado a pedido do usuário) — override sobre o zebra padrão
+   do Table (`bg-subtle`/`bg-default`), via seletor composto (mesmo padrão
+   de correção já documentado em rules.md pra colisões/ajustes de
+   componente). Cabeçalho (`.th`) recebe o mesmo `gray-100`, unificando o
+   tom em vez de deixá-lo só nas linhas ímpares. Table.module.css em si não
+   muda — outros consumidores do componente mantêm o zebra padrão. */
+.dash-table-body .th { background: var(--color-gray-100); }
+.dash-table-body .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.dash-table-body .tr:nth-child(even) .td { background: var(--color-gray-100); }
+.dash-table-body .tr:hover .td { filter: brightness(0.97); }
+
+/* ── Clima ─────────────────────────────────────────────────────────────── */
+
+.dash-weather {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+@media (min-width: 1024px) {
+  .dash-weather {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.dash-weather-current {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.dash-weather-icon {
+  display: inline-flex;
+  color: var(--color-text-brand);
+  flex-shrink: 0;
+}
+
+.dash-weather-current-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-weather-temp {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.dash-weather-condition {
+  color: var(--color-text-secondary);
+}
+
+.dash-weather-details {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  color: var(--color-text-tertiary);
+}
+
+.dash-weather-details li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+@media (min-width: 480px) {
+  .dash-weather-details {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+}
+
+.dash-weather-forecast {
+  list-style: none;
+  margin: 0;
+  padding: var(--spacing-md) 0 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--spacing-sm);
+}
+
+@media (min-width: 1024px) {
+  .dash-weather-forecast {
+    padding: 0 0 0 var(--spacing-lg);
+    border-top: none;
+    border-left: var(--border-width-thin) solid var(--color-border-subtle);
+    gap: var(--spacing-lg);
+  }
+}
+
+/* Cada dia é uma coluna independente com seu próprio eixo central: ícone,
+   nome do dia e temperaturas centralizados entre si (`align-items:center`
+   no flex-column), e os 5 dias distribuídos uniformemente pela grid de 5
+   colunas iguais (`.dash-weather-forecast`) — mesmo tratamento em mobile e
+   desktop. */
+.dash-forecast-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-brand);
+}
+
+.dash-forecast-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+}
+
+.dash-forecast-temps {
+  color: var(--color-text-secondary);
+}
+
+.dash-forecast-temps strong {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+/* ── Estados vazios (sem dados cadastrados) ───────────────────────────── */
+
+.dash-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+
+.dash-empty p {
+  margin: 0;
+}
+
+.dash-empty-link {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-link);
+  text-decoration: none;
+}
+
+.dash-empty-link:hover {
+  color: var(--color-text-link-hover);
+  text-decoration: underline;
+}
+
+/* Demonstração via `#state=empty`: alterna cada seção de dados pro seu
+   estado vazio, simulando uma fazenda recém-cadastrada. Ver dashboard.js.
+   `margin:auto 0` centraliza verticalmente dentro do `.dash-card-body`
+   esticado (flex column) — mesmo truque clássico de flexbox, sem precisar
+   de `justify-content` condicional no pai. */
+body.is-demo-empty [data-content] { display: none; }
+body.is-demo-empty [data-empty]   { display: flex !important; margin: auto 0; }

@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova fazenda — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-nova-fazenda.css" />
+</head>
+<body>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+      <div class="app-header-right">
+        <button type="button" class="btn secondary" id="notebook-btn">
+          <i data-lucide="book-open" width="16" height="16"></i>
+          <span class="app-header-notebook-label">Caderno de campo</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <!-- Cadastros (expansível: Pessoas e empresas / Produtos) -->
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pessoas e empresas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <!-- Financeiro (expansível, independente de Vendas) -->
+                                    <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Vendas (expansível, independente de Financeiro) -->
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Fiscal · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Manifesto</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Assistente IA (expansível, independente dos demais grupos) -->
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="message-square-plus" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Nova conversa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <!-- Configuração (expansível; contém, entre seus subitens, o subgrupo Fiscal) —
+                 grupo já nasce aberto nesta tela, com "Cadastro de fazenda" ativo. -->
+            <div class="app-nav-group is-open" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="true" data-tooltip="Configuração · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem is-active" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
+                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta Financeira</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+
+                <!-- Fiscal (subgrupo dentro de Configuração) -->
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVA FAZENDA ══════════════════ -->
+      <main class="app-main">
+        <div class="nova-fazenda-page">
+
+          <div class="nova-fazenda-header">
+            <a href="fazendas.html" class="nova-fazenda-back" id="nova-fazenda-back-link">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <h1 class="nova-fazenda-title text-heading-6" id="nova-fazenda-page-title">Nova fazenda</h1>
+          </div>
+
+          <!-- ══════════════ Indicador de etapas ══════════════
+               Mesmas classes/estados de `.cadastro-steps` (fluxo Criar conta),
+               copiadas pra page-nova-fazenda.css já que esta tela não carrega
+               page-cadastro.css (auth-only). -->
+          <ol class="cadastro-steps" id="nova-fazenda-steps" aria-label="Etapas do cadastro">
+            <li class="cadastro-step is-current" data-step="1">
+              <span class="cadastro-step-circle text-12-bold">1</span>
+              <span class="cadastro-step-label text-10-medium">Dados da fazenda</span>
+            </li>
+            <li class="cadastro-step-connector"></li>
+            <li class="cadastro-step" data-step="2">
+              <span class="cadastro-step-circle text-12-bold">2</span>
+              <span class="cadastro-step-label text-10-medium">Localização e áreas</span>
+            </li>
+            <li class="cadastro-step-connector" id="nova-fazenda-step-connector-3"></li>
+            <li class="cadastro-step" data-step="3" id="nova-fazenda-step-3">
+              <span class="cadastro-step-circle text-12-bold">3</span>
+              <span class="cadastro-step-label text-10-medium">Talhões</span>
+            </li>
+          </ol>
+
+          <form id="nova-fazenda-form" novalidate>
+
+            <!-- ══════════════ ETAPA 1 — Dados da fazenda ══════════════ -->
+            <section class="card nova-fazenda-step" data-step-panel="1">
+              <div class="nova-fazenda-step-intro">
+                <h2 class="nova-fazenda-step-title">Dados da fazenda</h2>
+                <p class="nova-fazenda-step-description text-body-s">Cadastre os dados básicos da propriedade para começar a organizar sua fazenda no Nivelo.</p>
+              </div>
+              <div class="nova-fazenda-grid">
+
+                <div class="wrapper" id="nf-nome-field">
+                  <label class="label" for="nf-nome">Nome da Fazenda</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="nf-nome" placeholder="Ex.: Fazenda São João" aria-describedby="nf-nome-error" />
+                  </div>
+                  <span class="errorText" id="nf-nome-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe o nome da fazenda.
+                  </span>
+                </div>
+
+                <div class="wrapper" id="nf-codigo-field">
+                  <label class="label" for="nf-codigo">Código</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="nf-codigo" disabled readonly />
+                  </div>
+                  <span class="helperText">Gerado automaticamente.</span>
+                </div>
+
+                <div class="wrapper" id="nf-proprietario-field">
+                  <label class="label" for="nf-proprietario">Proprietário</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="nf-proprietario" placeholder="Nome do proprietário" aria-describedby="nf-proprietario-error" />
+                  </div>
+                  <span class="errorText" id="nf-proprietario-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe o proprietário.
+                  </span>
+                </div>
+
+                <div class="wrapper" id="nf-cnpj-field">
+                  <label class="label" for="nf-cnpj">CNPJ</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" inputmode="numeric" id="nf-cnpj" placeholder="00.000.000/0000-00" maxlength="18" aria-describedby="nf-cnpj-error" />
+                  </div>
+                  <span class="helperText">CNPJ do proprietário da fazenda</span>
+                  <span class="errorText" id="nf-cnpj-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe um CNPJ válido.
+                  </span>
+                </div>
+
+                <div class="wrapper" id="nf-ie-field">
+                  <label class="label" for="nf-ie">Inscrição Estadual</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="nf-ie" placeholder="Ex.: 123.456.789.112" aria-describedby="nf-ie-error" />
+                  </div>
+                  <span class="errorText" id="nf-ie-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe a inscrição estadual.
+                  </span>
+                </div>
+
+                <div class="wrapper" id="nf-matricula-field">
+                  <label class="label" for="nf-matricula">Matrícula</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="nf-matricula" placeholder="Ex.: 45.678" aria-describedby="nf-matricula-error" />
+                  </div>
+                  <span class="errorText" id="nf-matricula-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe a matrícula.
+                  </span>
+                </div>
+
+              </div>
+
+              <div class="nova-fazenda-actions">
+                <a href="fazendas.html" class="btn secondary" id="nova-fazenda-cancel-1">Cancelar</a>
+                <button type="button" class="btn primary" id="nova-fazenda-continue-1">Continuar</button>
+              </div>
+            </section>
+
+            <!-- ══════════════ ETAPA 2 — Localização e áreas ══════════════ -->
+            <section class="card nova-fazenda-step" data-step-panel="2" hidden>
+              <div class="nova-fazenda-step-intro">
+                <h2 class="nova-fazenda-step-title">Localização e áreas</h2>
+                <p class="nova-fazenda-step-description text-body-s">Informe onde a fazenda está localizada e as principais informações sobre sua área.</p>
+              </div>
+
+              <div class="nova-fazenda-subsection">
+                <h3 class="nova-fazenda-subsection-title">Localização da fazenda</h3>
+                <div class="nova-fazenda-grid">
+
+                  <div class="wrapper" id="nf-cep-field">
+                    <label class="label" for="nf-cep">CEP</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" inputmode="numeric" autocomplete="postal-code" id="nf-cep" placeholder="00000-000" maxlength="9" aria-describedby="nf-cep-error" />
+                    </div>
+                    <span class="errorText" id="nf-cep-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o CEP.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="nf-rua-field">
+                    <label class="label" for="nf-rua">Rua</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" autocomplete="address-line1" id="nf-rua" placeholder="Nome da rua" aria-describedby="nf-rua-error" />
+                    </div>
+                    <span class="errorText" id="nf-rua-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe a rua.
+                    </span>
+                  </div>
+
+                  <div class="nova-fazenda-field-row nova-fazenda-span-2">
+                    <div class="wrapper" id="nf-numero-field">
+                      <label class="label" for="nf-numero">Número</label>
+                      <div class="inputWrap">
+                        <input class="input" type="text" inputmode="numeric" autocomplete="address-line2" id="nf-numero" placeholder="Nº" aria-describedby="nf-numero-error" />
+                      </div>
+                      <span class="errorText" id="nf-numero-error">
+                        <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                        Informe o número.
+                      </span>
+                    </div>
+                    <div class="wrapper" id="nf-complemento-field">
+                      <label class="label" for="nf-complemento">Complemento <span class="nova-fazenda-optional-tag">(opcional)</span></label>
+                      <div class="inputWrap">
+                        <input class="input" type="text" id="nf-complemento" placeholder="Apto, bloco, referência (opcional)" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="nf-bairro-field">
+                    <label class="label" for="nf-bairro">Bairro</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" autocomplete="address-level3" id="nf-bairro" placeholder="Bairro" aria-describedby="nf-bairro-error" />
+                    </div>
+                    <span class="errorText" id="nf-bairro-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o bairro.
+                    </span>
+                  </div>
+
+                  <div class="nova-fazenda-field-row nova-fazenda-span-2">
+                    <div class="wrapper" id="nf-cidade-field">
+                      <label class="label" for="nf-cidade">Cidade</label>
+                      <div class="inputWrap">
+                        <input class="input" type="text" autocomplete="address-level2" id="nf-cidade" placeholder="Cidade" aria-describedby="nf-cidade-error" />
+                      </div>
+                      <span class="errorText" id="nf-cidade-error">
+                        <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                        Informe a cidade.
+                      </span>
+                    </div>
+                    <div class="wrapper" id="nf-estado-field">
+                      <label class="label" for="nf-estado">Estado</label>
+                      <div class="inputWrap">
+                        <input class="input" type="text" autocomplete="address-level1" id="nf-estado" placeholder="UF" maxlength="2" aria-describedby="nf-estado-error" />
+                      </div>
+                      <span class="errorText" id="nf-estado-error">
+                        <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                        Informe o estado.
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="nf-latitude-field">
+                    <label class="label" for="nf-latitude">Latitude <span class="nova-fazenda-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="number" inputmode="decimal" step="0.0001" id="nf-latitude" placeholder="Ex.: -27.2400" />
+                    </div>
+                  </div>
+                  <div class="wrapper" id="nf-longitude-field">
+                    <label class="label" for="nf-longitude">Longitude <span class="nova-fazenda-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="number" inputmode="decimal" step="0.0001" id="nf-longitude" placeholder="Ex.: -48.6350" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="nova-fazenda-subsection">
+                <h3 class="nova-fazenda-subsection-title">Área da propriedade</h3>
+                <div class="nova-fazenda-grid">
+                  <div class="wrapper" id="nf-area-total-field">
+                    <label class="label" for="nf-area-total">Área total</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" inputmode="numeric" id="nf-area-total" placeholder="0" aria-describedby="nf-area-total-error" />
+                    </div>
+                    <span class="helperText">Em hectares (ha).</span>
+                    <span class="errorText" id="nf-area-total-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe a área total.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nf-area-agricultura-field">
+                    <label class="label" for="nf-area-agricultura">Área de agricultura <span class="nova-fazenda-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" inputmode="numeric" id="nf-area-agricultura" placeholder="0" aria-describedby="nf-area-agricultura-error" />
+                    </div>
+                    <span class="helperText">Em hectares (ha).</span>
+                    <span class="errorText" id="nf-area-agricultura-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      A área de agricultura deve ser menor que a área total.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="nova-fazenda-subsection">
+                <h3 class="nova-fazenda-subsection-title">Arrendamento <span class="nova-fazenda-optional-tag">(opcional)</span></h3>
+                <div class="nova-fazenda-grid">
+                  <div class="wrapper" id="nf-arrendatario-field">
+                    <label class="label" for="nf-arrendatario">Nome do arrendatário</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="nf-arrendatario" placeholder="Nome de quem arrenda a propriedade" />
+                    </div>
+                    <span class="helperText">Deixe em branco caso não haja arrendamento.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="nova-fazenda-actions">
+                <button type="button" class="btn secondary" id="nova-fazenda-back-2">Voltar</button>
+                <button type="button" class="btn primary" id="nova-fazenda-continue-2">Continuar</button>
+              </div>
+            </section>
+
+            <!-- ══════════════ ETAPA 3 — Talhões ══════════════ -->
+            <section class="card nova-fazenda-step" data-step-panel="3" hidden>
+              <div class="nova-fazenda-step-intro">
+                <h2 class="nova-fazenda-step-title">Talhões da fazenda</h2>
+                <p class="nova-fazenda-step-description text-body-s">Cadastre os talhões pertencentes a esta fazenda. Você também pode adicionar ou editar talhões posteriormente.</p>
+              </div>
+
+              <div class="nova-fazenda-talhoes-header">
+                <span class="nova-fazenda-talhoes-label text-subtitle-s">Talhões cadastrados</span>
+                <button type="button" class="btn primary sm hasLeft" id="nova-fazenda-add-talhao-btn">
+                  <span class="icon"><i data-lucide="plus" width="16" height="16"></i></span>
+                  Adicionar talhão
+                </button>
+              </div>
+
+              <div class="nova-fazenda-talhoes-list" id="nova-fazenda-talhoes-list"></div>
+
+              <div class="nova-fazenda-talhoes-empty" id="nova-fazenda-talhoes-empty">
+                <p class="nova-fazenda-talhoes-empty-title text-body-s">Nenhum talhão cadastrado ainda</p>
+                <p class="nova-fazenda-talhoes-empty-subtitle text-body-s">Você pode cadastrar os talhões agora ou adicioná-los posteriormente na página da fazenda.</p>
+              </div>
+
+              <div class="nova-fazenda-actions">
+                <button type="button" class="btn secondary" id="nova-fazenda-back-3">Voltar</button>
+                <button type="submit" class="btn primary" id="nova-fazenda-submit">Cadastrar fazenda</button>
+              </div>
+            </section>
+
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <!-- Toast de sucesso (mesmo padrão de fazenda-detalhe-cadastro.html) -->
+  <div class="nova-fazenda-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <!-- ══════════════════ Modal Adicionar/Editar talhão ══════════════════
+       Mesma estrutura do Dialog de fazenda-detalhe-cadastro.html, operando
+       sobre um array em memória (wizardState.talhoes) em vez da fazenda já
+       salva — Status aqui tem 5 opções (Disponível/Em produção/Em pousio/
+       Arrendado/Inativo), não o Ativo/Inativo daquela tela. -->
+  <div class="overlay" id="talhao-dialog-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="talhao-dialog-title">
+      <div class="header">
+        <h2 class="title" id="talhao-dialog-title">Adicionar talhão</h2>
+        <button type="button" class="closeBtn" id="talhao-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="wrapper" id="talhao-codigo-field" hidden>
+          <label class="label" for="talhao-codigo-input">Código</label>
+          <div class="inputWrap">
+            <input class="input" type="text" id="talhao-codigo-input" disabled />
+          </div>
+        </div>
+
+        <div class="wrapper" id="talhao-nome-field">
+          <label class="label" for="talhao-nome-input">Nome</label>
+          <div class="inputWrap">
+            <input class="input" type="text" id="talhao-nome-input" placeholder="Ex.: Talhão 01" aria-describedby="talhao-nome-error" />
+          </div>
+          <span class="errorText" id="talhao-nome-error" hidden>
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe o nome do talhão.
+          </span>
+        </div>
+
+        <div class="wrapper" id="talhao-area-field">
+          <label class="label" for="talhao-area-input">Área (ha)</label>
+          <div class="inputWrap">
+            <input class="input" type="text" inputmode="decimal" id="talhao-area-input" placeholder="0,00" aria-describedby="talhao-area-error" />
+          </div>
+          <span class="errorText" id="talhao-area-error" hidden>
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe uma área maior que zero.
+          </span>
+        </div>
+
+        <div class="wrapper" id="talhao-status-field" data-value="ativo">
+          <span class="label">Status</span>
+          <button type="button" class="trigger" data-dropdown-trigger>
+            <span data-dropdown-value>Ativo</span>
+            <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+          </button>
+          <div class="menu" data-dropdown-menu>
+            <div class="option selected" data-value="ativo">Ativo</div>
+            <div class="option" data-value="inativo">Inativo</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondary" id="talhao-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn primary" id="talhao-dialog-confirm">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ Modal de confirmação: Remover talhão ══════════════════
+       Mesmo padrão destrutivo já usado no modal "Excluir cadastro" — o
+       Cancelar segue o padrão oficial `.secondaryGray` (ver Button.module.css). -->
+  <div class="overlay" id="talhao-remove-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="talhao-remove-dialog-title">
+      <div class="header">
+        <h2 class="title" id="talhao-remove-dialog-title">Remover talhão</h2>
+        <button class="closeBtn" id="talhao-remove-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <p class="text-body-s" id="talhao-remove-dialog-message">Tem certeza que deseja remover este talhão?</p>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray" id="talhao-remove-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn destructive" id="talhao-remove-dialog-confirm">Remover</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/fazendas-data.js"></script>
+  <script src="../shared/nova-fazenda.js"></script>
+</body>
+</html>

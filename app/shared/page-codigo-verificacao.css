@@ -1,0 +1,117 @@
+/* ══════════════════════════════════════════════════════════
+   CÓDIGO DE VERIFICAÇÃO — tela 2 do fluxo de recuperação de senha
+   Reaproveita o shell/card/tipografia de `page-login.css`. Aqui só o
+   componente OTP (composição de 6 `Input` avulsos, não existe um
+   componente OTP dedicado no Storybook), a contagem regressiva e o
+   link de reenvio são específicos desta tela.
+   ══════════════════════════════════════════════════════════ */
+
+.otp-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.otp-inputs {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  width: 100%;
+}
+
+/* Cada caixa reaproveita a aparência do Input (borda, foco, disabled) —
+   só o tamanho/alinhamento de texto é específico do OTP. */
+/* Sempre 44x44, em qualquer breakpoint (não escala com o resto do Input em
+   telas maiores — tamanho fixo por decisão explícita). */
+.input.otp-digit {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  text-align: center;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Estado de erro (código incorreto/incompleto): reaproveita a mesma regra
+   `.error .input` já definida em Input.module.css (borda vermelha) — só
+   precisamos alternar a classe `error` no grupo. Mensagem de erro só
+   aparece junto (mesmo padrão de `.wrapper.login-field.error .errorText`
+   usado no Login, mas escopado ao `.otp-group` em vez do `.wrapper`). */
+.otp-error { display: none; }
+.otp-group.error .otp-error { display: flex; }
+
+/* Mesma colisão de `.error` (Feedback × Input) já documentada em
+   `page-login.css` (`.wrapper.login-field.error`): Feedback.module.css define
+   um `.error` bare (fundo/borda vermelhos, pensado só pra `.alert.error`) que,
+   carregado como stylesheet global, também pinta `.otp-group.error`. Regra do
+   Design System: nunca fundo vermelho preenchido atrás de inputs/OTP em erro,
+   só contorno vermelho (herdado de `.error .input` no Input.module.css) e
+   texto de erro vermelho (`.errorText`) — ver `rules.md`. */
+.otp-group.error { background: transparent; border-color: transparent; }
+
+.otp-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  margin-top: calc(var(--spacing-xs) * -1);
+}
+.otp-countdown-label {
+  color: var(--color-text-secondary);
+}
+.otp-countdown-time {
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+/* Últimos 30s: reforça urgência sem alarme (mesmo laranja de status usado
+   em outros avisos do design system). */
+.otp-countdown.is-ending .otp-countdown-time { color: var(--color-status-orange-fg); }
+
+.otp-resend {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+.otp-resend-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-link);
+  cursor: pointer;
+}
+.otp-resend-link:hover { color: var(--color-text-link-hover); text-decoration: underline; }
+.otp-resend-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+.otp-resend-link:disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+
+/* Retorno momentâneo de "reenviado" (some sozinho depois de ~1.8s, ver JS). */
+.otp-resend-link.is-confirmed:disabled {
+  color: var(--color-status-success-fg);
+}
+
+/* Estados que escondem a contagem/reenvio (expirado, muitas tentativas):
+   controlados via [data-state] no form, igual ao restante do fluxo. */
+[data-state="expired"] .otp-countdown,
+[data-state="expired"] .otp-resend,
+[data-state="toomany"] .otp-countdown,
+[data-state="toomany"] .otp-resend {
+  display: none;
+}
+
+/* Nesses dois estados o botão principal vira a ação de reenvio. */
+[data-state="expired"] .login-submit-label,
+[data-state="toomany"] .login-submit-label {
+  display: none;
+}
+[data-state="expired"] .login-submit-label-retry,
+[data-state="toomany"] .login-submit-label-retry {
+  display: inline;
+}

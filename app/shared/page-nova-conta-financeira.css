@@ -1,0 +1,82 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA CONTA FINANCEIRA — formulário de cadastro/edição, dentro de
+   Configuração > Conta Financeira. Mobile first. Cópia estrutural de
+   page-nova-conta-bancaria.css (mesmo "card único + grid de 2 colunas"),
+   com o form reduzido a 2 campos (Código+Nome) — entidade bem mais simples.
+   Classes próprias (`ncf-*`), não um arquivo compartilhado.
+   ══════════════════════════════════════════════════════════ */
+
+.ncf-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.ncf-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ncf-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.ncf-back:hover { color: var(--color-text-primary); }
+
+.ncf-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Card único (mesmo padrão de Novo produto/Nova categoria/Nova Conta
+   Bancária) ──────────────────────────────────────────────────────────── */
+
+#ncf-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.ncf-card { padding: var(--spacing-lg); }
+
+.ncf-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .ncf-grid { grid-template-columns: 1fr 2fr; }
+}
+
+/* Mensagem de erro: mesmo padrão de Nova Conta Bancária/Nova categoria —
+   `.errorText` só aparece quando `.wrapper` ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input { border-color: var(--color-action-error); }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.ncf-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+
+@media (min-width: 768px) {
+  .ncf-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .ncf-actions .btn { min-width: 160px; }
+}

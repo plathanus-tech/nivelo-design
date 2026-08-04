@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova Natureza de Operação — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tab/Tab.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-nova-natureza-operacao.css" />
+</head>
+<body>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+      <div class="app-header-right">
+        <button type="button" class="btn secondary" id="notebook-btn">
+          <i data-lucide="book-open" width="16" height="16"></i>
+          <span class="app-header-notebook-label">Caderno de campo</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pessoas e empresas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Fiscal · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Manifesto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="message-square-plus" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Nova conversa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group is-open" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="true" data-tooltip="Configuração · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
+                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta Financeira</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+
+                <div class="app-nav-subgroup is-open" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="true">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem is-active" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVA NATUREZA DE OPERAÇÃO ══════════════════ -->
+      <main class="app-main">
+        <div class="nnop-page">
+
+          <div class="nnop-header">
+            <a href="naturezas-operacao.html" class="nnop-back" id="nnop-back-top">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <h1 class="nnop-title text-heading-6" id="nnop-page-title">Nova Natureza de Operação</h1>
+          </div>
+
+          <form id="nnop-form" novalidate>
+
+            <!-- ══════════════ PADRÕES PRÉ-CONFIGURADOS ══════════════ -->
+            <section class="card nnop-presets-card" id="nnop-presets-section">
+              <h2 class="nnop-section-title text-body-xl">Padrões pré-configurados</h2>
+              <p class="nnop-section-hint text-body-s">Usar um padrão é <strong>opcional</strong>, se preferir, preencha tudo manualmente abaixo. Escolher um modelo comum só preenche os campos com valores sugeridos, que podem ser editados livremente depois.</p>
+              <div class="nnop-presets-row" id="nnop-presets-row">
+                <button type="button" class="nnop-preset-btn" data-preset="venda">
+                  <span class="nnop-preset-icon"><i data-lucide="shopping-cart" width="18" height="18"></i></span>
+                  <span class="nnop-preset-label">Venda</span>
+                  <span class="nnop-preset-check"><i data-lucide="check" width="16" height="16"></i></span>
+                </button>
+                <button type="button" class="nnop-preset-btn" data-preset="remessa">
+                  <span class="nnop-preset-icon"><i data-lucide="package" width="18" height="18"></i></span>
+                  <span class="nnop-preset-label">Remessa</span>
+                  <span class="nnop-preset-check"><i data-lucide="check" width="16" height="16"></i></span>
+                </button>
+                <button type="button" class="nnop-preset-btn" data-preset="devolucao">
+                  <span class="nnop-preset-icon"><i data-lucide="undo-2" width="18" height="18"></i></span>
+                  <span class="nnop-preset-label">Devolução</span>
+                  <span class="nnop-preset-check"><i data-lucide="check" width="16" height="16"></i></span>
+                </button>
+              </div>
+            </section>
+
+            <!-- ══════════════ DADOS GERAIS ══════════════ -->
+            <section class="card nnop-card">
+              <h2 class="nnop-section-title text-body-xl">Dados gerais</h2>
+
+              <div class="nnop-grid">
+
+                <div class="wrapper nnop-dropdown" id="tipo-field">
+                  <span class="label">Tipo</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value>Selecione o tipo</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" data-dropdown-menu>
+                    <div class="option" data-value="entrada">Entrada</div>
+                    <div class="option" data-value="saida">Saída</div>
+                  </div>
+                  <span class="errorText" id="tipo-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Selecione o tipo da natureza de operação.
+                  </span>
+                </div>
+
+                <div class="wrapper nnop-span-2" id="descricao-field">
+                  <label class="label" for="nnop-descricao">Descrição</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="nnop-descricao" placeholder="Ex.: Venda de mercadoria dentro do estado" aria-describedby="descricao-error" />
+                  </div>
+                  <span class="errorText" id="descricao-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe a descrição da natureza de operação.
+                  </span>
+                </div>
+
+                <div class="wrapper" id="finalizada-field">
+                  <span class="label">Finalizada</span>
+                  <div class="group horizontal" role="radiogroup" aria-label="Finalizada">
+                    <label class="option">
+                      <input type="radio" class="input" name="finalizada" value="sim" checked />
+                      <span class="circle"><span class="dot"></span></span>
+                      <span class="optionLabel">Sim</span>
+                    </label>
+                    <label class="option">
+                      <input type="radio" class="input" name="finalizada" value="nao" />
+                      <span class="circle"><span class="dot"></span></span>
+                      <span class="optionLabel">Não</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="wrapper" id="padrao-field">
+                  <span class="label">Padrão</span>
+                  <div class="group horizontal" role="radiogroup" aria-label="Padrão">
+                    <label class="option">
+                      <input type="radio" class="input" name="padrao" value="sim" />
+                      <span class="circle"><span class="dot"></span></span>
+                      <span class="optionLabel">Sim</span>
+                    </label>
+                    <label class="option">
+                      <input type="radio" class="input" name="padrao" value="nao" checked />
+                      <span class="circle"><span class="dot"></span></span>
+                      <span class="optionLabel">Não</span>
+                    </label>
+                  </div>
+                  <span class="helperText">Quando "Sim", esta natureza é sugerida automaticamente em novos documentos deste tipo.</span>
+                </div>
+
+                <div class="wrapper" id="serie-field">
+                  <label class="label" for="nnop-serie">Série</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="nnop-serie" placeholder="Ex.: 1" aria-describedby="serie-error" />
+                  </div>
+                  <span class="errorText" id="serie-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe a série.
+                  </span>
+                </div>
+
+                <div class="wrapper nnop-dropdown" id="regime-field">
+                  <span class="label">Código de Regime Tributário</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value>Selecione o regime</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" data-dropdown-menu>
+                    <div class="option" data-value="1">1 · Simples Nacional</div>
+                    <div class="option" data-value="2">2 · Simples Nacional, excesso de sublimite de receita bruta</div>
+                    <div class="option" data-value="3">3 · Regime Normal</div>
+                  </div>
+                  <span class="errorText" id="regime-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Selecione o Código de Regime Tributário.
+                  </span>
+                </div>
+
+                <div class="wrapper" id="consumidor-final-field">
+                  <span class="label">Consumidor Final</span>
+                  <div class="group horizontal" role="radiogroup" aria-label="Consumidor Final">
+                    <label class="option">
+                      <input type="radio" class="input" name="consumidor-final" value="sim" />
+                      <span class="circle"><span class="dot"></span></span>
+                      <span class="optionLabel">Sim</span>
+                    </label>
+                    <label class="option">
+                      <input type="radio" class="input" name="consumidor-final" value="nao" checked />
+                      <span class="circle"><span class="dot"></span></span>
+                      <span class="optionLabel">Não</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="wrapper nnop-span-2" id="observacao-field">
+                  <label class="label" for="nnop-observacao">Observação <span class="nnop-optional-tag">(opcional)</span></label>
+                  <div class="inputWrap">
+                    <textarea class="input nnop-textarea" id="nnop-observacao" rows="3" placeholder="Anotações internas sobre esta natureza de operação"></textarea>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ══════════════ CONFIGURAÇÃO TRIBUTÁRIA ══════════════
+                 Um único card, navegação por abas (Tab.module.css) — cada aba
+                 troca só o conteúdo interno, sem sair do card. Substituiu o
+                 Accordion (5 blocos independentes) porque o Accordion.tsx
+                 tinha uma classe `.trigger` que colidia com a do Dropdown
+                 (mesmo nome, carregada depois, vencia no CSS global e
+                 apagava borda/fundo de TODOS os selects da tela — não só
+                 o Tipo). Abas resolvem a mesma necessidade de "um imposto
+                 por vez" sem esse conflito. -->
+            <section class="card nnop-tax-card">
+              <h2 class="nnop-section-title text-body-xl">Configuração tributária</h2>
+              <p class="nnop-section-hint text-body-s" id="nnop-tax-subtitle">Regras do Simples Nacional aplicáveis a esta natureza de operação.</p>
+
+              <div class="list nnop-tax-tabs" role="tablist" id="nnop-tax-tablist">
+                <button type="button" role="tab" aria-selected="true" class="tab active" data-tax-tab="simples">Simples Nacional</button>
+                <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="ipi">IPI</button>
+                <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="issqn">ISSQN</button>
+                <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="pis">PIS</button>
+                <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="cofins">COFINS</button>
+              </div>
+
+              <div class="nnop-tax-panels">
+
+                <!-- ── Simples Nacional ── -->
+                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="simples">
+                    <div class="nnop-tax-grid">
+
+                      <div class="wrapper nnop-dropdown" id="sn-csosn-field">
+                        <span class="label">Código da Situação da Operação no Simples Nacional</span>
+                        <button type="button" class="trigger" data-dropdown-trigger>
+                          <span data-dropdown-value>Selecione o CSOSN</span>
+                          <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                        </button>
+                        <div class="menu" data-dropdown-menu>
+                          <div class="option" data-value="101">101</div>
+                          <div class="option" data-value="102">102</div>
+                          <div class="option" data-value="103">103</div>
+                          <div class="option" data-value="201">201</div>
+                          <div class="option" data-value="202">202</div>
+                          <div class="option" data-value="203">203</div>
+                          <div class="option" data-value="300">300</div>
+                          <div class="option" data-value="400">400</div>
+                          <div class="option" data-value="500">500</div>
+                          <div class="option" data-value="900">900</div>
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="sn-cfop-field">
+                        <label class="label" for="sn-cfop">CFOP</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="sn-cfop" placeholder="Ex.: 5102" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="sn-difal-field">
+                        <span class="label">ICMS DIFAL</span>
+                        <div class="group horizontal" role="radiogroup" aria-label="ICMS DIFAL">
+                          <label class="option">
+                            <input type="radio" class="input" name="sn-difal" value="sim" />
+                            <span class="circle"><span class="dot"></span></span>
+                            <span class="optionLabel">Sim</span>
+                          </label>
+                          <label class="option">
+                            <input type="radio" class="input" name="sn-difal" value="nao" checked />
+                            <span class="circle"><span class="dot"></span></span>
+                            <span class="optionLabel">Não</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="sn-observacao-field">
+                        <label class="label" for="sn-observacao">Observação <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="sn-observacao" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="sn-info-fisco-field">
+                        <label class="label" for="sn-info-fisco">Informação ao Fisco <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="sn-info-fisco" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                    </div>
+                </div>
+
+                <!-- ── IPI ── -->
+                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="ipi" hidden>
+                    <div class="nnop-tax-grid">
+
+                      <div class="wrapper nnop-dropdown" id="ipi-codigo-field" data-value="nao-destacar">
+                        <span class="label">Código</span>
+                        <button type="button" class="trigger" data-dropdown-trigger>
+                          <span data-dropdown-value>Não destacar IPI</span>
+                          <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                        </button>
+                        <div class="menu" data-dropdown-menu>
+                          <div class="option selected" data-value="nao-destacar">Não destacar IPI</div>
+                          <div class="option" data-value="50">50</div>
+                          <div class="option" data-value="51">51</div>
+                          <div class="option" data-value="52">52</div>
+                          <div class="option" data-value="53">53</div>
+                          <div class="option" data-value="54">54</div>
+                          <div class="option" data-value="55">55</div>
+                          <div class="option" data-value="99">99</div>
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="ipi-aliquota-field">
+                        <label class="label" for="ipi-aliquota">Alíquota (%)</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="ipi-aliquota" placeholder="Ex.: 5" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="ipi-enquadramento-field">
+                        <label class="label" for="ipi-enquadramento">Código de Enquadramento</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="ipi-enquadramento" placeholder="Ex.: 999" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="ipi-observacao-field">
+                        <label class="label" for="ipi-observacao">Observação <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="ipi-observacao" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="ipi-info-fisco-field">
+                        <label class="label" for="ipi-info-fisco">Informação ao Fisco <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="ipi-info-fisco" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                    </div>
+                </div>
+
+                <!-- ── ISSQN ── -->
+                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="issqn" hidden>
+                    <div class="nnop-tax-grid">
+
+                      <div class="wrapper nnop-dropdown" id="issqn-cst-field">
+                        <span class="label">CST</span>
+                        <button type="button" class="trigger" data-dropdown-trigger>
+                          <span data-dropdown-value>Selecione o CST</span>
+                          <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                        </button>
+                        <div class="menu" data-dropdown-menu>
+                          <div class="option" data-value="tributado">Tributado</div>
+                          <div class="option" data-value="isento">Isento</div>
+                          <div class="option" data-value="outra">Outra situação</div>
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="issqn-aliquota-field">
+                        <label class="label" for="issqn-aliquota">Alíquota (%)</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="issqn-aliquota" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="issqn-base-field">
+                        <label class="label" for="issqn-base">Base</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="issqn-base" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="issqn-desconto-field">
+                        <span class="label">Descontar ISS</span>
+                        <div class="group horizontal" role="radiogroup" aria-label="Descontar ISS">
+                          <label class="option">
+                            <input type="radio" class="input" name="issqn-desconto" value="sim" />
+                            <span class="circle"><span class="dot"></span></span>
+                            <span class="optionLabel">Sim</span>
+                          </label>
+                          <label class="option">
+                            <input type="radio" class="input" name="issqn-desconto" value="nao" checked />
+                            <span class="circle"><span class="dot"></span></span>
+                            <span class="optionLabel">Não</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="issqn-observacao-field">
+                        <label class="label" for="issqn-observacao">Observação <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="issqn-observacao" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="issqn-info-fisco-field">
+                        <label class="label" for="issqn-info-fisco">Informação ao Fisco <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="issqn-info-fisco" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                    </div>
+                </div>
+
+                <!-- ── PIS ── -->
+                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="pis" hidden>
+                    <div class="nnop-tax-grid">
+
+                      <div class="wrapper" id="pis-cst-field">
+                        <label class="label" for="pis-cst">CST</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="pis-cst" placeholder="Ex.: 01" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="pis-aliquota-field">
+                        <label class="label" for="pis-aliquota">Alíquota (%)</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="pis-aliquota" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="pis-base-field">
+                        <label class="label" for="pis-base">Base</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="pis-base" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="pis-observacao-field">
+                        <label class="label" for="pis-observacao">Observação <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="pis-observacao" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="pis-info-fisco-field">
+                        <label class="label" for="pis-info-fisco">Informação ao Fisco <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="pis-info-fisco" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                    </div>
+                </div>
+
+                <!-- ── COFINS ── -->
+                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="cofins" hidden>
+                    <div class="nnop-tax-grid">
+
+                      <div class="wrapper" id="cofins-cst-field">
+                        <label class="label" for="cofins-cst">CST</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="cofins-cst" placeholder="Ex.: 01" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="cofins-aliquota-field">
+                        <label class="label" for="cofins-aliquota">Alíquota (%)</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="cofins-aliquota" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper" id="cofins-base-field">
+                        <label class="label" for="cofins-base">Base</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="cofins-base" />
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="cofins-observacao-field">
+                        <label class="label" for="cofins-observacao">Observação <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="cofins-observacao" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="cofins-info-fisco-field">
+                        <label class="label" for="cofins-info-fisco">Informação ao Fisco <span class="nnop-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <textarea class="input nnop-textarea" id="cofins-info-fisco" rows="2"></textarea>
+                        </div>
+                      </div>
+
+                    </div>
+                </div>
+
+              </div>
+            </section>
+
+            <div class="nnop-actions">
+              <a href="naturezas-operacao.html" class="btn secondary" id="nnop-cancel">Cancelar</a>
+              <button type="submit" class="btn primary" id="nnop-submit">Salvar natureza de operação</button>
+            </div>
+
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/naturezas-operacao-data.js"></script>
+  <script src="../shared/nova-natureza-operacao.js"></script>
+</body>
+</html>

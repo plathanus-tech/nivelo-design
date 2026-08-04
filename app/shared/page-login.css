@@ -1,0 +1,472 @@
+/* ══════════════════════════════════════════════════════════
+   RESET / BASE
+   ══════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background sofisticado: base gray-50 com radiais grandes e difusos em
+   azul institucional, mesmo tratamento de iluminação sutil usado na
+   Landing Page (pontos de luz azuis, bem discretos, sem competir com o
+   conteúdo) — um pouco mais de profundidade que a versão anterior. */
+.login-screen {
+  background-color: var(--color-gray-50);
+  background-image:
+    radial-gradient(ellipse 1200px 900px at 85% 15%, rgba(23, 82, 176, 0.08), transparent 65%),
+    radial-gradient(ellipse 900px 700px at 75% 95%, rgba(23, 82, 176, 0.05), transparent 65%);
+  background-repeat: no-repeat;
+}
+
+img { max-width: 100%; display: block; }
+
+/* ══════════════════════════════════════════════════════════
+   COLISÃO DE CLASSES ENTRE COMPONENTES DO STORYBOOK
+   Input.module.css e Checkbox.module.css usam os mesmos nomes
+   de classe (.wrapper, .label, .input) — como aqui eles são
+   carregados juntos como stylesheets globais (não como CSS
+   Modules de verdade), cada instância precisa reafirmar suas
+   próprias regras com uma classe extra + especificidade maior,
+   senão o que carregar depois vence e quebra o outro componente.
+   Mesma causa raiz do bug de colisão do `.header` (SiteHeader x
+   Dialog) encontrado na landing page.
+   ══════════════════════════════════════════════════════════ */
+
+.wrapper.login-field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: var(--spacing-xs);
+  text-align: left;
+}
+.wrapper.login-checkbox {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  user-select: none;
+  padding: var(--spacing-xs) 0;
+}
+
+.label.login-field-label { font-weight: var(--font-weight-medium); }
+.label.login-checkbox-label { font-weight: var(--font-weight-regular); }
+
+.input.login-field-input { position: static; width: 100%; height: 44px; opacity: 1; }
+.input.login-checkbox-input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+/* No componente React o ícone de check só é montado quando marcado; aqui ele
+   fica sempre no DOM (mais simples de alternar via JS puro), então escondemos
+   por CSS até `.login-checkbox` receber a classe `checked`. */
+.login-checkbox .mark { display: none; }
+.login-checkbox.checked .mark { display: flex; align-items: center; justify-content: center; }
+
+/* Feedback.module.css também define um `.error` (e `.success`/`.warning`/`.info`)
+   bare no nível do alerta — sem isso, o estado de erro do Input (mesma classe
+   `.error` no wrapper) herdava o fundo/borda vermelhos do alerta por engano. */
+.wrapper.login-field.error { background: transparent; border-color: transparent; }
+
+/* Mensagem de erro do Input só aparece quando o wrapper está em estado de erro
+   (no componente React ela nem é montada sem erro; aqui ela fica sempre no DOM
+   pra facilitar alternar estado via JS/query string). */
+.errorText { display: none; }
+.wrapper.login-field.error .errorText { display: flex; }
+
+/* ══════════════════════════════════════════════════════════
+   LAYOUT — shell de duas colunas (desktop 1024px+) / centralizado (mobile)
+   ══════════════════════════════════════════════════════════ */
+
+.login-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Painel institucional: só existe a partir do desktop (ver media query) */
+.login-panel { display: none; }
+
+.login-page {
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg) var(--spacing-md);
+}
+
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 600px;
+  /* Leve tratamento azulado: fundo e borda levemente tingidos de brand-500,
+     em vez do branco/cinza puros do token — o card passa a conversar com o
+     resto da composição (background com radiais azuis, sombra já tingida
+     de azul), sem deixar de parecer neutro/branco à primeira vista. */
+  background-color: color-mix(in srgb, var(--color-bg-surface) 98%, var(--color-brand-500) 2%);
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-border-subtle) 85%, var(--color-brand-500) 15%);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+  .login-page { padding: var(--spacing-3xl) var(--spacing-2xl); }
+  .login-card {
+    padding: var(--spacing-3xl) var(--spacing-2xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .login-shell { flex-direction: row; }
+
+  /* Painel institucional: imagem "gestão com nivelo.png" funcionando como
+     hero (ocupa quase toda a largura e altura), com overlay azul
+     institucional (mesmo azul do CTA da landing: brand-950 → brand-600,
+     só que em opacidade muito mais baixa aqui, pra preservar as cores
+     naturais da lavoura) + fade suave na borda direita, dissolvendo a
+     imagem na área clara do formulário em vez de um corte reto. */
+  .login-panel {
+    display: block;
+    position: relative;
+    flex: 0 0 65%;
+    overflow: hidden;
+  }
+  /* Degradê de opacidade real na própria imagem (mask-image), não uma cor
+     sólida pintada por cima: a foto vai ficando transparente aos poucos e
+     revela o que está atrás dela (o fundo de `.login-screen`, com seus
+     radiais azuis), então ela funde com o fundo de verdade em vez de só
+     bater numa cor parecida. `.login-panel` não tem `background-color`
+     própria de propósito, pra deixar esse fundo aparecer. */
+  .login-panel-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 38% 65%;
+    mask-image: linear-gradient(
+      90deg,
+      black 10%,
+      rgba(0, 0, 0, 0.9) 35%,
+      rgba(0, 0, 0, 0.65) 55%,
+      rgba(0, 0, 0, 0.32) 72%,
+      rgba(0, 0, 0, 0.08) 88%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      black 10%,
+      rgba(0, 0, 0, 0.9) 35%,
+      rgba(0, 0, 0, 0.65) 55%,
+      rgba(0, 0, 0, 0.32) 72%,
+      rgba(0, 0, 0, 0.08) 88%,
+      transparent 100%
+    );
+  }
+  .login-panel-overlay {
+    position: absolute;
+    inset: 0;
+    /* Só o color grading permanece aqui (mesma dupla de cor e ângulo do
+       overlay do CTA final da Landing Page, numa fração da opacidade) — o
+       fade em si agora é a máscara de opacidade da imagem, acima. */
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--color-brand-950) 10%, transparent) 0%,
+      color-mix(in srgb, var(--color-brand-600) 7%, transparent) 100%
+    );
+    mask-image: linear-gradient(90deg, black 0%, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, black 0%, black 70%, transparent 100%);
+  }
+
+  /* Bloco institucional sobre a imagem: reforço de marca discreto, longe da
+     área onde o card se sobrepõe (fica na base esquerda). Fundo translúcido
+     com blur (glassmorphism sutil) pra garantir contraste sem competir com
+     o formulário. */
+  .login-panel-copy {
+    position: absolute;
+    left: var(--spacing-2xl);
+    bottom: var(--spacing-3xl);
+    max-width: 380px;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: color-mix(in srgb, var(--color-brand-950) 28%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: var(--border-width-thin) solid color-mix(in srgb, var(--color-gray-white) 14%, transparent);
+    border-radius: var(--radius-md);
+  }
+  /* Logo branco (NIVELO branco header): único lugar onde a marca aparece no
+     desktop, ao lado da mensagem institucional em vez de dentro do card. */
+  .login-panel-logo {
+    height: 34px;
+    width: auto;
+    margin: 0 0 var(--spacing-md);
+  }
+  .login-panel-heading {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-white);
+    line-height: var(--line-height-snug);
+    margin: 0 0 var(--spacing-xs);
+  }
+  .login-panel-text {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-light);
+    color: color-mix(in srgb, var(--color-gray-white) 82%, transparent);
+    line-height: var(--line-height-normal);
+    margin: 0;
+  }
+
+  .login-page {
+    flex: 1;
+    /* Volta pra row: no mobile é column pra empilhar logo+card, mas aqui só o
+       card fica visível (logo mora no painel) e o truque de sobreposição
+       (padding-left + margin-left negativo) pressupõe eixo horizontal. */
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-left: var(--spacing-3xl);
+  }
+
+  /* Card avança sobre a imagem, ficando claramente por cima dela, unindo as
+     duas metades numa composição só. Largura em `clamp()` baseada no viewport
+     (não em %/100% do próprio pai): a coluna do formulário só tem ~35% da
+     tela, então um `width:100%` fica preso a essa faixa estreita mesmo com
+     `max-width` maior — clamp com `vw` ignora esse pai apertado e ainda
+     encolhe com segurança perto do início do breakpoint (1024px). */
+  .login-card {
+    width: clamp(420px, 40vw, 600px);
+    margin-left: -200px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   CABEÇALHO
+   ══════════════════════════════════════════════════════════ */
+
+.login-header {
+  text-align: left;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Logo solto, fora do card (só mobile/tablet — ver 1024px+ onde ele some e
+   a marca passa a viver no painel institucional, versão branca). Sem
+   competir com o título: fica separado do card, não dentro do cabeçalho. */
+.login-logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  margin: 0 auto calc(var(--spacing-2xl) - 12px);
+}
+
+/* Some no desktop (o logo passa a viver no painel institucional, versão
+   branca) — regra precisa vir DEPOIS da base acima na ordem do arquivo,
+   senão a base (mesma especificidade) venceria o cascade mesmo dentro de
+   uma media query que bate. */
+@media (min-width: 1024px) {
+  .login-logo { display: none; }
+}
+
+/* Heading/6 no mobile, Heading/5 no desktop (escala tipográfica oficial da
+   Nivelo). `.login-title` agora aplica a classe `.text-heading-6` de
+   `typography.css` (fonte/peso/line-height/letter-spacing vêm de lá) — só o
+   `font-size` no desktop precisa de override aqui, porque Heading/5 e
+   Heading/6 são classes DIFERENTES (tamanhos diferentes do catálogo Figma),
+   e o breakpoint troca só esse valor entre as duas (as duas compartilham
+   o resto: mesma família, peso, line-height 1.1, letter-spacing -0.01em). */
+.login-title {
+  color: var(--color-text-primary);
+  /* Aproximado do subtítulo: título e subtítulo são um par, devem ler como
+     um bloco só (mesma lógica de proximidade do resto do formulário). */
+  margin: 0 0 var(--spacing-sm);
+}
+
+/* Subtítulo reduzido pra uma escala de heading menor (era font-size-base,
+   texto de corpo comum) — hierarquia mais clara em relação ao título.
+   Combinação própria (14px/light/line-height 1.5), sem classe `.text-*`
+   exatamente equivalente (`.text-body-s` é 14px/light mas line-height 1.4 e
+   letter-spacing 0.01em, diferente do que já estava calibrado aqui) — os
+   valores continuam 100% via token (`--font-size-md`/`--line-height-normal`),
+   só não migrou pra classe por não ter uma correspondência exata no catálogo. */
+.login-sub {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-light);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .login-title { font-size: var(--font-size-display-sm); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ALERTA (Feedback) — erro de autenticação
+   ══════════════════════════════════════════════════════════ */
+
+.login-alert { margin-bottom: var(--spacing-lg); }
+.login-alert[hidden] { display: none; }
+
+/* ══════════════════════════════════════════════════════════
+   FORMULÁRIO
+   ══════════════════════════════════════════════════════════ */
+
+/* Espaçamento do formulário segue uma escala deliberada, não um gap único:
+   16px entre inputs (elementos "irmãos" do mesmo tipo, ficam próximos pra
+   parecer um conjunto), 8px do último input pro bloco de opções (opções
+   pertencem/reforçam aquele campo), 24px das opções pro botão principal
+   (ação, precisa de mais respiro), 24px do botão pro link de criar conta
+   (ação secundária, mesmo respiro de "depois de um botão"). Base = 16px
+   (--spacing-md), os elementos que precisam de mais espaço usam margin-top
+   extra pra somar ao gap em vez de um valor solto. */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Campo de senha: reserva espaço pro botão de mostrar/ocultar */
+.login-password-wrap .input { padding-right: 44px; }
+
+.login-toggle-password {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+}
+.login-toggle-password:hover { color: var(--color-text-primary); background-color: var(--color-bg-subtle); }
+.login-toggle-password:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.login-toggle-password:disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+
+/* Lembrar-me + Esqueci minha senha */
+.login-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-top: calc(var(--spacing-sm) * -1);
+}
+
+.login-forgot-link {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-link);
+  text-decoration: none;
+}
+.login-forgot-link:hover { color: var(--color-text-link-hover); text-decoration: underline; }
+.login-forgot-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* Ação principal: 24px do bloco de opções (16px do gap do form + 8px extra) */
+.login-submit {
+  position: relative;
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--spacing-sm);
+}
+
+/* Convenção: quando houver 2+ botões em sequência, usar 16px entre eles
+   (--spacing-md), não os 24px de "botão depois de outro elemento" — usada
+   pela primeira vez no fluxo de recuperação de senha (Receber código +
+   Voltar para o Login). */
+.login-button-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+.login-button-row .login-submit { margin-top: 0; }
+
+/* Modificador genérico pra qualquer botão/link de largura total do fluxo de
+   autenticação (não só o submit principal) — links estilizados como botão
+   (`<a class="btn ...">`) usam isso em vez de reimplementar width:100%. */
+.login-full-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Segundo label do botão principal, usado quando a última tentativa falhou
+   (ex.: erro ao enviar código) — o texto muda de "Receber código" pra
+   "Tentar novamente" sem trocar o resto do botão (spinner, largura etc.). */
+.login-submit-label-retry { display: none; }
+
+.login-submit-spinner {
+  display: none;
+  width: 18px;
+  height: 18px;
+  border: var(--border-width-medium) solid color-mix(in srgb, var(--color-gray-white) 40%, transparent);
+  border-top-color: var(--color-gray-white);
+  border-radius: var(--radius-full);
+  animation: login-spin 0.6s linear infinite;
+}
+
+@keyframes login-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ESTADOS DO FORMULÁRIO (idle / invalid / loading / error)
+   Controlados via [data-state] no <form>, setado por login.js
+   a partir de ?state= na URL — só pra fins de demonstração no
+   protótipo, sem nenhuma lógica de autenticação real.
+   ══════════════════════════════════════════════════════════ */
+
+[data-state="loading"] .login-submit-label { visibility: hidden; }
+[data-state="loading"] .login-submit-spinner {
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -9px 0 0 -9px;
+}
+
+[data-state="senderror"] .login-submit-label { display: none; }
+[data-state="senderror"] .login-submit-label-retry { display: inline; }
+
+/* ══════════════════════════════════════════════════════════
+   AÇÃO SECUNDÁRIA — criar conta
+   ══════════════════════════════════════════════════════════ */
+
+.login-signup {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin: calc(var(--spacing-sm) + 4px) 0 0;
+}
+
+.login-signup-link {
+  color: var(--color-text-link);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+}
+.login-signup-link:hover { color: var(--color-text-link-hover); text-decoration: underline; }
+.login-signup-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}

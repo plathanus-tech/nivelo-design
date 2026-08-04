@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funcionalidades — Proposta 2 · Split sticky</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../shared/funcionalidades-explore.css" />
+</head>
+<body class="layout-screen">
+
+  <span class="fx-draft-label">V2 · Split sticky</span>
+
+  <section class="fx2-section" aria-labelledby="fx2-headline">
+    <header class="section-header">
+      <span class="section-tag">Plataforma</span>
+      <h2 class="section-headline" id="fx2-headline">Funcionalidades para uma gestão rural completa</h2>
+      <p class="section-sub">Do estoque ao financeiro, tudo pensado para ser simples de usar no dia a dia da fazenda.</p>
+    </header>
+
+    <div class="fx2-layout">
+
+      <div class="fx2-sticky" id="fx2-sticky">
+        <div class="fx2-placeholder" id="fx2-sticky-placeholder">
+          <span id="fx2-sticky-icon"><i data-lucide="image" width="28" height="28"></i></span>
+          <span class="fx2-placeholder-caption" id="fx2-sticky-caption">Imagem ilustrativa</span>
+        </div>
+        <span class="fx2-sticky-label" id="fx2-sticky-label">Estoque</span>
+      </div>
+
+      <div class="fx2-list" id="fx2-list">
+
+        <!-- 01 — Estoque -->
+        <article class="fx2-item is-active" data-panel="0">
+          <div class="fx2-item-visual">
+            <div class="fx2-placeholder fx2-placeholder--wide">
+              <i data-lucide="image" width="28" height="28"></i>
+              <span class="fx2-placeholder-caption">Imagem ilustrativa</span>
+            </div>
+          </div>
+          <h3 class="fx2-item-title">Estoque</h3>
+          <p class="fx2-item-desc">Controle completo dos produtos da fazenda, acompanhando vendas, compras e produção futura em um único lugar.</p>
+          <ul class="fx2-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Estoque de vendas:</strong> produtos já comercializados.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Estoque de compras:</strong> produtos adquiridos e insumos que serão utilizados.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Depósito futuro:</strong> produtos vendidos, mas que ainda precisam ser colhidos.</span></li>
+          </ul>
+          <p class="fx2-item-note">Quando a colheita acontece, o sistema realiza a transferência do estoque futuro e atualiza automaticamente a disponibilidade.</p>
+        </article>
+
+        <!-- 02 — Financeiro -->
+        <article class="fx2-item" data-panel="1">
+          <div class="fx2-item-visual">
+            <div class="fx2-placeholder fx2-placeholder--wide">
+              <i data-lucide="layout-template" width="28" height="28"></i>
+              <span class="fx2-placeholder-caption">Mockup do produto</span>
+            </div>
+          </div>
+          <h3 class="fx2-item-title">Financeiro</h3>
+          <p class="fx2-item-desc">Tenha uma visão completa da saúde financeira da propriedade, controlando entradas, saídas e compromissos.</p>
+          <ul class="fx2-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Contas a pagar:</strong> lançamentos, vencimentos e baixas.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Contas a receber:</strong> lançamentos e recebimentos.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Caixa:</strong> controle de entradas, saídas e movimentações.</span></li>
+          </ul>
+          <div class="fx2-item-subgroup">
+            <span class="fx2-item-subgroup-label">Notas fiscais</span>
+            <ul class="fx2-item-bullets">
+              <li><i data-lucide="check" width="14" height="14"></i><span>Notas fiscais emitidas.</span></li>
+              <li><i data-lucide="check" width="14" height="14"></i><span>Notas fiscais recebidas.</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 03 — Relatórios -->
+        <article class="fx2-item" data-panel="2">
+          <div class="fx2-item-visual">
+            <div class="fx2-placeholder fx2-placeholder--wide">
+              <i data-lucide="image" width="28" height="28"></i>
+              <span class="fx2-placeholder-caption">Imagem ilustrativa</span>
+            </div>
+          </div>
+          <h3 class="fx2-item-title">Relatórios</h3>
+          <p class="fx2-item-desc">Transforme os dados da operação rural em informações estratégicas para melhores decisões.</p>
+          <ul class="fx2-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span>LCDPR.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>DRE.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Balanço.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Fluxos de entradas e saídas.</span></li>
+          </ul>
+        </article>
+
+        <!-- 04 — Cadastro Rural -->
+        <article class="fx2-item" data-panel="3">
+          <div class="fx2-item-visual">
+            <div class="fx2-placeholder fx2-placeholder--wide">
+              <i data-lucide="layout-template" width="28" height="28"></i>
+              <span class="fx2-placeholder-caption">Mockup do produto</span>
+            </div>
+          </div>
+          <h3 class="fx2-item-title">Cadastro Rural</h3>
+          <p class="fx2-item-desc">Organize todas as informações da propriedade e acompanhe a operação rural com mais controle.</p>
+          <ul class="fx2-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span>Cadastro de fazendas.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Cadastro de talhões.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Caderno de talhões.</span></li>
+          </ul>
+        </article>
+
+        <!-- 05 — WhatsApp -->
+        <article class="fx2-item" data-panel="4">
+          <div class="fx2-item-visual">
+            <div class="fx2-placeholder fx2-placeholder--wide">
+              <i data-lucide="image" width="28" height="28"></i>
+              <span class="fx2-placeholder-caption">Imagem ilustrativa</span>
+            </div>
+          </div>
+          <h3 class="fx2-item-title">WhatsApp</h3>
+          <p class="fx2-item-desc">Simplifique tarefas do dia a dia permitindo interações rápidas através do WhatsApp.</p>
+          <ul class="fx2-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span>Emissão de nota fiscal por mensagem.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Registro de informações no caderno de talhões.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Anotações da operação diretamente pelo WhatsApp.</span></li>
+          </ul>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons();</script>
+
+  <script>
+    (function () {
+      var stickyCaption = document.getElementById('fx2-sticky-caption');
+      var stickyLabel = document.getElementById('fx2-sticky-label');
+      var stickyIconWrap = document.getElementById('fx2-sticky-icon');
+      var currentIcon = 'image';
+      var items = document.querySelectorAll('.fx2-item');
+
+      var modules = [
+        { label: 'Estoque',        type: 'Imagem ilustrativa', icon: 'image' },
+        { label: 'Financeiro',     type: 'Mockup do produto',  icon: 'layout-template' },
+        { label: 'Relatórios',     type: 'Imagem ilustrativa', icon: 'image' },
+        { label: 'Cadastro Rural', type: 'Mockup do produto',  icon: 'layout-template' },
+        { label: 'WhatsApp',       type: 'Imagem ilustrativa', icon: 'image' }
+      ];
+
+      function setActive(index) {
+        items.forEach(function (item) {
+          item.classList.toggle('is-active', item.dataset.panel === String(index));
+        });
+        var mod = modules[index];
+        stickyLabel.textContent = mod.label;
+        stickyCaption.textContent = mod.type;
+        if (currentIcon !== mod.icon) {
+          currentIcon = mod.icon;
+          stickyIconWrap.innerHTML = '<i data-lucide="' + mod.icon + '" width="28" height="28"></i>';
+          lucide.createIcons();
+        }
+      }
+
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                setActive(Number(entry.target.dataset.panel));
+              }
+            });
+          },
+          { rootMargin: '-40% 0px -40% 0px', threshold: 0 }
+        );
+        items.forEach(function (item) { observer.observe(item); });
+      }
+    })();
+  </script>
+</body>
+</html>

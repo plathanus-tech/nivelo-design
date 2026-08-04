@@ -1,0 +1,268 @@
+/* ══════════════════════════════════════════════════════════
+   CADERNO DE CAMPO — tela geral (acessada pelo botão "Caderno de campo" do
+   Header). Registro exclusivamente informativo e de controle pessoal do
+   produtor (despesas/vendas/colheitas por fazenda/talhão) — nunca gera
+   lançamento em Financeiro nem movimentação em Estoque (ver app/CLAUDE.md).
+   Estrutura de página/grid/card/estado-vazio é cópia deliberada de
+   `page-fazendas.css` (mesmo raciocínio: público-alvo tem normalmente 1-2
+   propriedades, listagem em cards, não tabela), com um bloco novo de resumo
+   (despesas/vendas/colheitas) dentro do card.
+   ══════════════════════════════════════════════════════════ */
+
+.caderno-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.caderno-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .caderno-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.caderno-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.caderno-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.caderno-description {
+  color: var(--color-text-tertiary);
+  margin: 0;
+  max-width: 560px;
+}
+
+#nova-anotacao-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  #nova-anotacao-btn {
+    width: auto;
+  }
+}
+
+/* ── Grid de cards ─────────────────────────────────────────────────────── */
+
+.caderno-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+  .caderno-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+  }
+}
+
+.card.caderno-fazenda-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.card.caderno-fazenda-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-default);
+}
+
+.caderno-fazenda-card .cardHeader {
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+}
+
+.caderno-fazenda-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-lg);
+  flex: 1;
+}
+
+.caderno-fazenda-card-location {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+}
+.caderno-fazenda-card-location svg {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+.caderno-fazenda-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.caderno-fazenda-card-stats dt {
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+.caderno-fazenda-card-stats dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.caderno-fazenda-card-updated {
+  color: var(--color-text-tertiary);
+}
+
+/* ── Resumo do Caderno (despesas/vendas/colheitas) ────────────────────────
+   Deliberadamente separado visualmente (fundo sutil + rótulo próprio "Registros
+   no caderno") pra nunca ser confundido com saldo financeiro/posição de
+   estoque — é só um resumo dos REGISTROS feitos, não uma movimentação real. */
+.caderno-fazenda-card-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  margin-top: 2px;
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.caderno-fazenda-card-summary-title {
+  color: var(--color-text-tertiary);
+}
+
+.caderno-fazenda-card-summary-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.caderno-fazenda-card-summary-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+}
+.caderno-fazenda-card-summary-item svg {
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+.caderno-fazenda-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.caderno-fazenda-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.caderno-fazenda-card-link:hover {
+  color: var(--color-action-primary-hover);
+}
+
+/* ── Estado vazio (mirror de `.fazendas-empty-global`) ────────────────────
+   Mostrado quando `NiveloFazendas.list()` está vazio ou via `#state=empty`. */
+.caderno-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.caderno-empty-global:not([hidden]) { display: flex; }
+
+.caderno-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+
+.caderno-empty-global-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.caderno-empty-global-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--spacing-sm);
+  max-width: 360px;
+}
+
+/* ── Toast de sucesso (nova anotação) ──────────────────────────────────────
+   Cópia exata do padrão de `.fazendas-toast-region` — mesmo Feedback
+   (Storybook) reaproveitado como toast, mesma correção de colisão com
+   `.card` (Table.module.css, carregado nesta tela pros cards de fazenda). */
+.caderno-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.caderno-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.caderno-toast {
+  box-shadow: var(--shadow-lg);
+  animation: caderno-toast-in 0.25s ease;
+}
+.caderno-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.caderno-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0;
+}
+
+@keyframes caderno-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

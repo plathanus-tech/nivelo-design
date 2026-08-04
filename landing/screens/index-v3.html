@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nivelo — Gestão Rural Simplificada para Pequenos e Médios Produtores</title>
+  <meta name="description" content="Nivelo é o sistema de gestão rural mais simples do Brasil. Controle estoque, financeiro, emita notas fiscais e gere relatórios LCDPR — tudo integrado, fácil de usar." />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Nivelo — Gestão Rural Simplificada" />
+  <meta property="og:description" content="O sistema mais simples para gerir sua propriedade rural. Estoque, financeiro, emissão de notas fiscais e relatórios LCDPR em um só lugar." />
+  <meta property="og:locale" content="pt_BR" />
+
+  <!-- 1. Fonts -->
+  <link rel="stylesheet" href="../shared/fonts.css" />
+
+  <!-- 2. Design System tokens -->
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+
+  <!-- 3. Storybook components used on this screen -->
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Accordion/Accordion.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+
+  <!-- 4. Landing layout (v3 — rebuilding from scratch) -->
+  <link rel="stylesheet" href="../shared/page-v3.css" />
+</head>
+<body class="layout-screen">
+
+  <!-- ══════════════════════════════════════════════════════════
+       NAVBAR — reaproveitada exatamente da v1 (classes .nav-*),
+       a pedido do usuário. Mesma estrutura, comportamento e CSS.
+  ══════════════════════════════════════════════════════════ -->
+  <nav class="nav-landing" id="navbar" aria-label="Navegação principal">
+    <div class="nav-inner">
+
+      <a href="#inicio" class="nav-logo" aria-label="Nivelo, ir para o início">
+        <img class="logo-white" src="../../NIVELO branco header.svg" alt="Nivelo" />
+        <img class="logo-color" src="../../NIVELO azul header.svg"   alt="Nivelo" />
+      </a>
+
+      <!-- Desktop links (hidden on mobile via CSS) -->
+      <ul class="nav-links" role="list">
+        <li><a href="#funcionalidades">Funcionalidades</a></li>
+        <li><a href="#planos">Planos</a></li>
+        <li><a href="#quem-somos">Quem Somos</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+
+      <!-- Desktop CTA (hidden on mobile via CSS) -->
+      <a href="../../app/screens/login.html" class="btn primary sm nav-cta">Área do Cliente</a>
+
+      <!-- Mobile hamburger -->
+      <button
+        class="nav-hamburger"
+        id="nav-toggle"
+        aria-label="Abrir menu"
+        aria-expanded="false"
+        aria-controls="nav-drawer"
+      >
+        <i data-lucide="menu" width="24" height="24"></i>
+      </button>
+
+    </div>
+
+    <!-- Mobile drawer -->
+    <div class="nav-drawer" id="nav-drawer" aria-hidden="true">
+      <div class="nav-drawer-overlay" id="nav-overlay"></div>
+      <div class="nav-drawer-panel" role="dialog" aria-modal="true" aria-label="Menu">
+
+        <button class="nav-drawer-close" id="nav-close" aria-label="Fechar menu">
+          <i data-lucide="x" width="24" height="24"></i>
+        </button>
+
+        <ul class="nav-drawer-links" role="list">
+          <li><a href="#funcionalidades">Funcionalidades</a></li>
+          <li><a href="#planos">Planos</a></li>
+          <li><a href="#quem-somos">Quem Somos</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+
+        <a href="../../app/screens/login.html" class="btn primary md nav-drawer-cta">Área do Cliente</a>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════════════
+       WHATSAPP FAB (elemento global, fixo)
+       Ao clicar, abre um popover pequeno perguntando com quem o usuário
+       quer falar (Suporte/Vendas) antes de redirecionar pro número certo
+       no WhatsApp — não abre o WhatsApp direto mais.
+  ══════════════════════════════════════════════════════════ -->
+  <div class="whatsapp-fab-wrapper">
+    <button
+      type="button"
+      class="whatsapp-fab"
+      id="whatsapp-fab"
+      aria-label="Fale conosco no WhatsApp"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="whatsapp-fab-menu"
+    >
+      <img
+        class="whatsapp-fab-icon"
+        src="../shared/icons/whatsapp.svg"
+        alt=""
+        aria-hidden="true"
+        width="28"
+        height="28"
+      />
+      <span class="whatsapp-tooltip" aria-hidden="true">Fale conosco</span>
+    </button>
+
+    <div class="whatsapp-fab-menu" id="whatsapp-fab-menu" role="menu" aria-label="Com quem você quer falar" hidden>
+      <p class="whatsapp-fab-menu-title">Com quem você quer falar?</p>
+      <a href="https://wa.me/5511988888888" class="whatsapp-fab-menu-item" role="menuitem" target="_blank" rel="noopener noreferrer">
+        <i data-lucide="life-buoy" width="18" height="18"></i>
+        Suporte
+      </a>
+      <a href="https://wa.me/5511999999999" class="whatsapp-fab-menu-item" role="menuitem" target="_blank" rel="noopener noreferrer">
+        <i data-lucide="shopping-cart" width="18" height="18"></i>
+        Vendas
+      </a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       HERO
+       (reaproveita a estrutura da v1; a mídia de fundo passou de
+       imagem estática para vídeo em loop, com controle de movimento)
+  ══════════════════════════════════════════════════════════ -->
+  <section class="hero" id="inicio" aria-label="Seção principal">
+
+    <div class="hero-bg" aria-hidden="true">
+      <video
+        class="hero-bg-video"
+        id="hero-bg-video"
+        src="../../Video%20landing.mp4"
+        loop
+        muted
+        playsinline
+      ></video>
+    </div>
+
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <span class="hero-tag">Gestão Rural Simplificada</span>
+
+      <h1 class="hero-headline">Sua fazenda organizada,<br>do jeito mais simples</h1>
+
+      <p class="hero-sub">
+        Estoque, financeiro e relatórios rurais em um só lugar.<br class="hero-sub-br" />
+        Fácil de usar, rápido de aprender.
+      </p>
+
+      <div class="hero-actions">
+        <a href="../../app/screens/login.html" class="btn primary lg hero-btn-primary">
+          Acessar Área do Cliente
+        </a>
+        <a href="#planos" class="hero-link">
+          Ver planos
+          <i data-lucide="arrow-down" width="16" height="16"></i>
+        </a>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="hero-motion-toggle"
+      id="hero-motion-toggle"
+      aria-pressed="false"
+      aria-label="Pausar animação"
+    >
+      <span class="hero-motion-icon" id="hero-motion-icon" aria-hidden="true">
+        <i data-lucide="pause" width="20" height="20"></i>
+      </span>
+      <span class="hero-motion-tooltip" id="hero-motion-tooltip" aria-hidden="true">Pausar animação</span>
+    </button>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FUNCIONALIDADES — Split sticky com scroll travado (desktop)
+       A seção prende (header + imagem + conteúdo) enquanto o usuário
+       passa pelos 5 módulos em cross-fade, liberando ao final.
+       Mobile: lista empilhada normal, sem travar o scroll.
+  ══════════════════════════════════════════════════════════ -->
+  <section class="features-section" id="funcionalidades" aria-labelledby="features-headline">
+   <div class="features-track" id="features-track">
+    <div class="features-pin">
+    <header class="section-header">
+      <span class="section-tag">Plataforma</span>
+      <h2 class="section-headline" id="features-headline">Funcionalidades para uma gestão rural completa</h2>
+      <p class="section-sub">Do estoque ao financeiro, tudo pensado para ser simples de usar no dia a dia da fazenda.</p>
+    </header>
+
+    <div class="features-layout">
+
+      <div class="features-sticky" id="features-sticky">
+        <div class="features-placeholder features-placeholder--photo" id="features-sticky-placeholder">
+          <img src="../../estoque.png?v=2" alt="" />
+        </div>
+        <span class="features-sticky-label" id="features-sticky-label">Estoque</span>
+      </div>
+
+      <div class="features-list" id="features-list">
+
+        <div class="features-progress" aria-hidden="true">
+          <div class="features-progress-fill" id="features-progress-fill"></div>
+        </div>
+
+        <!-- 01 — Estoque -->
+        <article class="features-item is-active" data-panel="0">
+          <div class="features-item-visual">
+            <div class="features-placeholder features-placeholder--wide features-placeholder--photo">
+              <img src="../../estoque.png?v=2" alt="" />
+            </div>
+          </div>
+          <h3 class="features-item-title">Estoque</h3>
+          <p class="features-item-desc">Controle completo dos produtos da fazenda, acompanhando vendas, compras e produção futura em um único lugar.</p>
+          <ul class="features-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Estoque de vendas:</strong> produtos já comercializados.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Estoque de compras:</strong> produtos adquiridos e insumos que serão utilizados.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Depósito futuro:</strong> produtos vendidos, mas que ainda precisam ser colhidos.</span></li>
+          </ul>
+          <p class="features-item-note">Quando a colheita acontece, o sistema realiza a transferência do estoque futuro e atualiza automaticamente a disponibilidade.</p>
+        </article>
+
+        <!-- 02 — Financeiro -->
+        <article class="features-item" data-panel="1">
+          <div class="features-item-visual">
+            <div class="features-placeholder features-placeholder--wide">
+              <i data-lucide="layout-template" width="28" height="28"></i>
+              <span class="features-placeholder-caption">Mockup do produto</span>
+            </div>
+          </div>
+          <h3 class="features-item-title">Financeiro</h3>
+          <p class="features-item-desc">Tenha uma visão completa da saúde financeira da propriedade, controlando entradas, saídas e compromissos.</p>
+          <ul class="features-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Contas a pagar:</strong> lançamentos, vencimentos e baixas.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Contas a receber:</strong> lançamentos e recebimentos.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Caixa:</strong> controle de entradas, saídas e movimentações.</span></li>
+          </ul>
+          <div class="features-item-subgroup">
+            <span class="features-item-subgroup-label">Notas fiscais</span>
+            <ul class="features-item-bullets">
+              <li><i data-lucide="check" width="14" height="14"></i><span>Notas fiscais emitidas.</span></li>
+              <li><i data-lucide="check" width="14" height="14"></i><span>Notas fiscais recebidas.</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 03 — Relatórios -->
+        <article class="features-item" data-panel="2">
+          <div class="features-item-visual">
+            <div class="features-placeholder features-placeholder--wide">
+              <i data-lucide="image" width="28" height="28"></i>
+              <span class="features-placeholder-caption">Imagem ilustrativa</span>
+            </div>
+          </div>
+          <h3 class="features-item-title">Relatórios</h3>
+          <p class="features-item-desc">Transforme os dados da operação rural em informações estratégicas para melhores decisões.</p>
+          <ul class="features-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span>LCDPR.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>DRE.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Balanço.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Fluxos de entradas e saídas.</span></li>
+          </ul>
+        </article>
+
+        <!-- 04 — Cadastro Rural -->
+        <article class="features-item" data-panel="3">
+          <div class="features-item-visual">
+            <div class="features-placeholder features-placeholder--wide">
+              <i data-lucide="layout-template" width="28" height="28"></i>
+              <span class="features-placeholder-caption">Mockup do produto</span>
+            </div>
+          </div>
+          <h3 class="features-item-title">Cadastro Rural</h3>
+          <p class="features-item-desc">Organize todas as informações da propriedade e acompanhe a operação rural com mais controle.</p>
+          <ul class="features-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span>Cadastro de fazendas.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Cadastro de talhões.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Caderno de talhões.</span></li>
+          </ul>
+        </article>
+
+        <!-- 05 — WhatsApp -->
+        <article class="features-item" data-panel="4">
+          <div class="features-item-visual">
+            <div class="features-placeholder features-placeholder--wide features-placeholder--photo">
+              <img src="../../WhatsAspp%20integra%C3%A7%C3%A3o.png" alt="" />
+            </div>
+          </div>
+          <h3 class="features-item-title">WhatsApp</h3>
+          <p class="features-item-desc">Simplifique tarefas do dia a dia permitindo interações rápidas através do WhatsApp.</p>
+          <ul class="features-item-bullets">
+            <li><i data-lucide="check" width="14" height="14"></i><span>Emissão de nota fiscal por mensagem.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Registro de informações no caderno de talhões.</span></li>
+            <li><i data-lucide="check" width="14" height="14"></i><span>Anotações da operação diretamente pelo WhatsApp.</span></li>
+          </ul>
+        </article>
+
+      </div>
+    </div>
+    </div>
+   </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       PLANOS
+       Inspirado no pricing do Claude: ícone linear, tagline curta,
+       preço em destaque, CTA, divisor fino, lista de features
+       encadeada ("Tudo do X, mais:") reforçando a progressão de valor.
+  ══════════════════════════════════════════════════════════ -->
+  <section class="pricing-section" id="planos" aria-labelledby="pricing-headline">
+    <div class="pricing-inner">
+
+      <header class="section-header" data-reveal>
+        <span class="section-tag">Planos</span>
+        <h2 class="section-headline" id="pricing-headline">Escolha o plano ideal para sua propriedade</h2>
+        <p class="section-sub">8 dias grátis em todos os planos. Compare os valores mensal e anual e escolha o plano ideal para sua operação.</p>
+      </header>
+
+      <div class="pricing-toggle-wrap" data-reveal>
+        <div class="pricing-toggle" role="group" aria-label="Forma de visualização de preços">
+          <button type="button" class="pricing-toggle-btn is-active" data-billing-btn="mensal" aria-pressed="true">Mensal</button>
+          <button type="button" class="pricing-toggle-btn pricing-toggle-btn--annual" data-billing-btn="anual" aria-pressed="false">
+            <span class="pricing-toggle-best">Melhor custo-benefício</span>
+            Anual <span class="pricing-toggle-save">Economize 20%</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pricing-grid">
+
+        <!-- Plano 1 — Fiscal -->
+        <article class="pricing-card" data-reveal>
+          <div class="pricing-icon"><i data-lucide="receipt" width="24" height="24"></i></div>
+          <h3 class="pricing-name">Fiscal</h3>
+          <p class="pricing-tagline">Ideal para quem precisa emitir notas fiscais e organizar sua operação fiscal.</p>
+          <div class="pricing-price" data-billing="mensal">
+            <span class="pricing-price-value">R$ 29,90</span>
+            <span class="pricing-price-period">/mês</span>
+          </div>
+          <p class="pricing-billing-note" data-billing="mensal">Cobrança mensal. Cancele quando quiser.</p>
+          <div class="pricing-price" data-billing="anual" hidden>
+            <span class="pricing-price-value">R$ 23,92</span>
+            <span class="pricing-price-period">/mês</span>
+          </div>
+          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual" hidden>
+            <span class="pricing-anual-total">Cobrado anualmente R$ 287,04</span>
+            <span class="pricing-savings-badge">Economize 20%</span>
+          </div>
+          <hr class="pricing-divider" />
+          <p class="pricing-features-intro">Inclui:</p>
+          <ul class="pricing-features">
+            <li><i data-lucide="check" width="16" height="16"></i>Emissão de Nota Fiscal</li>
+            <li><i data-lucide="check" width="16" height="16"></i>Cadastro de clientes e transportadoras</li>
+            <li><i data-lucide="check" width="16" height="16"></i>Cadastro de produtos</li>
+            <li><i data-lucide="check" width="16" height="16"></i>Configurações de emissão de nota</li>
+          </ul>
+          <a href="../../app/screens/login.html" class="btn secondary md pricing-cta">Começar agora</a>
+        </article>
+
+        <!-- Plano 2 — Fiscal + WhatsApp -->
+        <article class="pricing-card pricing-card--balanced" data-reveal>
+          <div class="pricing-icon pricing-icon--whatsapp">
+            <i data-lucide="receipt" width="24" height="24"></i>
+            <span class="pricing-icon-badge"><img src="../shared/icons/whatsapp.svg" alt="" width="12" height="12" /></span>
+          </div>
+          <h3 class="pricing-name">Fiscal + WhatsApp</h3>
+          <p class="pricing-tagline">Emita notas fiscais em segundos, direto pelo WhatsApp.</p>
+          <div class="pricing-price" data-billing="mensal">
+            <span class="pricing-price-value">R$ 99</span>
+            <span class="pricing-price-period">/mês</span>
+          </div>
+          <p class="pricing-billing-note" data-billing="mensal">Cobrança mensal. Cancele quando quiser.</p>
+          <div class="pricing-price" data-billing="anual" hidden>
+            <span class="pricing-price-value">R$ 79,20</span>
+            <span class="pricing-price-period">/mês</span>
+          </div>
+          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual" hidden>
+            <span class="pricing-anual-total">Cobrado anualmente R$ 950,40</span>
+            <span class="pricing-savings-badge">Economize 20%</span>
+          </div>
+          <hr class="pricing-divider" />
+          <p class="pricing-features-intro">Tudo do Fiscal, mais:</p>
+          <ul class="pricing-features">
+            <li><i data-lucide="check" width="16" height="16"></i>Emissão de Nota Fiscal pelo WhatsApp</li>
+          </ul>
+          <a href="../../app/screens/login.html" class="btn secondary md pricing-cta">Começar agora</a>
+        </article>
+
+        <!-- Plano 3 — Gestão Completa -->
+        <article class="pricing-card" data-reveal>
+          <div class="pricing-icon"><i data-lucide="layout-grid" width="24" height="24"></i></div>
+          <h3 class="pricing-name">Gestão Completa</h3>
+          <p class="pricing-tagline">Estoque, financeiro e relatórios em um só lugar.</p>
+          <div class="pricing-price" data-billing="mensal">
+            <span class="pricing-price-value">R$ 169</span>
+            <span class="pricing-price-period">/mês</span>
+          </div>
+          <p class="pricing-billing-note" data-billing="mensal">Cobrança mensal. Cancele quando quiser.</p>
+          <div class="pricing-price" data-billing="anual" hidden>
+            <span class="pricing-price-value">R$ 135,20</span>
+            <span class="pricing-price-period">/mês</span>
+          </div>
+          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual" hidden>
+            <span class="pricing-anual-total">Cobrado anualmente R$ 1.622,40</span>
+            <span class="pricing-savings-badge">Economize 20%</span>
+          </div>
+          <hr class="pricing-divider" />
+          <p class="pricing-features-intro">Tudo do Fiscal, mais:</p>
+          <ul class="pricing-features">
+            <li><i data-lucide="check" width="16" height="16"></i>Estoque de compras</li>
+            <li><i data-lucide="check" width="16" height="16"></i>Depósitos futuros</li>
+            <li><i data-lucide="check" width="16" height="16"></i>Financeiro</li>
+            <li><i data-lucide="check" width="16" height="16"></i>Relatórios</li>
+            <li><i data-lucide="check" width="16" height="16"></i>Cadastro Rural</li>
+          </ul>
+          <a href="../../app/screens/login.html" class="btn secondary md pricing-cta">Começar agora</a>
+        </article>
+
+        <!-- Plano 4 — Gestão Completa + WhatsApp (recomendado) -->
+        <article class="pricing-card pricing-card--featured" aria-label="Plano recomendado" data-reveal>
+          <span class="pricing-badge">Mais recomendado</span>
+          <div class="pricing-icon pricing-icon--whatsapp">
+            <i data-lucide="layout-grid" width="24" height="24"></i>
+            <span class="pricing-icon-badge"><img src="../shared/icons/whatsapp.svg" alt="" width="12" height="12" /></span>
+          </div>
+          <h3 class="pricing-name">Gestão Completa + WhatsApp</h3>
+          <p class="pricing-tagline">Toda a gestão da fazenda, com o WhatsApp como atalho.</p>
+          <div class="pricing-price" data-billing="mensal">
+            <span class="pricing-price-value">R$ 199</span>
+            <span class="pricing-price-period">/mês</span>
+          </div>
+          <p class="pricing-billing-note" data-billing="mensal">Cobrança mensal. Cancele quando quiser.</p>
+          <div class="pricing-price" data-billing="anual" hidden>
+            <span class="pricing-price-value">R$ 159,20</span>
+            <span class="pricing-price-period">/mês</span>
+          </div>
+          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual" hidden>
+            <span class="pricing-anual-total">Cobrado anualmente R$ 1.910,40</span>
+            <span class="pricing-savings-badge">Economize 20%</span>
+          </div>
+          <hr class="pricing-divider" />
+          <p class="pricing-features-intro">Tudo da Gestão Completa, mais:</p>
+          <ul class="pricing-features">
+            <li><i data-lucide="check" width="16" height="16"></i>Emissão de Nota Fiscal pelo WhatsApp</li>
+            <li><i data-lucide="check" width="16" height="16"></i>Anotações no Caderno de Campo via WhatsApp</li>
+          </ul>
+          <a href="../../app/screens/login.html" class="btn primary md pricing-cta">Começar agora</a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       POR QUE ESCOLHER A NIVELO
+       Sem cards: 3 razões em linha editorial, numeral grande e sutil
+       atrás de um ícone, separadas por hairline, com leve entrada em
+       scroll (fade + rise). Foge do grid de cards repetido em Planos.
+  ══════════════════════════════════════════════════════════ -->
+  <section class="why-section" id="quem-somos" aria-labelledby="why-headline">
+    <div class="why-inner">
+
+      <header class="section-header">
+        <span class="section-tag">Por que a Nivelo</span>
+        <h2 class="section-headline" id="why-headline">Por que escolher a Nivelo?</h2>
+      </header>
+
+      <div class="why-list">
+
+        <article class="why-row" data-why-row>
+          <div class="why-row-mark">
+            <span class="why-row-number" aria-hidden="true">01</span>
+            <span class="why-row-icon"><i data-lucide="sprout" width="22" height="22"></i></span>
+          </div>
+          <div class="why-row-content">
+            <h3 class="why-row-title">Desenvolvido para o produtor rural</h3>
+            <p class="why-row-desc">Sistema pensado para a rotina do campo, com uma interface simples e funcionalidades que atendem às necessidades reais da gestão rural.</p>
+          </div>
+        </article>
+
+        <article class="why-row" data-why-row>
+          <div class="why-row-mark">
+            <span class="why-row-number" aria-hidden="true">02</span>
+            <span class="why-row-icon"><i data-lucide="layers" width="22" height="22"></i></span>
+          </div>
+          <div class="why-row-content">
+            <h3 class="why-row-title">Tudo em um único lugar</h3>
+            <p class="why-row-desc">Controle estoque, financeiro, propriedades, relatórios, documentos fiscais e atendimento pelo WhatsApp em uma única plataforma.</p>
+          </div>
+        </article>
+
+        <article class="why-row" data-why-row>
+          <div class="why-row-mark">
+            <span class="why-row-number" aria-hidden="true">03</span>
+            <span class="why-row-icon"><i data-lucide="zap" width="22" height="22"></i></span>
+          </div>
+          <div class="why-row-content">
+            <h3 class="why-row-title">Tecnologia que simplifica a gestão</h3>
+            <p class="why-row-desc">Automatize tarefas, acompanhe indicadores e tome decisões mais rápidas utilizando uma plataforma moderna, intuitiva e preparada para crescer junto com o seu negócio.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FAQ
+       Split layout: intro fixo à esquerda (desktop) + Accordion real
+       do Storybook à direita. Sem novidade genérica de accordion solto
+       centralizado — a composição assimétrica mantém a identidade
+       editorial do restante da página.
+  ══════════════════════════════════════════════════════════ -->
+  <section class="faq-section" id="faq" aria-labelledby="faq-headline">
+    <div class="faq-inner">
+      <div class="faq-layout">
+
+        <div class="faq-intro">
+          <div data-reveal>
+            <header class="section-header">
+              <span class="section-tag">Dúvidas</span>
+              <h2 class="section-headline" id="faq-headline">Perguntas frequentes</h2>
+              <p class="section-sub">Não encontrou o que procura? Fale com a gente pelo WhatsApp.</p>
+            </header>
+            <a href="https://wa.me/PLACEHOLDER" class="btn secondary md hasLeft" target="_blank" rel="noopener noreferrer">
+              <span class="icon"><img src="../shared/icons/whatsapp-blue.svg" alt="" width="18" height="18" /></span>
+              Falar no WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <div class="faq-list">
+          <div class="accordion">
+
+            <div class="item" data-reveal>
+              <button class="trigger" aria-expanded="false" aria-controls="faq-panel-1" id="faq-btn-1">
+                A Nivelo funciona para qualquer tamanho de fazenda?
+                <i data-lucide="chevron-down" width="20" height="20" class="chevron" aria-hidden="true"></i>
+              </button>
+              <div class="panel" id="faq-panel-1" role="region" aria-labelledby="faq-btn-1">
+                <div class="content">
+                  Sim. A Nivelo foi desenvolvida para pequenas e médias propriedades rurais. Não importa se você tem uma pequena chácara ou uma fazenda com vários talhões: o sistema se adapta ao seu tamanho.
+                </div>
+              </div>
+            </div>
+
+            <div class="item" data-reveal>
+              <button class="trigger" aria-expanded="false" aria-controls="faq-panel-2" id="faq-btn-2">
+                Preciso ter conhecimento contábil para usar o sistema?
+                <i data-lucide="chevron-down" width="20" height="20" class="chevron" aria-hidden="true"></i>
+              </button>
+              <div class="panel" id="faq-panel-2" role="region" aria-labelledby="faq-btn-2">
+                <div class="content">
+                  Não. O sistema foi construído com foco em simplicidade. Você não precisa de nenhum conhecimento técnico ou contábil para registrar movimentações, emitir notas ou acompanhar o financeiro da propriedade.
+                </div>
+              </div>
+            </div>
+
+            <div class="item" data-reveal>
+              <button class="trigger" aria-expanded="false" aria-controls="faq-panel-3" id="faq-btn-3">
+                O que está incluso na emissão de nota fiscal?
+                <i data-lucide="chevron-down" width="20" height="20" class="chevron" aria-hidden="true"></i>
+              </button>
+              <div class="panel" id="faq-panel-3" role="region" aria-labelledby="faq-btn-3">
+                <div class="content">
+                  A emissão de nota fiscal está disponível em todos os planos. Nos planos Fiscal + WhatsApp e Gestão Completa + WhatsApp, você também pode solicitar e emitir notas diretamente pelo chat, sem precisar acessar o sistema.
+                </div>
+              </div>
+            </div>
+
+            <div class="item" data-reveal>
+              <button class="trigger" aria-expanded="false" aria-controls="faq-panel-4" id="faq-btn-4">
+                Como funciona a integração com o WhatsApp?
+                <i data-lucide="chevron-down" width="20" height="20" class="chevron" aria-hidden="true"></i>
+              </button>
+              <div class="panel" id="faq-panel-4" role="region" aria-labelledby="faq-btn-4">
+                <div class="content">
+                  Nos planos Fiscal + WhatsApp e Gestão Completa + WhatsApp, você executa tarefas diretamente pelo WhatsApp: solicite documentos, emita notas fiscais e registre informações no caderno de talhões. Um agente inteligente atende suas solicitações de forma rápida e prática.
+                </div>
+              </div>
+            </div>
+
+            <div class="item" data-reveal>
+              <button class="trigger" aria-expanded="false" aria-controls="faq-panel-5" id="faq-btn-5">
+                Posso cancelar meu plano a qualquer momento?
+                <i data-lucide="chevron-down" width="20" height="20" class="chevron" aria-hidden="true"></i>
+              </button>
+              <div class="panel" id="faq-panel-5" role="region" aria-labelledby="faq-btn-5">
+                <div class="content">
+                  Sim. Não há fidelidade nem multa por cancelamento. Você pode encerrar sua assinatura a qualquer momento diretamente pelo sistema ou entrando em contato com nossa equipe.
+                </div>
+              </div>
+            </div>
+
+            <div class="item" data-reveal>
+              <button class="trigger" aria-expanded="false" aria-controls="faq-panel-6" id="faq-btn-6">
+                Como começo a usar a Nivelo?
+                <i data-lucide="chevron-down" width="20" height="20" class="chevron" aria-hidden="true"></i>
+              </button>
+              <div class="panel" id="faq-panel-6" role="region" aria-labelledby="faq-btn-6">
+                <div class="content">
+                  Basta clicar em "Começar agora" em um dos planos e criar sua conta. Você terá 7 dias gratuitos para explorar o sistema sem precisar informar dados de pagamento. Após o período de teste, nossa equipe entra em contato para ajudar na contratação do plano ideal.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       CONTATO — CTA final
+       Texto sobreposto à foto (plantação de soja), que funciona como
+       plano de fundo da seção inteira. Overlay em gradiente, mais
+       intenso atrás do conteúdo. Sem cards, um único objetivo: iniciar
+       conversa no WhatsApp.
+  ══════════════════════════════════════════════════════════ -->
+  <section class="cta-section" id="contato" aria-labelledby="cta-headline">
+
+    <div class="cta-bg" aria-hidden="true">
+      <img src="../../plantacao%20de%20soja.png" alt="" role="presentation" loading="lazy" />
+      <div class="cta-overlay"></div>
+    </div>
+
+    <div class="cta-content" data-reveal>
+      <h2 class="cta-headline" id="cta-headline">Pronto para simplificar a gestão da sua fazenda?</h2>
+      <p class="cta-sub">Tire suas dúvidas, conheça os planos ou fale com nossa equipe comercial pelo WhatsApp.</p>
+      <a href="https://wa.me/PLACEHOLDER" class="btn primary lg hasLeft cta-btn" target="_blank" rel="noopener noreferrer">
+        <span class="icon"><img src="../shared/icons/whatsapp.svg" alt="" width="20" height="20" /></span>
+        Conversar pelo WhatsApp
+      </a>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SITE FOOTER
+       Reaproveitado EXATAMENTE da primeira landing (v1/v2) — mesma
+       estrutura, layout, espaçamentos, tipografia, links, ícones,
+       comportamento e acessibilidade. Não recriado.
+  ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="site-footer-inner">
+
+      <div class="site-footer-columns">
+
+        <!-- Coluna 1: Institucional -->
+        <div class="site-footer-brand">
+          <a href="#" class="site-footer-logo" aria-label="Nivelo — página inicial">
+            <img src="../../NIVELO branco header.svg" alt="Nivelo" width="136" />
+          </a>
+          <div class="site-footer-social" aria-label="Redes sociais da Nivelo">
+            <a href="#" aria-label="Instagram da Nivelo" rel="noopener noreferrer">
+              <img src="../shared/icons/instagram.svg" alt="" aria-hidden="true" width="20" height="20" />
+            </a>
+            <a href="#" aria-label="Facebook da Nivelo" rel="noopener noreferrer">
+              <img src="../shared/icons/facebook.svg" alt="" aria-hidden="true" width="20" height="20" />
+            </a>
+            <a href="#" aria-label="TikTok da Nivelo" rel="noopener noreferrer">
+              <img src="../shared/icons/tiktok.svg" alt="" aria-hidden="true" width="20" height="20" />
+            </a>
+            <a href="#" aria-label="YouTube da Nivelo" rel="noopener noreferrer">
+              <img src="../shared/icons/youtube.svg" alt="" aria-hidden="true" width="20" height="20" />
+            </a>
+          </div>
+          <div class="site-footer-phone-block">
+            <p class="site-footer-phone-label">Vendas</p>
+            <a href="tel:+5511999999999" class="site-footer-phone-number">(11) 99999-9999</a>
+          </div>
+          <div class="site-footer-phone-block">
+            <p class="site-footer-phone-label">Suporte</p>
+            <a href="tel:+5511988888888" class="site-footer-phone-number">(11) 98888-8888</a>
+          </div>
+        </div>
+
+        <!-- Coluna 2: Navegação -->
+        <div class="site-footer-col">
+          <p class="site-footer-col-title" aria-hidden="true">Navegação</p>
+          <nav aria-label="Links do rodapé">
+            <ul class="site-footer-nav-list">
+              <li><a href="#funcionalidades">Funcionalidades</a></li>
+              <li><a href="#planos">Planos</a></li>
+              <li><a href="#quem-somos">Quem Somos</a></li>
+              <li><a href="#faq">Perguntas Frequentes</a></li>
+              <li><a href="#contato">Contato</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <!-- Coluna 3: Legal -->
+        <div class="site-footer-col">
+          <p class="site-footer-col-title" aria-hidden="true">Legal</p>
+          <div class="site-footer-legal-links">
+            <button type="button" onclick="openModal('modal-termos')" class="site-footer-legal-btn">Termos de Uso</button>
+            <button type="button" onclick="openModal('modal-privacidade')" class="site-footer-legal-btn">Politica de Privacidade</button>
+            <button type="button" onclick="openModal('modal-lgpd')" class="site-footer-legal-btn">LGPD</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="site-footer-bottom">
+        <p class="site-footer-copy">&copy; 2026 Nivelo</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MODAIS LEGAIS (Dialog do Storybook)
+       Reaproveitados da v1: mesmo comportamento (abrir/fechar, Escape,
+       clique no backdrop, foco no botão fechar). Conteúdo idêntico,
+       só com acentuação corrigida e o travessão do título da LGPD
+       trocado por parênteses (regra do projeto: sem travessão no copy).
+  ══════════════════════════════════════════════════════════ -->
+  <div class="overlay modal-overlay" id="modal-termos" role="dialog" aria-modal="true" aria-labelledby="modal-termos-title">
+    <div class="dialog lg">
+      <div class="header">
+        <h2 class="title" id="modal-termos-title">Termos de Uso</h2>
+        <button type="button" class="closeBtn" onclick="closeModal('modal-termos')" aria-label="Fechar">
+          <i data-lucide="x" width="20" height="20" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="body">
+        <p><strong>1. Introdução</strong><br>Estes Termos de Uso regulam o acesso e a utilização da plataforma Nivelo, destinada à gestão de propriedades rurais. Ao criar uma conta, você concorda com os termos aqui descritos.</p>
+        <p><strong>2. Objetivo</strong><br>A Nivelo oferece ferramentas para controle de estoque, gestão financeira, emissão de documentos fiscais e relatórios rurais para pequenos e médios produtores.</p>
+        <p><strong>3. Definições</strong><br>"Usuário" refere-se à pessoa física ou jurídica que acessa a plataforma. "Serviço" corresponde ao conjunto de funcionalidades disponibilizadas pela Nivelo.</p>
+        <p><strong>4. Responsabilidades do Usuário</strong><br>O usuário é responsável pela veracidade das informações cadastradas, pela segurança de suas credenciais de acesso e pelo uso adequado das funcionalidades da plataforma.</p>
+        <p><strong>5. Responsabilidades da Nivelo</strong><br>A Nivelo se compromete a manter a plataforma disponível, segura e em constante evolução, garantindo suporte técnico e comunicação transparente sobre alterações relevantes.</p>
+        <p><strong>6. Cancelamento</strong><br>O usuário pode cancelar sua assinatura a qualquer momento, sem multa ou fidelidade. O acesso será mantido até o fim do período pago.</p>
+        <p><strong>7. Disposições Finais</strong><br>Estes termos podem ser atualizados. Em caso de alteração relevante, o usuário será notificado por e-mail com antecedência de 15 dias.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay modal-overlay" id="modal-privacidade" role="dialog" aria-modal="true" aria-labelledby="modal-privacidade-title">
+    <div class="dialog lg">
+      <div class="header">
+        <h2 class="title" id="modal-privacidade-title">Política de Privacidade</h2>
+        <button type="button" class="closeBtn" onclick="closeModal('modal-privacidade')" aria-label="Fechar">
+          <i data-lucide="x" width="20" height="20" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="body">
+        <p><strong>1. Introdução</strong><br>A Nivelo trata seus dados pessoais com responsabilidade e transparência. Esta política descreve como coletamos, usamos e protegemos suas informações.</p>
+        <p><strong>2. Dados Coletados</strong><br>Coletamos dados como nome, e-mail, CPF/CNPJ, telefone e informações sobre sua propriedade rural, necessários para o funcionamento da plataforma.</p>
+        <p><strong>3. Finalidade do Tratamento</strong><br>Os dados são utilizados para: prestação dos serviços contratados, comunicação com o usuário, emissão de documentos fiscais, melhoria contínua da plataforma e cumprimento de obrigações legais.</p>
+        <p><strong>4. Compartilhamento de Dados</strong><br>Não vendemos seus dados. Podemos compartilhá-los com parceiros técnicos necessários para a operação do serviço (ex.: processadores de pagamento, autoridades fiscais), sempre sob sigilo.</p>
+        <p><strong>5. Segurança</strong><br>Utilizamos criptografia e práticas de segurança da informação para proteger seus dados contra acesso não autorizado.</p>
+        <p><strong>6. Direitos do Usuário</strong><br>Você pode solicitar acesso, correção, portabilidade ou exclusão de seus dados a qualquer momento pelo e-mail privacidade@nivelo.com.br (placeholder).</p>
+        <p><strong>7. Contato</strong><br>Dúvidas sobre esta política? Entre em contato: privacidade@nivelo.com.br (placeholder).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay modal-overlay" id="modal-lgpd" role="dialog" aria-modal="true" aria-labelledby="modal-lgpd-title">
+    <div class="dialog lg">
+      <div class="header">
+        <h2 class="title" id="modal-lgpd-title">LGPD (Lei Geral de Proteção de Dados)</h2>
+        <button type="button" class="closeBtn" onclick="closeModal('modal-lgpd')" aria-label="Fechar">
+          <i data-lucide="x" width="20" height="20" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="body">
+        <p><strong>1. Introdução</strong><br>A Nivelo está comprometida com o cumprimento da Lei n. 13.709/2018 (LGPD). Este documento esclarece como seus direitos são garantidos no uso da plataforma.</p>
+        <p><strong>2. Base Legal</strong><br>O tratamento de dados é realizado com base em: execução de contrato, cumprimento de obrigação legal, interesse legítimo e, quando necessário, consentimento explícito do titular.</p>
+        <p><strong>3. Direitos do Titular</strong><br>Você tem direito a: confirmação de tratamento, acesso aos dados, correção de dados incorretos, anonimização ou exclusão, portabilidade, revogação de consentimento e informação sobre compartilhamento.</p>
+        <p><strong>4. Como Exercer seus Direitos</strong><br>Envie solicitação para o nosso DPO (Encarregado de Proteção de Dados) pelo e-mail dpo@nivelo.com.br (placeholder), identificando-se e descrevendo seu pedido.</p>
+        <p><strong>5. Segurança e Incidentes</strong><br>Em caso de incidente de segurança com potencial risco aos titulares, a Nivelo notificará a ANPD e os usuários afetados conforme exigido pela LGPD.</p>
+        <p><strong>6. Retenção de Dados</strong><br>Os dados são mantidos pelo tempo necessário para a prestação do serviço e cumprimento de obrigações legais, sendo eliminados ou anonimizados após esse período.</p>
+        <p><strong>7. Contato</strong><br>Encarregado de Proteção de Dados (DPO): dpo@nivelo.com.br (placeholder).</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons();</script>
+
+  <script>
+    // ── Footer: modais legais (Dialog do Storybook) ────────────────
+    function openModal(id) {
+      var modal = document.getElementById(id);
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      modal.querySelector('.closeBtn').focus();
+    }
+    function closeModal(id) {
+      var modal = document.getElementById(id);
+      modal.classList.remove('open');
+      var stillOpen = document.querySelector('.modal-overlay.open');
+      if (!stillOpen) document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.modal-overlay').forEach(function (modalOverlay) {
+      modalOverlay.addEventListener('click', function (e) {
+        if (e.target === modalOverlay) closeModal(modalOverlay.id);
+      });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var openModalEl = document.querySelector('.modal-overlay.open');
+      if (openModalEl) closeModal(openModalEl.id);
+    });
+
+    // ── WhatsApp FAB: tooltip aparece 5s após a carga, some após 4s ─
+    (function () {
+      var fab = document.getElementById('whatsapp-fab');
+      setTimeout(function () {
+        fab.classList.add('tooltip-visible');
+        setTimeout(function () {
+          fab.classList.remove('tooltip-visible');
+        }, 4000);
+      }, 5000);
+    })();
+
+    // ── WhatsApp FAB: popover "Com quem você quer falar?" ──────────
+    // Clicar no FAB não abre mais o WhatsApp direto — abre este popover
+    // pequeno primeiro; cada opção (Suporte/Vendas) é um link real pro
+    // número certo, que abre em nova aba.
+    (function () {
+      var fab = document.getElementById('whatsapp-fab');
+      var menu = document.getElementById('whatsapp-fab-menu');
+
+      function openMenu() {
+        menu.hidden = false;
+        fab.setAttribute('aria-expanded', 'true');
+        fab.classList.remove('tooltip-visible');
+        window.setTimeout(function () {
+          document.addEventListener('click', outsideClickHandler);
+        }, 0);
+      }
+      function closeMenu() {
+        menu.hidden = true;
+        fab.setAttribute('aria-expanded', 'false');
+        document.removeEventListener('click', outsideClickHandler);
+      }
+      function outsideClickHandler(event) {
+        var path = event.composedPath ? event.composedPath() : [event.target];
+        if (path.indexOf(menu) === -1 && path.indexOf(fab) === -1) closeMenu();
+      }
+
+      fab.addEventListener('click', function () {
+        if (menu.hidden) openMenu(); else closeMenu();
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !menu.hidden) closeMenu();
+      });
+    })();
+
+    // ── FAQ: Accordion (uma pergunta aberta por vez) ───────────────
+    (function () {
+      document.querySelectorAll('.faq-list .accordion .trigger').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var item = btn.closest('.item');
+          var isOpen = item.classList.contains('open');
+          document.querySelectorAll('.faq-list .accordion .item').forEach(function (i) {
+            i.classList.remove('open');
+            i.querySelector('.trigger').setAttribute('aria-expanded', 'false');
+          });
+          if (!isOpen) {
+            item.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+    })();
+
+    // ── Navbar: solid on scroll + drawer mobile ────────────────────
+    (function () {
+      var navbar = document.getElementById('navbar');
+      var toggle = document.getElementById('nav-toggle');
+      var drawer = document.getElementById('nav-drawer');
+      var overlay = document.getElementById('nav-overlay');
+      var closeBtn = document.getElementById('nav-close');
+
+      function onScroll() {
+        navbar.classList.toggle('nav-scrolled', window.scrollY > 80);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      function openDrawer() {
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden', 'false');
+        toggle.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+        toggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      toggle.addEventListener('click', openDrawer);
+      closeBtn.addEventListener('click', closeDrawer);
+      overlay.addEventListener('click', closeDrawer);
+      drawer.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', closeDrawer);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drawer.classList.contains('open')) {
+          closeDrawer();
+        }
+      });
+    })();
+
+    // ── Hero: controle de movimento do vídeo de fundo ─────────────
+    (function () {
+      var video = document.getElementById('hero-bg-video');
+      var toggle = document.getElementById('hero-motion-toggle');
+      var iconWrap = document.getElementById('hero-motion-icon');
+      var tooltip = document.getElementById('hero-motion-tooltip');
+      var heroContent = document.querySelector('.hero-content');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var isDesktop = window.matchMedia('(min-width: 768px)').matches;
+      var currentIcon = null;
+
+      // Mobile (pedido explícito do usuário): vídeo travado num frame fixo
+      // (00:00:05), sem autoplay e sem o controle de pausar/retomar (que já
+      // está escondido via CSS acima de 768px) — nem o listener de clique
+      // no vídeo é montado, pra não "destravar" o frame com um toque.
+      if (!isDesktop) {
+        video.pause();
+        var freezeAtFive = function () { video.currentTime = 5; };
+        if (video.readyState >= 1) {
+          freezeAtFive();
+        } else {
+          video.addEventListener('loadedmetadata', freezeAtFive, { once: true });
+        }
+        return;
+      }
+
+      // O ícone/label/tooltip são 100% controlados pelos eventos nativos
+      // "play"/"pause" do próprio <video> (não por quem chamou play()/pause()),
+      // então nunca ficam fora de sincronia com o estado real do vídeo —
+      // inclusive se o autoplay for bloqueado pelo navegador.
+      function setState(isPaused) {
+        var label = isPaused ? 'Retomar animação' : 'Pausar animação';
+        toggle.setAttribute('aria-pressed', String(isPaused));
+        toggle.setAttribute('aria-label', label);
+        tooltip.textContent = label;
+
+        var icon = isPaused ? 'play' : 'pause';
+        if (currentIcon !== icon) {
+          currentIcon = icon;
+          iconWrap.innerHTML = '<i data-lucide="' + icon + '" width="20" height="20"></i>';
+          lucide.createIcons();
+        }
+      }
+
+      video.addEventListener('play', function () { setState(false); });
+      video.addEventListener('pause', function () { setState(true); });
+
+      function toggleMotion() {
+        if (video.paused) {
+          video.play().catch(function () {});
+        } else {
+          video.pause();
+        }
+      }
+
+      // Estado inicial reflete o que o vídeo já é neste momento
+      setState(video.paused);
+
+      // Controle explícito do autoplay via JS (em vez do atributo autoplay do
+      // HTML): não inicia se o usuário preferir menos movimento.
+      if (!reduceMotion.matches) {
+        video.play().catch(function () {});
+      }
+
+      toggle.addEventListener('click', toggleMotion);
+
+      // Clicar no vídeo (fora do conteúdo e do próprio botão) também alterna
+      document.querySelector('.hero').addEventListener('click', function (e) {
+        if (heroContent.contains(e.target) || toggle.contains(e.target)) return;
+        toggleMotion();
+      });
+    })();
+
+    // ── Funcionalidades: seção travada (desktop) enquanto o usuário
+    // passa pelos 5 módulos; título/subtítulo ficam visíveis o tempo
+    // todo, só o conteúdo troca. No mobile não trava, lista empilhada
+    // normal (scroll comum, sem sensação de "scroll jacking").
+    (function () {
+      var track = document.getElementById('features-track');
+      var list = document.getElementById('features-list');
+      var sticky = document.getElementById('features-sticky');
+      var stickyBox = document.getElementById('features-sticky-placeholder');
+      var stickyLabel = document.getElementById('features-sticky-label');
+      var progressFill = document.getElementById('features-progress-fill');
+      var items = document.querySelectorAll('.features-item');
+      var mq = window.matchMedia('(min-width: 900px)');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var activeIndex = -1;
+      var swapTimer = null;
+      var ticking = false;
+      var SWAP_DIP_MS = 150; // acompanha --transition-fast, pro dip e a troca ficarem sincronizados
+
+      var modules = [
+        { label: 'Estoque',        kind: 'image', src: '../../estoque.png?v=2' },
+        { label: 'Financeiro',     kind: 'placeholder', type: 'Mockup do produto',  icon: 'layout-template' },
+        { label: 'Relatórios',     kind: 'placeholder', type: 'Imagem ilustrativa', icon: 'image' },
+        { label: 'Cadastro Rural', kind: 'placeholder', type: 'Mockup do produto',  icon: 'layout-template' },
+        { label: 'WhatsApp',       kind: 'image', src: '../../WhatsAspp%20integra%C3%A7%C3%A3o.png' }
+      ];
+
+      function setActiveModule(index) {
+        if (index === activeIndex) return;
+        var isFirstRun = activeIndex === -1;
+        activeIndex = index;
+        items.forEach(function (item) {
+          var active = item.dataset.panel === String(index);
+          item.classList.toggle('is-active', active);
+          if (mq.matches) {
+            item.setAttribute('aria-hidden', active ? 'false' : 'true');
+          } else {
+            item.removeAttribute('aria-hidden');
+          }
+        });
+        var mod = modules[index];
+
+        function applyStickyContent() {
+          stickyLabel.textContent = mod.label;
+          stickyBox.classList.toggle('features-placeholder--photo', mod.kind === 'image');
+          if (mod.kind === 'image') {
+            stickyBox.innerHTML = '<img src="' + mod.src + '" alt="" />';
+          } else {
+            stickyBox.innerHTML =
+              '<i data-lucide="' + mod.icon + '" width="28" height="28"></i>' +
+              '<span class="features-placeholder-caption">' + mod.type + '</span>';
+            lucide.createIcons();
+          }
+        }
+
+        window.clearTimeout(swapTimer);
+        // Na primeira aplicação (setup inicial da página) não há nada
+        // "trocando" ainda, então aplica direto, sem o dip.
+        if (reduceMotion.matches || isFirstRun) {
+          applyStickyContent();
+        } else {
+          sticky.classList.add('is-swapping');
+          swapTimer = window.setTimeout(function () {
+            applyStickyContent();
+            sticky.classList.remove('is-swapping');
+          }, SWAP_DIP_MS);
+        }
+      }
+
+      function measure() {
+        if (!mq.matches) {
+          list.style.minHeight = '';
+          return;
+        }
+        var maxH = 0;
+        items.forEach(function (item) {
+          if (item.scrollHeight > maxH) maxH = item.scrollHeight;
+        });
+        list.style.minHeight = maxH + 'px';
+      }
+
+      function updateScrollState() {
+        if (!mq.matches) return;
+        var pin = track.querySelector('.features-pin');
+        var trackRect = track.getBoundingClientRect();
+        var scrollable = track.offsetHeight - pin.offsetHeight;
+        var progress = scrollable > 0 ? (-trackRect.top) / scrollable : 0;
+        progress = Math.max(0, Math.min(1, progress));
+
+        // Progresso "dentro" do módulo atual (0 a 1, reinicia a cada
+        // módulo) — preenche a trilha gradualmente até a próxima troca,
+        // deixando claro que ainda dá pra continuar rolando.
+        var raw = progress * items.length;
+        var index = Math.min(items.length - 1, Math.floor(raw));
+        var withinModule = Math.max(0, Math.min(1, raw - index));
+
+        setActiveModule(index);
+        progressFill.style.height = (withinModule * 100) + '%';
+      }
+
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(function () {
+          updateScrollState();
+          ticking = false;
+        });
+      }
+
+      function onBreakpointChange() {
+        activeIndex = -1; // força reavaliação, inclusive do aria-hidden
+        measure();
+        updateScrollState();
+        if (!mq.matches) { setActiveModule(0); }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function () { measure(); onScroll(); });
+      if (mq.addEventListener) {
+        mq.addEventListener('change', onBreakpointChange);
+      }
+
+      measure();
+      setActiveModule(0);
+      updateScrollState();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(measure);
+      }
+    })();
+
+    // ── Por que a Nivelo: entrada suave (fade + rise) ao rolar até a seção ─
+    (function () {
+      var rows = document.querySelectorAll('[data-why-row]');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+        rows.forEach(function (row) { row.classList.add('is-visible'); });
+        return;
+      }
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+      rows.forEach(function (row) { observer.observe(row); });
+    })();
+
+    // ── Motion: entrada sutil ao rolar (fade + rise), compartilhada
+    // por todo [data-reveal] da página. Respeita prefers-reduced-motion.
+    (function () {
+      var elements = document.querySelectorAll('[data-reveal]');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+        elements.forEach(function (el) { el.classList.add('is-revealed'); });
+        return;
+      }
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+      elements.forEach(function (el) { observer.observe(el); });
+    })();
+
+    // ── Planos: seletor Mensal / Anual (só troca a exibição do valor,
+    // não representa escolha de contratação nem altera o CTA).
+    (function () {
+      var buttons = document.querySelectorAll('[data-billing-btn]');
+      var priceEls = document.querySelectorAll('[data-billing]');
+      if (!buttons.length) return;
+
+      function setBilling(mode) {
+        buttons.forEach(function (btn) {
+          var active = btn.dataset.billingBtn === mode;
+          btn.classList.toggle('is-active', active);
+          btn.setAttribute('aria-pressed', String(active));
+        });
+        priceEls.forEach(function (el) {
+          el.hidden = el.dataset.billing !== mode;
+        });
+      }
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          setBilling(btn.dataset.billingBtn);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

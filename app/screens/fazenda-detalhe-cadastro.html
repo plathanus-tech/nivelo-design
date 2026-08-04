@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhe da fazenda — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-fazenda-detalhe-cadastro.css" />
+</head>
+<body>
+
+  <div class="fazenda-cadastro-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+      <div class="app-header-right">
+        <button type="button" class="btn secondary" id="notebook-btn">
+          <i data-lucide="book-open" width="16" height="16"></i>
+          <span class="app-header-notebook-label">Caderno de campo</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <!-- Cadastros (expansível: Pessoas e empresas / Produtos) -->
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pessoas e empresas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <!-- Financeiro (expansível, independente de Vendas) -->
+                                    <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Vendas (expansível, independente de Financeiro) -->
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Fiscal · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Manifesto</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Assistente IA (expansível, independente dos demais grupos) -->
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="message-square-plus" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Nova conversa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <!-- Configuração (expansível; contém, entre seus subitens, o subgrupo Fiscal) —
+                 grupo já nasce aberto nesta tela, com "Cadastro de fazenda" ativo. -->
+            <div class="app-nav-group is-open" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="true" data-tooltip="Configuração · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem is-active" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
+                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta Financeira</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+
+                <!-- Fiscal (subgrupo dentro de Configuração) -->
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — DETALHE CADASTRAL DA FAZENDA ══════════════════ -->
+      <main class="app-main">
+        <div class="fazenda-cadastro-page">
+
+          <a href="fazendas.html" class="fazenda-cadastro-back" id="fazenda-cadastro-back">
+            <i data-lucide="arrow-left" width="18" height="18"></i>
+            Fazendas
+          </a>
+
+          <div id="fazenda-cadastro-not-found" class="fazenda-cadastro-not-found" hidden>
+            <i data-lucide="search-x" width="28" height="28"></i>
+            <p class="text-14-regular">Fazenda não encontrada.</p>
+            <a href="fazendas.html" class="btn secondary">Voltar para Fazendas</a>
+          </div>
+
+          <div id="fazenda-cadastro-content">
+
+            <!-- ══════════════ Cabeçalho ══════════════ -->
+            <div class="fazenda-cadastro-title-row">
+              <div class="fazenda-cadastro-title-block">
+                <h1 class="fazenda-cadastro-title text-heading-6" id="fazenda-cadastro-nome">—</h1>
+                <div class="fazenda-cadastro-location text-body-s">
+                  <i data-lucide="map-pin" width="16" height="16"></i>
+                  <span id="fazenda-cadastro-localizacao">—</span>
+                </div>
+              </div>
+              <button type="button" class="btn primary hasLeft" id="editar-fazenda-cadastro-btn">
+                <span class="icon"><i data-lucide="pencil" width="16" height="16"></i></span>
+                Editar fazenda
+              </button>
+            </div>
+
+            <!-- ══════════════ Identificação da fazenda ══════════════
+                 Mesmo padrão de detalhe-estoque.html: `.card` próprio,
+                 `.cardHeader`/`.title` (não mais um wrapper único "Dados da
+                 fazenda" com sub-títulos internos). Área/Arrendamento
+                 (opcional) entram aqui — não são "localização". -->
+            <section class="card fazenda-cadastro-section">
+              <div class="cardHeader">
+                <h2 class="title">Identificação da fazenda</h2>
+              </div>
+              <dl class="fazenda-cadastro-fields">
+                <div><dt>Código</dt><dd id="dado-codigo">—</dd></div>
+                <div><dt>Nome da Fazenda</dt><dd id="dado-nome">—</dd></div>
+                <div><dt>Proprietário</dt><dd id="dado-proprietario">—</dd></div>
+                <div><dt>CNPJ</dt><dd id="dado-cnpj">—</dd></div>
+                <div><dt>Inscrição Estadual</dt><dd id="dado-ie">—</dd></div>
+                <div><dt>Matrícula</dt><dd id="dado-matricula">—</dd></div>
+                <div><dt>Área total</dt><dd id="dado-area-total">—</dd></div>
+                <div><dt>Área de agricultura</dt><dd id="dado-area-agricultura">—</dd></div>
+              </dl>
+              <dl class="fazenda-cadastro-fields" id="dados-arrendamento-group" hidden>
+                <div><dt>Arrendatário</dt><dd id="dado-arrendatario">—</dd></div>
+                <div><dt>Área arrendada</dt><dd id="dado-arrendamento-area">—</dd></div>
+                <div><dt>Vigência do arrendamento</dt><dd id="dado-arrendamento-vigencia">—</dd></div>
+              </dl>
+            </section>
+
+            <!-- ══════════════ Localização ══════════════ -->
+            <section class="card fazenda-cadastro-section">
+              <div class="cardHeader">
+                <h2 class="title">Localização</h2>
+              </div>
+              <dl class="fazenda-cadastro-fields">
+                <div class="fazenda-cadastro-field-wide"><dt>Endereço completo</dt><dd id="dado-endereco">—</dd></div>
+                <div><dt>Latitude</dt><dd id="dado-latitude">—</dd></div>
+                <div><dt>Longitude</dt><dd id="dado-longitude">—</dd></div>
+              </dl>
+            </section>
+
+            <!-- ══════════════ Talhões ══════════════ -->
+            <section class="card talhoes-cadastro-section">
+              <div class="talhoes-cadastro-header">
+                <div class="talhoes-cadastro-title-block">
+                  <h2 class="talhoes-cadastro-title text-subtitle-s">Talhões</h2>
+                  <p class="talhoes-cadastro-description text-body-s">Gerencie os talhões cadastrados nesta fazenda.</p>
+                </div>
+                <button type="button" class="btn primary sm hasLeft" id="novo-talhao-cadastro-btn">
+                  <span class="icon"><i data-lucide="plus" width="16" height="16"></i></span>
+                  Novo talhão
+                </button>
+              </div>
+
+              <div class="tableWrap talhoes-cadastro-table-wrap" id="talhoes-cadastro-table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr class="headerRow">
+                      <th class="th">Código</th>
+                      <th class="th">Talhão</th>
+                      <th class="th">Área (ha)</th>
+                      <th class="th">Status</th>
+                      <th class="th">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="talhoes-cadastro-tbody"></tbody>
+                </table>
+              </div>
+
+              <div class="talhoes-cadastro-mobile-list" id="talhoes-cadastro-mobile-list"></div>
+
+              <div class="talhoes-cadastro-empty" id="talhoes-cadastro-empty" hidden>
+                <span class="talhoes-cadastro-empty-icon"><i data-lucide="layout-grid" width="28" height="28"></i></span>
+                <p class="talhoes-cadastro-empty-title text-subtitle-s">Nenhum talhão cadastrado</p>
+                <p class="talhoes-cadastro-empty-subtitle text-body-s">Cadastre os talhões desta fazenda para organizar sua estrutura produtiva.</p>
+                <button type="button" class="btn primary sm hasLeft" id="talhoes-cadastro-empty-btn">
+                  <span class="icon"><i data-lucide="plus" width="16" height="16"></i></span>
+                  Novo talhão
+                </button>
+              </div>
+            </section>
+
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <!-- ══════════════════ Modal de Talhão (Novo/Editar) ══════════════════
+       Um único Dialog reaproveitado pros dois casos (mesma estrutura, só
+       título/label do botão de confirmar mudam) — os 3 campos são idênticos
+       em Novo e Editar, então duplicar o markup violaria a diretriz de não
+       criar padrão paralelo. `#talhao-dialog-overlay` guarda o id do talhão
+       em edição via `data-editing-id` (vazio = criando um novo). -->
+  <div class="overlay" id="talhao-dialog-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="talhao-dialog-title">
+      <div class="header">
+        <h2 class="title" id="talhao-dialog-title">Novo talhão</h2>
+        <button type="button" class="closeBtn" id="talhao-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <!-- Código só aparece editando (gerado automaticamente ao criar) —
+             sempre `disabled`, nunca preenchido pelo usuário. -->
+        <div class="wrapper" id="talhao-codigo-field" hidden>
+          <label class="label" for="talhao-codigo-input">Código</label>
+          <div class="inputWrap">
+            <input class="input" type="text" id="talhao-codigo-input" disabled />
+          </div>
+        </div>
+
+        <div class="wrapper" id="talhao-nome-field">
+          <label class="label" for="talhao-nome-input">Nome</label>
+          <div class="inputWrap">
+            <input class="input" type="text" id="talhao-nome-input" placeholder="Ex.: Talhão 09" aria-describedby="talhao-nome-error" />
+          </div>
+          <span class="errorText" id="talhao-nome-error" hidden>
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe o nome do talhão.
+          </span>
+        </div>
+
+        <div class="wrapper" id="talhao-area-field">
+          <label class="label" for="talhao-area-input">Área (ha)</label>
+          <div class="inputWrap">
+            <input class="input" type="number" inputmode="decimal" min="0" step="0.1" id="talhao-area-input" placeholder="0" aria-describedby="talhao-area-error" />
+          </div>
+          <span class="errorText" id="talhao-area-error" hidden>
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe uma área maior que zero.
+          </span>
+        </div>
+
+        <div class="wrapper" id="talhao-status-field" data-value="ativo">
+          <span class="label">Status</span>
+          <button type="button" class="trigger" data-dropdown-trigger>
+            <span data-dropdown-value>Ativo</span>
+            <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+          </button>
+          <div class="menu" data-dropdown-menu>
+            <div class="option selected" data-value="ativo">Ativo</div>
+            <div class="option" data-value="inativo">Inativo</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondary" id="talhao-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn primary" id="talhao-dialog-confirm">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ Modal de confirmação: Ativar/Desativar talhão ══════════════════
+       Mesma estrutura do modal de confirmação de exclusão de Cadastro
+       (`.dialog.sm`, corpo com um só parágrafo, rodapé Cancelar+confirmar) —
+       reaproveitado pros dois casos: Desativar usa `.btn.destructive` (mesmo
+       padrão visual destrutivo de "Excluir cadastro"), Ativar usa
+       `.btn.primary` (padrão normal do sistema). Título/texto/classe do
+       botão de confirmar trocam via JS conforme a ação. -->
+  <div class="overlay" id="talhao-toggle-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="talhao-toggle-dialog-title">
+      <div class="header">
+        <h2 class="title" id="talhao-toggle-dialog-title">Desativar talhão</h2>
+        <button class="closeBtn" id="talhao-toggle-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <p class="text-body-s" id="talhao-toggle-dialog-message">Tem certeza que deseja desativar este talhão?</p>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray" id="talhao-toggle-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn destructive" id="talhao-toggle-dialog-confirm">Desativar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/fazendas-data.js"></script>
+  <script src="../shared/fazenda-detalhe-cadastro.js"></script>
+</body>
+</html>

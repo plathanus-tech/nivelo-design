@@ -1,0 +1,210 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA ANOTAÇÃO — Caderno de Campo. Formulário rápido de registro (Despesa/
+   Venda/Colheita) por Fazenda/Talhão, exclusivamente informativo — nunca
+   gera lançamento em Financeiro nem movimentação em Estoque (ver
+   app/CLAUDE.md). Estrutura de página/seção (1 único `.card`, subseções com
+   divisor, grid 2 colunas) é cópia deliberada de `page-novo-estoque.css`.
+   ══════════════════════════════════════════════════════════ */
+
+.nova-anotacao-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard (o componente
+   React resolve com `if (!open) return null`) — mesmo bug já documentado em
+   page-novo-estoque.css/page-novo-produto.css: sem isso, o modal "Adicionar
+   nova safra" abriria sozinho ao carregar a página. */
+.overlay[hidden] { display: none; }
+
+/* "+ Adicionar nova safra" no menu do Dropdown de Safra — mesmo tratamento
+   visual de `.novo-produto-categoria-option-create`. */
+.nova-anotacao-safra-option-create {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.nova-anotacao-safra-option-create:hover {
+  background: var(--color-bg-brand);
+}
+
+.nova-anotacao-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nova-anotacao-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nova-anotacao-back:hover { color: var(--color-text-primary); }
+
+.nova-anotacao-title { color: var(--color-text-primary); margin: 0; }
+.nova-anotacao-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 560px; }
+
+/* ── Seções (1 único `.card`, mesmo padrão de Novo registo de estoque/Novo
+   cadastro) ──────────────────────────────────────────────────────────── */
+
+#nova-anotacao-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.nova-anotacao-subsection {
+  padding: var(--spacing-lg);
+}
+.nova-anotacao-subsection + .nova-anotacao-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.nova-anotacao-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+.nova-anotacao-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .nova-anotacao-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .nova-anotacao-span-2 {
+    grid-column: span 2;
+  }
+}
+
+.nova-anotacao-dropdown { position: relative; }
+
+/* Mensagem de erro: mesmo padrão de Novo registo de estoque/Novo cadastro —
+   `.errorText` só aparece quando o `.wrapper` ganha `.error` via JS, nunca
+   por padrão (Input.module.css declara `.errorText{display:flex}` sem
+   guard nenhum). Erro é só a borda vermelha, nunca um fundo cobrindo o
+   `.wrapper` (mesmo padrão final já estabelecido em Nova Fazenda). */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* Mesma colisão .input×RadioButton já documentada em rules.md/page-novo-estoque.css
+   (RadioButton.module.css também declara `.input`, colidindo com Input real). */
+.nova-anotacao-grid input.input:not([type="radio"]) {
+  width: 100%;
+  height: 44px;
+}
+
+.nova-anotacao-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+.nova-anotacao-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 88px;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* ── Tipo de anotação: cards de seleção visual (Despesa/Venda/Colheita) ───
+   Não existe um componente "card de seleção" no Storybook — composição de
+   página sobre `<input type="radio">` reais (mesma base acessível do
+   RadioButton, só com apresentação de card em vez de círculo+ponto), seleção
+   controlada por classe (`.is-selected`) via JS, não `:checked` puro em CSS. */
+.nova-anotacao-tipo-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.nova-anotacao-tipo-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.nova-anotacao-tipo-card:hover {
+  border-color: var(--color-action-primary);
+}
+.nova-anotacao-tipo-card.is-selected {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+}
+
+.nova-anotacao-tipo-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.nova-anotacao-tipo-icon {
+  display: inline-flex;
+  color: var(--color-text-tertiary);
+}
+.nova-anotacao-tipo-card.is-selected .nova-anotacao-tipo-icon {
+  color: var(--color-action-primary);
+}
+
+.nova-anotacao-tipo-label {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+@media (max-width: 479px) {
+  .nova-anotacao-tipo-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Ações do rodapé ───────────────────────────────────────────────────── */
+
+.nova-anotacao-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+
+@media (min-width: 768px) {
+  .nova-anotacao-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .nova-anotacao-actions .btn { min-width: 160px; }
+}

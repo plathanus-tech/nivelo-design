@@ -1,0 +1,80 @@
+/* Tipografia de `.label`/`.trigger`/`.errorText`/`.option` abaixo: valores
+   mantidos (não removidos) — este .module.css é carregado como stylesheet
+   global em várias telas estáticas do protótipo (`app/screens/*.html`), que
+   usam essas classes direto no HTML sem passar pelo componente React;
+   Dropdown.tsx ainda aplica a classe `.text-*` mais próxima (redundante,
+   sobrescrita pelos valores abaixo, só documenta a intenção). Ver
+   rules.md, "componentes de consumo duplo". */
+.wrapper { position: relative; width: 100%; font-family: var(--font-body); flex-direction: column; gap: var(--spacing-xs); }
+.wrapper:not([hidden]) { display: flex; }
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--color-text-secondary);
+}
+
+.trigger {
+  width: 100%; height: 44px; display: flex; align-items: center; justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base); color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+.trigger:hover:not(:disabled) { border-color: var(--color-border-default); }
+.open .trigger { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px rgba(23, 82, 176, 0.18); }
+.trigger:disabled {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-100);
+  color: var(--color-gray-500);
+  cursor: not-allowed;
+}
+
+.placeholder { color: var(--color-gray-300); }
+.chevron { transition: transform var(--transition-fast); font-size: 11px; color: var(--color-text-tertiary); }
+.open .chevron { transform: rotate(180deg); }
+
+/* ── Error state ──────────────────────────────────── */
+.hasError .trigger {
+  border-color: var(--color-action-error);
+}
+.hasError.open .trigger {
+  box-shadow: 0 0 0 3px rgba(185, 28, 46, 0.15);
+}
+
+.errorText {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-error);
+  line-height: 1.4;
+}
+.msgIcon { flex-shrink: 0; margin-top: 1px; }
+
+.menu {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  max-height: 240px; overflow-y: auto;
+  display: none;
+}
+.open .menu { display: block; }
+
+.option {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base); color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.option:hover { background: var(--color-bg-subtle); }
+.option.selected { background: var(--color-bg-brand); color: var(--color-action-primary); font-weight: var(--font-weight-medium); }

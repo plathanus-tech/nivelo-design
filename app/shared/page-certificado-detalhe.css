@@ -1,0 +1,55 @@
+/* ══════════════════════════════════════════════════════════
+   DETALHE DO CERTIFICADO — Configuração > Fiscal > Certificado Digital >
+   Visualizar. Mesmo padrão de "Ver detalhes" já usado em Estoque/Talhão
+   (tela própria, nunca um Dialog modal). Reaproveita `.certdigital-view-grid`
+   de page-certificado-digital.css pros campos — só o container/cabeçalho é
+   novo aqui.
+   ══════════════════════════════════════════════════════════ */
+
+.certdet-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.certdet-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.certdet-back:hover { color: var(--color-text-primary); }
+
+.certdet-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .certdet-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+.certdet-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.certdet-title { color: var(--color-text-primary); margin: 0; }
+
+.certdet-card { padding: var(--spacing-lg); }
+
+.certdet-not-found {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.certdet-not-found:not([hidden]) { display: flex; }

@@ -1,0 +1,262 @@
+/* ══════════════════════════════════════════════════════════
+   CERTIFICADO DIGITAL — Configuração > Fiscal > Certificado Digital.
+   Mobile first. Estrutura copiada deliberadamente de page-naturezas-
+   operacao.css (mesmo módulo, mesmo padrão "Table como Card genérico" +
+   toast/Dialog já aprovados no sistema).
+   ══════════════════════════════════════════════════════════ */
+
+.certdigital-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.certdigital-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .certdigital-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.certdigital-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); max-width: 640px; }
+.certdigital-breadcrumb { color: var(--color-text-tertiary); }
+.certdigital-title { color: var(--color-text-primary); margin: 0; }
+.certdigital-description { color: var(--color-text-secondary); margin: 0; }
+
+/* ── Botão "Novo Certificado" + menu (reaproveita .menu/.option de
+   Dropdown.module.css, ancorado num Button em vez de um Dropdown de
+   formulário — mesmo visual de menu, sem inventar componente novo). ────── */
+.certdigital-new-wrapper { position: relative; flex-shrink: 0; }
+#new-cert-btn { width: 100%; justify-content: center; }
+@media (min-width: 768px) {
+  #new-cert-btn { width: auto; }
+}
+#new-cert-btn .chevron {
+  display: inline-flex;
+  transform-origin: center;
+  transition: transform var(--transition-fast);
+  color: var(--color-gray-white);
+}
+.certdigital-new-wrapper.open #new-cert-btn .chevron { transform: rotate(180deg); }
+.certdigital-new-wrapper .menu {
+  min-width: 220px;
+  padding: var(--spacing-2xs);
+}
+.certdigital-new-wrapper .option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Card de seção (Certificados cadastrados) ─────────────────────────────── */
+.certdigital-list-card {
+  padding: var(--spacing-lg);
+}
+.certdigital-section-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+.certdigital-section-hint {
+  margin: calc(var(--spacing-md) * -1) 0 var(--spacing-md);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Tabela (desktop) / Cards (mobile) ────────────────────────────────────
+   Mesma técnica de Natureza da Operação: `tableWrap` some no mobile,
+   `.certdigital-cards` assume; zebra Gray 50, cabeçalho Brand 50. ───────── */
+.certdigital-list-card .tableWrap {
+  display: none;
+}
+.certdigital-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .certdigital-list-card .tableWrap { display: block; }
+  .certdigital-cards { display: none; }
+}
+
+.certdigital-list-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.certdigital-list-card .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.certdigital-list-card .td {
+  height: 48px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.certdigital-list-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.certdigital-list-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.certdigital-list-card .tr:hover .td { filter: brightness(0.97); }
+
+.certdigital-list-card .table {
+  table-layout: fixed;
+  width: 100%;
+}
+.certdigital-list-card .th:nth-child(1) { width: 20%; } /* Nome */
+.certdigital-list-card .th:nth-child(2) { width: 8%; }  /* Tipo */
+.certdigital-list-card .th:nth-child(3) { width: 20%; } /* Titular */
+.certdigital-list-card .th:nth-child(4) { width: 14%; } /* CPF/CNPJ */
+.certdigital-list-card .th:nth-child(5) { width: 10%; } /* Validade */
+.certdigital-list-card .th:nth-child(6) { width: 13%; } /* Status */
+.certdigital-list-card .th:nth-child(7) { width: 11%; } /* Origem */
+.certdigital-list-card .th:nth-child(8) { width: 124px; } /* Ações */
+
+.certdigital-list-card .td:nth-child(1),
+.certdigital-list-card .td:nth-child(3) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.certdigital-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.certdigital-empty:not([hidden]) { display: flex; }
+.certdigital-empty-message { max-width: 520px; margin: 0; }
+
+/* ── Estado vazio: 2 opções (Importar / Emitir) ───────────────────────────
+   Mesma composição de "card com ícone+título+descrição+CTA" já usada em
+   `relatorios.html`'s `.rel-card` (round 53) — aqui com um Button real no
+   lugar do CTA-link, já que o pedido explicitamente quer "botões". ──────── */
+.certdigital-empty-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  width: 100%;
+  max-width: 640px;
+}
+@media (min-width: 640px) {
+  .certdigital-empty-options { grid-template-columns: 1fr 1fr; }
+}
+.certdigital-empty-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+.certdigital-empty-option-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.certdigital-empty-option-title { color: var(--color-text-primary); margin: 0; font-weight: var(--font-weight-bold); }
+.certdigital-empty-option-hint { margin: 0; color: var(--color-text-tertiary); }
+.certdigital-empty-option .btn { width: 100%; margin-top: auto; }
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.certdigital-mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+.certdigital-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.certdigital-mobile-card-name { color: var(--color-text-primary); }
+.certdigital-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.certdigital-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.certdigital-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+.certdigital-mobile-card-actions {
+  justify-content: flex-end;
+  padding: var(--spacing-sm) 0 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Modal "Visualizar certificado" ───────────────────────────────────────── */
+.certdigital-view-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin: 0;
+}
+.certdigital-view-grid .certdigital-view-span-2 { grid-column: span 2; }
+.certdigital-view-grid dt {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  margin: 0 0 2px;
+}
+.certdigital-view-grid dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ── Toast de sucesso ("Certificado importado com sucesso") ───────────────
+   Mesma colisão de 3 vias já documentada (Feedback × Table × Dialog). ────── */
+.certdigital-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.certdigital-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+.certdigital-toast {
+  box-shadow: var(--shadow-lg);
+  animation: certdigital-toast-in 0.25s ease;
+}
+.certdigital-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.certdigital-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+@keyframes certdigital-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   já documentado dezenas de vezes neste projeto. */
+.overlay[hidden] { display: none; }

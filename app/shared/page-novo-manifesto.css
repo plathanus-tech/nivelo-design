@@ -1,0 +1,169 @@
+/* ══════════════════════════════════════════════════════════
+   NOVO MANIFESTO — formulário de criação/edição/visualização de
+   Manifesto de Documentos Fiscais (Fiscal > Manifesto). Mobile first.
+   Mesmo padrão exato de Nova Nota Fiscal/Novo Cadastro: 1 único `.card`
+   com várias subseções separadas por divisor sutil, `?numero=&modo=
+   ver|corrigir` pra edição/visualização (ver novo-manifesto.js). Classes
+   próprias `nm-*`.
+   ══════════════════════════════════════════════════════════ */
+
+.nm-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.nm-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nm-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nm-back:hover { color: var(--color-text-primary); }
+
+.nm-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Card único, subseções separadas por divisor sutil ────────────────── */
+
+#nm-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.nm-subsection { padding: var(--spacing-lg); }
+.nm-subsection + .nm-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.nm-subsection-title {
+  margin: 0 0 var(--spacing-2xs);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+.nm-subsection-hint { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-md); }
+
+.nm-inner-subtitle {
+  color: var(--color-text-primary);
+  margin: var(--spacing-md) 0 var(--spacing-md);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.nm-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .nm-grid { grid-template-columns: 1fr 1fr; }
+  .nm-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .nm-span-2 { grid-column: span 2; }
+}
+
+/* ── Marcador "(opcional)" — mesmo padrão visual já usado em Novo
+   Cadastro/Nova Fazenda. ────────────────────────────────────────────────── */
+.nm-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Mensagem de erro: `.errorText` só aparece quando `.wrapper` ganha
+   `.error` via JS — mesmo padrão de Nova Fazenda/Nova Conta Financeira. ── */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input { border-color: var(--color-action-error); }
+
+/* ── Documentos da Carga (repeater) — mesmo padrão visual do card de
+   veículo de Novo Cadastro (fundo gray-50, header com título+remover). ── */
+.nm-documentos-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+.nm-documentos-list:empty { margin-bottom: 0; }
+
+.nm-documento {
+  background: var(--color-gray-50);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.nm-documento-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.nm-documento-title { color: var(--color-text-primary); margin: 0; }
+.nm-documento-remove { flex-shrink: 0; }
+
+/* `#nm-documentos-error` fica FORA de cada item (erro só de "faltou pelo
+   menos 1 documento válido"), controlado via JS diretamente na classe
+   `.error` do próprio `<span>`, não de um `.wrapper` — por isso o par de
+   regras acima não cobre este caso; guard próprio: */
+#nm-documentos-error { display: none; margin-bottom: var(--spacing-md); }
+#nm-documentos-error.error { display: flex; }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.nm-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .nm-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .nm-actions .btn { min-width: 160px; }
+}
+
+/* ── Toast de sucesso ─────────────────────────────────────────────────── */
+.nm-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.nm-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.nm-toast { box-shadow: var(--shadow-lg); animation: nm-toast-in 0.25s ease; }
+.nm-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.nm-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes nm-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* `.btn` (Button.module.css) tem `display:inline-flex` incondicional —
+   mesmo bug já documentado dezenas de vezes neste projeto. Guard aqui
+   protege o submit escondido em modo=ver. */
+.btn[hidden] { display: none; }

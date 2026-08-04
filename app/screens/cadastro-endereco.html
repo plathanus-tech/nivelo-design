@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endereço — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../shared/page-login.css" />
+  <link rel="stylesheet" href="../shared/page-cadastro.css" />
+</head>
+<body class="login-screen">
+
+  <div class="login-shell">
+
+    <aside class="login-panel" aria-hidden="true">
+      <img class="login-panel-img" src="../../gestão com nivelo.png" alt="" />
+      <div class="login-panel-overlay"></div>
+      <div class="login-panel-copy">
+        <img class="login-panel-logo" src="../../NIVELO branco header.svg" alt="Nivelo" />
+        <p class="login-panel-heading">Gestão inteligente para quem produz</p>
+        <p class="login-panel-text">Controle financeiro, estoque, safra e comercialização em um único lugar</p>
+      </div>
+    </aside>
+
+    <main class="login-page">
+    <img class="login-logo" src="../../NIVELO azul header.svg" alt="Nivelo" />
+    <div class="login-card">
+
+      <ol class="cadastro-steps" aria-label="Etapas do cadastro">
+        <li class="cadastro-step is-complete" data-step="1">
+          <span class="cadastro-step-circle text-12-bold"><i data-lucide="check" width="14" height="14"></i></span>
+          <span class="cadastro-step-label text-10-medium">Cadastro</span>
+        </li>
+        <li class="cadastro-step-connector"></li>
+        <li class="cadastro-step is-current" data-step="2">
+          <span class="cadastro-step-circle text-12-bold">2</span>
+          <span class="cadastro-step-label text-10-medium">Endereço</span>
+        </li>
+        <li class="cadastro-step-connector"></li>
+        <li class="cadastro-step" data-step="3">
+          <span class="cadastro-step-circle text-12-bold">3</span>
+          <span class="cadastro-step-label text-10-medium">Plano</span>
+        </li>
+      </ol>
+
+      <header class="login-header">
+        <h1 class="login-title text-heading-6">Endereço</h1>
+        <p class="login-sub">Informe o endereço da sua propriedade ou ponto de contato</p>
+      </header>
+
+      <form class="login-form" id="address-form" data-state="idle" novalidate>
+
+        <!-- CEP -->
+        <div class="wrapper login-field" id="cep-field">
+          <label class="label login-field-label" for="address-cep">CEP</label>
+          <div class="inputWrap">
+            <input class="input login-field-input" type="text" inputmode="numeric" autocomplete="postal-code" id="address-cep" name="cep" placeholder="00000-000" maxlength="9" aria-describedby="cep-error" />
+          </div>
+          <span class="errorText" id="cep-error">
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe o CEP.
+          </span>
+        </div>
+
+        <!-- Rua -->
+        <div class="wrapper login-field" id="street-field">
+          <label class="label login-field-label" for="address-street">Rua</label>
+          <div class="inputWrap">
+            <input class="input login-field-input" type="text" autocomplete="address-line1" id="address-street" name="street" placeholder="Nome da rua" aria-describedby="street-error" />
+          </div>
+          <span class="errorText" id="street-error">
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe a rua.
+          </span>
+        </div>
+
+        <!-- Número + Complemento (lado a lado no desktop) -->
+        <div class="cadastro-field-row">
+          <div class="wrapper login-field" id="number-field">
+            <label class="label login-field-label" for="address-number">Número</label>
+            <div class="inputWrap">
+              <input class="input login-field-input" type="text" inputmode="numeric" autocomplete="address-line2" id="address-number" name="number" placeholder="Nº" aria-describedby="number-error" />
+            </div>
+            <span class="errorText" id="number-error">
+              <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+              Informe o número.
+            </span>
+          </div>
+
+          <div class="wrapper login-field" id="complement-field">
+            <label class="label login-field-label" for="address-complement">Complemento <span class="cadastro-optional-tag">(opcional)</span></label>
+            <div class="inputWrap">
+              <input class="input login-field-input" type="text" id="address-complement" name="complement" placeholder="Apto, bloco, referência (opcional)" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Bairro -->
+        <div class="wrapper login-field" id="district-field">
+          <label class="label login-field-label" for="address-district">Bairro</label>
+          <div class="inputWrap">
+            <input class="input login-field-input" type="text" autocomplete="address-level3" id="address-district" name="district" placeholder="Bairro" aria-describedby="district-error" />
+          </div>
+          <span class="errorText" id="district-error">
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe o bairro.
+          </span>
+        </div>
+
+        <!-- Cidade + Estado (lado a lado no desktop) -->
+        <div class="cadastro-field-row">
+          <div class="wrapper login-field" id="city-field">
+            <label class="label login-field-label" for="address-city">Cidade</label>
+            <div class="inputWrap">
+              <input class="input login-field-input" type="text" autocomplete="address-level2" id="address-city" name="city" placeholder="Cidade" aria-describedby="city-error" />
+            </div>
+            <span class="errorText" id="city-error">
+              <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+              Informe a cidade.
+            </span>
+          </div>
+
+          <div class="wrapper login-field" id="state-field">
+            <label class="label login-field-label" for="address-state">Estado</label>
+            <div class="inputWrap">
+              <input class="input login-field-input" type="text" autocomplete="address-level1" id="address-state" name="state" placeholder="UF" maxlength="2" aria-describedby="state-error" />
+            </div>
+            <span class="errorText" id="state-error">
+              <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+              Informe o estado.
+            </span>
+          </div>
+        </div>
+
+        <div class="login-button-row">
+          <button type="submit" class="btn primary login-submit login-full-btn" id="address-submit">
+            <span class="login-submit-label">Continuar</span>
+            <span class="login-submit-spinner" aria-hidden="true"></span>
+          </button>
+          <a href="cadastro.html" class="btn secondary login-full-btn" id="address-back-link">Voltar</a>
+        </div>
+      </form>
+
+    </div>
+    </main>
+
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/cadastro-endereco.js"></script>
+</body>
+</html>

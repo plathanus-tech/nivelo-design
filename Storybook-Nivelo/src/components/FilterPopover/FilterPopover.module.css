@@ -1,0 +1,85 @@
+/* FilterPopover — agrupamento de filtros em popover: um botão "Filtros"
+   (ícone + texto) que abre um painel flutuante com os campos de filtro +
+   rodapé Limpar/Aplicar. Promovido a componente real a partir do padrão já
+   usado em Estoque Comprometido (`estoque-filter-popover` em
+   app/shared/page-estoque.css) — este é agora o padrão oficial de
+   agrupamento de filtros do sistema, reaproveitado por qualquer tela nova
+   que precise agrupar 2+ filtros fora da barra de busca principal.
+
+   Sem estado embutido em HTML estático: `data-filter-popover-trigger`/
+   `data-filter-popover` são hooks pra JS abrir/fechar (position:fixed
+   calculado via getBoundingClientRect do trigger, fecha em clique fora/Esc)
+   — mesmo padrão sem-estado dos demais componentes deste protótipo
+   (Dialog, Dropdown). */
+
+.wrapper {
+  display: inline-flex;
+  position: relative;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+.trigger:hover {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-300);
+  color: var(--color-text-primary);
+}
+.trigger:active {
+  background: var(--color-gray-100);
+}
+
+.triggerIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+.popover {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+/* Guard obrigatório (bug recorrente documentado em app/rules.md): sem
+   isso, `hidden` não esconde o popover porque a regra acima já declara
+   `display:flex` incondicional. */
+.popover[hidden] { display: none; }
+
+/* Cada filtro dentro do popover é o próprio Dropdown/Input real (`fields`,
+   ver FilterPopover.tsx) — o espaçamento entre eles vem do `gap` do
+   `.popover` acima; nenhum estilo de campo é redefinido aqui, pra nunca
+   competir com o componente real. Consumo em HTML estático (telas do
+   protótipo que carregam este `.module.css` como stylesheet global, sem
+   passar pelo componente React) usa as classes cruas de Dropdown
+   (`.wrapper`/`.label`/`.trigger`/`.menu`/`.option`) direto dentro do
+   `.popover`, ajustando altura/fonte via seletor composto
+   (`.popover .trigger`/`.popover .label`) — ver `app/shared/page-produtos.css`
+   pro exemplo real, mesma técnica já usada em `page-estoque.css`. */
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}

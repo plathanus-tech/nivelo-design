@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prototype Mobile — Nivelo</title>
+  <link rel="stylesheet" href="shared/prototipo-mobile.css" />
+</head>
+<body>
+  <p class="proto-label">Mobile · 390 × 844px</p>
+
+  <div class="proto-device">
+    <div class="proto-status-bar">
+      <span>9:41</span>
+      <span class="proto-status-icons">
+        <i data-lucide="signal" width="14" height="14"></i>
+        <i data-lucide="battery-full" width="14" height="14"></i>
+      </span>
+    </div>
+    <div class="proto-screen">
+      <iframe
+        src="screens/index.html"
+        title="Nivelo Landing Page — Mobile"
+      ></iframe>
+    </div>
+    <div class="proto-home-indicator"></div>
+  </div>
+
+  <a href="prototipo-desktop.html" class="proto-switch">Ver versão Desktop</a>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

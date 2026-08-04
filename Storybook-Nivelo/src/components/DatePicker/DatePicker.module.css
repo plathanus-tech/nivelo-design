@@ -1,0 +1,187 @@
+/* DatePicker — extraído do Popover+calendário já usado (composição própria
+   de página) em `cadastros.html`/Dashboard do protótipo estático (ver
+   app/rules.md, "Popover+calendário"). Classes prefixadas `dp*` de
+   propósito (não `.wrapper`/`.trigger`/`.option` genéricos) para não repetir
+   o mesmo padrão de colisão de classe já documentado entre outros
+   componentes deste design system quando usados juntos na mesma tela. */
+
+.dpRoot {
+  position: relative;
+  flex-direction: column;
+  gap: 4px;
+}
+.dpRoot:not([hidden]) { display: flex; }
+
+.dpLabel {
+  color: var(--color-text-secondary);
+}
+
+.dpTrigger {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+}
+.dpTrigger:hover { border-color: var(--color-border-default); }
+
+.dpTriggerIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.dpPlaceholder { color: var(--color-text-disabled); }
+
+.dpPopover[hidden] { display: none; }
+
+.dpPopover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 60;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.dpCalendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dpNavBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+.dpNavBtn:hover { background: var(--color-bg-subtle); }
+
+.dpCalendarLabel {
+  flex: 1;
+  text-align: center;
+  color: var(--color-text-primary);
+}
+
+.dpWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding-bottom: var(--spacing-xs);
+}
+.dpWeekdays span {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+}
+
+.dpGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.dpDay,
+.dpDayEmpty {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dpDay {
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.dpDay:hover { background: var(--color-bg-subtle); }
+
+.dpDayInRange {
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-xs);
+}
+.dpDayInRange:hover { filter: brightness(0.97); }
+
+.dpDaySelected {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+.dpDaySelected:hover { background: var(--color-action-primary-hover); }
+
+.dpActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Modo "month" (ex.: Competência) — mesmo dpRoot/dpTrigger/dpPopover/
+   dpCalendarHeader/dpNavBtn do modo "single", troca só o corpo do popover:
+   grade de 12 meses (`dpMonthGrid`/`dpMonth`/`dpMonthSelected`) no lugar da
+   grade de 7 dias, navegação por ANO em vez de mês a mês. Padrão oficial do
+   sistema pra qualquer campo que só precise de mês/ano (nunca dia). ──────── */
+.dpTriggerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.dpTriggerRow .dpTrigger { flex: 1; min-width: 0; }
+.dpClearBtn { width: 32px; height: 32px; flex-shrink: 0; }
+.dpClearBtn[hidden] { display: none; }
+
+.dpMonthGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.dpMonth {
+  padding: var(--spacing-xs) 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.dpMonth:hover { background: var(--color-bg-subtle); }
+.dpMonthSelected {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+.dpMonthSelected:hover { background: var(--color-action-primary-hover); }
+
+/* ── Modo readonly (ex.: Competência em `?modo=ver`) ──────────────────────── */
+.dpRoot.is-readonly .dpTrigger { cursor: not-allowed; opacity: 0.7; }
+
+/* ── Estado de erro — mesmo padrão `.error` já usado em `.wrapper`
+   (Input/Dropdown) em todo o sistema: só a borda muda, nunca um fundo
+   cobrindo o campo. `.dpRoot` substitui `.wrapper` nos campos de data. ──── */
+.dpRoot.error .dpTrigger { border-color: var(--color-action-error); }

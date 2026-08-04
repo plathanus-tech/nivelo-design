@@ -1,0 +1,77 @@
+.wrapper { font-family: var(--font-body); width: 100%; }
+
+/* `padding-bottom:1px` compensa o `margin-bottom:-1px` do `.tab` abaixo: sem
+   isso, `overflow-x:auto` força `overflow-y` a computar como `auto` também
+   (regra do próprio CSS: um eixo non-visible força o outro non-visible),
+   e o layout de flex calcula a altura da linha pela MARGIN-BOX do item
+   (reduzida em 1px pela margem negativa) — 1px menor que a BORDER-BOX
+   realmente pintada, cortando quase toda a borda azul de 2px do item
+   ativo (sobrava ~0.2px visível). Bug real, presente em qualquer uso deste
+   componente (não só quando as abas de fato transbordam — o corte
+   acontece mesmo com poucas abas, só de `overflow-x:auto` estar
+   declarado), achado ao investigar "a tab não parece estar correta" no
+   Cadastro. */
+.list {
+  display: flex; border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+  gap: 0; overflow-x: auto; padding-bottom: 1px;
+  /* Some a scrollbar visualmente (o navegador desenharia uma, com setas
+     em alguns temas de SO, mesmo quando as abas cabem inteiras) sem
+     tirar a capacidade de rolar por toque/wheel se um dia houver mais
+     abas do que espaço disponível. Promovido de Cadastro pro componente
+     — qualquer tela ganha isso por padrão. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+/* .tab/.panel: valores mantidos (não removidos) — este .module.css é
+   carregado como stylesheet global em `app/screens/cadastros.html`, que
+   usa essas classes direto no HTML sem passar pelo componente React;
+   Tab.tsx ainda aplica a classe `.text-*` mais próxima (redundante,
+   sobrescrita pelos valores abaixo, só documenta a intenção). Ver
+   rules.md, "componentes de consumo duplo". */
+/* Mobile-first: fonte/padding reduzidos (`--font-size-sm`/`--spacing-xs`
+   `--spacing-sm`) por padrão, sobem pro tamanho "desktop" a partir de
+   768px. Valores vieram do ajuste original feito só na tela de Cadastro
+   (4 abas, a mais longa "Transportadora" estourava a largura em telas
+   estreitas) e foram promovidos pra cá pra virar o padrão do sistema —
+   qualquer tela que use este componente já ganha o tratamento mobile
+   correto, sem precisar de override próprio por tela. */
+.tab {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: none; border: none; border-bottom: 2px solid transparent;
+  font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer; white-space: nowrap;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  margin-bottom: -1px;
+}
+@media (min-width: 768px) {
+  .tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-base);
+  }
+}
+.tab:hover { color: var(--color-text-primary); }
+.tab:focus-visible { outline: var(--border-width-medium) solid var(--color-border-focus); outline-offset: -2px; }
+.active {
+  color: var(--color-action-primary);
+  border-bottom-color: var(--color-action-primary);
+  font-weight: var(--font-weight-bold);
+}
+/* `.tab:hover` (classe + pseudo-classe, 2 seletores) é mais específico que
+   `.active` sozinho (1 classe) — sem esta regra, passar o mouse sobre a aba
+   JÁ ATIVA trocava a cor de marca por `--color-text-primary` (quase preto),
+   já que `.tab:hover` vencia. Fix: seletor de 3 partes (`.tab.active:hover`)
+   pra garantir que a aba ativa continue com um tom de marca no hover, só
+   mais escuro (`--color-action-primary-hover`, o mesmo token já usado nos
+   demais estados de hover de elementos de marca deste design system, ex.
+   `.cellLink:hover` em Table.module.css) em vez de preto. */
+.tab.active:hover {
+  color: var(--color-action-primary-hover);
+  border-bottom-color: var(--color-action-primary-hover);
+}
+
+.panel { padding: var(--spacing-md) 0; color: var(--color-text-secondary); line-height: var(--line-height-normal); }

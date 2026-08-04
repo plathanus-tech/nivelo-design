@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novo Manifesto — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-novo-manifesto.css" />
+</head>
+<body>
+
+  <div class="nm-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+      <div class="app-header-right">
+        <button type="button" class="btn secondary" id="notebook-btn">
+          <i data-lucide="book-open" width="16" height="16"></i>
+          <span class="app-header-notebook-label">Caderno de campo</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pessoas e empresas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Fiscal já nasce aberto nesta tela, com "Manifesto" ativo. -->
+            <div class="app-nav-group is-open" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="true" data-tooltip="Fiscal · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem is-active" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Manifesto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="message-square-plus" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Nova conversa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
+                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta Financeira</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVO MANIFESTO ══════════════════ -->
+      <main class="app-main">
+        <div class="nm-page">
+
+          <div class="nm-header">
+            <a href="manifestos.html" class="nm-back" id="nm-back-top">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <h1 class="nm-title text-heading-6" id="nm-page-title">Novo Manifesto</h1>
+          </div>
+
+          <form id="nm-form" novalidate>
+
+            <section class="card nm-card">
+
+              <!-- ══════════════ EMITENTE ══════════════ -->
+              <div class="nm-subsection">
+                <h2 class="nm-subsection-title">Emitente</h2>
+                <p class="nm-subsection-hint text-body-s">Dados obtidos automaticamente do seu cadastro.</p>
+                <div class="nm-grid">
+                  <div class="wrapper" id="nm-emitente-razao-field">
+                    <label class="label" for="nm-emitente-razao">Razão Social</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-emitente-razao" disabled readonly /></div>
+                  </div>
+                  <div class="wrapper" id="nm-emitente-documento-field">
+                    <label class="label" for="nm-emitente-documento">CNPJ/CPF</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-emitente-documento" disabled readonly /></div>
+                  </div>
+                  <div class="wrapper nm-span-2" id="nm-emitente-endereco-field">
+                    <label class="label" for="nm-emitente-endereco">Endereço</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-emitente-endereco" disabled readonly /></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ══════════════ VEÍCULOS ══════════════ -->
+              <div class="nm-subsection">
+                <h2 class="nm-subsection-title">Veículos</h2>
+                <p class="nm-subsection-hint text-body-s">Informe até 3 placas.</p>
+                <div class="nm-grid nm-grid-3">
+                  <div class="wrapper" id="nm-placa1-field">
+                    <label class="label" for="nm-placa1">Placa 1</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-placa1" maxlength="7" placeholder="ABC1D23" aria-describedby="nm-placa1-error" /></div>
+                    <span class="errorText" id="nm-placa1-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe a placa do veículo.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-placa2-field">
+                    <label class="label" for="nm-placa2">Placa 2 <span class="nm-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-placa2" maxlength="7" placeholder="ABC1D23" /></div>
+                  </div>
+                  <div class="wrapper" id="nm-placa3-field">
+                    <label class="label" for="nm-placa3">Placa 3 <span class="nm-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-placa3" maxlength="7" placeholder="ABC1D23" /></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ══════════════ MOTORISTA ══════════════ -->
+              <div class="nm-subsection">
+                <h2 class="nm-subsection-title">Motorista</h2>
+                <div class="nm-grid">
+                  <div class="wrapper nm-span-2" id="nm-motorista-nome-field">
+                    <label class="label" for="nm-motorista-nome">Nome completo</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-motorista-nome" placeholder="Nome completo do motorista" aria-describedby="nm-motorista-nome-error" /></div>
+                    <span class="errorText" id="nm-motorista-nome-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o nome completo do motorista.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-motorista-documento-field">
+                    <label class="label" for="nm-motorista-documento">CPF/CNPJ</label>
+                    <div class="inputWrap"><input class="input" type="text" inputmode="numeric" id="nm-motorista-documento" placeholder="000.000.000-00" aria-describedby="nm-motorista-documento-error" /></div>
+                    <span class="errorText" id="nm-motorista-documento-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o CPF ou CNPJ do motorista.
+                    </span>
+                  </div>
+                </div>
+
+                <h3 class="nm-inner-subtitle text-subtitle-s">Endereço do motorista</h3>
+                <div class="nm-grid">
+                  <div class="wrapper" id="nm-mot-cep-field">
+                    <label class="label" for="nm-mot-cep">CEP</label>
+                    <div class="inputWrap"><input class="input" type="text" inputmode="numeric" id="nm-mot-cep" maxlength="9" placeholder="00000-000" aria-describedby="nm-mot-cep-error" /></div>
+                    <span class="errorText" id="nm-mot-cep-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o CEP.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-mot-logradouro-field">
+                    <label class="label" for="nm-mot-logradouro">Logradouro</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-mot-logradouro" placeholder="Nome da rua" aria-describedby="nm-mot-logradouro-error" /></div>
+                    <span class="errorText" id="nm-mot-logradouro-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o logradouro.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-mot-numero-field">
+                    <label class="label" for="nm-mot-numero">Número</label>
+                    <div class="inputWrap"><input class="input" type="text" inputmode="numeric" id="nm-mot-numero" placeholder="Nº" aria-describedby="nm-mot-numero-error" /></div>
+                    <span class="errorText" id="nm-mot-numero-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o número.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-mot-complemento-field">
+                    <label class="label" for="nm-mot-complemento">Complemento <span class="nm-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-mot-complemento" placeholder="Apto, bloco, referência" /></div>
+                  </div>
+                  <div class="wrapper" id="nm-mot-bairro-field">
+                    <label class="label" for="nm-mot-bairro">Bairro</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-mot-bairro" placeholder="Bairro" aria-describedby="nm-mot-bairro-error" /></div>
+                    <span class="errorText" id="nm-mot-bairro-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o bairro.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-mot-cidade-field">
+                    <label class="label" for="nm-mot-cidade">Cidade</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-mot-cidade" placeholder="Cidade" aria-describedby="nm-mot-cidade-error" /></div>
+                    <span class="errorText" id="nm-mot-cidade-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe a cidade.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-mot-estado-field">
+                    <label class="label" for="nm-mot-estado">Estado</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-mot-estado" maxlength="2" placeholder="UF" aria-describedby="nm-mot-estado-error" /></div>
+                    <span class="errorText" id="nm-mot-estado-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o estado.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ══════════════ ORIGEM / DESTINO ══════════════ -->
+              <div class="nm-subsection">
+                <h2 class="nm-subsection-title">Origem</h2>
+                <div class="nm-grid">
+                  <div class="wrapper" id="nm-origem-cidade-field">
+                    <label class="label" for="nm-origem-cidade">Cidade</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-origem-cidade" placeholder="Cidade de origem" aria-describedby="nm-origem-cidade-error" /></div>
+                    <span class="errorText" id="nm-origem-cidade-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe a cidade de origem.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-origem-estado-field">
+                    <label class="label" for="nm-origem-estado">Estado</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-origem-estado" maxlength="2" placeholder="UF" aria-describedby="nm-origem-estado-error" /></div>
+                    <span class="errorText" id="nm-origem-estado-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o estado de origem.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="nm-subsection">
+                <h2 class="nm-subsection-title">Destino</h2>
+                <div class="nm-grid">
+                  <div class="wrapper" id="nm-destino-cidade-field">
+                    <label class="label" for="nm-destino-cidade">Cidade</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-destino-cidade" placeholder="Cidade de destino" aria-describedby="nm-destino-cidade-error" /></div>
+                    <span class="errorText" id="nm-destino-cidade-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe a cidade de destino.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-destino-estado-field">
+                    <label class="label" for="nm-destino-estado">Estado</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-destino-estado" maxlength="2" placeholder="UF" aria-describedby="nm-destino-estado-error" /></div>
+                    <span class="errorText" id="nm-destino-estado-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o estado de destino.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ══════════════ DOCUMENTOS DA CARGA ══════════════ -->
+              <div class="nm-subsection">
+                <h2 class="nm-subsection-title">Documentos da Carga</h2>
+                <p class="nm-subsection-hint text-body-s">Adicione um ou mais documentos vinculados a esta carga.</p>
+                <div class="nm-documentos-list" id="nm-documentos-list"></div>
+                <span class="errorText" id="nm-documentos-error">
+                  <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                  Adicione ao menos um documento da carga, com Chave da Nota Fiscal, Origem e Destino preenchidos.
+                </span>
+                <button type="button" class="btn secondary hasLeft" id="nm-add-documento-btn">
+                  <span class="icon"><i data-lucide="plus" width="16" height="16"></i></span>
+                  Adicionar documento
+                </button>
+              </div>
+
+              <!-- ══════════════ SEGURO DA CARGA (OPCIONAL) ══════════════ -->
+              <div class="nm-subsection">
+                <h2 class="nm-subsection-title">Seguro da Carga <span class="nm-optional-tag">(opcional)</span></h2>
+                <p class="nm-subsection-hint text-body-s">Único grupo de informações não obrigatório do manifesto.</p>
+                <div class="nm-grid">
+                  <div class="wrapper" id="nm-seguro-seguradora-field">
+                    <label class="label" for="nm-seguro-seguradora">Seguradora</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-seguro-seguradora" placeholder="Nome da seguradora" /></div>
+                  </div>
+                  <div class="wrapper" id="nm-seguro-cnpj-field">
+                    <label class="label" for="nm-seguro-cnpj">CNPJ</label>
+                    <div class="inputWrap"><input class="input" type="text" inputmode="numeric" id="nm-seguro-cnpj" placeholder="00.000.000/0000-00" maxlength="18" /></div>
+                  </div>
+                  <div class="wrapper" id="nm-seguro-apolice-field">
+                    <label class="label" for="nm-seguro-apolice">Nº da Apólice</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-seguro-apolice" placeholder="Número da apólice" /></div>
+                  </div>
+                  <div class="wrapper" id="nm-seguro-averbacao-field">
+                    <label class="label" for="nm-seguro-averbacao">Nº da Averbação</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-seguro-averbacao" placeholder="Número da averbação" /></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ══════════════ PAGAMENTO DO FRETE ══════════════ -->
+              <div class="nm-subsection">
+                <h2 class="nm-subsection-title">Pagamento do Frete</h2>
+                <div class="nm-grid">
+                  <div class="wrapper" id="nm-pagamento-documento-field">
+                    <label class="label" for="nm-pagamento-documento">CPF/CNPJ do responsável pelo pagamento</label>
+                    <div class="inputWrap"><input class="input" type="text" inputmode="numeric" id="nm-pagamento-documento" placeholder="000.000.000-00" aria-describedby="nm-pagamento-documento-error" /></div>
+                    <span class="errorText" id="nm-pagamento-documento-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o CPF ou CNPJ do responsável pelo pagamento.
+                    </span>
+                  </div>
+                  <div class="wrapper" id="nm-pagamento-dados-field">
+                    <label class="label" for="nm-pagamento-dados">Dados bancários ou chave PIX</label>
+                    <div class="inputWrap"><input class="input" type="text" id="nm-pagamento-dados" placeholder="Banco, agência e conta ou chave PIX" aria-describedby="nm-pagamento-dados-error" /></div>
+                    <span class="errorText" id="nm-pagamento-dados-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe os dados bancários ou a chave PIX para recebimento do frete.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+            </section>
+
+            <div class="nm-actions">
+              <a href="manifestos.html" class="btn secondary" id="nm-cancel">Cancelar</a>
+              <button type="submit" class="btn primary" id="nm-submit">Salvar manifesto</button>
+            </div>
+
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/emitente-data.js"></script>
+  <script src="../shared/manifestos-data.js"></script>
+  <script src="../shared/novo-manifesto.js"></script>
+</body>
+</html>

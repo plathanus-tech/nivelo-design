@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar senha — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../shared/page-login.css" />
+  <link rel="stylesheet" href="../shared/page-recuperar-senha.css" />
+</head>
+<body class="login-screen">
+
+  <div class="login-shell">
+
+    <aside class="login-panel" aria-hidden="true">
+      <img class="login-panel-img" src="../../gestão com nivelo.png" alt="" />
+      <div class="login-panel-overlay"></div>
+      <div class="login-panel-copy">
+        <img class="login-panel-logo" src="../../NIVELO branco header.svg" alt="Nivelo" />
+        <p class="login-panel-heading">Gestão inteligente para quem produz</p>
+        <p class="login-panel-text">Controle financeiro, estoque, safra e comercialização em um único lugar</p>
+      </div>
+    </aside>
+
+    <main class="login-page">
+    <img
+      class="login-logo"
+      src="../../NIVELO azul header.svg"
+      alt="Nivelo"
+    />
+    <div class="login-card">
+
+      <header class="login-header">
+        <h1 class="login-title text-heading-6">Recuperar senha</h1>
+        <p class="login-sub">Informe o telefone cadastrado para enviarmos um código de verificação via WhatsApp</p>
+      </header>
+
+      <!-- Feedback: erro ao enviar o código -->
+      <div class="alert error login-alert" role="alert" id="send-error-banner" hidden>
+        <span class="icon"><i data-lucide="circle-x" width="18" height="18"></i></span>
+        <div class="body">
+          <div class="title">Não foi possível enviar o código de verificação</div>
+          <div class="message">Tente novamente.</div>
+        </div>
+      </div>
+
+      <form class="login-form" id="recover-form" data-state="idle" novalidate>
+
+        <!-- Campo Telefone (Input) -->
+        <div class="wrapper login-field" id="phone-field">
+          <label class="label login-field-label" for="recover-phone">Telefone</label>
+          <div class="inputWrap">
+            <input
+              class="input login-field-input"
+              type="tel"
+              inputmode="numeric"
+              autocomplete="tel"
+              id="recover-phone"
+              name="phone"
+              placeholder="(00) 00000-0000"
+              maxlength="15"
+              aria-describedby="phone-error"
+            />
+          </div>
+          <span class="errorText" id="phone-error">
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            <span class="phone-error-text">Informe seu telefone.</span>
+          </span>
+        </div>
+
+        <div class="login-button-row">
+          <!-- Ação principal -->
+          <button type="submit" class="btn primary login-submit login-full-btn" id="recover-submit">
+            <span class="login-submit-label">Receber código</span>
+            <span class="login-submit-label-retry">Tentar novamente</span>
+            <span class="login-submit-spinner" aria-hidden="true"></span>
+          </button>
+
+          <!-- Ação secundária: voltar -->
+          <a href="../screens/login.html" class="btn secondary login-full-btn" id="back-to-login-link">
+            Voltar para o Login
+          </a>
+        </div>
+      </form>
+
+    </div>
+    </main>
+
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/recuperar-senha.js"></script>
+</body>
+</html>
