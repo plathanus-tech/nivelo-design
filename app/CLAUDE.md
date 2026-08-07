@@ -2576,6 +2576,1156 @@ uma "navegação" pro mesmo hash não recarrega a página de verdade — usado `
 testar de fato); Detalhe de Conta a Pagar/Receber carregam sem erro; nenhum erro de console em
 nenhuma das ~15 telas tocadas neste round.
 
+## Ajustes 2026-08-05 (round 70) — Nova jornada: Vídeos
+
+Ativado o item de sidebar "Vídeos" (`data-nav="videos"`, ícone `circle-play`, stub visual desde a
+criação do shell — sem `NAV_DESTINATIONS`). Escopo do pedido: só a listagem que os usuários
+consomem (o cadastro/gestão é uma funcionalidade administrativa ainda não pedida como tela).
+
+- **Arquivos novos:** `app/shared/videos-data.js` (`window.NiveloVideos`); `app/screens/
+  videos.html` + `app/shared/page-videos.css` + `app/shared/videos.js`.
+- **Vídeos nunca são armazenados no sistema** — só o vínculo com o YouTube (URL + metadados já
+  extraídos) é persistido, conforme pedido. `videos-data.js` guarda só `videoId`/`titulo`/
+  `categoria`/`thumbnail`/`canal`/`publicadoEm` por vídeo, nunca o vídeo em si.
+- **Regras de negócio implementadas na CAMADA DE DADOS, mesmo sem tela de cadastro ainda**
+  (mesmo raciocínio já usado em `certificado-digital-data.js` round 56 — `setParceiro()`/
+  `registrarAcessoParceiro()` prontos antes de qualquer admin screen — e em `emitente-data.js`):
+  `isValidYoutubeUrl()`/`extractVideoId()` aceitam `youtube.com/watch?v=`, `youtu.be/`,
+  `/shorts/` e `/embed/`; `fetchMetadata()` usa o endpoint público de **oEmbed do YouTube**
+  (`https://www.youtube.com/oembed?url=...&format=json`, sem chave de API) pra obter título
+  automaticamente, e `buildThumbnailUrl()` usa o padrão público de thumbnail
+  (`img.youtube.com/vi/<id>/hqdefault.jpg`) — ambos mecanismos documentados publicamente pelo
+  YouTube, sem depender de nenhuma integração paga. `add()` rejeita (mensagem de erro) quando o
+  link é inválido ou os metadados não puderem ser obtidos, e bloqueia vídeos duplicados (mesmo
+  `videoId`). Nenhuma tela chama `add()` ainda — fica pronto pra quando a tela administrativa de
+  cadastro for pedida.
+- **Seed:** 7 vídeos fictícios (`videoId` inventado, ex. `nivelo0001` — mesma convenção de dado
+  fictício plausível já usada em todo o protótipo, ex. CNPJ/número de série de certificado) com
+  `thumbnail: null`, cobrindo as 6 categorias fixas (Primeiros passos/Notas Fiscais/Financeiro/
+  Estoque/Caderno de Campo/Assistente IA). `list()` sempre ordena do mais recente pro mais antigo
+  (`publicadoEm` desc), conforme pedido.
+- **Card sem thumbnail real usa um placeholder de gradiente + ícone `play-circle`** (`.videos-
+  thumb-placeholder`) em vez de tentar carregar uma URL de imagem inventada — evita depender de
+  uma URL de conteúdo externo real que este protótipo não pode garantir que exista. Quando um
+  vídeo tiver `thumbnail` real (fluxo de cadastro futuro), o card já renderiza a imagem de
+  verdade via `<img>`, sem nenhuma mudança de código.
+- **Card inteiro é clicável** (mesmo padrão de "card inteiro navegável" já usado no feed do
+  Canal de Ideias: `role="link"`, `tabindex="0"`, Enter/Espaço funcionam) — clique abre
+  `window.open(url, '_blank', 'noopener,noreferrer')`, nunca um player embutido, conforme
+  pedido explícito ("Não utilizar player incorporado nesta versão"). Categoria como `.badge`
+  colorido por categoria (mesma técnica de mapa `CATEGORIA_COR` já usada em `canal-ideias.js`),
+  ícone do YouTube via SVG inline (mesma exceção documentada do WhatsApp — **correção do round
+  71:** `data-lucide="youtube"` foi usado aqui inicialmente por engano; o Lucide não tem esse
+  ícone na versão servida pelo CDN, ver round 71).
+- **Grid responsivo `auto-fill`** (`minmax(280px,1fr)`, mesma técnica já usada em Fazendas/Canal
+  de Ideias pra listas que crescem dinamicamente) — 1 coluna no mobile, várias no desktop
+  conforme o espaço disponível, sem contagem fixa de colunas (o admin pode adicionar quantos
+  vídeos quiser).
+- **Bug evitado preventivamente, mesma classe já documentada dezenas de vezes neste projeto:**
+  `.videos-grid`/`.videos-empty` (que alternam via atributo `hidden` conforme a lista está vazia
+  ou não) já nasceram com os guards `[hidden]{display:none}` desde a primeira versão do CSS —
+  sem isso, `display:grid`/`display:flex` incondicionais derrotariam o `hidden` do jeito que já
+  aconteceu dezenas de vezes com `.overlay`/`.actionBtn`/`.btn`/`.alert`/etc.
+- **`interface-principal.js`:** uma linha em `NAV_DESTINATIONS` (`videos: 'videos.html'`) ativa
+  a navegação real em todas as telas que já tinham o item de sidebar. **`prototype-nav/
+  nav.config.js`:** nova "Jornada · Vídeos" com a tela única.
+
+Verificado ao vivo: os 7 vídeos seed renderizando ordenados do mais recente pro mais antigo;
+clique no card (interceptando `window.open`) abrindo a URL certa do YouTube em nova aba, sem
+player embutido; navegação real a partir da Sidebar de outra tela (Dashboard); estado vazio
+(simulado via `NiveloVideos.list` sobrescrito) mostrando a mensagem central corretamente, sem o
+bug de `hidden`+`display`; grid responsivo sem overflow horizontal em 375px; nenhum erro de
+console real (só os 404 de `/fonts/*.otf` já pré-existentes em toda tela do sistema, não
+relacionados a esta feature).
+
+## Ajustes 2026-08-05 (round 71) — Nova área: Minha Conta + Fluxo completo de compra
+
+Pedido grande em 2 partes: (1) área "Minha Conta" (3 abas: Dados/Plano/Pagamento), ativando o
+stub de sidebar `config-minha-conta` (sem destino desde a criação do shell); (2) fluxo de
+checkout completo (`comprar-plano.html`), acessível tanto do Dashboard ("Contratar agora") quanto
+do modal de trial expirado ("Realizar pagamento") — **a mesma tela nos dois casos**, conforme
+pedido explícito.
+
+- **3 módulos de dados novos:** `app/shared/planos-data.js` (`window.NiveloPlanos` — os mesmos 4
+  planos e valores mensais já usados na landing page, `list/findById/isUpgrade/
+  precoPorModalidade`, desconto anual de 20% sobre 12x, mesma regra da landing — mantidos em
+  sincronia manual, sem import cruzado entre `landing/` e `app/`, ver "Escopo" no topo deste
+  arquivo); `app/shared/assinatura-data.js` (`window.NiveloAssinatura` — mock da assinatura atual
+  por cenário, `TODAY` fixo `'2026-07-31'`, mesma convenção de `contas-pagar-data.js`, campos
+  derivados `diasParaVencer`/`vencida`/`diasRestantesTeste` calculados a partir da data de
+  vencimento, nunca guardados); `app/shared/minha-conta-data.js` (`window.NiveloMinhaConta` —
+  dados cadastrais do titular, módulo NOVO e separado de `emitente-data.js` — os dois coexistem
+  por design, sem import cruzado, mesmo raciocínio já documentado pra `natureza-operacao-data.js`
+  × `naturezas-operacao-data.js`).
+- **Minha Conta (`app/screens/minha-conta.html`):** 3 abas via `Tab` real (`#mc-tablist`), estado
+  inicial/cenário de demonstração via hash combinado `#tab=X&state=Y` (mesmo mecanismo de
+  `#step=N&state=X` já usado em `nova-fazenda.html`).
+  - **Aba Dados:** Nome/CPF-CNPJ/E-mail/Telefone/Senha (campo vazio, placeholder "Deixe em branco
+    para manter a senha atual" — nunca mostra a senha real) + Endereço completo (CEP com máscara
+    + autofill via ViaCEP, mesma técnica de `cadastro-endereco.js`; Estado como `Dropdown` real,
+    27 UFs) + seção **"Dados adicionais para cobrança (opcional)"** reservada pra uma futura
+    exigência da Cielo (Data de nascimento + Documento do titular do cartão, se diferente) —
+    nenhum dos dois é usado hoje em lugar nenhum do checkout, só reservados por precaução
+    conforme pedido ("deixe espaço para esses campos"). Único botão: "Salvar alterações"
+    (`NiveloMinhaConta.update()` + toast).
+  - **Aba Plano:** card de resumo (Plano atual/Status/Forma de contratação/Data de início/
+    vencimento, badge por status: teste=info, ativo=success, aguardando=warning,
+    cancelado=error); card informativo de trial ("Você está utilizando o plano X gratuitamente
+    até DD/MM/AAAA.", só quando `status==='teste'`); botão "Escolher outro plano" revela um
+    seletor com toggle Mensal/Anual (mesmo padrão visual `.pricing-toggle` já usado na landing,
+    reconstruído aqui com classes próprias `mc-picker-*` — `landing/` e `app/` não compartilham
+    CSS) + os 4 planos em cards. **Decisão de escopo confirmada no código:** como este protótipo
+    não tem (nem foi pedido) lógica de proração/downgrade automática, qualquer troca de plano
+    escolhida aqui (não só upgrade, que foi o caso explicitamente descrito no pedido) abre o
+    mesmo modal informativo — "O valor do upgrade será calculado proporcionalmente ao período
+    restante da sua assinatura" + botão "Falar com Comercial" (WhatsApp, `wa.me/...`, mesmo SVG
+    inline do ícone já usado no item Suporte da Sidebar) — nunca um upgrade automático. O fluxo
+    de checkout completo (`comprar-plano.html`) é reservado só pra CONTRATAÇÃO NOVA (trial/sem
+    plano/vencido), nunca pra troca de plano de quem já é assinante ativo.
+  - **Aba Pagamento:** Forma de contratação atual/Situação/Próxima cobrança (mensal) ou
+    Vencimento (anual). Aviso de renovação próxima (`.alert.warning`, licença anual, ≤30 dias,
+    ainda não vencida) e aviso de plano vencido (`.alert.error` + "Comprar novamente" →
+    `comprar-plano.html?motivo=vencido`) são mutuamente exclusivos e calculados a partir de
+    `assinatura.diasParaVencer`/`vencida`, nunca hardcoded. "Renovar licença" (anual, não vencida)
+    → `comprar-plano.html?motivo=renovacao` — mesmo fluxo de compra, conforme pedido ("Este botão
+    abre novamente o mesmo fluxo de compra"). "Cancelar renovação" (mensal com renovação
+    automática ativa) abre um modal de confirmação (`.btn.destructive`) e, ao confirmar, mostra a
+    frase exata pedida: "O acesso permanecerá disponível até o final do período já pago." +
+    toast. Histórico de compras (Data/Plano/Tipo/Valor/Status) — tabela padrão, estado vazio
+    próprio quando não há nenhuma compra ainda.
+- **Fluxo de compra (`app/screens/comprar-plano.html`), chrome minimalista sem Sidebar** (decisão
+  deliberada — checkout de e-commerce convencionalmente remove distrações de navegação pra
+  manter o foco, mesmo espírito "moderno/profissional/transmitir confiança" pedido) — só um topo
+  com logo + "Cancelar e voltar" (pro Dashboard). Indicador de 3 etapas (mesma linguagem visual
+  do wizard de `nova-fazenda.html`/Criar Conta, classes próprias `cp-step*` — não reaproveita
+  `page-cadastro.css`, que é auth-only). **Mesma tela em ambas as origens** (Dashboard "Contratar
+  agora" e modal de trial expirado "Realizar pagamento"), como pedido explicitamente — só um
+  parâmetro `?motivo=renovacao|vencido` opcional ajusta um banner de contexto no topo, nunca o
+  comportamento.
+  - **Etapa 1 (Plano):** 4 cards comparáveis (nome/tagline/recursos/preço "a partir de
+    R$X/mês"), clicar em "Escolher plano" já avança pra Etapa 2 (auto-avanço, conforme pedido:
+    "Ao selecionar um plano, seguir para a próxima etapa" — diferente da Etapa 2, que exige um
+    clique explícito em "Continuar"). **Sem seletor Mensal/Anual nesta etapa** — decisão
+    corrigida durante a implementação: a Etapa 2 inteira já existe pra decidir isso; um toggle na
+    Etapa 1 duplicaria a decisão e contradiria o desenho de 2 etapas distintas pedido.
+  - **Etapa 2 (Modalidade):** 2 cards clicáveis (não radio nativo) — Licença mensal (preço +
+    "Cobrança recorrente automática, uma vez por mês. Cancele quando quiser.") e Licença anual
+    (preço mensal-equivalente + selo "Economize 20%" + "Pague o ano inteiro de uma vez... e
+    economize"), atendendo o pedido de "explicar rapidamente a diferença". "Continuar" só habilita
+    depois de uma escolha.
+  - **Etapa 3 (Pagamento):** método só aparece pra escolher (Cartão/PIX) quando `modalidade===
+    'anual'` — mensal é sempre só Cartão, com a frase exata pedida ("A assinatura será renovada
+    automaticamente todos os meses.") abaixo dos campos. Cartão: Número (máscara de 4 em 4)/Nome
+    impresso/Validade (MM/AA)/CVV, nenhuma técnica de máscara de cartão existia no projeto antes
+    (implementada do zero, mesma filosofia de máscara progressiva sem lib externa já usada em
+    Área/Moeda/CPF-CNPJ). Parcelamento 1x-12x **só quando Anual + Cartão** (mensal não parcela —
+    é uma assinatura recorrente, não uma compra única), sem juros (decisão de escopo, não
+    especificada no pedido, documentada no código). PIX (só quando Anual escolhido): QR code
+    **ilustrativo mas visualmente real** (SVG gerado via grade 21×21 determinística com padrão de
+    "olhos" nos 3 cantos, técnica nova no projeto, sem lib externa — decisão deliberada de não
+    usar um placeholder tracejado genérico aqui, já que "transmitir confiança" foi pedido
+    explicitamente) + código copia-e-cola fictício com botão Copiar (Clipboard API) +
+    instruções + badge "Aguardando pagamento". **Botão "Verificar pagamento" com mock de 2
+    cliques** (1º "ainda não identificamos", 2º confirma) — simula o atraso real de compensação
+    de um PIX sem precisar de backend/webhook, mesmo espírito do código OTP fixo (`111111`) do
+    Login. **Cupom de desconto:** `NIVELO10`/`NIVELO20` válidos (10%/20% off), qualquer outro
+    "Cupom inválido" — atualiza o Resumo automaticamente. **Resumo da compra** (aside sticky):
+    Plano/Modalidade/Valor/Desconto (só se houver cupom)/Parcelamento (só cartão parcelado)/
+    Total, sempre recalculado a cada mudança (método, parcelas, cupom).
+  - **Cartão de teste pra recusa, interativo:** número terminado em `0002` sempre recusa
+    (`.alert.error` inline, "Verifique os dados do cartão ou tente outro cartão."), qualquer
+    outro aprova — mesmo padrão de "valor mágico de teste" já usado no OTP do Login, já que não
+    há gateway real neste protótipo. Overlay de carregamento (~1,3s, "Processando pagamento...")
+    entre o clique em "Confirmar pagamento" e o resultado.
+  - **Confirmação:** ícone de sucesso + "Pagamento realizado com sucesso." + Plano contratado/
+    Tipo da assinatura/Próxima renovação (mensal, +1 mês) ou Próximo vencimento (anual, +12
+    meses) + "Ir para o Dashboard". Indicador de etapas escondido nesta tela (não faz sentido
+    mostrar "Etapa 3" numa tela que já não é mais uma etapa do formulário).
+- **Dashboard:** "Contratar agora" (`#dash-trial-upgrade-btn`) e "Realizar pagamento" (modal de
+  trial expirado, `#trial-block-pay`) — eram flash-disable, agora navegam de verdade pra
+  `comprar-plano.html`. "Falar com administrador" continua flash-disable (fora do escopo deste
+  pedido, não é fluxo de pagamento). **2 variantes novas de demonstração:** `#state=
+  renewalwarning` (banner `.dash-renewal-banner`, licença anual vencendo em breve, com "Renovar
+  licença" → `comprar-plano.html?motivo=renovacao`) e `#state=planoexpirado` (novo modal de
+  bloqueio `#plan-expired-overlay`, mesma composição exata do bloqueio de trial — sem X, sem
+  fechar por fora/Esc — mas com a mensagem "Seu plano expirou." + "Comprar novamente" →
+  `comprar-plano.html?motivo=vencido`; **conceitualmente distinto** do bloqueio de trial: é pra
+  quem JÁ foi assinante pago, não pra quem nunca contratou).
+- **`interface-principal.js`:** uma linha em `NAV_DESTINATIONS` (`'config-minha-conta':
+  'minha-conta.html'`) ativa a navegação real em todas as telas que já tinham o item de sidebar.
+- **`prototype-nav/nav.config.js`:** nova "Jornada · Minha Conta" (Minha Conta × 3 variantes de
+  aba/estado + Contratar plano × 2 variantes de origem) + 2 novas variantes em "Jornada · Sistema"
+  (Dashboard: `renewalwarning`/`planoexpirado`).
+- **Bug real de uma feature ANTERIOR encontrado e corrigido nesta rodada, ao testar o ícone do
+  YouTube de `videos.js` (round 70) num teste comparativo de ícones:** `data-lucide="youtube"`
+  não existe na build do Lucide servida pelo CDN (`unpkg.com/lucide@latest`) — o ícone nunca
+  renderizava (confirmado via `Object.keys(window.lucide.icons)`, vazio pra qualquer variação de
+  "youtube"). Corrigido trocando pro mesmo padrão já usado pro WhatsApp: SVG inline com
+  `fill="currentColor"` (exceção documentada à regra "sem SVG inline" — a marca não existe no
+  Lucide). **Lição:** o `lucide.icons` object usa chaves PascalCase (`ChevronDown`, não
+  `chevron-down`) — pra checar se um ícone existe de verdade via console, converter o nome
+  kebab-case pro PascalCase antes de checar `window.lucide.icons[nome]`.
+- **Mesma limitação de sempre, já documentada em todo o protótipo:** sem `localStorage`, uma
+  compra concluída/cancelamento de renovação/edição de dados só existe durante a sessão de JS da
+  própria página — ao navegar pra outra tela, os dados voltam ao mock seed. O toast/tela de
+  sucesso aparece corretamente; a mudança em si não persiste na Sidebar/Dashboard.
+
+Verificado ao vivo (servidor `app-preview-2`, porta 8091): Minha Conta com as 3 abas trocando
+(hash `#tab=&state=`), formulário de Dados pré-preenchido + CEP/Estado funcionando, aba Plano com
+os 4 cenários de status corretos (badge/datas/card de trial), "Escolher outro plano" abrindo o
+seletor com toggle Mensal/Anual funcionando e o modal de WhatsApp abrindo com o plano certo; aba
+Pagamento com os 5 cenários (mensal ativo/cancelado, aguardando, renovação próxima, vencido) todos
+mostrando o aviso/botão certo, fluxo completo de "Cancelar renovação" (modal → confirmação →
+nota + toast) testado; fluxo de compra completo testado 3 vezes (Cartão anual com cupom aplicado
+e total recalculado corretamente R$1.622,40→R$1.460,16; PIX com QR/código/2 cliques de
+"Verificar pagamento" até confirmação; cartão terminado em 0002 recusando com a mensagem certa),
+confirmação mostrando plano/tipo/data de renovação corretos nos 2 casos (mensal +1 mês, anual +12
+meses); "Contratar agora" e "Realizar pagamento" do Dashboard navegando de verdade pro checkout;
+`#state=renewalwarning`/`#state=planoexpirado` do Dashboard mostrando banner/modal corretos;
+navegação real da Sidebar até Minha Conta; nenhum erro de console real em nenhuma das 3 telas
+novas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo o sistema).
+
+## Ajustes 2026-08-05 (round 72) — Fluxo de compra: Etapa 1 redesenhada + 3 bugs reais corrigidos
+
+Pedido em 4 partes, sobre `comprar-plano.html` (round 71). Reduziu o wizard de 3 etapas pra 2
+(Plano → Pagamento) — Modalidade deixou de ser uma etapa própria.
+
+- **Etapa 1 redesenhada: de "cards de landing page" pra acordeão vertical.** Os 4 planos eram
+  cards lado a lado com preço em destaque, idêntico ao visual da landing — pedido explícito pra
+  não parecer página comercial, já que o usuário já está dentro do produto contratando/alterando
+  um plano. Agora é uma lista vertical (`.cp-plan-accordion`/`.cp-plan-item`), um plano por linha,
+  que expande in-place ao clicar (accordion, só um aberto por vez): dentro do item expandido,
+  lista de recursos + as 2 opções de modalidade (Mensal/Anual, cada uma com preço + badge
+  "Economize 20%" na anual) + botão "Continuar" (escopado àquele plano, só habilita depois de
+  escolher uma modalidade). **Isso elimina a Etapa 2 (Modalidade) como passo próprio** — a escolha
+  de modalidade acontece dentro do mesmo passo que a escolha do plano. Indicador de etapas
+  reduzido de 3 pra 2 (`Plano`/`Pagamento`).
+- **Texto do topo corrigido pra refletir as regras reais de troca de plano** (antes dizia "Você
+  pode trocar de plano quando quiser depois, em Minha Conta" — impreciso, já que as regras
+  variam por modalidade): "No plano mensal, a troca de plano vale a partir do próximo ciclo de
+  cobrança. No plano anual, é possível fazer upgrade a qualquer momento — a troca para um plano
+  inferior só é permitida na renovação."
+- **3 bugs reais corrigidos na Etapa de Pagamento** (renumerada pra Etapa 2), todos a mesma causa
+  raiz: `RadioButton.module.css` é carregado nesta tela (pro método Cartão/PIX) e colide com
+  classes genéricas de outros componentes, mesmo padrão documentado dezenas de vezes neste
+  projeto:
+  1. **Campos do cartão invisíveis:** `RadioButton.module.css`'s `.input{opacity:0;position:
+     absolute;width:1px;height:1px}` (esconde o radio nativo) vazava pra QUALQUER `<input
+     class="input">` de texto real da página — número/nome/validade/CVV do cartão, cupom, código
+     PIX. Fix: `.input:not([type="radio"]) { position:static;opacity:1;width:100%;height:auto; }`
+     em `page-comprar-plano.css` (mesmo padrão preventivo já usado em Estoque/Nova Natureza de
+     Operação/Balancete pra essa exata colisão).
+  2. **Parcelamento agrupado horizontalmente, não empilhado:** `RadioButton.module.css`'s
+     `.option{display:inline-flex}` colidia com o `.option` do MENU do Dropdown de parcelas
+     (mesmo nome de classe, componente diferente) — as 12 opções (1x a 12x) ficavam lado a lado
+     em vez de uma por linha. Fix escopado só ao menu de parcelas (`#cp-parcelas-menu .option {
+     display:block; width:100%; }`), sem tocar no `.option` real do RadioButton (usado por
+     Cartão/PIX e pelas novas opções de modalidade, que precisam continuar `inline-flex`).
+  3. **Radio de método de pagamento não aparecia marcado:** `RadioButton.module.css` pinta o dot
+     via classe `.checked` no `<label class="option">`, nunca via `:checked` do input nativo — o
+     JS original nunca sincronizava essa classe ao trocar Cartão/PIX. Fix: `.checked` sincronizada
+     em `setupStep2()` e no handler `change` dos radios de método, mais um reforço via CSS
+     `:has()` (`.cp-method-option:has(.input:checked) .dot { opacity:1; }`) que garante o efeito
+     visual mesmo se a sincronização via JS falhar por qualquer motivo — aplicado também nas
+     novas opções de modalidade dentro do acordeão.
+- **Resumo/lógica de preço/cupom/parcelamento não foram tocados** — só a apresentação da Etapa 1
+  e os 3 bugs da Etapa de Pagamento. `pedido.planoId`/`modalidade` continuam preenchidos do mesmo
+  jeito, só a origem da escolha (clique no botão "Continuar" dentro do item expandido) mudou.
+
+Verificado ao vivo: acordeão expande um plano por vez (fechando os outros automaticamente); opção
+de modalidade marca o radio de verdade (dot visível, borda azul) e habilita "Continuar" só depois
+de escolher; clique em "Continuar" leva pra Pagamento com os campos do cartão TOTALMENTE visíveis
+(`position:static`, `opacity:1`, largura real ~568px, confirmado via `getComputedStyle`); rádio de
+Cartão/PIX aparecendo marcado ao trocar; as 12 opções de parcelamento empilhadas verticalmente
+(mesma coordenada X, Y sequencial, confirmado via `getBoundingClientRect`); fluxo completo até a
+confirmação testado de novo, sem regressão; nenhum erro de console real (só os 404 de
+`/fonts/*.otf` já documentados).
+
+## Ajustes 2026-08-05 (round 73) — Minha Conta: modo leitura/edição, nova aba Segurança,
+modal de troca de plano com regra de downgrade; Fluxo de compra: navegação e cupom
+
+Pedido em 9 partes sobre Minha Conta (round 71/72) e o fluxo de compra (round 72).
+
+- **Aba Dados vira tela de detalhes (leitura por padrão):** todos os campos nascem
+  `disabled`; botão "Editar" (`.btn.secondary.sm.hasLeft`, ícone `pencil`) no lado oposto do
+  título "Dados cadastrais" habilita os campos + revela "Cancelar"/"Salvar alterações"
+  (escondidos em modo leitura). "Cancelar" recarrega os valores originais de
+  `NiveloMinhaConta.getConta()` e volta ao modo leitura sem persistir nada.
+- **Campo "Data de nascimento" promovido pra dado real** (antes reservado/vazio pra uma
+  futura exigência da Cielo) — agora faz parte de "Dados cadastrais" com valor preenchido.
+  **Seção "Dados adicionais para cobrança" removida por completo** (Data de nascimento
+  migrada pra cima; "Documento do titular do cartão" removido do HTML/JS/dado — não tinha
+  nenhum consumidor real no checkout).
+- **Aba Plano: modal de troca de plano com acordeão** (mesma linguagem visual de
+  `comprar-plano.html`, prefixo `mc-modal-*` pra não colidir com as classes `cp-*` da outra
+  tela) substitui o painel inline de toggle Mensal/Anual + 4 cards. Clicar "Escolher outro
+  plano" abre `#mc-plan-modal-overlay`; expandir um plano revela Mensal/Anual + "Continuar";
+  ao confirmar, fecha esse modal e abre o já existente `#mc-upgrade-overlay` (Falar com
+  Comercial) — a arquitetura "qualquer troca de plano de assinante ativo vai pro Comercial"
+  (round 71) não mudou, só a INTERAÇÃO de escolha.
+  - **Regra de downgrade implementada:** `isPlanoElegivel()` em `minha-conta.js` — numa
+    licença ANUAL `ativa`, planos igual/inferior ao atual (downgrade, via
+    `NiveloPlanos.isUpgrade()`) só entram na lista quando `diasParaVencer <= 30`; upgrades
+    sempre aparecem; mensal/teste/aguardando/cancelado não têm essa restrição. Testado nos 2
+    extremos: cenário `ativo` (plano mais alto, longe da renovação) mostra a lista vazia com
+    mensagem explicativa; cenário `mensal` mostra os 3 outros planos sem restrição.
+  - **Bug de footer cortado corrigido preventivamente:** `#mc-upgrade-overlay`/
+    `#mc-plan-modal-overlay` passaram de `dialog sm` (360px) pra `dialog md` (540px) + `.footer
+    {flex-wrap:wrap}` — evita o padrão já documentado (round 4) de rótulo longo ("Falar com
+    Comercial") cortando o botão vizinho num modal estreito. Confirmado via
+    `getBoundingClientRect()`: os 2 botões cabem lado a lado sem sobreposição.
+- **Espaçamento padrão entre cards:** `.mc-panel{display:flex;flex-direction:column;gap:
+  var(--spacing-lg)}` (com guard `[hidden]{display:none}`, mesmo bug recorrente) — resolve de
+  uma vez tanto o espaçamento pedido entre o card do Plano e o botão "Escolher outro plano"
+  quanto entre as informações de Pagamento e o Histórico de compras (nenhum dos dois tinha gap
+  antes, só ordem de bloco sem `flex`).
+- **Nova aba "Segurança":** senha mascarada (`********`, nunca a senha real) + "Última
+  alteração: DD/MM/AAAA" + botão "Alterar senha". `minha-conta-data.js` ganhou
+  `senhaUltimaAlteracao`/`senhaAtualMock` (valor mágico de teste, mesmo espírito do OTP fixo
+  do Login — sem backend real).
+- **Modal "Alterar senha":** Senha atual/Nova senha/Confirmar, reaproveitando literalmente os
+  critérios de segurança de `criar-nova-senha.html` (lista `.pwd-criteria`, CSS copiado pra
+  `page-minha-conta.css` já que a tela não carrega `page-criar-nova-senha.css`). Validação:
+  senha atual incorreta (compara com `senhaAtualMock`), critérios de senha, confirmação
+  divergente — cada uma com mensagem própria, borda vermelha só no campo errado (`.errorText`
+  com o guard padrão `.wrapper .errorText{display:none}`/`.wrapper.error .errorText{display:
+  flex}`, já que `Input.module.css`'s `.errorText{display:flex}` é incondicional).
+- **RadioButton.module.css passou a ser carregado em `minha-conta.html`** (pro Mensal/Anual do
+  modal de troca de plano) — aplicado PREVENTIVAMENTE o fix já conhecido da colisão com
+  `Input`/`Dropdown` (`.input:not([type="radio"])`, `#mc-estado-field .menu .option{display:
+  block}`) desde a criação, sem esperar o bug aparecer.
+- **Fluxo de compra (`comprar-plano.html`):** texto da Etapa 1 corrigido (travessão → vírgula,
+  nova regra permanente de copy). Link "Cancelar e voltar" do topo ganhou ícone + cor mais
+  forte (secundária, não mais terciária) pra ficar mais perceptível. Novo botão "Voltar"
+  (`.btn.secondaryGray.hasLeft`) abaixo do formulário de pagamento, além do link "Trocar de
+  plano" já existente no topo do passo — nenhuma mudança de JS necessária (`[data-back-to]` já
+  era genérico). Cupom de desconto ganhou a classe `sm` do Button (estava sem) e o bloco
+  inteiro foi movido pra ANTES do painel do PIX (satisfaz tanto o pedido do cartão quanto do
+  PIX, já que os dois compartilham o mesmo trecho de HTML). Botão "Confirmar pagamento" já não
+  aparecia no PIX antes deste round (`submitRow.hidden = isPix`), confirmado ao vivo — nenhuma
+  mudança necessária ali. Nenhum título geral novo foi adicionado à página (avaliado e
+  descartado): cada etapa já tem um `<h1>` próprio ("Escolha o plano..."/"Pagamento") que
+  cumpre esse papel sem duplicar informação.
+
+Verificado ao vivo: modo leitura→edição→cancelar preservando os valores originais; modal de
+troca de plano com a lista de planos elegíveis correta nos 2 cenários extremos (`ativo`/
+`mensal`); rádio de modalidade marcando visualmente (dot/borda); footer do modal de Comercial
+sem sobreposição de botões; aba Segurança com data formatada; modal de alterar senha
+bloqueando senha atual errada, aceitando o fluxo completo (critérios + confirmação + toast +
+data atualizada); Etapa 1 do checkout sem travessão; cupom antes do Pix no DOM; PIX sem botão
+de Confirmar pagamento; campos do cartão com `position:static/opacity:1/width:100%`; botão
+Voltar navegando pra Etapa 1; nenhum erro de console real em nenhuma das 2 telas.
+
+## Ajustes 2026-08-05 (round 74) — Minha Conta: espaçamento/toast/mensagens; Fluxo de compra:
+breadcrumb, ação de pagamento unificada, resumo primeiro no mobile
+
+Pedido em 8 partes, refinando o round 73.
+
+- **Dados cadastrais:** `.mc-actions` ganhou `gap: var(--spacing-md)` (16px, padrão de
+  botão×botão do sistema) — antes os dois botões ficavam colados. Toast de sucesso
+  **corrigido pra bater com o padrão EXATO do resto do sistema**: era `top-right` (só desta
+  tela), virou centralizado no topo (`left:0;right:0;justify-content:center`, mesma estrutura
+  de `page-produtos.css`/`page-categorias-financeiras.css`), incluindo o fix de colisão
+  Feedback×Table×Dialog (`.mc-toast .body{padding:0;color:inherit}`) que faltava.
+- **Aba Plano:**
+  - **Mensagem de licença anual sem repetição:** antes o hint fixo do modal E a mensagem de
+    lista vazia repetiam a mesma explicação sobre downgrade/renovação. Agora o hint só
+    aparece quando `modalidade==='anual' && status==='ativo'` (explica a regra uma vez),
+    e a lista vazia virou só "Nenhum plano disponível para troca no momento." (sem repetir).
+  - **Período de teste:** botão "Escolher outro plano" → **"Contratar agora"**, navega direto
+    pra `comprar-plano.html` (contratação nova, sem passar pelo modal de troca — não faz
+    sentido "trocar" de um trial). A mensagem de sucesso de "Dados" reaproveita o mesmo toast
+    corrigido acima, então o pedido de espaçamento em período de teste já fica resolvido.
+  - **Licença mensal não passa mais pelo Comercial** (mudança de arquitetura sobre o round
+    71/73, restrita à MENSAL — anual continua indo pro Comercial, proração não é calculável
+    neste protótipo): novo modal `#mc-mensal-change-overlay` mostra o plano escolhido + "A
+    cobrança continua normalmente. O novo plano passa a valer a partir de `<data exata =
+    assinatura.dataVencimento>`, quando o ciclo atual terminar." + botão "Ir para pagamento"
+    que navega pra `comprar-plano.html?motivo=trocaplano&plano=&modalidade=&vigencia=`.
+  - `comprar-plano.js` ganhou suporte a esses query params: quando presentes, pula a Etapa 1
+    por completo (`pularParaPagamento`), preenche `pedido.planoId`/`modalidade` direto e já
+    abre a Etapa 2, com o banner de contexto mostrando a data exata de vigência.
+- **Aba Segurança virou "Senha", reposicionada ao lado de "Dados"** (era a última aba) — só
+  reordenação de markup (tab + painel), nenhuma mudança de comportamento.
+- **Modal "Alterar senha":** largura de `sm`(360px)→`md`(540px, resolve o "Cancelar cortado"
+  de vez); espaçamento reconstruído seguindo literalmente o padrão de `page-login.css`
+  (`.login-form{gap:16px}` → `.mc-password-body{gap:var(--spacing-md)}`; descrição nova
+  "Escolha uma nova senha segura..." com `margin-bottom:var(--spacing-sm)`, resultando em 24px
+  de respiro até o 1º campo, igual à razão gap+margin do Login); footer ganhou
+  `gap:var(--spacing-md)` (era 8px do Dialog padrão, agora 16px do padrão botão×botão) +
+  `flex-wrap` de segurança.
+- **Histórico de compras (Pagamento):** tabela ganhou o mesmo padrão visual das demais
+  tabelas do sistema — cabeçalho Brand 50/caixa-alta/semibold + zebra branco/gray-50
+  (`page-categorias-financeiras.css` como referência), confirmado via `getComputedStyle`.
+- **Fluxo de compra — navegação:** removidos "Cancelar e voltar" do topo E "Trocar de plano"
+  do topo da Etapa 2 (pedido explícito, item 8) — a navegação agora é só o **breadcrumb**
+  (`#cp-steps`), clicável pra voltar a uma etapa já concluída (`is-clickable`, JS rastreia
+  `currentStepNum`; tentar avançar clicando numa etapa futura não faz nada).
+  - **Etapa de pagamento: ação unificada numa linha só** (`.cp-payment-actions-row`) —
+    "Voltar" sempre à esquerda; "Confirmar pagamento" (Cartão) OU "Verificar pagamento"
+    (PIX) sempre à direita, nunca os dois botões de submissão juntos (o botão de PIX saiu de
+    dentro do painel do QR Code pra esta linha compartilhada).
+  - **Mobile: resumo da compra agora aparece ANTES do formulário** (`.cp-summary-card{order:
+    -1}`, revertido pra `order:0` a partir de 900px onde vira grid de 2 colunas) — confirmado
+    via `getBoundingClientRect()` nos dois breakpoints.
+
+Verificado ao vivo: gap de 16px entre Cancelar/Salvar; toast centralizado
+(`toastCenter≈viewportCenter`); modal de troca de plano sem repetição de texto; "Contratar
+agora" (teste) navegando direto pro checkout; troca de plano mensal abrindo o modal novo (sem
+Comercial) com a data exata e navegando pro checkout já na Etapa 2 com os campos do cartão
+totalmente visíveis; aba "Senha" ao lado de "Dados"; modal de senha com 540px de largura e
+footer sem sobreposição; histórico com zebra/cabeçalho corretos; breadcrumb voltando de Etapa
+2→1 mas bloqueando avançar de 1→2 por clique; linha de ação do Pix com Voltar+Verificar
+pagamento lado a lado, sem Confirmar pagamento; resumo antes do formulário no mobile (375px) e
+depois dele no desktop (1280px, grid 2 colunas); nenhum erro de console real em nenhuma das
+2 telas.
+
+## Ajustes 2026-08-05 (round 75) — Bug real do Cancelar/Salvar; toast/alertas no padrão certo;
+mostrar/ocultar senha; texto do modal de plano; reversão da navegação do checkout
+
+- **Bug real corrigido: Cancelar/Salvar apareciam sempre, mesmo em modo leitura.**
+  `.mc-actions{display:flex}` (round 73) não tinha guard `[hidden]` — mesmo padrão de bug
+  `hidden`+`display` incondicional documentado dezenas de vezes neste projeto. Fix:
+  `.mc-actions[hidden]{display:none}`. Confirmado via `getComputedStyle` que o container vai
+  de `none`→`flex` só depois de clicar "Editar".
+- **Toast/alertas de Minha Conta fora do padrão — causa raiz era a colisão de 3 vias
+  Feedback×Table×Dialog (Dialog carregado por último no `<head>`), só tinha sido corrigida
+  pro toast (round 73), não pros outros `.alert` da página** (card de trial, avisos de
+  renovação/vencimento). Generalizado: `.alert .body`/`.alert .title` restaurados pros
+  valores originais do Feedback pra QUALQUER `.alert` da tela, não só `.mc-toast`. Toast
+  ganhou também a animação de entrada (`mc-toast-in`, mesma de `page-produtos.css`) e
+  `z-index:80` (era 90, sem motivo pra divergir do padrão).
+- **Mostrar/ocultar senha** nos 3 campos do modal "Alterar senha" — mesmo ícone/comportamento
+  de `page-login.css`'s `.login-toggle-password` (`eye`/`eye-off`, `aria-pressed`), classes
+  próprias `.mc-password-wrap`/`.mc-password-toggle`. Reseta pra oculto/ícone `eye` sempre que
+  o modal reabre (`resetPasswordVisibility()`, chamado de dentro de `resetModal()`).
+- **Modal "Escolher outro plano": texto sem jargão em inglês.** "só upgrades... downgrades..."
+  → "você só pode mudar para um plano superior... mudança para um plano inferior..." — mesma
+  regra de negócio (round 73), só a redação simplificada, sem inglês.
+- **Fluxo de compra: revertida a navegação do round 74** (breadcrumb clicável como navegação
+  principal) — pedido explícito do usuário pra voltar ao padrão original: topbar com
+  "Cancelar e voltar" de volta, "Trocar de plano" de volta no topo da Etapa 2, breadcrumb
+  (`#cp-steps`) voltou a ser só indicador visual, não clicável (`is-clickable`/handler de
+  clique removidos). A ação unificada da Etapa de pagamento (Voltar esquerda + Confirmar/
+  Verificar direita, `.cp-payment-actions-row`) e o resumo-primeiro-no-mobile do round 74
+  NÃO foram tocados — só a navegação de cabeçalho voltou atrás.
+
+Verificado ao vivo: Cancelar/Salvar escondidos por padrão, aparecendo só após "Editar"; toast
+com título 16px/500/verde (bate com o padrão de sucesso do sistema) e card de trial com cor/
+padding info corretos; toggle de senha alternando type+ícone nos 3 campos; texto novo do modal
+de plano sem "upgrade"/"downgrade"; "Cancelar e voltar" e "Trocar de plano" de volta no
+checkout; nenhum erro de console em nenhuma das 2 telas.
+
+## Ajustes 2026-08-05 (round 76) — Nova tela: Relatórios > LCDPR (Livro Caixa Digital do
+Produtor Rural)
+
+Segundo relatório real dentro de Relatórios (depois de Balancete, round 66) — clique no card
+"LCDPR" agora navega de verdade pra `lcdpr.html` (`relatorios.js`'s `REAL_DESTINATIONS`
+generalizado de um único `if` pra um mapa report→tela, cobrindo os dois casos). DRE/Entradas e
+saídas continuam só com o flash-disable, sem tela própria.
+
+- **Arquivos novos:** `app/screens/lcdpr.html` + `app/shared/page-lcdpr.css` +
+  `app/shared/lcdpr.js`. Mesmo padrão visual/de interação de Balancete (round 66) — filtros em
+  card recolhível, cabeçalho de resultado com resumo+ações (Exportar PDF/Excel/Imprimir, sem
+  Compartilhar), cards de KPI, tabela com rolagem horizontal + 1ª coluna sticky — só que
+  **simplificado**: sem gráfico (não pedido) e a tabela é uma lista CRONOLÓGICA (Data/
+  Documento/Histórico/Categoria/Entradas/Saídas), não uma matriz de categorias × período como
+  o Balancete. Sem módulo de dados próprio — agrega `window.NiveloCaixa` (mesma fonte do
+  Balancete), filtrado por `window.NiveloContasFinanceiras`/`window.NiveloCategoriasFinanceiras`.
+- **Filtros:** "Tipo de período" (RadioButton Ano-calendário/Intervalo personalizado — campos
+  aparecem dinamicamente, mesma técnica de `syncTipoPeriodo()` de Balancete); Ano-calendário usa
+  um `Dropdown` simples (2024-2027, não um DatePicker de mês/dia — não fazia sentido pro
+  conceito "ano inteiro"); Intervalo personalizado reaproveita os mesmos `NiveloDatePicker.
+  initDay()` de Data inicial/final já usados em Balancete. Conta/Categoria são o MESMO
+  combobox pesquisável (`initCombobox`, código copiado de `balancete.js` verbatim — os dois
+  relatórios/telas continuam sem compartilhar JS entre si, por convenção do projeto, mas usam a
+  mesma técnica). Sem campo "Agrupamento" (não pedido — o LCDPR é sempre linha a linha, nunca
+  agregado por período).
+- **"Documento" (coluna da tabela):** `NiveloCaixa` não tem um campo de número de documento
+  próprio — usado o `codigo` do lançamento (`LC-NNNN`, já auto-gerado e único) como referência
+  de documento, decisão de prototipagem documentada no código.
+- **Cards de resumo:** "Total de receitas"/"Total de despesas"/"Resultado do período" (nomes
+  literais do pedido, diferente de "Total de entradas/saídas" do Balancete) — mesma cópia
+  estrutural exata (12px/24px fixo em qualquer largura).
+- **Tabela cronológica, 1ª coluna (Data) sticky:** diferente do Balancete (sticky é a coluna
+  Categoria, numa tabela matricial), aqui é uma listagem simples ordenada por data ascendente,
+  então a coluna que precisa ficar fixa durante o scroll horizontal é a Data (contexto
+  temporal). Zebra striping (branco/gray-50) nas linhas do corpo; nunca vira Cards no mobile
+  (relatório financeiro, mesmo princípio do Balancete).
+- **Rodapé da tabela** com Total de entradas/Total de saídas (1ª linha) + Resultado do período
+  (2ª linha, `colspan` 2 na última coluna), destaque visual (fundo Brand 50, negrito).
+- **Bug real pego ao vivo e corrigido:** as regras de zebra striping do corpo da tabela
+  (`.tr:nth-child(odd/even) .td`, escritas com o seletor genérico `.lcdpr-table ...`) também
+  batiam nas 2 linhas do `<tfoot>` — `:nth-child` conta os `<tr>` relativos ao PAI DIRETO
+  (`<tbody>` ou `<tfoot>`, independentemente), então a 1ª linha do rodapé é sempre ímpar e a 2ª
+  sempre par dentro do próprio `<tfoot>`, e essas regras (4 níveis de especificidade,
+  `.lcdpr-table`+`.tr`+`:nth-child`+`.td`) venciam a regra de destaque do rodapé (3 níveis,
+  `.lcdpr-table`+`.lcdpr-foot-row`+`.td`), apagando o fundo Brand 50 esperado. Corrigido
+  escopando as regras de zebra ao `#lcdpr-tbody` (seletor por ID, nunca alcança o `<tfoot>`) em
+  vez do `.lcdpr-table` genérico. **Lição nova, generalização do padrão de colisão de
+  especificidade já documentado várias vezes neste projeto:** ao estilizar `<tfoot>` com
+  destaque próprio numa tabela que também tem zebra striping por `:nth-child` no `<tbody>`,
+  sempre escopar a zebra a um seletor que não alcance o `<tfoot>` (ID do `<tbody>`, nunca uma
+  classe genérica da tabela) — `:nth-child` reinicia a contagem em cada `<tbody>`/`<tfoot>`,
+  então a interação é sutil e só aparece testando o rodapé de verdade via `getComputedStyle`.
+- **`prototype-nav/nav.config.js`:** novo item leaf "LCDPR" na journey "Jornada · Financeiro",
+  logo após "Balancete".
+
+Verificado ao vivo: geração com filtros padrão (Ano-calendário 2026) reproduzindo os mesmos
+totais exatos de Caixa/Balancete (R$ 102.200,00/R$ 45.039,00/R$ 57.161,00, 14 lançamentos);
+filtros recolhem depois de gerar, "Exibir filtros" reabre; alternar Ano-calendário ⇄ Intervalo
+personalizado troca os campos corretamente; intervalo 01/07 a 31/07/2026 isola as 13 linhas
+certas; ano sem nenhum lançamento (2024) mostra o estado vazio com a mensagem exata pedida;
+rodapé com as 2 linhas em Brand 50 (bug de zebra corrigido, confirmado via `getComputedStyle`
+nas 2 linhas × todas as células); mobile (375px): scroll horizontal real (895px de conteúdo em
+341px de viewport), coluna Data sticky confirmada via `getBoundingClientRect` antes/depois do
+scroll, cards de resumo empilhados verticalmente; clique no card "LCDPR" em Relatórios
+navegando de verdade; nenhum erro de console em nenhum estado testado.
+
+## Ajustes 2026-08-05 (round 77) — LCDPR: dados gerais do relatório, colunas
+Documento Fiscal/Natureza/Saldo, tipografia da tabela, rodapé com nota de emissão
+
+Ajustes de UX/UI sobre o relatório LCDPR (round 76), preservando identidade visual/
+componentes/estrutura — pedido explícito de dar cara de documento contábil/profissional.
+
+- **Nova seção "Dados gerais do relatório"** (`.card.lcdpr-info-card`, `dl`/`dt`/`dd`
+  read-only, grid 1/2/4 colunas mobile/tablet/desktop), posicionada logo abaixo dos filtros
+  e antes dos cards de resumo (a antiga linha de resumo dentro do cabeçalho —
+  `#lcdpr-resumo-filtros`, "Período: X · Conta: Y · Categoria: Z" — foi removida, virou
+  redundante com esta seção mais completa). Campos: Produtor Rural/CPF (de
+  `window.NiveloMinhaConta.getConta()` — `nome`/`documento`, já no formato CPF, mais fiel a
+  "Produtor Rural" do que `emitente-data.js`, que modela uma empresa com CNPJ), Propriedade/
+  Município-UF (primeira fazenda de `window.NiveloFazendas.list()` — este protótipo não tem
+  seleção de fazenda no relatório, mesmo raciocínio de "assume 1 propriedade" já usado em
+  outros defaults do sistema), Exercício (ano escolhido no filtro Ano-calendário, ou
+  ano/intervalo de anos coberto pelo período personalizado), Período consultado (mesmo texto
+  já calculado como `periodoLabel`), Data e hora da emissão (`new Date()` real, não o `TODAY`
+  fixo do resto do protótipo — mesma exceção documentada em `nova-conversa.js`: é o instante
+  real do clique em "Gerar relatório", não um registro de negócio simulado).
+- **Ações Exportar PDF/Excel/Imprimir já estavam no canto superior direito do relatório**
+  desde o round 76 — conferido, nenhuma mudança necessária.
+- **Título da tabela** → "Lançamentos do Livro Caixa (LCDPR)".
+- **Coluna "Categoria" → "Natureza"** (só o rótulo do cabeçalho, o dado continua vindo de
+  `NiveloCategoriasFinanceiras`).
+- **Coluna "Documento" → "Documento Fiscal / Documento"**, mostrando um TIPO de documento
+  (NF-e/DARF/Recibo/TED) em destaque + o código interno (`LC-NNNN`) como legenda pequena
+  abaixo (`.lcdpr-doc-tipo`/`.lcdpr-doc-ref`). `NiveloCaixa` não tem um campo de tipo de
+  documento — `inferDocumentoFiscal(l)` é uma heurística de prototipagem (documentada no
+  código, mesmo espírito do round 76 pro "Documento" original): impostos (`CAT-006`) → DARF;
+  lançamento com contraparte identificada (`pessoaDocumento`) → NF-e; pago em dinheiro →
+  Recibo; caso contrário → TED. Não modela PIX (nenhum dado do mock sugere esse meio) — a
+  lista do pedido era só exemplos do que a coluna PODE mostrar, não uma exigência de cobrir
+  os 5 valores.
+- **Nova coluna "Saldo"**, saldo acumulado após cada lançamento (soma corrida de
+  entrada−saída ao longo das linhas já ordenadas cronologicamente, começando em zero — este
+  protótipo não modela saldo de exercícios anteriores, decisão documentada no código).
+  Rodapé: linha "Total" ganhou uma 3ª célula numérica com o saldo final (bate com o
+  Resultado do período, mesmo valor); linha "Resultado do período" passou a ocupar
+  `colspan="3"` (Entradas+Saídas+Saldo) em vez de 2.
+- **Tipografia da tabela aumentada levemente**: 12px→14px (`--font-size-md`) no cabeçalho,
+  corpo e rodapé (`.lcdpr-table .th, .lcdpr-table .td`).
+- **Alinhamento monetário à direita reforçado em TODA a tabela**, incl. a linha de Totais —
+  **bug real pego ao vivo**: as células do rodapé (com `colspan`) caem nas primeiras posições
+  de `:nth-child` do `<tr>` (mesmo mecanismo do bug de zebra×tfoot do round 76 — `colspan`
+  não altera a contagem de `nth-child`, só o span visual), então a regra existente
+  `.lcdpr-table .td:nth-child(-n+4){text-align:left}` (3 níveis de especificidade) vencia as
+  classes de alinhamento à direita do rodapé (`.lcdpr-td-label`/`.lcdpr-foot-value`, só 2
+  níveis) — TODAS as células do rodapé, incluindo os valores em R$, ficavam alinhadas à
+  esquerda. Corrigido reforçando os 2 seletores pra 3 níveis
+  (`.lcdpr-table .lcdpr-foot-row .lcdpr-td-label`/`.lcdpr-foot-value`), empatando a
+  especificidade e vencendo por ordem no arquivo (regra mais específica declarada depois).
+  **Generalização da lição do round 76**: `colspan` não é só uma armadilha para zebra
+  striping por `:nth-child` — qualquer regra baseada em posição de `:nth-child` (incl.
+  alinhamento) pode colidir com células de rodapé/colspan; sempre verificar a especificidade
+  real, não assumir que uma classe nova "helper" vai vencer.
+- **Linha de Totais com destaque sutil**: fundo Brand 50 mantido (já sutil), peso reduzido de
+  Bold pra Semibold (`--font-weight-semibold`) — "tipografia sem exageros", como pedido.
+  Resultado do período continua em Bold + cor de marca (`--color-text-brand`), reforçando que
+  é o valor mais importante da tabela, alinhado à direita junto aos demais.
+- **Cores mantidas**: verde/vermelho só nos 2 KPIs de receita/despesa e no Resultado
+  condicional (positivo/negativo) — nenhuma cor nova introduzida na tabela em si (Saldo
+  aparece em preto/neutro, não colorido por linha — não pedido, e coloriria demais uma
+  coluna que já tem 14 valores por página).
+- **Nova nota de rodapé do relatório** (`#lcdpr-emission-note`, abaixo da tabela): "Relatório
+  emitido em: dd/mm/aaaa hh:mm • Filtros aplicados: Exercício 2026 (ou Período: dd/mm/aaaa a
+  dd/mm/aaaa) • Conta: X • Categoria: Y" — texto exato sugerido pelo usuário, generalizado
+  pra também citar Conta/Categoria quando filtrados (não só Exercício/Período).
+- **`lcdpr.html` ganhou 2 novos `<script>`**: `minha-conta-data.js` (Produtor Rural/CPF) e
+  `fazendas-data.js` (Propriedade/Município-UF) — nenhum dos dois carregava nesta tela antes.
+
+Verificado ao vivo: totais batendo (R$ 102.200,00/R$ 45.039,00/R$ 57.161,00, saldo corrente
+da última linha = R$ 57.161,00 = Resultado); rodapé com alinhamento à direita e fundo Brand
+50 confirmados via `getComputedStyle` nas 2 linhas × todas as células (bug de especificidade
+corrigido); tipografia da tabela em 14px; Dados gerais preenchidos corretamente (Miguel
+Fernando da Silva/123.456.789-00/Fazenda São João/Tijucas-SC); mobile (375px): Dados gerais
+e cards de resumo em 1 coluna, tabela com scroll horizontal (1146px em 341px de viewport);
+nenhum erro de console.
+
+## Ajustes 2026-08-05 (round 78) — LCDPR: remoção de Propriedade/Município, alinhamento
+do rodapé, exportação real (PDF/Excel) + Imprimir nativo
+
+4 ajustes pontuais sobre o relatório LCDPR (round 77).
+
+- **Campos Propriedade/Município-UF removidos** de "Dados gerais do relatório" (pedido
+  explícito) — a seção ficou só com Produtor Rural/CPF/Exercício/Período consultado/Data e
+  hora da emissão. `fazendas-data.js` (adicionado no round 77 só pra esses 2 campos) saiu do
+  `<head>` de `lcdpr.html`, sem consumidor restante nesta tela.
+- **Bug real de alinhamento no rodapé, causa raiz igual à já documentada no round 77 (mesma
+  classe de colisão, ainda não totalmente resolvida):** ao reforçar a especificidade de
+  `.lcdpr-td-label`/`.lcdpr-foot-value` pra 3 classes no round anterior, o rótulo
+  ("Total"/"Resultado do período") tinha sido deixado à DIREITA junto com os valores — pedido
+  explícito agora corrige pra o padrão certo de tabela contábil: rótulo à ESQUERDA, só os
+  valores monetários à direita (no mesmo alinhamento das colunas Entradas/Saídas/Saldo do
+  corpo). Fix: `.lcdpr-table .lcdpr-foot-row .lcdpr-td-label { text-align: left; }` (mantendo
+  `.lcdpr-foot-value` à direita, já correto desde o round 77).
+- **Exportação real, primeira vez no sistema** (todas as outras telas de relatório —
+  Balancete, e o próprio LCDPR até este round — usavam flash-disable, documentado como "fora
+  de escopo real neste protótipo estático"). Duas bibliotecas novas via CDN (mesmo padrão já
+  usado pro Lucide): **jsPDF** (`unpkg.com/jspdf`, global `window.jspdf.jsPDF`) e **SheetJS**
+  (`unpkg.com/xlsx`, global `window.XLSX`).
+  - **Exportar PDF:** `exportarPdf(report)` monta um PDF de verdade (cabeçalho, dados gerais,
+    KPIs, tabela completa com paginação automática quando o conteúdo passa da página, rodapé
+    de totais) e chama `doc.save('LCDPR-<exercício>.pdf')` — download real do navegador.
+    Layout é texto simples posicionado por coordenadas (sem `autotable`, que exigiria mais uma
+    dependência) — suficiente pra um documento funcional, não pixel-perfect com a tela.
+  - **Exportar Excel:** `exportarExcel(report)` monta uma planilha real (`XLSX.utils.
+    aoa_to_sheet`, mesmas seções do PDF + cabeçalho de tabela + linhas + totais, valores
+    monetários como números de verdade, não texto formatado) e chama `XLSX.writeFile(wb,
+    'LCDPR-<exercício>.xlsx')` — download real (`.xlsx`).
+  - **Imprimir:** passou a chamar `window.print()` de verdade (antes também era só
+    flash-disable, apesar do rótulo já sugerir impressão nativa) — usa o diálogo de impressão
+    nativo do navegador, sem nenhum CSS de impressão dedicado (não pedido).
+  - Os 3 botões só funcionam depois de "Gerar relatório" (já ficavam dentro de
+    `#lcdpr-resultado`, que só é revelado após gerar — nenhuma guarda adicional necessária).
+
+Verificado ao vivo: Dados gerais com só 5 campos; rodapé com "Total"/"Resultado do período"
+à esquerda e os valores em R$ à direita (`getComputedStyle` confirmando `text-align` de cada
+célula); clique em Exportar PDF gera um Blob real (`application/pdf`, ~12,9 KB) via
+`URL.createObjectURL` interceptado; clique em Exportar Excel gera um Blob real
+(`application/octet-stream`, ~21,9 KB, arquivo `.xlsx`); clique em Imprimir chama
+`window.print()` (interceptado e confirmado); nenhum erro de console.
+
+## Ajustes 2026-08-05 (round 79) — Nova tela: Relatórios > DRE (Demonstração do
+Resultado do Exercício)
+
+Terceiro relatório real dentro de Relatórios (depois de Balancete round 66 e LCDPR round
+76/77/78) — clique no card "DRE" agora navega de verdade pra `dre.html`
+(`relatorios.js`'s `REAL_DESTINATIONS` ganhou a entrada `dre`). Só "Entradas e saídas"
+continua com o flash-disable, sem tela própria.
+
+- **Arquivos novos:** `app/screens/dre.html` + `app/shared/page-dre.css` +
+  `app/shared/dre.js`. Mesmo padrão visual/de interação de Balancete/LCDPR (filtros em card
+  recolhível, cabeçalho de resultado com resumo+ações Exportar PDF/Excel/Imprimir sem
+  Compartilhar, gráfico SVG puro, tabela hierárquica com 1ª coluna sticky, nunca vira Cards
+  no mobile). Sem módulo de dados próprio — agrega `window.NiveloCaixa` (mesma fonte de
+  Balancete/LCDPR) por `window.NiveloCategoriasFinanceiras`.
+- **Filtros: sem campo Conta** (diferente de Balancete/LCDPR) — o pedido só especificou
+  Período/Categoria/Agrupamento pra este relatório, respeitado literalmente. Tipo de período
+  (RadioButton Mês/Intervalo personalizado, mesma técnica de Balancete) + Categoria (mesmo
+  combobox pesquisável `initCombobox`, código copiado — telas de relatório continuam sem
+  compartilhar JS entre si, por convenção do projeto) + Agrupamento (Dropdown Automático/
+  Diário/Semanal/Mensal, mesma heurística `chooseAgrupamento` de Balancete pro modo
+  automático: ≤31 dias vira Diário, ≤180 Semanal, acima Mensal).
+- **Classificação da DRE — decisão de mapeamento documentada no código
+  (`dre.js`'s `classifyDreBucket`):** o campo `classificacaoDre` de
+  `categorias-financeiras-data.js` (5 valores fixos desde o round 38: deducoes/despesas-
+  operacionais/outras/tributos/taxas-tarifas) não cobre 1:1 os 6 grupos pedidos aqui
+  (Receitas Operacionais/Outras Receitas/Custos/Despesas Operacionais/Despesas
+  Financeiras/Outras Despesas) — não existe nenhuma opção de receita além de "outras", e
+  "Custos" (insumo de produção) não é um valor próprio do enum. Heurística aplicada: toda
+  receita vira **Receitas Operacionais** (caso comum no agronegócio — venda de safra);
+  despesas com nome de insumo direto de produção (fertilizante/combustível/semente/adubo/
+  defensivo, regex `CUSTOS_KEYWORDS_RE`) viram **Custos**; `classificacaoDre==='taxas-
+  tarifas'` vira **Despesas Financeiras** (tarifa/juro bancário é financeiro, não
+  operacional); `'outras'`/`'deducoes'` viram **Outras Despesas**; o restante (`despesas-
+  operacionais`/`tributos`) vira **Despesas Operacionais**. "Outras Receitas" fica vazia com
+  o dataset seed atual (nenhuma categoria de receita não classificada como "outras" existe
+  hoje) — a linha aparece mesmo assim, sem toggle de expandir (nenhuma categoria dentro).
+  Categorias com `consideraDre=false` (ex. "Transferência entre contas próprias") ficam de
+  fora de todos os cálculos, como já era o campo pra isso desde o round 38.
+- **KPIs (4, não 3 como Balancete/LCDPR):** Receita Bruta, Total de Despesas, Resultado do
+  Período (verde quando ≥0/vermelho quando <0) e **Margem (%)** — nova métrica neste
+  relatório (`resultado/receitaBruta*100`, 1 casa decimal; `—` quando a receita bruta é
+  zero, evita divisão por zero). Mesma cópia estrutural exata de card de KPI (12px/24px
+  fixo em qualquer largura), grid 1→2→4 colunas (mobile/~640px/1024px+, mesmo padrão de
+  Contas a Pagar/Receber, que também têm 4 KPIs).
+- **Gráfico: barra ÚNICA divergente (Resultado por coluna), não um par Entradas×Saídas
+  lado a lado como Balancete.** Primeira vez no sistema com esse tipo de gráfico — a linha
+  de base (zero) não fica fixa embaixo, é calculada pela proporção entre o maior valor
+  positivo e o maior valor negativo do período (`baseline = top + usableH * maxPos/(maxPos+
+  maxNeg)`), permitindo barras subirem (verde, lucro) ou descerem (vermelho, prejuízo) a
+  partir dela. Legenda com 2 dots (Resultado positivo/negativo) em vez de Entradas/Saídas.
+  Tooltip por coluna mostra só "Resultado" (não 3 linhas como Balancete). Não permite trocar
+  o tipo de gráfico (pedido explícito) — sem nenhum controle de configuração visual.
+- **Tabela: hierarquia sequencial Receitas→Total das Receitas→(-) Despesas→Total das
+  Despesas→(=) Resultado do Exercício**, diferente da estrutura de Balancete (que tem
+  Entradas/Saídas como 2 blocos colapsáveis independentes seguidos de um bloco "Resultado"
+  separado no fim). Aqui os subtotais ("Total das Receitas"/"Total das Despesas") aparecem
+  logo depois de cada bloco correspondente, e nunca ficam `parentGroup`-ados a nenhum grupo
+  colapsável (sempre visíveis, mesmo se Receitas/Despesas estiverem recolhidos) — mesmo
+  princípio já usado pro bloco "Resultado" de Balancete. Nível 0 (Receitas/"(-) Despesas")
+  e nível 1 (os 6 buckets, só com toggle quando têm categoria dentro) são colapsáveis;
+  nível 2 (categorias, zebra) são as folhas. **"(=) Resultado do Exercício" tem destaque
+  visual SUPERIOR a qualquer outra linha** (pedido explícito) — fundo de marca + negrito +
+  cor de marca + `font-size` maior (`--font-size-md`, as demais linhas usam o tamanho
+  padrão da tabela), e vira vermelho (`--color-status-error-fg`) quando o resultado do
+  período é negativo (classe `dre-row-negativo`).
+- **`prototype-nav/nav.config.js`:** novo item leaf "DRE" na journey "Jornada ·
+  Financeiro", logo após "LCDPR".
+- **Mesma limitação de sempre:** sem `localStorage`, o relatório é sempre recalculado a
+  partir dos dados seed de `caixa-data.js` — nenhum lançamento criado em outra sessão de JS
+  aparece aqui. Exportação (PDF/Excel/Imprimir) fica como flash-disable, mesmo padrão de
+  Balancete — não foi pedido export real nesta rodada (diferente do LCDPR, que teve essa
+  função implementada de verdade numa rodada anterior, sob pedido explícito).
+
+Verificado ao vivo: geração com filtros padrão (mês 07/2026, agrupamento automático →
+Diário, 31 colunas) reproduzindo os totais exatos esperados (Receita Bruta R$ 102.200,00,
+Total de Despesas R$ 42.239,00 — exclui corretamente CAT-008/Transferência entre contas
+próprias, que tem `consideraDre=false` — Resultado R$ 59.961,00, Margem 58,7%); estrutura
+hierárquica renderizando os 6 buckets corretos, com "Outras Receitas"/"Outras Despesas"
+sem toggle (vazias); expandir/recolher o grupo "Receitas" esconde corretamente as 2
+subgrupos+2 categorias (4 linhas), sem afetar Despesas; linha "(=) Resultado do Exercício"
+com fundo/cor de marca e sticky confirmados via `getComputedStyle`; filtros recolhem
+depois de gerar, "Exibir filtros" reabre; alternar Mês ⇄ Intervalo personalizado troca os
+campos corretamente; mobile (375px): cards de resumo em 1 coluna, gráfico com 140px de
+altura, tabela com scroll horizontal real (2824px de conteúdo em 341px de viewport),
+filtros permanecem recolhidos; nenhum erro de console em nenhum estado testado.
+
+## Ajustes 2026-08-05 (round 80) — DRE: camadas contábeis (Deduções/Receita Líquida,
+Lucro Bruto, Resultado Operacional), cross-highlight gráfico↔tabela, gráfico colapsável
+
+Refinamento da tela de DRE (round 79) motivado por uma consultoria de UX explícita sobre
+estrutura contábil (comparação com padrão de mercado tipo Olist) — 5 melhorias
+implementadas na ordem combinada com o usuário.
+
+- **Classificação: `classificacaoDre==='deducoes'` ganhou bucket próprio.** Antes caía sem
+  distinção dentro de "Outras Despesas" (round 79) — `classifyDreBucket()` agora checa esse
+  valor ANTES do `grupo`, então tem prioridade mesmo que a categoria seja tecnicamente
+  `grupo:'despesa'`. Nenhuma categoria seed hoje usa esse valor (nenhuma mudança visível
+  sem cadastro novo), mas a estrutura já está pronta.
+- **Nova camada Deduções da Receita → Receita Líquida**, entre "Total da Receita Bruta"
+  (renomeado de "Total das Receitas") e "(-) Custos". Estilo visual integrado ao bloco de
+  Receitas (mesmo peso de `.dre-row-subtotal`/nível 1, nunca o brand-background forte de
+  nível 0) — reforça que deduções corrigem a receita, não são uma despesa.
+  **Oculta por completo quando zerada em todas as colunas** (`report.hasDeducoes`) — evita
+  2 linhas mortas (Deduções + Receita Líquida) pra quem não usa essa classificação; some a
+  camada inteira, não deixa um "0" residual.
+- **2 subtotais novos, fechando a cascata contábil completa:** Receita Bruta → Receita
+  Líquida → **Lucro Bruto** (Receita Líquida − Custos) → **Resultado Operacional**
+  (Lucro Bruto − Despesas Operacionais, agrupando os antigos buckets "Despesas
+  Operacionais" + "Outras Despesas" sob um único grupo `(-) Despesas Operacionais`) → **(+/-)
+  Resultado Financeiro** (Despesas Financeiras com sinal invertido — é "resultado", não
+  "despesa bruta", coerente com poder incluir receita financeira no futuro) → Resultado do
+  Exercício. Antes disso, uma única subtração colapsava Custos+DespesasOperacionais+
+  DespesasFinanceiras+OutrasDespesas de uma vez, escondendo se o resultado vinha da
+  operação core ou só de efeito financeiro.
+- **Peso visual crescente nos subtotais** (pedido explícito da consultoria): `.dre-row-
+  subtotal` (gray-50/semibold — Receita Líquida/Lucro Bruto) → `.dre-row-subtotal-strong`
+  (NOVA classe, gray-100/bold — Resultado Operacional) → `.dre-row-resultado-final`
+  (inalterado, brand bg/bold/cor de marca/fonte maior — Resultado do Exercício).
+- **KPI "Total de Despesas" passou a incluir Deduções na soma** (`grandDespesas =
+  Σdeduções+Σcustos+ΣdespesasOperacionaisGrupo+ΣdespesasFinanceiras`) — matematicamente
+  necessário pra `Receita Bruta − Total de Despesas = Resultado do Período` continuar
+  batendo nos 3 KPIs, agora que Deduções saiu de dentro do bucket de despesas genérico.
+  Confirmado por álgebra e testado ao vivo (bate com a cascata completa da tabela).
+- **Cross-highlight gráfico ↔ tabela** (`setActiveColumn()`/`clearActiveColumn()`, novo em
+  `dre.js`): hover numa barra do gráfico ilumina a coluna inteira na tabela (cabeçalho +
+  todas as linhas, incl. subtotais) e o rótulo do eixo correspondente; hover no cabeçalho
+  de uma coluna ilumina a barra equivalente no gráfico. Implementado com `filter:
+  brightness(0.94)` nas células (`.dre-col-active`, preserva a cor de fundo que cada linha
+  já tem — nível 0 brand/nível 1 gray-50/zebra/subtotal — em vez de um `background` sólido
+  que apagaria essas cores) e `stroke`+opacidade na barra ativa (`.dre-chart-bar.is-active`).
+  Transforma o gráfico de "resumo decorativo" em índice de navegação da tabela densa.
+- **Gráfico virou um card colapsável** (mesmo padrão accordion de Filtros — cabeçalho
+  inteiro clicável, chevron rotaciona), com a preferência de expandido/recolhido persistida
+  em `localStorage` (`nivelo.dre.chartCollapsed`, mesmo raciocínio de
+  `nivelo.shell.sidebarCollapsed`) — nasce expandido na primeira geração de qualquer sessão
+  nova, mas lembra a escolha do usuário entre gerações/reloads seguintes. Reduz a
+  competição por espaço vertical agora que a tabela ficou mais alta (9 linhas de estrutura
+  fixa, antes eram 3).
+- **`(+/-) Resultado Financeiro` e suas categorias mostram valores NEGADOS** (`-v`, não a
+  magnitude bruta da despesa) — única linha de "despesa" que já se apresenta como
+  resultado assinado, coerente com o nome da linha e com a convenção de sinal já usada em
+  `(=) Resultado do Exercício`.
+
+Verificado ao vivo: com o dataset seed (sem nenhuma categoria `deducoes`), a camada de
+Deduções/Receita Líquida não aparece (confirmado no HTML gerado); cascata Lucro Bruto/
+Resultado Operacional/Resultado Financeiro com os valores corretos por coluna e batendo
+com o Resultado do Exercício final; toggle do grupo "(-) Despesas Operacionais" escondendo
+as 2 sub-linhas + 2 categorias (4 linhas); os 3 KPIs continuam batendo exatamente
+(R$ 102.200,00/R$ 42.239,00/R$ 59.961,00/58,7%); toggle do gráfico colapsando/expandindo e
+persistindo em `localStorage` (confirmado `getItem` após clique); hover no cabeçalho de
+uma coluna (índice 4) ilumina as 20 células da coluna + a barra correspondente do gráfico,
+some ao tirar o mouse; hover na área de uma barra do gráfico ilumina as mesmas 20 células
++ mostra o tooltip; mobile (375px): tabela mais alta continua com scroll horizontal real
+(2824px em 341px) e 1ª coluna sticky; nenhum erro de console em nenhum estado testado.
+
+## Ajustes 2026-08-05 (round 81) — DRE: reestruturação completa da hierarquia da tabela
+(validada e adaptada pro contexto de produtor rural, não reprodução literal de um DRE
+de varejo)
+
+Pedido grande do usuário: reorganizar a hierarquia da tabela do DRE seguindo um modelo de
+mercado (estilo Olist), incluindo linhas como "Notas fiscais/Ticket médio", "CMV", pacote
+fixo de tributos (ICMS/IR/IPI/ISS/INSS/CSLL/PIS/COFINS), "FGTS". Pedido explícito do
+usuário: **validar antes de implementar literalmente**, adaptando pro contexto real do
+sistema (produtor rural pequeno/médio) em vez de reproduzir um DRE empresarial genérico.
+A validação (mensagem anterior, antes deste round) identificou que boa parte da estrutura
+proposta não tinha lastro nos dados do sistema — decisões tomadas e implementadas nesta
+rodada:
+
+- **Removido por falta de dado/sentido no contexto:** "Notas fiscais/Notas de serviços/
+  Quantidade/Ticket médio" (conceito de e-commerce com muitos pedidos pequenos;
+  `NiveloNotasFiscais` não tem vínculo com `NiveloCaixa`, e não faria sentido pra vendas de
+  safra, poucas e de alto valor); "CMV"/"Estorno de CMV" (terminologia de revenda; o
+  equivalente rural já existe — bucket "Custos", insumo de produção); lista fixa de
+  siglas de imposto (ICMS/IR/IPI/ISS/INSS/CSLL/PIS/COFINS) e "Estorno de impostos de
+  devoluções" (nenhum dado sustenta by-sigla; categoria é texto livre do usuário); segunda
+  seção "(-) Tributos > Imposto Simples/FGTS/INSS" no fim (duplicava a dedução de
+  impostos já tratada acima, e não há módulo de folha de pagamento no sistema);
+  "Comissões"/"Taxas e tarifas" fixas em Despesas Operacionais (Taxas bancárias já existe
+  como categoria real e já tinha sido classificada como Despesas Financeiras — mover pra
+  Despesas Operacionais seria um retrocesso conceitual, mantido como estava).
+- **`classifyDreBucket()` reescrito** (`dre.js`): `classificacaoDre==='deducoes'` e
+  `==='tributos'` agora são verificados ANTES de tudo (prioridade absoluta), os dois
+  alimentando `(-) Deduções da Receita`. **Decisão nova, não estava na v1 do DRE:**
+  `tributos` (ex.: CAT-006 "Impostos sobre a produção") saiu do bucket "Despesas
+  Operacionais" e foi pra dentro de Deduções — imposto sobre produção/venda rural (ex.:
+  Funrural) costuma ser retido na fonte pelo comprador, reduzindo a receita bruta na
+  prática, mais parecido com ICMS-sobre-vendas do que uma despesa operacional recorrente.
+  Efeito colateral positivo: "Impostos" agora tem dado real (R$ 2.100,00 em julho/2026),
+  diferente de "Devoluções" (`deducoes`, ainda sem categoria seed).
+- **Nova hierarquia completa** (cascata, cada subtotal alimenta o próximo):
+  ```
+  Receita Bruta                      (bucket receitas-operacionais, direto — sem
+                                       sub-nível, já que Outras Receitas saiu daqui)
+  Total da Receita Bruta
+  (-) Deduções da Receita            [só aparece se houver valor]
+    Devoluções    (classificacaoDre='deducoes')
+    Impostos      (classificacaoDre='tributos' — NOVO, movido de Despesas Operacionais)
+  Receita Líquida
+  (-) Custos
+  Lucro Bruto
+  (-) Despesas Operacionais          (agora só classificacaoDre='despesas-operacionais')
+  Resultado Operacional
+  (+) Outras Receitas                [NOVO: reposicionado pós-operacional, sempre visível]
+  (-) Outras Despesas                [NOVO: saiu de dentro de Despesas Operacionais]
+  (+/-) Resultado Financeiro
+  (=) Resultado do Exercício
+  ```
+- **KPI "Total de Despesas" agora é DERIVADO** (`grandDespesas = grandReceita −
+  grandResultado`), não mais somado bucket a bucket — necessário porque "Outras Receitas"
+  entra na cascata como uma ADIÇÃO depois do Resultado Operacional; a subtração manual
+  antiga quebraria a consistência `Receita Bruta − Total de Despesas = Resultado` assim
+  que Outras Receitas tivesse valor. Resultado do Exercício idêntico ao de antes da
+  reclassificação (confirmado ao vivo, byte a byte por coluna) — a reorganização só move
+  ONDE cada valor é subtraído, nunca muda o resultado final.
+- **Tipografia das linhas principais (nível 0 — grupos: Receita Bruta/Deduções/Custos/
+  Despesas Operacionais/Outras Receitas/Outras Despesas/Resultado Financeiro), pedido
+  explícito:** `.dre-row-level-0 .td` ganhou `font-size:16px` (um nível acima do resto da
+  tabela, que é 12px do componente `Table`), `font-weight:bold`, `color:--color-gray-900`
+  (mais escuro), `padding-top/bottom:8px` (mais espaçamento vertical) — aparência de
+  subtotal de relatório contábil. Linhas de detalhe (categorias, nível 2) mantidas
+  intocadas, como pedido.
+- **Regras de UX já cumpridas por herança do desenho anterior** (nenhuma mudança nova
+  necessária): todo grupo com categorias tem toggle; a linha do grupo sempre mostra o
+  total consolidado (`report.totals[bucket]`); itens internos só aparecem expandidos
+  (`applyRowVisibility`/`data-parent-group`); alinhamento monetário à direita preservado;
+  filtros/cards/gráfico/layout geral **não foram tocados**, conforme pedido explícito de
+  escopo restrito só à tabela.
+- **Validação da última linha:** confirmado com o usuário que "(=) Resultado / Lucro
+  Bruto" da proposta original era um equívoco de nomenclatura — a estrutura já implementada
+  desde o round 80 termina corretamente em "(=) Resultado do Exercício", sem alteração
+  necessária aqui.
+
+Verificado ao vivo: "Impostos" renderizando com dado real (R$ 2.100,00, dia 25) dentro de
+Deduções da Receita; "Despesas Operacionais" agora só com Energia elétrica (Impostos
+sobre a produção corretamente migrado); "(+) Outras Receitas"/"(-) Outras Despesas"
+sempre visíveis (vazias no seed atual, sem toggle); toggle do grupo "Deduções" escondendo
+as 2 sub-linhas (Devoluções/Impostos) + 1 categoria (3 linhas); linha final "(=) Resultado
+do Exercício" com os MESMOS valores por coluna de antes da reclassificação (confirma que
+a reorganização não alterou o resultado); os 3 KPIs continuam batendo exatamente
+(R$ 102.200,00/R$ 42.239,00/R$ 59.961,00/58,7%); linhas de nível 0 confirmadas via
+`getComputedStyle` (16px/700/rgb(23,23,23)/8px de padding); mobile (375px): tabela mais
+alta continua com scroll horizontal real (2824px em 342px) e 1ª coluna sticky; nenhum
+erro de console em nenhum estado testado.
+
+## Ajustes 2026-08-06 (round 82) — Ajustes finos nos gráficos (Evolução do resultado + Entradas
+x Saídas) e nova tela: Relatórios > Entradas e Saídas
+
+Dois pedidos no mesmo dia: (1) refinamento visual dos 2 gráficos SVG já existentes (DRE/
+Balancete), pra um visual de "dashboard financeiro profissional"; (2) quarto e último relatório
+real dentro de Relatórios, fechando os 4 cards da tela (Balancete round 66, LCDPR round 76,
+DRE round 79) — só "Entradas e saídas" ainda estava sem tela própria.
+
+**Parte 1 — Refino dos gráficos:**
+- **Dados mockados de `caixa-data.js` reescritos**: o único lançamento gigante (Venda de soja,
+  R$ 74.400, ~5x maior que qualquer outro do mês) foi dividido em 2 remessas mais moderadas
+  (R$ 18.200/R$ 24.000) + ~12 lançamentos novos espalhados por julho/2026, resultando num
+  gradiente de valores diários de ~R$ 89 a R$ 24.000 sem nenhum pico isolado dominando a
+  altura do gráfico "Evolução do resultado" — confirmado ao vivo (`getComputedStyle` das
+  alturas das barras: escada suave, sem saltos bruscos).
+- **Hover das barras (DRE e Balancete, idêntico nos 2):** trocado de `opacity+stroke` (turvava
+  a cor, adicionava contorno escuro) pra expansão pura via `transform:scale(1.05,1.08)` —
+  mesma cor, sem contorno, transição suave (160ms). `transform-box:fill-box` + origem ancorada
+  na linha de zero (embaixo pra barras positivas, em cima pras negativas no DRE; sempre embaixo
+  no Balancete, que só tem barras positivas) — a barra parece crescer a partir do próprio ponto
+  de referência, nunca do centro do gráfico. No Balancete, hover em qualquer ponto do dia
+  também expande as 2 barras (Entrada+Saída) juntas, já que o tooltip é por dia, não por barra.
+- **Eixo X reescrito** (`buildAxisLabelsHTML`, função duplicada em `dre.js`/`balancete.js` por
+  convenção — telas de relatório não compartilham JS entre si): no agrupamento diário, mostra
+  "01 Mmm" só no 1º dia de cada mês representado + o dia isolado a cada 5 dias (05/10/15/20/
+  25/30), nunca repetindo o mês em toda coluna.
+- **Bug real pego ao vivo, 2 rodadas seguidas:** o rótulo "01 Jul" (6 caracteres) não cabia
+  numa coluna de ~9-11px (31 dias divididos pela largura do gráfico) — `overflow:hidden`
+  cortava o texto quase por completo, sumindo até o número isolado do dia no mobile. Fix
+  definitivo: rótulo dividido em 2 `<span>` (`-day`/`-month`), `overflow:visible` na coluna
+  (o texto vaza pras colunas vizinhas VAZIAS, seguro porque os rótulos só aparecem espaçados a
+  cada 5 dias) + `.{prefix}-axis-label-month{display:none}` abaixo de 768px — mobile mostra só
+  o número do dia inteiro (nunca cortado), desktop mostra "01 Jul" completo.
+- **Linha de zero**: já existia como referência matemática real nos 2 gráficos (não decorativa,
+  calculada pela proporção entre maior valor positivo/negativo no DRE; sempre a base no
+  Balancete) — só isolada numa classe própria (`.dre/bal-chart-zero-line`) e clareada um tom
+  (`--color-gray-300` → `--color-gray-200`), pedido explícito.
+- **Legenda "Resultado positivo/negativo" removida do DRE** (as cores das barras já são
+  autoexplicativas nesse contexto) — a legenda "Entradas/Saídas" do Balancete foi MANTIDA (ali
+  as cores distinguem 2 séries de dados diferentes, não um sinal óbvio só pela cor). Gap de
+  8px (`--spacing-sm`) adicionado entre o eixo/gráfico e a legenda do Balancete, pedido à parte.
+- **Raio das barras reduzido** de `0.9` pra `0.5` nos 2 gráficos — visual mais limpo.
+- **Eixo Y removido nos 2 gráficos** (decisão de UX, pedido explícito de avaliar a melhor
+  alternativa): as 3 gridlines horizontais que existiam (25/50/75%) nunca tinham valor numérico
+  associado — eram só decorativas, não ajudavam a interpretar grandeza nenhuma. Adicionar um
+  eixo Y de verdade exigiria reservar uma coluna lateral pro rótulo (o `<svg>` usa
+  `preserveAspectRatio="none"`, que distorce texto embutido nele mesmo), uma mudança de layout
+  desproporcional ao ganho. Optado por remover as gridlines e manter só a linha de zero (única
+  referência horizontal com significado real) + o tooltip rico no hover (valor exato por
+  coluna) — mesma filosofia "Stripe/Linear/Vercel" já documentada no código do Balancete desde
+  a criação.
+
+Verificado ao vivo (`getComputedStyle`/`getBoundingClientRect`, técnica já documentada em
+rounds anteriores por causa da lentidão de composição do sandbox): hover crescendo 5%/8% sem
+stroke/opacidade nos 2 gráficos; eixo X mostrando "01 Jul"/dias isolados no desktop e só os
+dias (sem mês) no mobile, todos os números completos (não cortados, `getBoundingClientRect`
+confirmando largura igual à do texto); linha de zero num tom mais claro; legenda do DRE
+removida, a do Balancete com 8px de gap; raio das barras em 0.5; KPIs recalculando certo com o
+dataset novo (R$ 140.900,00/R$ 56.159,00/R$ 84.741,00); nenhum erro de console.
+
+**Parte 2 — Nova tela: Relatórios > Entradas e Saídas.**
+
+Quarto relatório real dentro de Relatórios — `relatorios.js`'s `REAL_DESTINATIONS` ganhou a
+entrada `'entradas-saidas'`, fechando os 4 cards da tela de entrada (Balancete/LCDPR/DRE/
+Entradas e saídas, todos com fluxo real agora).
+
+- **Arquivos novos:** `app/screens/entradas-saidas.html` + `app/shared/page-entradas-saidas.css`
+  + `app/shared/entradas-saidas.js`. Mesmo padrão visual/de interação de Balancete/DRE/LCDPR
+  (filtros em card recolhível, cabeçalho de resultado com resumo+ações Exportar PDF/Excel/
+  Imprimir sem Compartilhar, tabela com 1ª coluna sticky, nunca vira Cards no mobile). Sem
+  módulo de dados próprio — agrega `window.NiveloCaixa` (mesma fonte de Balancete/LCDPR/DRE).
+- **"Agrupar por" (Categoria padrão / Cliente)** — `Dropdown` simples de 2 opções — troca
+  dinamicamente qual combobox de filtro aparece (`#categoria-field`/`#cliente-field`, um
+  `hidden` por vez, mesma posição no grid) e qual coluna a tabela usa.
+- **Decisão de mapeamento documentada no código (`entradas-saidas.js`):** "Cliente" é a
+  CONTRAPARTE do lançamento (`pessoaNome`/`pessoaDocumento` de `NiveloCaixa`, mesmo vocabulário
+  livre já usado no combobox "Cliente ou Fornecedor" de Novo Lançamento de Caixa, round 43) —
+  não restrito a cadastros com `tipo` incluindo `"cliente"` em `NiveloCadastros`. Boa parte das
+  despesas do mock tem uma contraparte FORNECEDORA (ex. "Insumos Agrícolas Vale Ltda"); a
+  proposta da tela é mostrar de onde vêm as receitas e pra onde vão as despesas por contraparte,
+  então restringir a lista só a `tipo:cliente` deixaria a maioria das despesas sem grupo
+  selecionável. Lançamentos sem nenhuma contraparte (tarifas, impostos, combustível avulso)
+  caem no grupo "Sem cliente identificado" na tabela/donuts, mas não viram opção do filtro (não
+  há "quem" escolher).
+- **KPIs (4):** Total de entradas/Total de saídas/Saldo do período (cor semântica)/
+  Movimentações (contagem inteira, sem formatação monetária) — mesma cópia estrutural exata de
+  card de resumo (12px/24px fixo em qualquer largura), grid 1→2→4 colunas (mobile/~640px/
+  1024px+, mesmo padrão de Contas a Pagar/Receber/DRE).
+- **2 donuts (primeiro donut do sistema, SVG puro, sem lib)** — "Distribuição das entradas"/
+  "Distribuição das saídas", lado a lado no desktop (1024px+)/empilhados no mobile. Técnica de
+  círculos empilhados via `stroke-dasharray`/`stroke-dashoffset` (cada fatia é um `<circle>` de
+  mesmo raio com um trecho tracejado do tamanho da própria fração + deslocamento acumulado das
+  fatias anteriores); `<svg>` inteiro gira -90° via CSS pra a 1ª fatia nascer no topo (12h,
+  convenção universal de pizza/donut). Paleta qualitativa de 8 cores (tokens já existentes:
+  brand/green/orange/indigo/pink/yellow/red/blue, cicla se houver mais grupos), com um detalhe
+  de consistência: a mesma categoria/cliente usa SEMPRE a mesma cor nos 2 donuts (mapa de cor
+  construído 1x a partir da ordem da tabela — sorted por saldo — e reaproveitado pelos 2
+  gráficos, não recalculado por donut). Centro do círculo mostra o total (bônus não pedido
+  explicitamente, mas convenção comum de donut chart moderno — soma o mesmo valor do KPI
+  correspondente). Legenda abaixo/ao lado com dot+nome+percentual+valor por fatia. **Somem por
+  completo (`#es-donuts-row[hidden]`)** quando o filtro dinâmico está numa categoria/cliente
+  específico (deixam de representar uma distribuição), e mostram uma mensagem própria
+  ("Nenhuma entrada/saída no período") quando o lado correspondente está zerado.
+- **Tabela: lista simples, não hierárquica** (diferente de Balancete/DRE, que são matriciais/em
+  árvore) — 1 linha por categoria ou cliente, ordenada do maior pro menor saldo (`rows.sort`
+  desc), 1ª coluna sticky ("Categoria" ou "Cliente", rótulo trocado conforme o agrupamento).
+  Rodapé: 1 linha só ("Total", com Entradas/Saídas/Saldo final cada um sob a coluna certa),
+  destaque de marca (fundo brand/negrito/cor de marca), mesma escala visual de "linha mais
+  importante da tabela" já usada em Balancete/LCDPR/DRE. Zebra do corpo escopada a `#es-tbody`
+  (ID, não classe genérica) — mesma lição de especificidade já documentada em LCDPR/DRE
+  (`:nth-child` reinicia a contagem em cada `<tbody>`/`<tfoot>`, então uma regra de zebra
+  genérica também pintaria a linha de rodapé, competindo com o destaque de Total).
+- **Estado vazio:** quando não há nenhum lançamento pro período+filtros (`qtdMovimentacoes===
+  0`), esconde KPIs/donuts/tabela e mostra um card central (ícone+título+texto), mesmo padrão
+  de estado vazio já usado em outras listagens do sistema.
+- **`prototype-nav/nav.config.js`:** novo item leaf "Entradas e Saídas" na journey "Jornada ·
+  Financeiro" já existente, logo após "DRE".
+
+Verificado ao vivo: geração com filtros padrão (mês 07/2026, Categoria) reproduzindo os mesmos
+totais exatos de Caixa/Balancete/LCDPR/DRE (R$ 140.900,00/R$ 56.159,00/R$ 84.741,00, 25
+movimentações, mesmo dataset reescrito na Parte 1); tabela com 7 categorias ordenadas
+corretamente do maior pro menor saldo; donuts com percentuais/valores batendo com os totais
+(Entradas: Venda de soja 60,3%/Venda de milho 39,7%; Saídas: 5 categorias somando 100%); troca
+pra Agrupar por Cliente reclassificando a mesma base em 9 contrapartes (incl. "Sem cliente
+identificado" com saldo -23.759, ordenado corretamente); selecionar um cliente específico
+("Cerealista Bom Grão S.A.") escondendo os donuts e isolando 1 linha na tabela; mês sem nenhum
+lançamento (janeiro/2024) mostrando o estado vazio com a mensagem correta; mobile (375px):
+filtros recolhidos após gerar, donuts empilhados (1 coluna), tabela com scroll horizontal real
+(550px em 341px de viewport) e 1ª coluna sticky confirmada via `getBoundingClientRect`
+antes/depois do scroll; navegação real a partir do card "Entradas e saídas" em Relatórios;
+nenhum erro de console em nenhum estado testado.
+
+## Ajustes 2026-08-06 (round 83) — Notas Fiscais: prefill via Cadastro + rótulo; consistência de
+label nos relatórios; tooltip e agrupamento em Entradas e Saídas
+
+Pedido em 6 partes sobre Notas Fiscais e os relatórios financeiros, focado em reduzir
+preenchimento manual e reforçar consistência visual.
+
+1. **"Cadastrar Nota Fiscal" (Cadastro de Pessoas e Empresas) ganhou destino real.** Era
+   flash-disable desde a criação da tela (round de origem do Cadastro). `cadastros.js`'s
+   `openNovaNotaFiscal()`: grava só o `codigo` do cadastro de origem em `sessionStorage`
+   (`nivelo.novanotafiscal.prefill`, mesmo mecanismo de uso único já usado pelo handoff de
+   edição) e navega pra `nova-nota-fiscal.html`. Lido e removido no primeiro load de
+   `nova-nota-fiscal.js`, só quando a tela abre em modo de CRIAÇÃO (nunca em `?numero=`).
+2. **Participante pré-preenchido (nota de saída):** quando o cadastro de origem tem o papel
+   "cliente", `destinatarioDropdown.selectValue(codigo)` seleciona automaticamente o mesmo
+   participante no campo Cliente/Transportadora (documento/UF preenchidos de graça, já era o
+   comportamento do `onChange` existente) — o usuário pode trocar normalmente depois.
+3. **Tipo da nota definido automaticamente:** quando o cadastro de origem tem
+   EXCLUSIVAMENTE o papel "fornecedor" (`tipo.length===1 && tipo[0]==='fornecedor'`), o radio
+   "Nota de entrada" é marcado programaticamente antes do primeiro render (`refreshTipoNota
+   Visibility()` já roda depois, então a tela abre direto no formulário de entrada — upload de
+   XML, sem Certificado Digital). Qualquer outra combinação (Cliente sozinho, Cliente+
+   Fornecedor, Fornecedor+Transportadora etc.) mantém o padrão atual (Saída pré-selecionada,
+   usuário escolhe) — regra explícita do pedido.
+4. **Rótulo "Cliente" → "Cliente / Transportadora"** em `nova-nota-fiscal.html` (campo do
+   formulário + `dt` do modo de visualização) — só nomenclatura, a fonte de dados do dropdown
+   continua sendo `NiveloCadastros.findByTipo('cliente')` (comportamento intocado, pedido
+   explícito de manter).
+5. **Consistência tipográfica do label "Mês/Ano" em Balancete/DRE/Entradas e Saídas — 2 bugs
+   reais encontrados, não 1.** Investigação (`getComputedStyle`) achou:
+   - **`DatePicker.module.css`'s `.dpLabel` só tinha `color` definido** (herdava peso/tamanho/
+     entrelinha do body: 16px, mas peso ~300/light e sem letter-spacing) — nunca tinha a
+     mesma tipografia de `.label` (Input/Dropdown: 16px/Medium/1.4/0.01em). Corrigido NA FONTE
+     do componente (não um patch por página) — vale pra toda tela que já usa o DatePicker
+     (Balancete/DRE/LCDPR/Entradas e Saídas/Contas a Pagar/Receber/Caixa/Estoque/Produtos), não
+     só as 3 pedidas.
+   - **Bug PRÉ-EXISTENTE achado no processo:** `RadioButton.module.css` declara `.label{font-
+     weight:bold}` (rótulo do próprio grupo de radio, "Período") — carregado depois de `Input.
+     module.css` no `<head>`, vencia por ordem e deixava TODOS os labels normais de campo
+     (Categoria/Conta/Agrupamento/Agrupar por/Cliente) em Bold em vez do Medium correto do
+     componente Input, nas 3 telas. Corrigido com um seletor mais específico
+     (`.{prefix}-filtros-grid .label`) em cada `page-balancete.css`/`page-dre.css`/`page-
+     entradas-saidas.css` — mesmo padrão de fix já usado várias vezes neste projeto pra essa
+     classe de colisão, só que desta vez em `font-weight`, não em `opacity`/`position`. Sem os
+     2 fixes juntos, "Mês/Ano" ficaria consistente com um valor ainda errado (Bold, por causa
+     do 2º bug) — os dois precisavam ser corrigidos pra "Mês/Ano" bater de verdade com "Categoria"/
+     "Agrupamento"/etc.
+6. **Entradas e Saídas — tooltip nos donuts:** mesmo padrão visual/estrutural do tooltip dos
+   gráficos de barra (DRE/Balancete — fundo escuro `--color-gray-900`, `position:fixed`,
+   cabeçalho com borda inferior sutil, linhas rótulo+valor), classes próprias `.es-donut-
+   tooltip*` (cópia deliberada, não uma função compartilhada — telas de relatório não
+   compartilham JS entre si, mesma convenção já documentada). Um único elemento reaproveitado
+   pelos 2 donuts; hover delegado no `<svg>` (persiste entre renders) via `e.target.closest(
+   '.es-donut-slice')`, cada fatia carrega `data-label`/`data-value`/`data-percent` gravados
+   no momento da construção do SVG. Mostra nome do grupo + Valor + Participação (%).
+7. **Entradas e Saídas — títulos de agrupamento na tabela:** 2 linhas de cabeçalho ("Entradas"/
+   "Saídas", `colspan="4"`, fundo de marca/negrito/cor de marca — mesma linguagem visual de
+   "linha de grupo" já usada em Balancete/DRE) inseridas entre os blocos da tabela, sem alterar
+   a ordenação existente (`report.rows`, já vem ordenado do maior pro menor saldo) — só
+   reparticionada visualmente: uma linha entra em "Entradas" quando `entrada>0`, senão em
+   "Saídas" quando `saida>0` (prioridade documentada no código; na prática cada categoria/
+   cliente do dataset é sempre puramente um ou outro, mas a regra cobre com segurança o caso
+   raro de uma mesma linha ter os dois tipos de lançamento no período). Bloco escondido por
+   completo quando não há nenhuma linha daquele tipo (ex.: filtrar um cliente que só vendeu,
+   sem nenhuma despesa, esconde o cabeçalho "Saídas"). Zebra do corpo (`#es-tbody .tr:nth-
+   child`) precisou de um seletor com `.tr` explícito no cabeçalho de grupo pra igualar
+   especificidade e vencer por ordem — mesma lição de zebra×linha-especial já documentada em
+   LCDPR/DRE — e a célula (colspan) teve o `position:sticky` da 1ª coluna desligado (`position:
+   static`), já que uma célula que já ocupa a largura inteira não precisa (nem deveria) grudar
+   à esquerda durante o scroll horizontal.
+
+Verificado ao vivo: ação "Cadastrar nota fiscal" em 3 cenários (fornecedor puro → abre em
+Nota de entrada; cliente puro → Saída + destinatário/documento/UF pré-preenchidos; cliente+
+fornecedor → mantém Saída, mas ainda pré-preenche o participante); rótulo "Cliente /
+Transportadora" no formulário e na visualização; label "Mês/Ano" com peso/tamanho/entrelinha/
+letter-spacing IDÊNTICOS aos demais labels de filtro nas 3 telas (`getComputedStyle`: 16px/
+500/22.4px/0.16px em todos); LCDPR (não pedido, mas usa o mesmo componente) sem regressão;
+tooltip do donut mostrando nome/valor/percentual corretos no hover e escondendo no mouseleave;
+tabela de Entradas e Saídas com os cabeçalhos "Entradas"/"Saídas" corretos nos 2 modos de
+agrupamento (Categoria e Cliente), incl. "Sem cliente identificado" corretamente dentro do
+bloco Saídas; rodapé de Total intacto; nenhum erro de console em nenhuma das telas tocadas.
+
+## Ajustes 2026-08-06 (round 84) — Nova tela Fiscal (Nota de entrada); auditoria de itens
+diversos já implementados em rounds anteriores
+
+Pedido em várias partes cobrindo Cadastro/Financeiro/Manifesto/Certificado Digital/
+Configuração/KPIs/Tabelas/Mobile/Criar Conta. Boa parte já tinha sido resolvida em rounds
+anteriores (confirmado por auditoria antes de tocar em qualquer arquivo); os itens abaixo
+foram os que precisaram de trabalho de verdade nesta rodada.
+
+- **Nova tela `app/screens/fiscal.html`** (+ `page-fiscal.css` + `fiscal.js`) — landing da
+  Configuração > Fiscal, ativando o subsubitem "Nota de entrada" (`data-nav="fiscal-nota-
+  entrada"`, já existia no HTML de todas as 52 telas com Sidebar completa, mas sem
+  `NAV_DESTINATIONS`; provavelmente deixado por uma rodada/sessão anterior sem a tela real).
+  Confirmado com o usuário via pergunta explícita: "Nota de entrada" ganha uma página própria
+  "Fiscal" (não emenda em Certificado Digital nem em Natureza da Operação). Conteúdo: card
+  único com descrição ("notas de entrada são as NF-es emitidas por terceiros para o CNPJ da
+  empresa") + RadioButton Sim/Não "Deseja receber automaticamente as notas de entrada?" +
+  botão Salvar, persistido em `localStorage` (`nivelo.fiscal.notaEntrada.autoReceber`, mesma
+  convenção de configuração de conta já usada em `categorias-financeiras-data.js`/
+  `safras-data.js`) + toast de sucesso. `interface-principal.js`: `NAV_DESTINATIONS['fiscal-
+  nota-entrada'] = 'fiscal.html'`. `prototype-nav/nav.config.js`: novo leaf "Fiscal" na
+  Jornada · Configuração, logo após o épico Certificado Digital.
+- **Login e Criar Conta: campo CPF → "CPF ou CNPJ"** (`login.html`/`login.js`,
+  `cadastro.html`/`cadastro.js`) — documento único com máscara auto-detectada por tamanho
+  (até 11 dígitos formata como CPF, a partir do 12º vira CNPJ), mesma técnica já usada em
+  `novo-manifesto.js` pro documento do motorista/responsável pelo frete. Validação com
+  dígitos verificadores reais dos dois documentos (`isValidCPF`/`isValidCNPJ` completos, não
+  só checagem de tamanho) — `isValidCNPJ` novo, adicionado às 2 telas (só existia uma versão
+  simplificada, sem dígito verificador, em `nova-fazenda.js`). `maxlength` subiu de 14 pra 18
+  (tamanho de um CNPJ formatado); textos de rótulo/erro atualizados nas 2 telas.
+- **Padronização de largura: Contas Financeiras e Contas Bancárias.** `page-contas-
+  financeiras.css`/`page-contas-bancarias.css` usavam `max-width:1200px`, destoando do padrão
+  do resto das telas de Configuração (Produtos/Categorias/Fazendas, todas `1440px`). Corrigido
+  nos 2 arquivos.
+- **Categorias de receitas e despesas: tabela agora preenche 100% da largura disponível
+  (Fill).** A tabela (round 39) tinha largura FIXA de 1100px mesmo dentro de um container de
+  até 1440px, sobrando espaço morto à direita em telas largas. Corrigido: `.table` passou de
+  `width:1100px` pra `width:100%;min-width:1100px`, e a coluna Descrição perdeu sua largura
+  fixa (`width:auto` sob `table-layout:fixed` = recebe todo o espaço restante) — a tabela
+  estica de verdade em telas largas, mas mantém a rolagem horizontal (via `min-width`) em
+  telas mais estreitas que 1100px, sem quebrar o sticky de Ações.
+- **Itens já implementados em rounds anteriores, confirmados por auditoria (nenhuma mudança
+  necessária):** rename "Produtos" → "Produtos e serviços" (título+sidebar, round 26/47);
+  filtro de Período em Contas a Pagar/Receber/Caixa (já existia desde a criação de cada
+  jornada, rounds 43/45/65); título "Manifesto eletrônico" (round 64); botões de Novo
+  Manifesto (Manifestar primário/Salvar manifesto secundário/Cancelar já em `.btn.ghost`,
+  round 64); campo "Data de validade" em Importar Certificado (round 56) e seção
+  "Observação" (nunca existiu nessa tela, ou já removida no round 57); padronização de
+  título/espaçamento dos cards de KPI (round 55); coluna Ações com largura "Hug" (cada
+  tabela do sistema já usa uma largura própria dimensionada pro número de ícones daquela
+  tabela especificamente — 96px/1 ícone, 120px/2, 170px/4 — não uma largura genérica
+  sobrando); vídeo da Landing Page travado em 00:00:05 no mobile (implementado junto com a
+  seção Hero, sem round numerado específico).
+
+Verificado ao vivo: `fiscal.html` renderizando o card/descrição/radio corretos, subsubitem
+"Nota de entrada" `is-active`, alternar Sim/Não sincronizando a classe `.checked` do dot,
+Salvar persistindo em `localStorage` e mostrando o toast; lógica de máscara/validação de
+CPF/CNPJ conferida via Node (CNPJ real com dígito verificador válido passa, inválido não
+passa; CNPJ auto-formatado corretamente a partir do 12º dígito) — a verificação visual no
+Browser pane deste sandbox mostrou JS desatualizado mesmo após reload forçado (mesma
+instabilidade de cache já documentada em rounds anteriores), contornada validando a lógica
+isoladamente fora do navegador; `page-contas-financeiras.css`/`page-contas-bancarias.css`
+com `max-width:1440px` confirmado; Categorias de receitas e despesas sem mudança de
+comportamento fora do preenchimento de largura.
+
 ## Storybook
 Sempre usar `Storybook-Nivelo/` — nunca `Storybook/`.
 
@@ -3178,7 +4328,13 @@ Desativar (botão vermelho) e o ciclo completo (badge Ativo→Inativo, ícone do
 | Contas Bancárias (Configuração > Conta bancária) | **Done (round 56, 2026-08-03; corrigido round 59, 2026-08-04)** — Listagem (`contas-bancarias.html`, busca+ordenação+paginação+Excluir REAL com confirmação) + cadastro/edição (`nova-conta-bancaria.html`, Código auto-increment+Banco (catálogo real)+Descrição+Agência/Conta com máscara+Conta Financeira). "Conta Financeira" referenciava um stand-in (Categorias de receitas e despesas) até o round 59, quando a entidade real (`contas-financeiras.html`) foi construída e o vínculo corrigido. Migrou a fonte do campo Banco de Caixa do stub antigo (`bancos-data.js`) pro catálogo real. Ver "Ajustes round 56/59" acima |
 | Conta Financeira (Configuração > Conta Financeira) | **Nova (round 59, 2026-08-04)** — Done. Listagem (`contas-financeiras.html`, busca por Código/Nome+ordenação (Código como padrão)+paginação+Excluir bloqueado quando vinculada a Caixa/Conta Bancária, com mensagem explicando o motivo) + cadastro/edição (`nova-conta-financeira.html`, só Código auto-increment readonly+Nome único). Usada pra gerar o DRE (preparação de dados, sem tela de relatório ainda) e como novo campo obrigatório em todo lançamento de Caixa. Ver "Ajustes round 59" acima |
 | Natureza da Operação (Configuração > Fiscal) | **Nova (round 51, 2026-08-03)** — Done. Substitui o item "Notas fiscais" removido do submenu Fiscal. Listagem (`naturezas-operacao.html`, abas Entrada/Saída+busca+filtro de Situação+Ativar/Desativar com confirmação) + cadastro/edição (`nova-natureza-operacao.html`, Dados Gerais+Padrões pré-configurados+Configuração Tributária em `Accordion` com 5 blocos independentes: Simples Nacional/IPI/ISSQN/PIS/COFINS). Primeiro uso real do componente `Accordion` do Storybook. Ver "Ajustes round 51" acima |
-| Relatórios (Financeiro > Relatórios) | **Nova (round 53, 2026-08-03)** — Done, só a página de entrada. `relatorios.html`: 4 cards clicáveis (Balancete/LCDPR/DRE/Entradas e saídas), grid 2 colunas desktop/1 mobile, sem abas (cada relatório terá filtros próprios). Os 4 fluxos de configuração/visualização em si ainda não existem (fora de escopo) — clique dá só o flash-disable por enquanto. Ver "Ajustes round 53" acima |
+| Relatórios (Financeiro > Relatórios) | **Nova (round 53, 2026-08-03)** — Done, página de entrada. `relatorios.html`: 4 cards clicáveis (Balancete/LCDPR/DRE/Entradas e saídas), grid 2 colunas desktop/1 mobile, sem abas. Todos os 4 relatórios têm tela própria completa desde o round 82. Ver "Ajustes round 53/66/76/79/82" acima |
+| LCDPR (Financeiro > Relatórios > LCDPR) | **Nova (round 76, 2026-08-05)** — Done. `lcdpr.html`: filtros (Ano-calendário/Intervalo personalizado + Conta/Categoria pesquisáveis) em card recolhível, KPIs (Total de receitas/despesas/Resultado do período), tabela cronológica (Data/Documento/Histórico/Categoria/Entradas/Saídas) com 1ª coluna (Data) sticky, rodapé com totais em destaque, estado vazio. Mesmo padrão visual de Balancete, sem gráfico. Ver "Ajustes round 76" acima |
+| DRE (Financeiro > Relatórios > DRE) | **Nova (round 79, 2026-08-05)** — Done. `dre.html`: filtros (Mês/Intervalo personalizado + Categoria pesquisável + Agrupamento, sem Conta) em card recolhível, 4 KPIs (Receita Bruta/Total de Despesas/Resultado do Período/Margem %), gráfico de barra única divergente (Resultado por período, sobe verde/desce vermelho), tabela hierárquica (Receitas→Receitas Operacionais/Outras Receitas→Total das Receitas→(-) Despesas→Custos/Despesas Operacionais/Despesas Financeiras/Outras Despesas→Total das Despesas→(=) Resultado do Exercício, com destaque visual máximo) com 1ª coluna sticky. Mesmo padrão visual de Balancete/LCDPR. Gráfico refinado no round 82 (hover por expansão, eixo X "01 Mmm"+dias a cada 5, sem eixo Y, raio de barra reduzido). Ver "Ajustes round 79/82" acima |
+| Entradas e Saídas (Financeiro > Relatórios > Entradas e Saídas) | **Nova (round 82, 2026-08-06)** — Done, fecha os 4 relatórios de Relatórios. `entradas-saidas.html`: filtros (Mês/Intervalo personalizado + Agrupar por Categoria/Cliente + filtro dinâmico correspondente) em card recolhível, 4 KPIs (Entradas/Saídas/Saldo/Movimentações), 2 donuts (Distribuição das entradas/saídas — primeiro donut SVG do sistema, somem quando um item específico é filtrado), tabela flat ordenada por saldo desc com 1ª coluna sticky. "Cliente" = contraparte do lançamento (`pessoaNome`), não restrito a cadastros `tipo:cliente`. Ver "Ajustes round 82" acima |
+| Vídeos | **Nova (round 70, 2026-08-05)** — Done, só a listagem (pedido explícito). `videos.html`: cards com thumbnail/título/categoria/CTA "Assistir no YouTube", grid `auto-fill` responsivo, clique abre o vídeo em nova aba (`window.open`, sem player embutido). Sem tela de cadastro/admin ainda — `videos-data.js` já implementa a extração automática de metadados via oEmbed público do YouTube e a validação de link, prontas pra uma futura tela administrativa. Ver "Ajustes round 70" acima |
+| Minha Conta (Dados/Plano/Pagamento) | **Nova (round 71, 2026-08-05)** — Done. `minha-conta.html`, 3 abas via `Tab` real, hash `#tab=&state=` pros cenários de demonstração. Dados: form completo + CEP/ViaCEP + Estado (Dropdown). Plano: status/card de trial/seletor "Escolher outro plano" (sempre via Comercial/WhatsApp, nunca upgrade automático). Pagamento: renovar/cancelar renovação/aviso de vencimento próximo/histórico. Ver "Ajustes round 71" acima |
+| Contratar plano (fluxo de compra) | **Nova (round 71, 2026-08-05); Etapa 1 redesenhada + 3 bugs corrigidos (round 72)** — Done. `comprar-plano.html`, chrome minimalista sem Sidebar, **2 etapas** (Plano→Pagamento) + Confirmação — Plano é um acordeão vertical (plano expande e já mostra Mensal/Anual dentro dele, sem parecer landing page). Cartão (mensal/anual, parcelamento 1-12x empilhado) ou PIX (só anual, QR ilustrativo+copia-e-cola+mock de verificação em 2 cliques). Cupom de desconto, resumo ao vivo, estados de erro/carregamento. Acessível de "Contratar agora" (Dashboard) e "Realizar pagamento" (modal de trial expirado) — mesma tela nos 2 casos. Ver "Ajustes round 71/72" acima |
 
 ## Shell principal (Header + Sidebar) — migrado pro Storybook, 2026-07-21 (round 8)
 

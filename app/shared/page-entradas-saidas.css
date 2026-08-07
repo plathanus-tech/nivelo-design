@@ -1,0 +1,545 @@
+/* ══════════════════════════════════════════════════════════
+   ENTRADAS E SAÍDAS — Financeiro > Relatórios > Entradas e Saídas. Mobile
+   first. Mesmo padrão visual/de interação de Balancete/LCDPR/DRE (filtros
+   em card recolhível, cabeçalho de resultado com resumo+ações, tabela com
+   1ª coluna sticky, nunca vira Cards no mobile) — diferenças próprias
+   desta tela: "Agrupar por" (Categoria/Cliente) troca dinamicamente o
+   filtro/coluna, e 2 gráficos de donut (primeiro donut do sistema, SVG
+   puro) lado a lado no desktop / empilhados no mobile, escondidos quando
+   o usuário filtra uma categoria/cliente específico. Classes próprias
+   `es-*`. ══════════════════════════════════════════════════════════ */
+
+.es-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+.es-page-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.es-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.es-back:hover { color: var(--color-text-primary); }
+.es-title { color: var(--color-text-primary); margin: 0; }
+.es-description { color: var(--color-text-tertiary); margin: 0; }
+
+/* ── Filtros (accordion: recolhe sozinho após gerar) — mesma composição
+   exata de Balancete/DRE/LCDPR. ── */
+.es-filtros-card { display: flex; flex-direction: column; }
+
+.es-filtros-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+}
+.es-filtros-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+}
+.es-filtros-toggle svg { transition: transform var(--transition-fast); }
+.es-filtros-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.es-filtros-content:not([hidden]) { display: flex; flex-direction: column; }
+
+.es-filtros-body { padding: 0 var(--spacing-lg) var(--spacing-lg); }
+
+.es-filtros-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .es-filtros-grid { grid-template-columns: 1fr 1fr; }
+  .es-span-2 { grid-column: span 2; }
+}
+@media (min-width: 1024px) {
+  .es-filtros-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.es-intervalo-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 480px) {
+  .es-intervalo-fields { grid-template-columns: 1fr 1fr; }
+}
+.es-intervalo-fields[hidden] { display: none; }
+#mes-ano-field[hidden] { display: none; }
+/* Colisão real, causa raiz encontrada via inspeção de `document.styleSheets`:
+   `Tooltip.module.css` (carregada nesta tela pros tooltips dos ícones de ação de exportar)
+   declara `.wrapper{display:inline-flex}` SEM guarda `:not([hidden])` — como Categoria/
+   Cliente também usam a classe genérica `.wrapper` (Input/Dropdown), essa regra vence quando
+   o campo é escondido via `hidden` pelo JS (`syncFiltroDinamico()`), reaparecendo mesmo com o
+   atributo presente. `#cliente-field` (escondido por padrão no HTML) já tinha esse guard;
+   faltava em `#categoria-field` (visível por padrão, só escondido depois via JS ao trocar
+   Agrupar por pra Cliente). */
+#cliente-field[hidden] { display: none; }
+#categoria-field[hidden] { display: none; }
+
+/* Colisão RadioButton×Input — mesmo fix preventivo já usado em Balancete/DRE/LCDPR: o radio
+   nativo escondido (`.input{opacity:0;position:absolute;width:1px;height:1px}`) vaza pros
+   campos de texto/data/mês reais desta tela. */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+  width: 100%;
+  height: 44px;
+}
+
+/* Mesma colisão, agora em `.label`: `RadioButton.module.css` declara `.label{font-weight:
+   bold}` (rótulo do grupo de radio, "Período") — vence os labels normais de campo (Categoria/
+   Cliente/Agrupar por), deixando-os Bold em vez do Medium correto do componente Input.
+   Reafirma o peso certo com um seletor mais específico; `.dpLabel` (Mês/Ano) já nasce Medium
+   no próprio componente (ver DatePicker.module.css), incluído aqui só por robustez. */
+.es-filtros-grid .label,
+.es-filtros-grid .dpLabel {
+  font-weight: var(--font-weight-medium);
+}
+
+.es-filtros-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.es-filtros-actions .btn { width: 100%; }
+@media (min-width: 640px) {
+  .es-filtros-actions .btn { width: auto; min-width: 200px; }
+}
+
+/* ── Combobox (Categoria/Cliente) — mesma técnica Radix/shadcn de Balancete/DRE/LCDPR. ── */
+.es-combobox { position: relative; }
+
+.es-combobox-chevron svg {
+  transition: transform var(--transition-fast);
+  color: var(--color-text-tertiary);
+}
+.es-combobox.open .es-combobox-chevron svg { transform: rotate(180deg); }
+
+.es-combobox-menu {
+  position: fixed;
+  z-index: 60;
+  overflow-y: auto;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: top;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+.es-combobox-menu.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.es-combobox-menu .option-empty {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+/* Dropdown (Agrupar por) e Combobox (Categoria/Cliente): opções empilhadas, uma por linha —
+   mesmo fix de colisão RadioButton×Dropdown/Combobox já documentado em Balancete/DRE/LCDPR. */
+.es-dropdown .menu .option,
+.es-combobox-menu .option {
+  display: block;
+  width: 100%;
+}
+.es-combobox-menu .option.is-active { background: var(--color-bg-subtle); }
+.es-dropdown .trigger { text-align: left; }
+
+.btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Resultado ── */
+#es-resultado:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.es-resultado-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .es-resultado-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+.es-resultado-title { color: var(--color-text-primary); margin: 0 0 var(--spacing-2xs); }
+.es-resultado-resumo { color: var(--color-text-tertiary); margin: 0; }
+.es-resultado-actions { display: flex; gap: var(--spacing-2xs); flex-shrink: 0; }
+
+#es-resultado-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+#es-resultado-content[hidden] { display: none; }
+
+/* ── Estado vazio (nenhuma movimentação encontrada) — mesmo padrão central de ícone+título+
+   texto já usado em outras listagens vazias do sistema (Produtos/Cadastro/Fazendas). ── */
+.es-empty-card[hidden] { display: none; }
+.es-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  color: var(--color-text-secondary);
+}
+.es-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  color: var(--color-text-tertiary);
+}
+.es-empty h3 { color: var(--color-text-primary); margin: 0; }
+.es-empty p { margin: 0; max-width: 420px; }
+
+/* ── Cards de resumo — 4 KPIs (Entradas/Saídas/Saldo/Movimentações), mesma cópia estrutural
+   exata de Estoque/Caixa/Contas a Pagar/Receber/DRE (tamanho fixo 12px/24px em qualquer
+   largura). Grid: 1 coluna mobile → 2 colunas ~640px → 4 colunas 1024px+. ── */
+.es-summary-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+@media (min-width: 640px) {
+  .es-summary-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .es-summary-row { grid-template-columns: repeat(4, 1fr); gap: var(--spacing-lg); }
+}
+
+.card.es-summary-card { box-shadow: var(--shadow-sm); display: flex; flex-direction: column; height: 100%; }
+.es-summary-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) calc(var(--spacing-md) - 4px); }
+.es-summary-card .title { color: var(--color-text-primary); }
+.es-summary-card .title.text-14-bold { font-size: 14px; font-weight: var(--font-weight-bold); }
+.es-summary-icon svg { width: 14px; height: 14px; }
+.es-summary-title-row { display: flex; align-items: center; gap: var(--spacing-xs); }
+.es-summary-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-brand); }
+.es-summary-icon-entrada { color: var(--color-status-success-fg); }
+.es-summary-icon-saida { color: var(--color-status-error-fg); }
+.es-summary-body { display: flex; flex-direction: column; gap: 2px; flex: 1; padding: 0 var(--spacing-lg) var(--spacing-lg); }
+.es-summary-value {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+.es-value-positive { color: var(--color-status-success-fg); }
+.es-value-negative { color: var(--color-status-error-fg); }
+
+/* ── Donuts (SVG puro, sem lib) — 2 gráficos lado a lado no desktop, empilhados no mobile.
+   Escondidos por completo (`#es-donuts-row[hidden]`) quando o filtro dinâmico está numa
+   categoria/cliente específico — ver entradas-saidas.js. ── */
+#es-donuts-row[hidden] { display: none; }
+.es-donuts-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+}
+@media (min-width: 1024px) {
+  .es-donuts-row { grid-template-columns: 1fr 1fr; }
+}
+
+.es-donut-card { display: flex; flex-direction: column; }
+
+.es-donut-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+@media (min-width: 480px) {
+  .es-donut-body { flex-direction: row; align-items: center; }
+}
+
+.es-donut-svg-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+}
+.es-donut-svg { width: 100%; height: 100%; display: block; transform: rotate(-90deg); }
+.es-donut-slice { transition: opacity var(--transition-fast); cursor: default; }
+.es-donut-slice:hover { opacity: 0.82; }
+
+/* Tooltip dos donuts — MESMO padrão visual do tooltip dos gráficos de barra (DRE/Balancete:
+   `.dre-chart-tooltip`/`.bal-chart-tooltip`), copiado propositalmente pra manter consistência
+   de identidade entre os 3 tipos de gráfico do sistema (barra divergente/barra dupla/donut). */
+.es-donut-tooltip {
+  position: fixed;
+  z-index: 90;
+  min-width: 180px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-gray-900);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-sm);
+  pointer-events: none;
+}
+.es-donut-tooltip[hidden] { display: none; }
+.es-donut-tooltip-header {
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: var(--border-width-thin) solid rgba(255, 255, 255, 0.12);
+}
+.es-donut-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: 2px 0;
+}
+.es-donut-tooltip-label { flex: 1; color: rgba(255, 255, 255, 0.72); }
+.es-donut-tooltip-value { font-weight: var(--font-weight-medium); color: var(--color-text-inverse); }
+
+.es-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.es-donut-center-value {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+.es-donut-center-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.es-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  min-width: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.es-donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+.es-donut-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+.es-donut-legend-label {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.es-donut-legend-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  text-align: right;
+}
+.es-donut-legend-percent { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.es-donut-legend-value { color: var(--color-text-tertiary); font-size: var(--font-size-xs); }
+
+.es-donut-empty[hidden] { display: none; }
+.es-donut-empty {
+  margin: 0;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+/* ── Tabela — 1ª coluna (Categoria/Cliente) sticky à esquerda, nunca vira Cards no mobile
+   (relatório financeiro, mesmo princípio de Balancete/LCDPR). ── */
+.es-table-card { display: flex; flex-direction: column; }
+.es-table-card .cardHeader { flex-wrap: wrap; gap: var(--spacing-xs); align-items: baseline; }
+.es-table-caption { color: var(--color-text-tertiary); margin: 0; }
+
+.es-table-scroll-shell { position: relative; }
+.es-table-scroll-fade {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to right, transparent, var(--color-gray-300));
+  transition: opacity var(--transition-fast);
+}
+@media (max-width: 767px) {
+  .es-table-scroll-shell.es-has-hscroll .es-table-scroll-fade {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.es-tablewrap { padding-top: 0; cursor: grab; -webkit-overflow-scrolling: touch; }
+.es-tablewrap.es-dragging { cursor: grabbing; user-select: none; }
+
+.es-tablewrap,
+.es-table-scroll-top {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-muted) transparent;
+}
+.es-tablewrap::-webkit-scrollbar,
+.es-table-scroll-top::-webkit-scrollbar { height: 6px; }
+.es-tablewrap::-webkit-scrollbar-track,
+.es-table-scroll-top::-webkit-scrollbar-track { background: transparent; }
+.es-tablewrap::-webkit-scrollbar-thumb,
+.es-table-scroll-top::-webkit-scrollbar-thumb {
+  background: var(--color-border-muted);
+  border-radius: var(--radius-full);
+}
+.es-tablewrap::-webkit-scrollbar-thumb:hover,
+.es-table-scroll-top::-webkit-scrollbar-thumb:hover { background: var(--color-border-default); }
+
+.es-table-scroll-top {
+  display: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 10px;
+}
+.es-table-scroll-top-spacer { height: 1px; }
+@media (max-width: 767px) {
+  .es-table-scroll-shell.es-has-hscroll .es-table-scroll-top { display: block; }
+}
+
+.es-table { table-layout: auto; }
+.es-table .th,
+.es-table .td {
+  white-space: nowrap;
+  text-align: right;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.es-table .th:first-child,
+.es-table .td:first-child {
+  text-align: left;
+  white-space: normal;
+  min-width: 220px;
+}
+.es-table .th:not(:first-child),
+.es-table .td:not(:first-child) {
+  min-width: 110px;
+}
+
+/* Coluna Categoria/Cliente sticky à esquerda — mesma técnica de Balancete/LCDPR/DRE. */
+.es-table .th:first-child,
+.es-table .td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 1px solid var(--color-gray-300);
+}
+
+/* Zebra do corpo escopada ao `#es-tbody` (ID, não classe genérica da tabela) — evita o
+   mesmo bug de especificidade já documentado em LCDPR/DRE: `:nth-child` reinicia a contagem
+   em cada `<tbody>`/`<tfoot>`, então uma regra de zebra genérica também pintaria as linhas
+   do rodapé, competindo com o destaque de Total/Saldo final abaixo. */
+#es-tbody .tr:nth-child(odd) .td { background: var(--color-bg-surface); }
+#es-tbody .tr:nth-child(even) .td { background: var(--color-gray-50); }
+
+/* Títulos de agrupamento (Entradas/Saídas) — separam visualmente os lançamentos dentro da
+   mesma tabela (pedido explícito). MESMA hierarquia visual exata das linhas de nível 0 do DRE
+   (`.dre-row-level-0`/`#dre-tbody .dre-row-level-0 .td` em page-dre.css — Receita Bruta,
+   Deduções, Custos etc.): fundo de marca, texto Gray 900 (não a cor de marca — só o Resultado
+   final do DRE/rodapé usa `--color-text-brand`), 14px (`--font-size-md`, um nível acima do
+   resto da tabela), negrito, `--spacing-sm` de padding vertical extra. Objetivo explícito:
+   Entradas/Saídas devem ser percebidas como seções principais, do mesmo jeito que os grupos de
+   1º nível do DRE. Seletor com `.tr` explícito pra igualar a especificidade do zebra acima (3
+   classes) e vencer por ordem — senão o zebra por posição pintaria por cima do destaque do
+   título. Não fica sticky (a célula é `colspan="4"`, já ocupa a largura inteira, sticky aqui só
+   faria a linha "descolar" visualmente da coluna de dados durante o scroll horizontal). */
+#es-tbody .tr.es-row-group-header .td {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  padding-top: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+}
+.es-row-group-header .td:first-child { position: static; }
+
+/* Rodapé — 1 linha só (Total de entradas/Total de saídas/Saldo final, cada valor sob a
+   coluna certa), destaque máximo (fundo de marca, negrito, cor de marca), mesma escala
+   visual já usada em Balancete/LCDPR/DRE pra "a linha mais importante da tabela". */
+#es-tfoot .es-foot-saldo .td {
+  background: var(--color-bg-brand);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-brand);
+}
+#es-tfoot .es-foot-saldo.es-row-negativo .td { color: var(--color-status-error-fg); }
+#es-tfoot .es-foot-label { text-align: left; }
+
+.es-row-saldo-positivo .es-cell-saldo { color: var(--color-status-success-fg); }
+.es-row-saldo-negativo .es-cell-saldo { color: var(--color-status-error-fg); }
+
+/* ── Toast (mesma composição do resto do sistema, caso necessário no futuro) ── */
+.es-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.es-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }

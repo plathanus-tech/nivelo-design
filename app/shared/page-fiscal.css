@@ -1,0 +1,97 @@
+/* ══════════════════════════════════════════════════════════
+   FISCAL — Configuração > Fiscal > Nota de entrada. Mobile first.
+   Página de entrada do subgrupo Fiscal (paralela a Natureza da operação/
+   Certificado digital), reaproveitando `.card`/`.cardHeader`/`.title` do
+   Table.module.css como container genérico (mesmo padrão de todo o
+   sistema), RadioButton pro opt-in Sim/Não. Classes próprias `fis-*`.
+   ══════════════════════════════════════════════════════════ */
+
+.fis-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.fis-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+.fis-title { margin: 0; }
+.fis-description { color: var(--color-text-tertiary); margin: 0; }
+
+.fis-section-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Conteúdo abaixo do `.cardHeader` (que já traz seu próprio padding
+   `24px 24px 16px`, Table.module.css) precisa do mesmo padding horizontal
+   pra alinhar com o título, e do padding inferior pro respiro final do
+   card — mesmo padrão já usado em todo o sistema pra cards com cardHeader
+   + corpo próprio (ex.: `.bal-summary-body`/`.ctr-summary-body`/
+   `.cp-plan-item-body`: `padding: 0 var(--spacing-lg) var(--spacing-lg)`). */
+.fis-section-description,
+#nota-entrada-field,
+.fis-section-actions {
+  padding: 0 var(--spacing-lg);
+}
+
+.fis-section-description {
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 720px;
+}
+
+.fis-section-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: var(--spacing-lg);
+}
+@media (max-width: 479px) {
+  .fis-section-actions .btn { width: 100%; }
+}
+
+/* RadioButton (Sim/Não) — mesmo guard preventivo já documentado dezenas de
+   vezes neste projeto (o .checked do dot precisa ser sincronizado via JS,
+   não vem de :checked do input nativo). */
+#nota-entrada-field .group.horizontal {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+/* ── Toast de sucesso (mesmo padrão exato do resto do sistema) ─────────── */
+.fis-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.fis-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+.fis-toast {
+  box-shadow: var(--shadow-lg);
+  animation: fis-toast-in 0.25s ease;
+}
+.fis-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.fis-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+@keyframes fis-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

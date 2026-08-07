@@ -136,6 +136,8 @@ window.PROTO_NAV_CONFIG = {
             { id: 'dashboard-multifarm', label: 'Usuário com várias fazendas (filtro visível)', desktop: '../app/screens/dashboard.html#state=multifarm' },
             { id: 'dashboard-trialwarning', label: 'Teste: menos de 3 dias restantes (tag amarela)', desktop: '../app/screens/dashboard.html#state=trialwarning' },
             { id: 'dashboard-trialexpired', label: 'Teste: período expirado (modal de bloqueio + blur)', desktop: '../app/screens/dashboard.html#state=trialexpired' },
+            { id: 'dashboard-renewalwarning', label: 'Licença anual vencendo em breve (aviso)', desktop: '../app/screens/dashboard.html#state=renewalwarning' },
+            { id: 'dashboard-planoexpirado', label: 'Plano pago vencido (modal de bloqueio + blur)', desktop: '../app/screens/dashboard.html#state=planoexpirado' },
             { id: 'dashboard-success', label: 'Sucesso ao recuperar senha', desktop: '../app/screens/dashboard.html#state=success' },
             { id: 'dashboard-signupsuccess', label: 'Conta criada com sucesso', desktop: '../app/screens/dashboard.html#state=signupsuccess' }
           ]
@@ -185,7 +187,7 @@ window.PROTO_NAV_CONFIG = {
         },
         {
           id: 'produtos-listagem',
-          label: 'Produtos',
+          label: 'Produtos e serviços',
           desktop: '../app/screens/produtos.html',
           variants: [
             { id: 'produtos-listagem-empty', label: 'Nenhum produto', desktop: '../app/screens/produtos.html#state=empty' }
@@ -375,6 +377,14 @@ window.PROTO_NAV_CONFIG = {
               ]
             }
           ]
+        },
+        // Fiscal > Nota de entrada — página de entrada do subgrupo Fiscal
+        // (paralela a Natureza da Operação/Certificado Digital), com a
+        // seção de opt-in pra recebimento automático de NF-es de terceiros.
+        {
+          id: 'fiscal-nota-entrada',
+          label: 'Fiscal',
+          desktop: '../app/screens/fiscal.html'
         }
       ]
     },
@@ -561,6 +571,21 @@ window.PROTO_NAV_CONFIG = {
           id: 'balancete',
           label: 'Balancete',
           desktop: '../app/screens/balancete.html'
+        },
+        {
+          id: 'lcdpr',
+          label: 'LCDPR',
+          desktop: '../app/screens/lcdpr.html'
+        },
+        {
+          id: 'dre',
+          label: 'DRE',
+          desktop: '../app/screens/dre.html'
+        },
+        {
+          id: 'entradas-saidas',
+          label: 'Entradas e Saídas',
+          desktop: '../app/screens/entradas-saidas.html'
         }
       ]
     },
@@ -586,7 +611,7 @@ window.PROTO_NAV_CONFIG = {
         },
         {
           id: 'manifestos',
-          label: 'Manifestos',
+          label: 'Manifesto eletrônico',
           desktop: '../app/screens/manifestos.html'
         },
         {
@@ -634,6 +659,60 @@ window.PROTO_NAV_CONFIG = {
           id: 'nova-ideia',
           label: 'Nova ideia',
           desktop: '../app/screens/nova-ideia.html'
+        }
+      ]
+    },
+    {
+      id: 'videos',
+      label: 'Jornada · Vídeos',
+      screens: [
+        {
+          id: 'videos-listagem',
+          label: 'Vídeos',
+          desktop: '../app/screens/videos.html'
+        }
+      ]
+    },
+    {
+      id: 'minha-conta',
+      label: 'Jornada · Minha Conta',
+      screens: [
+        {
+          id: 'minha-conta-dados',
+          label: 'Minha Conta',
+          desktop: '../app/screens/minha-conta.html#tab=dados'
+        },
+        {
+          id: 'minha-conta-plano',
+          label: 'Minha Conta · Plano',
+          desktop: '../app/screens/minha-conta.html#tab=plano',
+          variants: [
+            { id: 'minha-conta-plano-teste', label: 'Período de teste', desktop: '../app/screens/minha-conta.html#tab=plano&state=teste' },
+            { id: 'minha-conta-plano-mensal', label: 'Ativo · Licença mensal', desktop: '../app/screens/minha-conta.html#tab=plano&state=mensal' },
+            { id: 'minha-conta-plano-aguardando', label: 'Aguardando pagamento', desktop: '../app/screens/minha-conta.html#tab=plano&state=aguardando' },
+            { id: 'minha-conta-plano-cancelado', label: 'Cancelado', desktop: '../app/screens/minha-conta.html#tab=plano&state=cancelado' }
+          ]
+        },
+        {
+          id: 'minha-conta-pagamento',
+          label: 'Minha Conta · Pagamento',
+          desktop: '../app/screens/minha-conta.html#tab=pagamento',
+          variants: [
+            { id: 'minha-conta-pagamento-mensal', label: 'Mensal · renovação automática ativa', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=mensal' },
+            { id: 'minha-conta-pagamento-mensal-cancelada', label: 'Mensal · renovação cancelada', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=mensal-cancelada' },
+            { id: 'minha-conta-pagamento-renovacaoproxima', label: 'Anual · vencendo em breve (aviso)', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=renovacaoproxima' },
+            { id: 'minha-conta-pagamento-vencido', label: 'Anual · plano vencido', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=vencido' },
+            { id: 'minha-conta-pagamento-aguardando', label: 'Aguardando pagamento', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=aguardando' }
+          ]
+        },
+        {
+          id: 'comprar-plano',
+          label: 'Contratar plano (fluxo de compra)',
+          desktop: '../app/screens/comprar-plano.html',
+          variants: [
+            { id: 'comprar-plano-renovacao', label: 'Via renovação de licença', desktop: '../app/screens/comprar-plano.html?motivo=renovacao' },
+            { id: 'comprar-plano-vencido', label: 'Via plano vencido', desktop: '../app/screens/comprar-plano.html?motivo=vencido' }
+          ]
         }
       ]
     }

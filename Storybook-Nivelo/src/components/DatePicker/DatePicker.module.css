@@ -12,7 +12,18 @@
 }
 .dpRoot:not([hidden]) { display: flex; }
 
+/* Mesma tipografia de `.label` (Input/Dropdown) — o `.dpLabel` só tinha `color` definido
+   (herdando peso/tamanho/entrelinha do body), o que deixava "Mês/Ano" com peso mais leve e
+   mais colado no campo do que os demais labels de filtro da mesma tela (pedido explícito de
+   consistência visual, 2026-08-06). Corrigido na fonte — vale pra qualquer tela que já usa o
+   DatePicker (Balancete/DRE/LCDPR/Entradas e Saídas/Contas a Pagar/Receber/Caixa/Estoque/
+   Produtos), não só um patch pontual. */
 .dpLabel {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
   color: var(--color-text-secondary);
 }
 

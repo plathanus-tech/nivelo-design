@@ -478,11 +478,10 @@
   });
 
   // ---------- Ações da tabela (Nota fiscal / Editar / Excluir) ----------
-  // Fluxo detalhado de criação/edição fica pra uma próxima etapa — aqui só
-  // "Excluir" tem comportamento real (soft delete), pra demonstrar a regra
-  // de negócio central desta tela. Nota fiscal/Editar dão um retorno visual
-  // mínimo (mesmo padrão do botão do Caderno de campo no Header), sem
-  // destino real ainda.
+  // "Nota fiscal" navega pra Nova Nota Fiscal com o participante pré-preenchido
+  // (ver `openNovaNotaFiscal()` abaixo); "Editar" reaproveita o formulário de
+  // Novo Cadastro; "Excluir" é soft delete de verdade, a regra de negócio
+  // central desta tela.
   var STATUS_BADGE = {
     ativo: { status: 'success', label: 'Ativo' },
     inativo: { status: 'warning', label: 'Inativo' },
@@ -587,6 +586,20 @@
     window.location.href = 'novo-cadastro.html#state=edit';
   }
 
+  // ---------- Cadastrar Nota Fiscal: navega pra Nova Nota Fiscal com o
+  // participante de origem pré-preenchido. Handoff via `sessionStorage` (mesmo
+  // mecanismo já usado por `openEditScreen()` acima, e pelo rascunho de "+
+  // Cadastrar novo fornecedor" de Nova Conta a Pagar) — só o código do cadastro
+  // atravessa, a resolução completa (nome/documento/UF/tipo) acontece do lado
+  // de lá, lendo o mesmo `NiveloCadastros` que já é a fonte real do dropdown
+  // Destinatário. Consumido e removido no primeiro load de `nova-nota-
+  // fiscal.js`, nunca sobrevive a uma 2ª navegação. ----------
+  function openNovaNotaFiscal(row) {
+    var codigo = cellText(row.children[1]);
+    try { sessionStorage.setItem('nivelo.novanotafiscal.prefill', JSON.stringify({ codigo: codigo })); } catch (e) {}
+    window.location.href = 'nova-nota-fiscal.html';
+  }
+
   function handleRowAction(btn, row) {
     var action = btn.dataset.action;
 
@@ -601,8 +614,11 @@
       return;
     }
 
-    // Nota fiscal: sem destino real ainda — só um retorno visual mínimo pra
-    // deixar claro que o clique registrou.
+    if (action === 'nota-fiscal') {
+      openNovaNotaFiscal(row);
+      return;
+    }
+
     btn.disabled = true;
     window.setTimeout(function () { btn.disabled = false; }, 300);
   }

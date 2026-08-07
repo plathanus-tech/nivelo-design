@@ -100,23 +100,47 @@
     if (appShellEl) appShellEl.classList.add('is-trial-blocked');
   }
 
-  // "Falar com administrador"/"Realizar pagamento": sem destino real ainda
-  // (fluxo de pagamento pode mudar depois) — só um retorno visual mínimo,
-  // mesmo padrão já usado noutros botões sem destino definido neste app.
+  // "Falar com administrador": sem destino real ainda (não é fluxo de
+  // pagamento) — só um retorno visual mínimo, mesmo padrão já usado noutros
+  // botões sem destino definido neste app.
   function flashDisabled(btn) {
     btn.disabled = true;
     window.setTimeout(function () { btn.disabled = false; }, 300);
   }
   var trialContactBtn = document.getElementById('trial-block-contact');
-  var trialPayBtn = document.getElementById('trial-block-pay');
   if (trialContactBtn) trialContactBtn.addEventListener('click', function () { flashDisabled(trialContactBtn); });
-  if (trialPayBtn) trialPayBtn.addEventListener('click', function () { flashDisabled(trialPayBtn); });
 
-  // "Contratar agora" (topbar): permite pagar o plano já escolhido a
-  // qualquer momento do teste, sem esperar o período acabar — mesmo padrão
-  // de "ação sem tela ainda" já usado nos botões do modal de bloqueio.
+  // "Realizar pagamento" (modal de bloqueio) e "Contratar agora" (topbar)
+  // abrem o mesmo fluxo de compra (comprar-plano.html) — mesma tela
+  // independente da origem, conforme especificado.
+  var trialPayBtn = document.getElementById('trial-block-pay');
+  if (trialPayBtn) trialPayBtn.addEventListener('click', function () { window.location.href = 'comprar-plano.html'; });
+
   var trialUpgradeBtn = document.getElementById('dash-trial-upgrade-btn');
-  if (trialUpgradeBtn) trialUpgradeBtn.addEventListener('click', function () { flashDisabled(trialUpgradeBtn); });
+  if (trialUpgradeBtn) trialUpgradeBtn.addEventListener('click', function () { window.location.href = 'comprar-plano.html'; });
+
+  // ---------- Aviso de renovação próxima / plano expirado (demonstração) ----------
+  // `#state=renewalwarning`: licença anual vencendo em breve (banner, não bloqueia).
+  // `#state=planoexpirado`: plano pago já vencido (bloqueio real, mesmo padrão do
+  // bloqueio de trial acima, mas pra quem já foi assinante).
+  if (state === 'renewalwarning') {
+    var renewalBanner = document.getElementById('dash-renewal-banner');
+    if (renewalBanner) {
+      renewalBanner.hidden = false;
+      document.getElementById('dash-renewal-banner-text').textContent =
+        'Sua licença anual vence em 12 dias. Renove agora para não perder o acesso.';
+    }
+  }
+
+  if (state === 'planoexpirado') {
+    var planExpiredOverlay = document.getElementById('plan-expired-overlay');
+    if (planExpiredOverlay) {
+      planExpiredOverlay.hidden = false;
+      if (appShellEl) appShellEl.classList.add('is-trial-blocked');
+    }
+  }
+  var planExpiredBuyBtn = document.getElementById('plan-expired-buy');
+  if (planExpiredBuyBtn) planExpiredBuyBtn.addEventListener('click', function () { window.location.href = 'comprar-plano.html?motivo=vencido'; });
 
   // ---------- Feedback de carregamento ao trocar filtros (Fazenda/Período) ----------
   // Sem backend neste protótipo: não há dado real pra buscar, então o

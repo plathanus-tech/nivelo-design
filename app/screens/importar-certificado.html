@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-importar-certificado.css" />
 </head>
@@ -73,7 +74,7 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos</span>
+                  <span class="app-nav-label">Produtos e serviços</span>
                 </button>
               </div>
             </div>
@@ -192,6 +193,10 @@
                       <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
                       <span class="app-nav-label">Certificado digital</span>
                     </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -301,11 +306,32 @@
                   </span>
                 </div>
 
-                <div class="wrapper impcert-span-2" id="observacoes-field">
-                  <label class="label" for="ic-observacoes">Observações <span class="impcert-optional-tag">(opcional)</span></label>
-                  <div class="inputWrap">
-                    <textarea class="input impcert-textarea" id="ic-observacoes" rows="3" placeholder="Anotações internas sobre este certificado"></textarea>
+                <div class="dpRoot" id="validade-field">
+                  <label class="dpLabel" for="validade-trigger">Data de validade</label>
+                  <button type="button" class="dpTrigger" id="validade-trigger" aria-describedby="validade-error">
+                    <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
+                    <span class="dpPlaceholder" id="validade-value">Selecionar data</span>
+                  </button>
+                  <input type="hidden" id="ic-validade" />
+                  <div class="dpPopover" id="validade-popover" hidden>
+                    <div class="dpCalendarHeader">
+                      <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior">
+                        <i data-lucide="chevron-left" width="16" height="16"></i>
+                      </button>
+                      <span class="dpCalendarLabel text-body-s" data-dp-label></span>
+                      <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês">
+                        <i data-lucide="chevron-right" width="16" height="16"></i>
+                      </button>
+                    </div>
+                    <div class="dpWeekdays">
+                      <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+                    </div>
+                    <div class="dpGrid" data-dp-grid></div>
                   </div>
+                  <span class="errorText" id="validade-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe a data de validade do certificado.
+                  </span>
                 </div>
 
                 <div class="impcert-span-2 errorText" id="serie-duplicada-error" hidden>
@@ -391,6 +417,7 @@
   <script src="../shared/interface-principal.js"></script>
   <script src="../shared/emitente-data.js"></script>
   <script src="../shared/certificado-digital-data.js"></script>
+  <script src="../shared/date-picker.js"></script>
   <script src="../shared/importar-certificado.js"></script>
 </body>
 </html>

@@ -78,7 +78,7 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos</span>
+                  <span class="app-nav-label">Produtos e serviços</span>
                 </button>
               </div>
             </div>
@@ -201,6 +201,10 @@
                     <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
                       <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
                       <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
                     </button>
                   </div>
                 </div>
@@ -335,6 +339,16 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Aviso de renovação próxima (licença anual, até 30 dias do vencimento) —
+               variante de demonstração, `#state=renewalwarning`, nunca aparece por padrão. -->
+          <div class="alert warning dash-renewal-banner" id="dash-renewal-banner" hidden>
+            <span class="icon"><i data-lucide="triangle-alert" width="18" height="18"></i></span>
+            <div class="body">
+              <div class="message" id="dash-renewal-banner-text"></div>
+            </div>
+            <a href="comprar-plano.html?motivo=renovacao" class="btn primary sm" id="dash-renewal-banner-btn">Renovar licença</a>
           </div>
 
           <!-- ── Linha 1: Safra · Estoque de grãos · Saldo em contas ── -->
@@ -699,8 +713,25 @@
         <p class="text-body-s">Seu teste gratuito de 7 dias chegou ao fim. Para continuar usando o sistema, fale com o administrador da conta ou realize o pagamento.</p>
       </div>
       <div class="footer">
-        <button type="button" class="btn secondary" id="trial-block-contact">Falar com administrador</button>
-        <button type="button" class="btn primary" id="trial-block-pay">Realizar pagamento</button>
+        <button type="button" class="btn secondary sm" id="trial-block-contact">Falar com administrador</button>
+        <button type="button" class="btn primary sm" id="trial-block-pay">Realizar pagamento</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de bloqueio (plano pago vencido) — mesma composição do bloqueio de
+       trial acima (sem X, sem fechar por fora/Esc), mas pra quem já foi
+       assinante e o plano venceu, não pra quem nunca pagou (#state=planoexpirado). -->
+  <div class="overlay" id="plan-expired-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="plan-expired-title">
+      <div class="header">
+        <h2 class="title" id="plan-expired-title">Seu plano expirou.</h2>
+      </div>
+      <div class="body">
+        <p class="text-body-s">Sua assinatura venceu e o acesso ao sistema foi pausado. Compre novamente para continuar usando o Nivelo.</p>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn primary sm" id="plan-expired-buy">Comprar novamente</button>
       </div>
     </div>
   </div>

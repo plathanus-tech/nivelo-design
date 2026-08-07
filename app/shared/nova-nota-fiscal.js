@@ -452,7 +452,7 @@
 
     var isSaida = nota.tipo === 'saida';
     document.getElementById('nv-destinatario-title').textContent = isSaida ? 'Destinatário' : 'Remetente';
-    document.getElementById('nv-pessoa-label').textContent = isSaida ? 'Cliente' : 'Fornecedor';
+    document.getElementById('nv-pessoa-label').textContent = isSaida ? 'Cliente / Transportadora' : 'Fornecedor';
     document.getElementById('nv-pessoa-nome').textContent = (isSaida ? nota.clienteNome : nota.fornecedorNome) || '—';
     document.getElementById('nv-pessoa-documento').textContent = (isSaida ? nota.clienteDocumento : nota.fornecedorDocumento) || '—';
     document.getElementById('nv-pessoa-uf').textContent = nota.uf || '—';
@@ -479,6 +479,39 @@
     document.getElementById('nv-cfop').textContent = nota.cfop || '—';
 
     document.getElementById('nv-observacao').textContent = nota.observacao || '—';
+  }
+
+  // ---------- Prefill vindo da ação "Cadastrar nota fiscal" (Cadastro de
+  // Pessoas e Empresas) — sessionStorage de uso único (mesmo padrão de
+  // toast/rascunho já usado em outras telas), consumido e removido no
+  // primeiro load. Só se aplica à CRIAÇÃO (sem `?numero=`, nunca em
+  // visualização/correção de uma nota já existente). ----------
+  if (!editingNota) {
+    try {
+      var prefillRaw = sessionStorage.getItem('nivelo.novanotafiscal.prefill');
+      if (prefillRaw) {
+        sessionStorage.removeItem('nivelo.novanotafiscal.prefill');
+        var prefill = JSON.parse(prefillRaw);
+        var origemPessoa = window.NiveloCadastros.findByCodigo ? window.NiveloCadastros.findByCodigo(prefill.codigo) : null;
+        if (!origemPessoa) origemPessoa = window.NiveloCadastros.list().filter(function (p) { return p.codigo === prefill.codigo; })[0];
+        if (origemPessoa) {
+          var tiposOrigem = origemPessoa.tipo || [];
+          // Regra 2: só quando a pessoa é EXCLUSIVAMENTE Fornecedor a tela força
+          // Nota de Entrada — qualquer outra combinação (incl. Cliente+Fornecedor)
+          // mantém o comportamento atual (usuário escolhe o tipo).
+          var somenteFornecedor = tiposOrigem.length === 1 && tiposOrigem[0] === 'fornecedor';
+          if (somenteFornecedor) {
+            var entradaRadio = tipoRadios.filter(function (r) { return r.value === 'entrada'; })[0];
+            if (entradaRadio) { entradaRadio.checked = true; syncTipoRadioChecked(); }
+          } else if (tiposOrigem.indexOf('cliente') !== -1) {
+            // Regra 1: nota de saída → Cliente/Transportadora pré-preenchido com o
+            // participante de origem (o dropdown Destinatário só lista quem tem o
+            // papel "cliente" — mesma fonte/comportamento de sempre, ver acima).
+            destinatarioDropdown.selectValue(origemPessoa.codigo);
+          }
+        }
+      }
+    } catch (e) { /* sessionStorage indisponível */ }
   }
 
   if (editingNota && (modo === 'ver' || modo === 'corrigir')) {

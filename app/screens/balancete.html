@@ -78,7 +78,7 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos</span>
+                  <span class="app-nav-label">Produtos e serviços</span>
                 </button>
               </div>
             </div>
@@ -197,6 +197,10 @@
                       <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
                       <span class="app-nav-label">Certificado digital</span>
                     </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -250,12 +254,16 @@
             <h1 class="bal-title text-heading-6">Balancete</h1>
           </div>
 
-          <!-- ══════════════ FILTROS ══════════════ -->
+          <!-- ══════════════ FILTROS (accordion: recolhe sozinho após gerar) ══════════════ -->
           <div class="card bal-filtros-card" id="bal-filtros-card">
-            <div class="cardHeader">
+            <div class="cardHeader bal-filtros-header" id="bal-filtros-header">
               <h2 class="title">Filtros</h2>
+              <button type="button" class="bal-filtros-toggle" id="bal-filtros-toggle" aria-expanded="true" aria-controls="bal-filtros-content" aria-label="Recolher filtros">
+                <i data-lucide="chevron-down" width="18" height="18"></i>
+              </button>
             </div>
 
+            <div class="bal-filtros-content" id="bal-filtros-content">
             <div class="bal-filtros-body">
               <div class="bal-filtros-grid">
 
@@ -345,38 +353,22 @@
                   </div>
                 </div>
 
-                <div class="wrapper bal-searchselect" id="conta-field">
-                  <span class="label">Conta</span>
-                  <button type="button" class="trigger" data-searchselect-trigger>
-                    <span data-searchselect-value>Todas as contas</span>
-                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                  </button>
-                  <div class="menu bal-searchselect-menu" data-searchselect-menu hidden>
-                    <div class="bal-searchselect-search">
-                      <div class="inputWrap hasLeft">
-                        <span class="iconLeft"><i data-lucide="search" width="16" height="16"></i></span>
-                        <input type="text" class="input" data-searchselect-input placeholder="Buscar conta..." autocomplete="off" />
-                      </div>
-                    </div>
-                    <div class="bal-searchselect-options" data-searchselect-options></div>
+                <div class="wrapper bal-combobox" id="conta-field">
+                  <span class="label" id="conta-label">Conta</span>
+                  <div class="inputWrap hasRight">
+                    <input type="text" class="input" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list" aria-controls="conta-combobox-menu" aria-labelledby="conta-label" data-combobox-input placeholder="Todas as contas" autocomplete="off" />
+                    <span class="iconRight bal-combobox-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                   </div>
+                  <div class="menu bal-combobox-menu" id="conta-combobox-menu" role="listbox" data-combobox-menu hidden></div>
                 </div>
 
-                <div class="wrapper bal-searchselect" id="categoria-field">
-                  <span class="label">Categoria</span>
-                  <button type="button" class="trigger" data-searchselect-trigger>
-                    <span data-searchselect-value>Todas as categorias</span>
-                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                  </button>
-                  <div class="menu bal-searchselect-menu" data-searchselect-menu hidden>
-                    <div class="bal-searchselect-search">
-                      <div class="inputWrap hasLeft">
-                        <span class="iconLeft"><i data-lucide="search" width="16" height="16"></i></span>
-                        <input type="text" class="input" data-searchselect-input placeholder="Buscar categoria..." autocomplete="off" />
-                      </div>
-                    </div>
-                    <div class="bal-searchselect-options" data-searchselect-options></div>
+                <div class="wrapper bal-combobox" id="categoria-field">
+                  <span class="label" id="categoria-label">Categoria</span>
+                  <div class="inputWrap hasRight">
+                    <input type="text" class="input" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list" aria-controls="categoria-combobox-menu" aria-labelledby="categoria-label" data-combobox-input placeholder="Todas as categorias" autocomplete="off" />
+                    <span class="iconRight bal-combobox-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                   </div>
+                  <div class="menu bal-combobox-menu" id="categoria-combobox-menu" role="listbox" data-combobox-menu hidden></div>
                 </div>
 
                 <div class="wrapper bal-dropdown" id="agrupamento-field">
@@ -399,12 +391,8 @@
             <div class="bal-filtros-actions">
               <button type="button" class="btn primary" id="bal-gerar-btn">Gerar relatório</button>
             </div>
+            </div>
           </div>
-
-          <button type="button" class="btn secondary hasLeft bal-exibir-filtros-btn" id="bal-exibir-filtros-btn" hidden>
-            <span class="icon"><i data-lucide="sliders-horizontal" width="16" height="16"></i></span>
-            Exibir filtros
-          </button>
 
           <!-- ══════════════ RESULTADO ══════════════ -->
           <div id="bal-resultado" hidden>
@@ -435,7 +423,7 @@
                 <div class="cardHeader">
                   <div class="bal-summary-title-row">
                     <span class="bal-summary-icon bal-summary-icon-entrada"><i data-lucide="arrow-down-circle" width="18" height="18"></i></span>
-                    <h3 class="title">Total de entradas</h3>
+                    <h3 class="title text-14-bold">Total de entradas</h3>
                   </div>
                 </div>
                 <div class="bal-summary-body">
@@ -446,7 +434,7 @@
                 <div class="cardHeader">
                   <div class="bal-summary-title-row">
                     <span class="bal-summary-icon bal-summary-icon-saida"><i data-lucide="arrow-up-circle" width="18" height="18"></i></span>
-                    <h3 class="title">Total de saídas</h3>
+                    <h3 class="title text-14-bold">Total de saídas</h3>
                   </div>
                 </div>
                 <div class="bal-summary-body">
@@ -457,7 +445,7 @@
                 <div class="cardHeader">
                   <div class="bal-summary-title-row">
                     <span class="bal-summary-icon"><i data-lucide="scale" width="18" height="18"></i></span>
-                    <h3 class="title">Saldo do período</h3>
+                    <h3 class="title text-14-bold">Saldo do período</h3>
                   </div>
                 </div>
                 <div class="bal-summary-body">
@@ -473,9 +461,10 @@
               <div class="bal-chart-wrap">
                 <svg id="bal-chart-svg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
               </div>
+              <div class="bal-chart-axis" id="bal-chart-axis"></div>
               <div class="bal-chart-legend">
-                <span class="bal-chart-legend-item"><span class="bal-chart-legend-dot bal-chart-legend-dot-entrada"></span>Entradas</span>
-                <span class="bal-chart-legend-item"><span class="bal-chart-legend-dot bal-chart-legend-dot-saida"></span>Saídas</span>
+                <span class="bal-chart-legend-item text-14-regular"><span class="bal-chart-legend-dot bal-chart-legend-dot-entrada"></span>Entradas</span>
+                <span class="bal-chart-legend-item text-14-regular"><span class="bal-chart-legend-dot bal-chart-legend-dot-saida"></span>Saídas</span>
               </div>
             </div>
 
@@ -484,13 +473,19 @@
                 <h3 class="title">Balancete detalhado</h3>
                 <p class="bal-table-caption text-body-xs">Valores em R$, sem centavos.</p>
               </div>
-              <div class="tableWrap bal-tablewrap">
-                <table class="table bal-table">
-                  <thead>
-                    <tr class="headerRow" id="bal-header-row"></tr>
-                  </thead>
-                  <tbody id="bal-tbody"></tbody>
-                </table>
+              <div class="bal-table-scroll-shell">
+                <div class="bal-table-scroll-top" id="bal-table-scroll-top">
+                  <div class="bal-table-scroll-top-spacer" id="bal-table-scroll-top-spacer"></div>
+                </div>
+                <div class="tableWrap bal-tablewrap" id="bal-tablewrap">
+                  <table class="table bal-table">
+                    <thead>
+                      <tr class="headerRow" id="bal-header-row"></tr>
+                    </thead>
+                    <tbody id="bal-tbody"></tbody>
+                  </table>
+                </div>
+                <div class="bal-table-scroll-fade" aria-hidden="true"></div>
               </div>
             </div>
 

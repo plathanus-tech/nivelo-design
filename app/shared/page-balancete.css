@@ -29,8 +29,36 @@
 .bal-back:hover { color: var(--color-text-primary); }
 .bal-title { color: var(--color-text-primary); margin: 0; }
 
-/* ── Filtros ───────────────────────────────────────────────────────────── */
+/* ── Filtros (accordion: recolhe sozinho após gerar) ──────────────────────
+   Cabeçalho inteiro é clicável (não só o botão de chevron) pra expandir/
+   recolher; `.bal-filtros-content` (corpo+ações) alterna via `hidden`. ── */
 .bal-filtros-card { display: flex; flex-direction: column; }
+
+.bal-filtros-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+}
+.bal-filtros-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+}
+.bal-filtros-toggle svg { transition: transform var(--transition-fast); }
+.bal-filtros-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.bal-filtros-content:not([hidden]) { display: flex; flex-direction: column; }
+
 .bal-filtros-body { padding: 0 var(--spacing-lg) var(--spacing-lg); }
 
 .bal-filtros-grid {
@@ -61,13 +89,28 @@
 /* Colisão RadioButton×Input: RadioButton.module.css esconde o radio nativo via
    `.input{opacity:0;position:absolute;width:1px;height:1px}` — como essa classe é
    carregada globalmente, vaza pros campos de texto/data/mês reais desta tela (Mês/Ano,
-   Data inicial, Data final), deixando-os invisíveis. Mesmo padrão de fix já usado em
-   várias outras telas do sistema. */
+   Data inicial, Data final, Conta, Categoria), deixando-os invisíveis. Mesmo padrão de
+   fix já usado em várias outras telas do sistema. Bug real pego nesta rodada: a versão
+   anterior deste fix usava `height:auto`, que "resolvia" a invisibilidade mas nunca
+   restaurava a altura real do componente (44px, `Input.module.css`) — só mascarava
+   com uma altura baseada em fonte/padding (~35px), sempre menor que os outros campos
+   do mesmo formulário (Agrupamento, Mês/Ano). Corrigido fixando `height:44px`
+   explicitamente, o valor real do componente. */
 .input:not([type="radio"]) {
   position: static;
   opacity: 1;
   width: 100%;
-  height: auto;
+  height: 44px;
+}
+
+/* Mesma colisão, agora em `.label`: `RadioButton.module.css` declara `.label{font-weight:
+   bold}` (rótulo do grupo de radio, "Período") — vence os labels normais de campo (Conta/
+   Categoria/Agrupamento), deixando-os Bold em vez do Medium correto do componente Input.
+   Reafirma o peso certo com um seletor mais específico; `.dpLabel` (Mês/Ano) já nasce Medium
+   no próprio componente (ver DatePicker.module.css), incluído aqui só por robustez. */
+.bal-filtros-grid .label,
+.bal-filtros-grid .dpLabel {
+  font-weight: var(--font-weight-medium);
 }
 
 .bal-filtros-actions {
@@ -81,43 +124,80 @@
   .bal-filtros-actions .btn { width: auto; min-width: 200px; }
 }
 
-.bal-exibir-filtros-btn[hidden] { display: none; }
+/* ── Combobox (Conta/Categoria) — dropdown pesquisável (padrão Radix/
+   shadcn): aparência de Select (chevron à direita, mesmo `.input` de
+   qualquer outro campo do sistema — garante altura/raio/padding/foco
+   idênticos "de graça"), digitação dentro do próprio campo filtra a
+   lista, navegação por teclado (↑↓ Enter Esc) além de mouse. "Todas as
+   X" fixa no topo da lista. Os dois campos chamam a MESMA função JS
+   (`initCombobox`), então identidade visual/comportamento são garantidos
+   por construção — não há CSS/lógica duplicada entre eles. ──────────── */
+.bal-combobox { position: relative; }
 
-/* ── Select pesquisável (Conta/Categoria) — padrão novo no sistema:
-   Dropdown fechado, mas o menu contém um campo de busca no topo +
-   "Todas as X" fixa. Reaproveita `.wrapper`/`.trigger`/`.menu` do
-   Dropdown.module.css como base, com uma composição própria por
-   dentro do menu. ────────────────────────────────────────────────── */
-.bal-searchselect { position: relative; }
-.bal-searchselect-menu:not([hidden]) {
+.bal-combobox-chevron svg {
+  transition: transform var(--transition-fast);
+  color: var(--color-text-tertiary);
+}
+.bal-combobox.open .bal-combobox-chevron svg { transform: rotate(180deg); }
+
+.bal-combobox-menu {
   position: fixed;
   z-index: 60;
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
   background: var(--color-bg-surface);
   border: var(--border-width-thin) solid var(--color-border-subtle);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: top;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
-.bal-searchselect-search {
-  padding: var(--spacing-sm);
-  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
-  flex-shrink: 0;
+.bal-combobox-menu.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
-.bal-searchselect-search .input { height: 32px; font-size: var(--font-size-sm); }
-.bal-searchselect-options { overflow-y: auto; }
-.bal-searchselect-options .option { display: block; }
-.bal-searchselect-options .option-empty {
+.bal-combobox-menu .option-empty {
   padding: var(--spacing-sm) var(--spacing-md);
   color: var(--color-text-tertiary);
   font-size: var(--font-size-sm);
+}
+
+/* ── Dropdown (Agrupamento) e Combobox (Conta/Categoria): opções um
+   abaixo do outro. Bug real: `RadioButton.module.css` também declara
+   `.option{display:inline-flex}` (o wrapper do próprio radio) — como os
+   dois `.module.css` são carregados como stylesheet global na mesma
+   tela, essa regra (mesma especificidade, 1 classe) vazava pras opções
+   de menu do Dropdown/Combobox, empilhando-as lado a lado em vez de uma
+   por linha. Fix com um seletor de 2 classes (mais específico, vence
+   independente da ordem no `<head>`). ──────────────────────────────── */
+.bal-dropdown .menu .option,
+.bal-combobox-menu .option {
+  display: block;
+  width: 100%;
+}
+
+/* Destaque do item navegado via teclado (↑↓) — mesma cor de fundo já
+   usada no `:hover` do componente (Dropdown.module.css), garantindo que
+   mouse e teclado produzam a mesma aparência de "opção em foco". */
+.bal-combobox-menu .option.is-active {
+  background: var(--color-bg-subtle);
 }
 
 .bal-dropdown .trigger { text-align: left; }
 
 /* ── Botão "Gerar relatório" desabilitado enquanto sem período válido ──── */
 .btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Resultado: espaçamento entre cards igual ao padrão já adotado nas
+   telas de detalhe do sistema (ver `#detalhe-content` em
+   page-detalhe-estoque.css) — 16px entre os blocos (cabeçalho/KPIs/
+   gráfico/tabela), não os 24px usados entre as seções de topo da página. */
+#bal-resultado:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
 /* ── Cabeçalho do resultado ───────────────────────────────────────────── */
 .bal-resultado-header {
@@ -153,8 +233,12 @@
 }
 
 .card.bal-summary-card { box-shadow: var(--shadow-sm); display: flex; flex-direction: column; height: 100%; }
-.bal-summary-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md); }
-.bal-summary-card .title { font-size: 12px; font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
+.bal-summary-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) calc(var(--spacing-md) - 4px); }
+.bal-summary-card .title { color: var(--color-text-primary); }
+/* Colisão .title (Table.module.css, carregado depois de typography.css no <head>) vs
+   .text-14-bold: mesma especificidade de 1 classe, Table.module.css vence por ordem de
+   carregamento. Reafirma os valores do token com um seletor de 3 classes. */
+.bal-summary-card .title.text-14-bold { font-size: 14px; font-weight: var(--font-weight-bold); }
 .bal-summary-icon svg { width: 14px; height: 14px; }
 .bal-summary-title-row { display: flex; align-items: center; gap: var(--spacing-xs); }
 .bal-summary-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-brand); }
@@ -184,16 +268,104 @@
   .bal-chart-wrap { height: 140px; }
 }
 #bal-chart-svg { width: 100%; height: 100%; display: block; }
+.bal-chart-hit { cursor: default; }
+
+/* Tooltip do gráfico — visual "moderno" (fundo escuro, sombra suave,
+   cantos arredondados), criado uma vez via JS e reposicionado perto do
+   cursor a cada hover. `position:fixed`, mesma técnica já usada em todo
+   tooltip/popover deste sistema. */
+.bal-chart-tooltip {
+  position: fixed;
+  z-index: 90;
+  min-width: 180px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-gray-900);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-sm);
+  pointer-events: none;
+}
+.bal-chart-tooltip[hidden] { display: none; }
+.bal-chart-tooltip-header {
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: var(--border-width-thin) solid rgba(255, 255, 255, 0.12);
+}
+.bal-chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: 2px 0;
+}
+.bal-chart-tooltip-label { flex: 1; color: rgba(255, 255, 255, 0.72); }
+.bal-chart-tooltip-value { font-weight: var(--font-weight-medium); color: var(--color-text-inverse); }
+.bal-chart-tooltip-saldo {
+  margin-top: var(--spacing-2xs);
+  padding-top: var(--spacing-xs);
+  border-top: var(--border-width-thin) solid rgba(255, 255, 255, 0.12);
+}
+.bal-chart-tooltip-saldo .bal-chart-tooltip-label { color: rgba(255, 255, 255, 0.72); }
+/* --color-status-success/error-fg (green-700/red-700) são pensados pra texto sobre fundo
+   CLARO — contra o fundo escuro deste tooltip (--color-gray-900) o contraste calculado é
+   ~3.6:1 (verde) e ~2.8:1 (vermelho), abaixo do mínimo WCAG AA (4.5:1). Usando os tokens
+   green-400/red-400 (mesmos valores do tema dark do catálogo, pensados pra fundo escuro):
+   ~10.3:1 e ~6.5:1, ambos aprovados. */
+.bal-chart-tooltip .bal-value-positive { color: var(--color-green-400); }
+.bal-chart-tooltip .bal-value-negative { color: var(--color-red-400); }
+
+/* Legenda de dias/períodos abaixo do gráfico — HTML real (não `<text>`
+   dentro do SVG, que escalava com a largura do viewBox e ficava com
+   tipografia grande e fora do padrão do sistema). Cada `<span>` tem a
+   mesma largura fracionária (`flex:1 1 0`) do grupo de barras
+   correspondente no SVG, garantindo alinhamento exato mesmo quando nem
+   toda coluna mostra texto (amostragem em períodos longos). */
+.bal-chart-axis {
+  display: flex;
+  padding: 0 var(--spacing-lg);
+  margin-top: 2px;
+}
+.bal-chart-axis-label {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  /* `overflow:visible` de propósito — mesmo raciocínio do DRE (ver page-dre.css): a coluna é
+     mais estreita que o texto do rótulo, que precisa vazar pras colunas vizinhas VAZIAS. */
+  overflow: visible;
+}
+/* Mês (" Jul") só cabe em telas largas — abaixo de 768px sobra só o número do dia. */
+@media (max-width: 767px) {
+  .bal-chart-axis-label-month { display: none; }
+}
+
+/* Linha de zero — única referência horizontal do gráfico (mesma decisão do DRE: as antigas
+   gridlines de 25/50/75% eram só decorativas, sem valor associado). Cinza suave, idêntica à
+   do DRE (mesma identidade visual entre os 2 gráficos). */
+.bal-chart-zero-line { stroke: var(--color-gray-200); }
+
+/* Hover: expansão pura da própria barra (mesma cor, sem stroke/contorno), idêntico ao gráfico
+   do DRE — `transform-box:fill-box` + origem ancorada embaixo (todas as barras daqui nascem
+   do baseline pra cima, nunca invertidas). */
+.bal-chart-bar {
+  transition: transform 160ms ease;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.bal-chart-bar.is-active { transform: scale(1.05, 1.08); }
+
 .bal-chart-legend {
   display: flex;
   gap: var(--spacing-lg);
   padding: 0 var(--spacing-lg) var(--spacing-lg);
+  margin-top: var(--spacing-sm);
 }
 .bal-chart-legend-item {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2xs);
-  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 .bal-chart-legend-dot { width: 10px; height: 10px; border-radius: var(--radius-full); display: inline-block; }
@@ -209,7 +381,72 @@
 .bal-table-card .cardHeader { flex-wrap: wrap; gap: var(--spacing-xs); align-items: baseline; }
 .bal-table-caption { color: var(--color-text-tertiary); margin: 0; }
 
-.bal-tablewrap { padding-top: 0; }
+/* Shell da rolagem horizontal: `.bal-tablewrap` é quem rola de verdade
+   (overflow-x:auto do `.tableWrap` de fábrica); o shell só existe pra
+   posicionar o indicativo visual de fade (`.bal-table-scroll-fade`) num
+   ponto FIXO em relação ao card, cobrindo cabeçalho+corpo (span de
+   top:0 a bottom:0), independente de quanto a tabela já rolou. */
+.bal-table-scroll-shell { position: relative; }
+.bal-table-scroll-fade {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to right, transparent, var(--color-gray-300));
+  transition: opacity var(--transition-fast);
+}
+@media (max-width: 767px) {
+  /* Indicativo visual da rolagem horizontal só é necessário no mobile —
+     no desktop a tabela normalmente cabe ou já é óbvio que há scroll. */
+  .bal-table-scroll-shell.bal-has-hscroll .bal-table-scroll-fade {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.bal-tablewrap { padding-top: 0; cursor: grab; -webkit-overflow-scrolling: touch; }
+.bal-tablewrap.bal-dragging { cursor: grabbing; user-select: none; }
+
+/* Scrollbar mais fino (mesmo padrão já usado na Sidebar — 6px, cor
+   `--color-border-muted`) em vez do scrollbar grosso padrão do
+   navegador — só a espessura muda, o comportamento nativo continua. */
+.bal-tablewrap,
+.bal-table-scroll-top {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-muted) transparent;
+}
+.bal-tablewrap::-webkit-scrollbar,
+.bal-table-scroll-top::-webkit-scrollbar { height: 6px; }
+.bal-tablewrap::-webkit-scrollbar-track,
+.bal-table-scroll-top::-webkit-scrollbar-track { background: transparent; }
+.bal-tablewrap::-webkit-scrollbar-thumb,
+.bal-table-scroll-top::-webkit-scrollbar-thumb {
+  background: var(--color-border-muted);
+  border-radius: var(--radius-full);
+}
+.bal-tablewrap::-webkit-scrollbar-thumb:hover,
+.bal-table-scroll-top::-webkit-scrollbar-thumb:hover { background: var(--color-border-default); }
+
+/* Scrollbar espelhada ACIMA da tabela, só no mobile: dá ao usuário um
+   indicativo de rolagem horizontal já visível no topo do card, sem
+   precisar chegar ao fim da tabela pra notar o scroll nativo. Sincronizada
+   via JS (`scrollLeft` dos dois elementos), altura mínima só pra mostrar
+   a barra fina (nenhum conteúdo visível dentro, só o espaçador). */
+.bal-table-scroll-top {
+  display: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 10px;
+}
+.bal-table-scroll-top-spacer { height: 1px; }
+@media (max-width: 767px) {
+  .bal-table-scroll-shell.bal-has-hscroll .bal-table-scroll-top { display: block; }
+}
+
 .bal-table { table-layout: auto; }
 .bal-table .th,
 .bal-table .td {
@@ -253,6 +490,15 @@
 .bal-row-level-2,
 .bal-row-level-2 > .td:first-child {
   background: var(--color-bg-surface);
+}
+/* Zebra striping das categorias (folhas), mesma cor de alternância já
+   padronizada nas demais tabelas do sistema (branco ímpar / Gray 50 par,
+   ver `.estoque-table-card .tr:nth-child`) — aplicada via classe (não
+   `:nth-child` puro) porque o índice de alternância é só entre as linhas
+   de categoria, não entre todas as `<tr>` da tabela matricial. */
+.bal-row-level-2.bal-row-zebra,
+.bal-row-level-2.bal-row-zebra > .td:first-child {
+  background: var(--color-gray-50);
 }
 .bal-row-resultado,
 .bal-row-resultado > .td:first-child {

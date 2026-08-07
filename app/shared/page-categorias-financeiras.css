@@ -279,22 +279,23 @@
 .catfin-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
 .catfin-table-card .tr:hover .td { filter: brightness(0.97); }
 
-/* Colunas em `px` fixo somando mais que a largura útil do card (a soma
-   passa de 1100px) — a tabela FICA mais larga que o container de propósito,
-   pra cada coluna (principalmente as de rótulo mais longo, como
-   "Classificação DRE"/"Competência") ter espaço suficiente sem depender de
-   quebra de linha agressiva. `.tableWrap` já tem `overflow-x:auto`
-   (Table.module.css), então a rolagem horizontal aparece sozinha sempre que
-   o container for mais estreito que 1100px. Ações (última coluna) fica
-   `position:sticky` presa à direita, sempre visível durante a rolagem —
-   primeira vez que esse padrão é usado no sistema, documentado aqui pra
-   reuso futuro em outras tabelas largas. */
+/* Colunas em `px` fixo pras de rótulo/dado curto (Código/Grupo/Status/DRE/
+   LCDPR/Competência/Ações); Descrição fica sem largura própria (`width:auto`
+   sob `table-layout:fixed` = recebe todo o espaço restante), esticando a
+   tabela pra preencher 100% do card em telas largas (comportamento "Fill"),
+   em vez de ficar presa numa largura fixa menor que o container e sobrar
+   espaço morto à direita. `min-width` no wrapper preserva a rolagem
+   horizontal (`.tableWrap` já tem `overflow-x:auto`, Table.module.css)
+   quando o container for mais estreito que o necessário pras colunas
+   curtas não ficarem cramped. Ações (última coluna) continua
+   `position:sticky` presa à direita durante a rolagem. */
 .catfin-table-card .table {
   table-layout: fixed;
-  width: 1100px;
+  width: 100%;
+  min-width: 1100px;
 }
 .catfin-table-card .th:nth-child(1) { width: 90px; }  /* Código */
-.catfin-table-card .th:nth-child(2) { width: 220px; } /* Descrição */
+.catfin-table-card .th:nth-child(2) { width: auto; }  /* Descrição — preenche o resto */
 .catfin-table-card .th:nth-child(3) { width: 100px; } /* Grupo */
 .catfin-table-card .th:nth-child(4) { width: 100px; } /* Status */
 .catfin-table-card .th:nth-child(5) { width: 90px; }  /* DRE */

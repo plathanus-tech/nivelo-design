@@ -41,7 +41,7 @@
 
       <header class="login-header">
         <h1 class="login-title text-heading-6">Entrar</h1>
-        <p class="login-sub">Acesse sua área do cliente utilizando seu CPF e sua senha</p>
+        <p class="login-sub">Acesse sua área do cliente utilizando seu CPF ou CNPJ e sua senha</p>
       </header>
 
       <!-- Feedback (banner de erro de autenticação) -->
@@ -49,15 +49,16 @@
         <span class="icon"><i data-lucide="circle-x" width="18" height="18"></i></span>
         <div class="body">
           <div class="title">Não foi possível entrar</div>
-          <div class="message">CPF ou senha incorretos. Verifique os dados e tente novamente.</div>
+          <div class="message">CPF/CNPJ ou senha incorretos. Verifique os dados e tente novamente.</div>
         </div>
       </div>
 
       <form class="login-form" id="login-form" data-state="idle" novalidate>
 
-        <!-- Campo CPF (Input) -->
+        <!-- Campo CPF ou CNPJ (Input, documento único: máscara auto-detectada
+             por tamanho, mesma técnica já usada em novo-manifesto.js) -->
         <div class="wrapper login-field" id="cpf-field">
-          <label class="label login-field-label" for="login-cpf">CPF</label>
+          <label class="label login-field-label" for="login-cpf">CPF ou CNPJ</label>
           <div class="inputWrap">
             <input
               class="input login-field-input"
@@ -67,13 +68,13 @@
               id="login-cpf"
               name="cpf"
               placeholder="000.000.000-00"
-              maxlength="14"
+              maxlength="18"
               aria-describedby="cpf-error"
             />
           </div>
           <span class="errorText" id="cpf-error">
             <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-            Informe um CPF válido.
+            Informe um CPF ou CNPJ válido.
           </span>
         </div>
 

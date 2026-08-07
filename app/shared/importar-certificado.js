@@ -42,7 +42,8 @@
   var filenameEl = document.getElementById('arquivo-filename');
   var senhaField = document.getElementById('senha-field');
   var senhaInput = document.getElementById('ic-senha');
-  var observacoesInput = document.getElementById('ic-observacoes');
+  var validadeField = document.getElementById('validade-field');
+  var validadeInput = document.getElementById('ic-validade');
   var serieDuplicadaError = document.getElementById('serie-duplicada-error');
   var extraidosSection = document.getElementById('extraidos-section');
   var expiradoBanner = document.getElementById('expirado-banner');
@@ -59,6 +60,20 @@
   }
   toggleSenhaBtn.addEventListener('click', function () {
     setSenhaVisible(senhaInput.type === 'password');
+  });
+
+  // ---------- Data de validade: padrão oficial de calendário do sistema
+  // (dia único), ver app/shared/date-picker.js. ----------
+  var validadePicker = window.NiveloDatePicker.initDay({
+    rootId: 'validade-field',
+    triggerId: 'validade-trigger',
+    valueId: 'validade-value',
+    hiddenInputId: 'ic-validade',
+    popoverId: 'validade-popover',
+    placeholder: 'Selecionar data',
+    onChange: function () {
+      if (validadeField.classList.contains('error') && validadeInput.value) validadeField.classList.remove('error');
+    }
   });
 
   // ---------- Upload do arquivo ----------
@@ -162,6 +177,14 @@
     setFieldError(nomeField, !nomeInput.value.trim());
     if (!nomeInput.value.trim()) valid = false;
 
+    // Só exigida a partir do 2º clique (depois que a extração automática já
+    // teve a chance de pré-preenchê-la) — no 1º clique (extração) o campo
+    // ainda não tem valor nenhum, exigi-lo ali bloquearia a extração em si.
+    if (extracted) {
+      setFieldError(validadeField, !validadeInput.value);
+      if (!validadeInput.value) valid = false;
+    }
+
     if (!isEditMode) {
       var file = fileInput.files[0];
       var arquivoValido = !!(file && /\.(pfx|p12)$/i.test(file.name));
@@ -188,7 +211,7 @@
     document.title = 'Editar Certificado — Nivelo';
     codigoInput.value = certificadoExistente.codigo;
     nomeInput.value = certificadoExistente.nome;
-    observacoesInput.value = certificadoExistente.observacoes || '';
+    validadePicker.setValue(certificadoExistente.dataValidade);
     filenameEl.textContent = certificadoExistente.arquivoNome || 'Certificado já importado';
     filenameEl.classList.add('has-file');
     selectBtn.disabled = true;
@@ -237,6 +260,7 @@
       extracted = dados;
       extracted.arquivoNome = arquivoNome;
       populateExtractedSection(extracted);
+      if (!validadeInput.value) validadePicker.setValue(extracted.dataValidade);
       revealExtractedSection();
       submitBtn.textContent = 'Salvar Certificado';
       extraidosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -253,11 +277,10 @@
       numeroSerie: extracted.numeroSerie,
       emissor: extracted.emissor,
       dataInicio: extracted.dataInicio,
-      dataValidade: extracted.dataValidade,
+      dataValidade: validadeInput.value,
       arquivoNome: certificadoExistente ? certificadoExistente.arquivoNome : extracted.arquivoNome,
       origem: certificadoExistente ? certificadoExistente.origem : 'importado',
-      status: certificadoExistente && certificadoExistente.status === 'revogado' ? 'revogado' : extracted.status,
-      observacoes: observacoesInput.value.trim(),
+      status: certificadoExistente && certificadoExistente.status === 'revogado' ? 'revogado' : computeStatusFromValidade(validadeInput.value),
       dataAlteracao: toISODate(new Date()),
       usuarioAlteracao: 'Miguel Silva'
     };

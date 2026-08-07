@@ -69,15 +69,16 @@
           </span>
         </div>
 
-        <!-- CPF -->
+        <!-- CPF ou CNPJ (documento único: máscara auto-detectada por
+             tamanho, mesma técnica já usada em login.js/novo-manifesto.js) -->
         <div class="wrapper login-field" id="cpf-field">
-          <label class="label login-field-label" for="signup-cpf">CPF</label>
+          <label class="label login-field-label" for="signup-cpf">CPF ou CNPJ</label>
           <div class="inputWrap">
-            <input class="input login-field-input" type="tel" inputmode="numeric" autocomplete="off" id="signup-cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" aria-describedby="cpf-error" />
+            <input class="input login-field-input" type="tel" inputmode="numeric" autocomplete="off" id="signup-cpf" name="cpf" placeholder="000.000.000-00" maxlength="18" aria-describedby="cpf-error" />
           </div>
           <span class="errorText" id="cpf-error">
             <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-            <span class="cpf-error-text">Informe um CPF válido.</span>
+            <span class="cpf-error-text">Informe um CPF ou CNPJ válido.</span>
           </span>
         </div>
 

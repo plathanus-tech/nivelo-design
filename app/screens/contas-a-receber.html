@@ -80,7 +80,7 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos</span>
+                  <span class="app-nav-label">Produtos e serviços</span>
                 </button>
               </div>
             </div>
@@ -199,6 +199,10 @@
                     <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
                       <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
                       <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
                     </button>
                   </div>
                 </div>
@@ -393,6 +397,42 @@
           <!-- Popover "Filtros": Categoria (múltipla escolha) / Forma de
                Recebimento / Status. -->
           <div class="ctr-filter-popover" id="ctr-filtros-popover" hidden>
+            <div class="wrapper ctr-period-field" id="ctr-period-field">
+              <span class="label">Período</span>
+              <button type="button" class="trigger" id="ctr-period-trigger">
+                <span id="ctr-period-value" class="ctr-period-placeholder">Todo o período</span>
+                <span class="chevron"><i data-lucide="calendar" width="16" height="16"></i></span>
+              </button>
+
+              <div class="ctr-period-popover" id="ctr-period-popover" hidden>
+                <div class="ctr-period-inputs">
+                  <div class="wrapper" id="ctr-period-start-field">
+                    <label class="label" for="ctr-period-start-input">De</label>
+                    <div class="inputWrap"><input type="date" class="input" id="ctr-period-start-input" /></div>
+                  </div>
+                  <div class="wrapper" id="ctr-period-end-field">
+                    <label class="label" for="ctr-period-end-input">Até</label>
+                    <div class="inputWrap"><input type="date" class="input" id="ctr-period-end-input" /></div>
+                  </div>
+                </div>
+                <div class="ctr-period-calendar">
+                  <div class="ctr-period-calendar-header">
+                    <button type="button" class="actionBtn" data-period-prev aria-label="Mês anterior"><i data-lucide="chevron-left" width="16" height="16"></i></button>
+                    <span class="text-body-s" data-period-label></span>
+                    <button type="button" class="actionBtn" data-period-next aria-label="Próximo mês"><i data-lucide="chevron-right" width="16" height="16"></i></button>
+                  </div>
+                  <div class="ctr-period-weekdays">
+                    <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+                  </div>
+                  <div class="ctr-period-grid" data-period-grid></div>
+                </div>
+                <div class="ctr-period-actions">
+                  <button type="button" class="btn secondary sm" id="ctr-period-cancel">Cancelar</button>
+                  <button type="button" class="btn primary sm" id="ctr-period-apply">Aplicar</button>
+                </div>
+              </div>
+            </div>
+
             <div class="wrapper ctr-dropdown ctr-multidropdown" id="dropdown-categoria">
               <span class="label">Categoria</span>
               <button type="button" class="trigger" data-multidropdown-trigger>
@@ -491,8 +531,8 @@
                 </div>
               </div>
               <div class="footer">
-                <button type="button" class="btn secondaryGray" id="recebimento-cancel">Cancelar</button>
-                <button type="button" class="btn primary" id="recebimento-confirm">Registrar recebimento</button>
+                <button type="button" class="btn secondaryGray sm" id="recebimento-cancel">Cancelar</button>
+                <button type="button" class="btn primary sm" id="recebimento-confirm">Registrar recebimento</button>
               </div>
             </div>
           </div>
@@ -508,8 +548,8 @@
                 <p class="text-body-s" id="cancelar-dialog-message">Tem certeza que deseja cancelar esta conta a receber? Contas canceladas não podem mais receber pagamentos do cliente.</p>
               </div>
               <div class="footer">
-                <button type="button" class="btn secondaryGray" id="cancelar-dialog-voltar">Voltar</button>
-                <button type="button" class="btn destructive" id="cancelar-dialog-confirmar">Cancelar conta</button>
+                <button type="button" class="btn secondaryGray sm" id="cancelar-dialog-voltar">Voltar</button>
+                <button type="button" class="btn destructive sm" id="cancelar-dialog-confirmar">Cancelar conta</button>
               </div>
             </div>
           </div>

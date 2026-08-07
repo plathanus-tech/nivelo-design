@@ -146,6 +146,12 @@
 .wrapper .errorText { display: none; }
 .wrapper.error .errorText { display: flex; }
 .wrapper.error .input { border-color: var(--color-action-error); }
+
+/* Campo "Data de validade" (`.dpRoot`, não `.wrapper`) precisa do mesmo
+   guard — `.errorText` do Input.module.css tem `display:flex` incondicional,
+   sem isso a mensagem fica sempre visível abaixo do campo. */
+.dpRoot .errorText { display: none; }
+.dpRoot.error .errorText { display: flex; }
 .impcert-upload.error .btn.secondary { border-color: var(--color-action-error); }
 
 .impcert-actions {

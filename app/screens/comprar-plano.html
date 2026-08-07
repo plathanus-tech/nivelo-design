@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contratar plano — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-comprar-plano.css" />
+</head>
+<body class="cp-body">
+
+  <div class="cp-shell">
+
+    <!-- ══════════════════ TOPO MINIMALISTA (sem Sidebar, foco na compra) ══════════════════ -->
+    <header class="cp-topbar">
+      <img class="cp-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+      <a href="dashboard.html" class="cp-exit-link"><i data-lucide="arrow-left" width="16" height="16"></i> Cancelar e voltar</a>
+    </header>
+
+    <div class="cp-container">
+
+      <p class="cp-context-banner text-body-s" id="cp-context-banner" hidden></p>
+
+      <ol class="cp-steps" id="cp-steps" aria-label="Etapas da compra">
+        <li class="cp-step is-current" data-step="1">
+          <span class="cp-step-circle">1</span>
+          <span class="cp-step-label">Plano</span>
+        </li>
+        <li class="cp-step-connector"></li>
+        <li class="cp-step" data-step="2">
+          <span class="cp-step-circle">2</span>
+          <span class="cp-step-label">Pagamento</span>
+        </li>
+      </ol>
+
+      <!-- ══════════ ETAPA 1 — ESCOLHA DO PLANO (plano + modalidade no mesmo passo) ══════════ -->
+      <section class="cp-step-panel" data-step-panel="1">
+        <div class="cp-step-head">
+          <h1 class="cp-step-title text-heading-6">Escolha o plano da sua assinatura</h1>
+          <p class="cp-step-sub text-body-s">No plano mensal, a troca de plano vale a partir do próximo ciclo de cobrança. No plano anual, é possível fazer upgrade a qualquer momento, a troca para um plano inferior só é permitida na renovação.</p>
+        </div>
+
+        <div class="cp-plan-accordion" id="cp-plan-accordion"></div>
+      </section>
+
+      <!-- ══════════ ETAPA 2 — PAGAMENTO ══════════ -->
+      <section class="cp-step-panel" data-step-panel="2" hidden>
+        <button type="button" class="cp-back-link" data-back-to="1"><i data-lucide="arrow-left" width="16" height="16"></i> Trocar de plano</button>
+
+        <div class="cp-step-head">
+          <h1 class="cp-step-title text-heading-6">Pagamento</h1>
+        </div>
+
+        <div class="cp-payment-layout">
+          <div class="cp-payment-form">
+
+            <!-- Erro de pagamento (inline, aparece após tentativa recusada) -->
+            <div class="alert error cp-payment-error" id="cp-payment-error" hidden>
+              <span class="icon"><i data-lucide="circle-x" width="18" height="18"></i></span>
+              <div class="body">
+                <div class="title">Não foi possível aprovar o pagamento</div>
+                <div class="message">Verifique os dados do cartão ou tente outro cartão.</div>
+              </div>
+            </div>
+
+            <!-- Método (só aparece quando Anual: Cartão ou PIX) -->
+            <div class="cp-method-choice" id="cp-method-choice" hidden>
+              <span class="label">Forma de pagamento</span>
+              <div class="cp-method-options" role="radiogroup" aria-label="Forma de pagamento">
+                <label class="option cp-method-option">
+                  <input type="radio" class="input" name="cp-metodo" value="cartao" checked />
+                  <span class="circle"><span class="dot"></span></span>
+                  <span><i data-lucide="credit-card" width="16" height="16"></i> Cartão de Crédito</span>
+                </label>
+                <label class="option cp-method-option">
+                  <input type="radio" class="input" name="cp-metodo" value="pix" />
+                  <span class="circle"><span class="dot"></span></span>
+                  <span><i data-lucide="qr-code" width="16" height="16"></i> PIX</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Cartão -->
+            <div class="cp-card-fields" id="cp-card-fields">
+              <label class="wrapper">
+                <span class="label">Número do cartão</span>
+                <div class="inputWrap"><input type="text" class="input" id="cp-card-number" inputmode="numeric" placeholder="0000 0000 0000 0000" /></div>
+              </label>
+              <label class="wrapper">
+                <span class="label">Nome impresso no cartão</span>
+                <div class="inputWrap"><input type="text" class="input" id="cp-card-name" placeholder="Como está no cartão" /></div>
+              </label>
+              <div class="cp-card-row">
+                <label class="wrapper">
+                  <span class="label">Validade</span>
+                  <div class="inputWrap"><input type="text" class="input" id="cp-card-expiry" inputmode="numeric" placeholder="MM/AA" /></div>
+                </label>
+                <label class="wrapper">
+                  <span class="label">CVV</span>
+                  <div class="inputWrap"><input type="text" class="input" id="cp-card-cvv" inputmode="numeric" placeholder="000" /></div>
+                </label>
+              </div>
+
+              <div class="wrapper" id="cp-parcelas-field" data-dropdown hidden>
+                <label class="label" for="cp-parcelas-trigger">Parcelamento</label>
+                <button type="button" class="trigger" data-dropdown-trigger id="cp-parcelas-trigger">
+                  <span class="placeholder" data-dropdown-value>1x sem juros</span>
+                  <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                </button>
+                <div class="menu" data-dropdown-menu id="cp-parcelas-menu"></div>
+              </div>
+
+              <p class="cp-recorrencia-note text-body-s" id="cp-recorrencia-note" hidden>A assinatura será renovada automaticamente todos os meses.</p>
+            </div>
+
+            <div class="cp-coupon-row">
+              <label class="wrapper cp-coupon-input">
+                <span class="label">Cupom de desconto</span>
+                <div class="inputWrap"><input type="text" class="input" id="cp-coupon-input" placeholder="Ex: NIVELO10" /></div>
+              </label>
+              <button type="button" class="btn secondary sm" id="cp-coupon-apply">Aplicar</button>
+            </div>
+            <p class="cp-coupon-feedback text-body-s" id="cp-coupon-feedback" hidden></p>
+
+            <!-- PIX -->
+            <div class="cp-pix-panel" id="cp-pix-panel" hidden>
+              <div class="cp-pix-qr" id="cp-pix-qr" aria-hidden="true"></div>
+              <div class="cp-pix-copy-row">
+                <input type="text" class="input" id="cp-pix-code" readonly />
+                <button type="button" class="btn secondary" id="cp-pix-copy-btn">Copiar</button>
+              </div>
+              <ol class="cp-pix-instructions text-body-s">
+                <li>Abra o app do seu banco.</li>
+                <li>Escolha pagar via PIX com QR Code ou copia e cola.</li>
+                <li>Confirme o valor e finalize o pagamento.</li>
+              </ol>
+              <div class="cp-pix-status">
+                <span class="badge" data-status="warning" id="cp-pix-status-badge">Aguardando pagamento</span>
+              </div>
+            </div>
+
+            <!-- Ação da etapa: Voltar sempre à esquerda; Confirmar pagamento (Cartão) ou
+                 Verificar pagamento (PIX) sempre à direita, nunca os dois ao mesmo tempo. -->
+            <div class="cp-payment-actions-row">
+              <button type="button" class="btn secondaryGray hasLeft" data-back-to="1">
+                <i data-lucide="arrow-left" width="16" height="16"></i> Voltar
+              </button>
+              <button type="button" class="btn primary" id="cp-submit-btn">Confirmar pagamento</button>
+              <button type="button" class="btn secondary" id="cp-pix-check-btn" hidden>Verificar pagamento</button>
+            </div>
+          </div>
+
+          <aside class="card cp-summary-card">
+            <h2 class="cp-summary-title text-body-l">Resumo da compra</h2>
+            <dl class="cp-summary-grid">
+              <div><dt>Plano</dt><dd id="cp-summary-plano">—</dd></div>
+              <div><dt>Modalidade</dt><dd id="cp-summary-modalidade">—</dd></div>
+              <div><dt>Valor</dt><dd id="cp-summary-valor">—</dd></div>
+              <div id="cp-summary-desconto-row" hidden><dt>Desconto</dt><dd id="cp-summary-desconto">—</dd></div>
+              <div id="cp-summary-parcelamento-row" hidden><dt>Parcelamento</dt><dd id="cp-summary-parcelamento">—</dd></div>
+            </dl>
+            <div class="cp-summary-total-row">
+              <span>Total</span>
+              <strong id="cp-summary-total">—</strong>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ══════════ CONFIRMAÇÃO ══════════ -->
+      <section class="cp-step-panel cp-confirmation" data-step-panel="confirmacao" hidden>
+        <div class="cp-confirmation-icon"><i data-lucide="circle-check" width="48" height="48"></i></div>
+        <h1 class="cp-step-title text-heading-6">Pagamento realizado com sucesso.</h1>
+        <dl class="cp-confirmation-grid">
+          <div><dt>Plano contratado</dt><dd id="cp-conf-plano">—</dd></div>
+          <div><dt>Tipo da assinatura</dt><dd id="cp-conf-tipo">—</dd></div>
+          <div><dt id="cp-conf-next-label">Próxima renovação</dt><dd id="cp-conf-next-value">—</dd></div>
+        </dl>
+        <a href="dashboard.html" class="btn primary" id="cp-goto-dashboard">Ir para o Dashboard</a>
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- Overlay de carregamento durante o processamento do pagamento -->
+  <div class="cp-loading-overlay" id="cp-loading-overlay" hidden>
+    <div class="cp-loading-spinner"><i data-lucide="loader-2" width="28" height="28"></i></div>
+    <p class="text-body-s">Processando pagamento...</p>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/planos-data.js"></script>
+  <script src="../shared/assinatura-data.js"></script>
+  <script src="../shared/comprar-plano.js"></script>
+</body>
+</html>

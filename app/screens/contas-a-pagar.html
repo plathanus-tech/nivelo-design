@@ -80,7 +80,7 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos</span>
+                  <span class="app-nav-label">Produtos e serviços</span>
                 </button>
               </div>
             </div>
@@ -199,6 +199,10 @@
                     <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
                       <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
                       <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
                     </button>
                   </div>
                 </div>
@@ -397,6 +401,42 @@
                Pagamento (integral/parcial/não pago, derivado de saldo×pago) /
                Status do Pagamento (6 opções pedidas explicitamente). -->
           <div class="ctp-filter-popover" id="ctp-filtros-popover" hidden>
+            <div class="wrapper ctp-period-field" id="ctp-period-field">
+              <span class="label">Período</span>
+              <button type="button" class="trigger" id="ctp-period-trigger">
+                <span id="ctp-period-value" class="ctp-period-placeholder">Todo o período</span>
+                <span class="chevron"><i data-lucide="calendar" width="16" height="16"></i></span>
+              </button>
+
+              <div class="ctp-period-popover" id="ctp-period-popover" hidden>
+                <div class="ctp-period-inputs">
+                  <div class="wrapper" id="ctp-period-start-field">
+                    <label class="label" for="ctp-period-start-input">De</label>
+                    <div class="inputWrap"><input type="date" class="input" id="ctp-period-start-input" /></div>
+                  </div>
+                  <div class="wrapper" id="ctp-period-end-field">
+                    <label class="label" for="ctp-period-end-input">Até</label>
+                    <div class="inputWrap"><input type="date" class="input" id="ctp-period-end-input" /></div>
+                  </div>
+                </div>
+                <div class="ctp-period-calendar">
+                  <div class="ctp-period-calendar-header">
+                    <button type="button" class="actionBtn" data-period-prev aria-label="Mês anterior"><i data-lucide="chevron-left" width="16" height="16"></i></button>
+                    <span class="text-body-s" data-period-label></span>
+                    <button type="button" class="actionBtn" data-period-next aria-label="Próximo mês"><i data-lucide="chevron-right" width="16" height="16"></i></button>
+                  </div>
+                  <div class="ctp-period-weekdays">
+                    <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+                  </div>
+                  <div class="ctp-period-grid" data-period-grid></div>
+                </div>
+                <div class="ctp-period-actions">
+                  <button type="button" class="btn secondary sm" id="ctp-period-cancel">Cancelar</button>
+                  <button type="button" class="btn primary sm" id="ctp-period-apply">Aplicar</button>
+                </div>
+              </div>
+            </div>
+
             <div class="wrapper ctp-dropdown" id="dropdown-categoria">
               <span class="label">Categoria</span>
               <button type="button" class="trigger" data-dropdown-trigger>
@@ -513,8 +553,8 @@
                 </div>
               </div>
               <div class="footer">
-                <button type="button" class="btn secondaryGray" id="pagamento-cancel">Cancelar</button>
-                <button type="button" class="btn primary" id="pagamento-confirm">Registrar pagamento</button>
+                <button type="button" class="btn secondaryGray sm" id="pagamento-cancel">Cancelar</button>
+                <button type="button" class="btn primary sm" id="pagamento-confirm">Registrar pagamento</button>
               </div>
             </div>
           </div>
@@ -532,8 +572,8 @@
                 <p class="text-body-s" id="cancelar-dialog-message">Tem certeza que deseja cancelar esta conta a pagar? Contas canceladas não podem mais receber pagamentos.</p>
               </div>
               <div class="footer">
-                <button type="button" class="btn secondaryGray" id="cancelar-dialog-voltar">Voltar</button>
-                <button type="button" class="btn destructive" id="cancelar-dialog-confirmar">Cancelar conta</button>
+                <button type="button" class="btn secondaryGray sm" id="cancelar-dialog-voltar">Voltar</button>
+                <button type="button" class="btn destructive sm" id="cancelar-dialog-confirmar">Cancelar conta</button>
               </div>
             </div>
           </div>

@@ -1,0 +1,550 @@
+/* ══════════════════════════════════════════════════════════
+   DRE — Financeiro > Relatórios > DRE (Demonstração do Resultado do
+   Exercício). Mobile first. Mesmo padrão visual/de interação de
+   page-balancete.css (filtros em card recolhível, cabeçalho de resultado
+   com resumo+ações, gráfico SVG puro, tabela matricial com 1ª coluna
+   sticky, nunca vira Cards no mobile) — adaptado: sem filtro de Conta
+   (não pedido), 4 KPIs (incl. Margem %), gráfico de barra ÚNICA
+   divergente (Resultado, não Entradas×Saídas lado a lado), estrutura de
+   6 grupos de nível 2 (Receitas Operacionais/Outras Receitas, Custos/
+   Despesas Operacionais/Despesas Financeiras/Outras Despesas) + 2 linhas
+   de subtotal + Resultado do Exercício final. Classes próprias `dre-*`.
+   ══════════════════════════════════════════════════════════ */
+
+.dre-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+.dre-page-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.dre-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.dre-back:hover { color: var(--color-text-primary); }
+.dre-title { color: var(--color-text-primary); margin: 0; }
+.dre-sub { color: var(--color-text-secondary); margin: 0; }
+
+/* ── Filtros (accordion: recolhe sozinho após gerar) ── */
+.dre-filtros-card { display: flex; flex-direction: column; }
+
+.dre-filtros-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+}
+.dre-filtros-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+}
+.dre-filtros-toggle svg { transition: transform var(--transition-fast); }
+.dre-filtros-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.dre-filtros-content:not([hidden]) { display: flex; flex-direction: column; }
+
+.dre-filtros-body { padding: 0 var(--spacing-lg) var(--spacing-lg); }
+
+.dre-filtros-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .dre-filtros-grid { grid-template-columns: 1fr 1fr; }
+  .dre-span-2 { grid-column: span 2; }
+}
+@media (min-width: 1024px) {
+  .dre-filtros-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.dre-intervalo-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 480px) {
+  .dre-intervalo-fields { grid-template-columns: 1fr 1fr; }
+}
+.dre-intervalo-fields[hidden] { display: none; }
+#mes-ano-field[hidden] { display: none; }
+
+/* Colisão RadioButton×Input: RadioButton.module.css esconde o radio nativo via
+   `.input{opacity:0;position:absolute;width:1px;height:1px}` — vaza pros campos de
+   texto/data/mês reais desta tela (Mês/Ano, Data inicial, Data final, Categoria).
+   Mesmo fix preventivo já aplicado desde a criação em Balancete/LCDPR/Natureza da
+   Operação. */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+  width: 100%;
+  height: 44px;
+}
+
+/* Mesma colisão, agora em `.label`: `RadioButton.module.css` declara `.label{font-weight:
+   bold}` (rótulo do próprio grupo de radio, "Período") — carregado depois de `Input.module.css`
+   no `<head>`, vence por ordem e deixa os labels normais de campo (Categoria/Agrupamento) em
+   Bold em vez do Medium correto do componente Input. Reafirma o peso certo com um seletor mais
+   específico; `.dpLabel` (Mês/Ano) já nasce Medium no próprio componente (ver DatePicker.
+   module.css), incluído aqui só por robustez caso a ordem de carregamento mude no futuro. */
+.dre-filtros-grid .label,
+.dre-filtros-grid .dpLabel {
+  font-weight: var(--font-weight-medium);
+}
+
+.dre-filtros-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.dre-filtros-actions .btn { width: 100%; }
+@media (min-width: 640px) {
+  .dre-filtros-actions .btn { width: auto; min-width: 200px; }
+}
+
+/* ── Combobox (Categoria) — mesma técnica de Balancete/LCDPR ── */
+.dre-combobox { position: relative; }
+
+.dre-combobox-chevron svg {
+  transition: transform var(--transition-fast);
+  color: var(--color-text-tertiary);
+}
+.dre-combobox.open .dre-combobox-chevron svg { transform: rotate(180deg); }
+
+.dre-combobox-menu {
+  position: fixed;
+  z-index: 60;
+  overflow-y: auto;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: top;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+.dre-combobox-menu.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.dre-combobox-menu .option-empty {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+/* Dropdown (Agrupamento) e Combobox (Categoria): opções empilhadas, uma por
+   linha — mesmo fix de colisão RadioButton×Dropdown/Combobox já documentado
+   em Balancete/LCDPR. */
+.dre-dropdown .menu .option,
+.dre-combobox-menu .option {
+  display: block;
+  width: 100%;
+}
+.dre-combobox-menu .option.is-active { background: var(--color-bg-subtle); }
+.dre-dropdown .trigger { text-align: left; }
+
+.btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Resultado ── */
+#dre-resultado:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dre-resultado-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .dre-resultado-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+.dre-resultado-title { color: var(--color-text-primary); margin: 0 0 var(--spacing-2xs); }
+.dre-resultado-resumo { color: var(--color-text-tertiary); margin: 0; }
+.dre-resultado-actions { display: flex; gap: var(--spacing-2xs); flex-shrink: 0; }
+
+/* ── Cards de resumo — 4 KPIs (Receita Bruta/Total de Despesas/Resultado do
+   Período/Margem %), mesma cópia estrutural exata de Estoque/Caixa/Balancete/
+   LCDPR (tamanho fixo 12px/24px em qualquer largura). Grid: 1 coluna mobile
+   → 2 colunas ~640px → 4 colunas 1024px+ (mesmo padrão de Contas a Pagar/
+   Receber, que também têm 4 cards). ── */
+.dre-summary-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+@media (min-width: 640px) {
+  .dre-summary-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .dre-summary-row { grid-template-columns: repeat(4, 1fr); gap: var(--spacing-lg); }
+}
+
+.card.dre-summary-card { box-shadow: var(--shadow-sm); display: flex; flex-direction: column; height: 100%; }
+.dre-summary-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) calc(var(--spacing-md) - 4px); }
+.dre-summary-card .title { color: var(--color-text-primary); }
+.dre-summary-card .title.text-14-bold { font-size: 14px; font-weight: var(--font-weight-bold); }
+.dre-summary-icon svg { width: 14px; height: 14px; }
+.dre-summary-title-row { display: flex; align-items: center; gap: var(--spacing-xs); }
+.dre-summary-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-brand); }
+.dre-summary-icon-receita { color: var(--color-status-success-fg); }
+.dre-summary-icon-despesa { color: var(--color-status-error-fg); }
+.dre-summary-body { display: flex; flex-direction: column; gap: 2px; flex: 1; padding: 0 var(--spacing-lg) var(--spacing-lg); }
+.dre-summary-value {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+.dre-value-positive { color: var(--color-status-success-fg); }
+.dre-value-negative { color: var(--color-status-error-fg); }
+
+/* ── Gráfico (SVG puro, sem lib) — barra ÚNICA divergente (Resultado por
+   coluna), diferente do par Entradas×Saídas de Balancete: cada barra nasce
+   de uma linha de base (zero) que pode ficar em qualquer altura do gráfico
+   (calculada pela proporção entre o maior valor positivo e o maior valor
+   negativo do período) — sobe em verde quando positiva, desce em vermelho
+   quando negativa. ── */
+.dre-chart-card { display: flex; flex-direction: column; }
+
+/* Card colapsável (mesmo padrão do accordion de Filtros) — cabeçalho inteiro clicável,
+   preferência persistida em `localStorage` (ver `dre.js`). */
+.dre-chart-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+}
+.dre-chart-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+}
+.dre-chart-toggle svg { transition: transform var(--transition-fast); }
+.dre-chart-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.dre-chart-wrap {
+  padding: 0 var(--spacing-lg) var(--spacing-sm);
+  height: 220px;
+}
+@media (max-width: 767px) {
+  .dre-chart-wrap { height: 140px; }
+}
+#dre-chart-svg { width: 100%; height: 100%; display: block; }
+.dre-chart-hit { cursor: default; }
+
+.dre-chart-tooltip {
+  position: fixed;
+  z-index: 90;
+  min-width: 180px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-gray-900);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-sm);
+  pointer-events: none;
+}
+.dre-chart-tooltip[hidden] { display: none; }
+.dre-chart-tooltip-header {
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: var(--border-width-thin) solid rgba(255, 255, 255, 0.12);
+}
+.dre-chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: 2px 0;
+}
+.dre-chart-tooltip-label { flex: 1; color: rgba(255, 255, 255, 0.72); }
+.dre-chart-tooltip-value { font-weight: var(--font-weight-medium); color: var(--color-text-inverse); }
+/* Mesma correção de contraste de Balancete: green-700/red-700 (pensados pra
+   texto sobre fundo claro) não passam WCAG AA sobre --color-gray-900; os
+   tokens 400 (tema dark) resolvem. */
+.dre-chart-tooltip .dre-value-positive { color: var(--color-green-400); }
+.dre-chart-tooltip .dre-value-negative { color: var(--color-red-400); }
+
+.dre-chart-axis {
+  display: flex;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+  margin-top: 2px;
+}
+.dre-chart-axis-label {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  /* `overflow:visible` de propósito: cada coluna é bem mais estreita que o texto do rótulo
+     (ex. "01 Jul"), então o texto precisa "vazar" pras colunas vizinhas VAZIAS pra caber —
+     seguro porque os rótulos só aparecem espaçados (a cada 5 dias, nunca em colunas
+     adjacentes). Com `overflow:hidden` (valor antigo) o número do dia ficava cortado antes
+     mesmo de renderizar por completo, sumindo quase todo no mobile (colunas de ~9px). */
+  overflow: visible;
+}
+/* Mês (" Jul") só cabe em telas largas — abaixo de 768px sobra só o número do dia, nunca
+   cortado pela metade. */
+@media (max-width: 767px) {
+  .dre-chart-axis-label-month { display: none; }
+}
+
+/* Linha de zero — única referência horizontal do gráfico (as antigas gridlines de 25/50/75%
+   eram só decorativas, sem valor associado; removidas, ver `dre.js`). Cinza suave, sempre no
+   valor exato onde Resultado = 0 (calculado, não fixo no fundo do SVG). */
+.dre-chart-zero-line { stroke: var(--color-gray-200); }
+
+/* Cross-highlight gráfico ↔ tabela: hover numa barra ilumina a coluna inteira na tabela
+   (cabeçalho+linhas) e o rótulo do eixo; hover no cabeçalho de uma coluna ilumina a barra
+   correspondente — ver `dre.js`'s `setActiveColumn()`. Hover na barra: expansão pura (mesma
+   cor, sem stroke/contorno) via `transform:scale()` — `transform-box:fill-box` faz a origem
+   ser relativa à própria caixa do `<rect>`, não ao viewBox inteiro; a origem muda conforme a
+   barra sobe (positiva, ancorada embaixo) ou desce (negativa, ancorada em cima) a partir da
+   linha de zero, senão a barra "cresceria" pro lado errado. */
+.dre-chart-bar {
+  transition: transform 160ms ease;
+  transform-box: fill-box;
+}
+.dre-chart-bar-pos { transform-origin: 50% 100%; }
+.dre-chart-bar-neg { transform-origin: 50% 0%; }
+.dre-chart-bar.is-active { transform: scale(1.05, 1.08); }
+.dre-chart-axis-label.is-active { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+
+/* ── Tabela — DRE hierárquica, 1ª coluna (Grupo/Categoria) sticky à
+   esquerda, nunca vira Cards no mobile (pedido explícito). ── */
+.dre-table-card { display: flex; flex-direction: column; }
+.dre-table-card .cardHeader { flex-wrap: wrap; gap: var(--spacing-xs); align-items: baseline; }
+.dre-table-caption { color: var(--color-text-tertiary); margin: 0; }
+
+.dre-table-scroll-shell { position: relative; }
+.dre-table-scroll-fade {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to right, transparent, var(--color-gray-300));
+  transition: opacity var(--transition-fast);
+}
+@media (max-width: 767px) {
+  .dre-table-scroll-shell.dre-has-hscroll .dre-table-scroll-fade {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.dre-tablewrap { padding-top: 0; cursor: grab; -webkit-overflow-scrolling: touch; }
+.dre-tablewrap.dre-dragging { cursor: grabbing; user-select: none; }
+
+.dre-tablewrap,
+.dre-table-scroll-top {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-muted) transparent;
+}
+.dre-tablewrap::-webkit-scrollbar,
+.dre-table-scroll-top::-webkit-scrollbar { height: 6px; }
+.dre-tablewrap::-webkit-scrollbar-track,
+.dre-table-scroll-top::-webkit-scrollbar-track { background: transparent; }
+.dre-tablewrap::-webkit-scrollbar-thumb,
+.dre-table-scroll-top::-webkit-scrollbar-thumb {
+  background: var(--color-border-muted);
+  border-radius: var(--radius-full);
+}
+.dre-tablewrap::-webkit-scrollbar-thumb:hover,
+.dre-table-scroll-top::-webkit-scrollbar-thumb:hover { background: var(--color-border-default); }
+
+.dre-table-scroll-top {
+  display: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 10px;
+}
+.dre-table-scroll-top-spacer { height: 1px; }
+@media (max-width: 767px) {
+  .dre-table-scroll-shell.dre-has-hscroll .dre-table-scroll-top { display: block; }
+}
+
+.dre-table { table-layout: auto; }
+.dre-table .th,
+.dre-table .td {
+  white-space: nowrap;
+  text-align: right;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.dre-table .th:first-child,
+.dre-table .td:first-child {
+  text-align: left;
+  white-space: normal;
+  min-width: 220px;
+}
+.dre-table .th:not(:first-child),
+.dre-table .td:not(:first-child) {
+  min-width: 84px;
+}
+
+/* Coluna Grupo/Categoria sticky à esquerda — mesma técnica de Balancete
+   (cada nível de hierarquia precisa de um par linha+célula com o MESMO
+   background, já que `position:sticky` cria seu próprio contexto). */
+.dre-table .th:first-child,
+.dre-table .td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 1px solid var(--color-gray-300);
+}
+
+/* Linhas principais (grupos de nível 0: Receita Bruta/Deduções/Custos/Despesas
+   Operacionais/Outras Receitas/Outras Despesas/Resultado Financeiro) — tipografia um
+   nível acima do resto da tabela (16px, não 14px), peso bold, cinza mais escuro, mais
+   espaçamento vertical: aparência de subtotal de relatório contábil, pedido explícito. */
+.dre-row-level-0 .td {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+  padding-top: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+}
+#dre-tbody .dre-row-level-0,
+#dre-tbody .dre-row-level-0 .td {
+  background: var(--color-bg-brand);
+  font-weight: var(--font-weight-bold);
+}
+/* A partir daqui, todas as regras de fundo por tipo de linha são escopadas a `#dre-tbody`
+   (ID, não classe) pra vencer de propósito a especificidade do zebra genérico de
+   `Table.module.css` (`.tr:nth-child(odd/even) .td`, 2 classes) — sem isso, só a 1ª coluna
+   (sticky) ficava com a cor certa e o resto da linha caía no zebra por posição de DOM do
+   componente, gerando linhas com 2 cores diferentes na mesma linha. Aplicado em TODA
+   célula (não só `:first-child`) pra cada linha nascer inteiriça de uma cor só, alternando
+   os MESMOS cinzas padrão (branco/gray-50) já usados nas demais tabelas do sistema
+   (Balancete/LCDPR/Cadastro/etc). */
+#dre-tbody .dre-row-level-1,
+#dre-tbody .dre-row-level-1 .td {
+  background: var(--color-gray-50);
+  font-weight: var(--font-weight-medium);
+}
+#dre-tbody .dre-row-level-2,
+#dre-tbody .dre-row-level-2 .td {
+  background: var(--color-bg-surface);
+}
+#dre-tbody .dre-row-level-2.dre-row-zebra,
+#dre-tbody .dre-row-level-2.dre-row-zebra .td {
+  background: var(--color-gray-50);
+}
+/* Subtotais (Total da Receita Bruta/Receita Líquida/Lucro Bruto) — destaque sutil,
+   sempre visíveis (não parented a nenhum grupo colapsável). */
+#dre-tbody .dre-row-subtotal,
+#dre-tbody .dre-row-subtotal .td {
+  background: var(--color-gray-50);
+  font-weight: var(--font-weight-semibold);
+}
+/* Resultado Operacional — peso intermediário entre o subtotal simples e o Resultado do
+   Exercício final (escala de destaque crescente pedida na revisão de UX). */
+#dre-tbody .dre-row-subtotal-strong,
+#dre-tbody .dre-row-subtotal-strong .td {
+  background: var(--color-gray-100);
+  font-weight: var(--font-weight-bold);
+}
+/* Resultado do Exercício — destaque visual SUPERIOR a qualquer outra linha
+   (pedido explícito): fundo de marca, texto maior, negrito, cor de marca. */
+#dre-tbody .dre-row-resultado-final,
+#dre-tbody .dre-row-resultado-final .td {
+  background: var(--color-bg-brand);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-brand);
+}
+.dre-row-resultado-final .td { font-size: var(--font-size-md); }
+#dre-tbody .dre-row-resultado-final.dre-row-negativo,
+#dre-tbody .dre-row-resultado-final.dre-row-negativo .td {
+  color: var(--color-status-error-fg);
+}
+
+.dre-row-collapsed { display: none; }
+
+/* Cross-highlight: coluna iluminada por hover no gráfico ou no cabeçalho — `filter`
+   (não `background` sólido) pra preservar a cor de fundo que cada linha já tem (nível 0
+   brand/nível 1 gray-50/zebra/subtotal), mesma técnica já usada no hover nativo de linha
+   do `Table.module.css` (`filter: brightness()`). */
+.dre-col-active { filter: brightness(0.94); }
+
+.dre-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.dre-row-indent-1 { padding-left: var(--spacing-lg); }
+.dre-row-indent-2 { padding-left: calc(var(--spacing-lg) * 2); }
+
+.dre-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.dre-group-toggle svg { transition: transform var(--transition-fast); }
+.dre-group-toggle.is-collapsed svg { transform: rotate(-90deg); }
+
+/* ── Toast (mesma composição do resto do sistema) ── */
+.dre-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.dre-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }

@@ -205,6 +205,81 @@
 .ctp-filter-popover .trigger { height: 36px; font-size: var(--font-size-sm); padding: var(--spacing-xs) var(--spacing-sm); }
 .ctp-filter-popover .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
 
+/* ── Período (range picker aninhado dentro do Filtros, mesma composição de
+   Caixa/Notas fiscais/Dashboard) — z-index maior que o Filtros (60) já que
+   abre por cima dele. ─────────────────────────────────────────────────── */
+.ctp-period-field { position: relative; }
+.ctp-period-placeholder { color: var(--color-text-tertiary); }
+
+.ctp-period-popover:not([hidden]) {
+  position: fixed;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.ctp-period-inputs { display: flex; gap: var(--spacing-sm); }
+.ctp-period-inputs .wrapper { flex: 1; }
+.ctp-period-inputs .input { height: 36px; font-size: var(--font-size-sm); }
+.ctp-period-inputs .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
+
+.ctp-period-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ctp-period-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+.ctp-period-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.ctp-period-day,
+.ctp-period-day-empty {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ctp-period-day {
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.ctp-period-day:hover { background: var(--color-bg-subtle); }
+.ctp-period-day.is-in-range { background: var(--color-bg-brand); }
+.ctp-period-day.is-start,
+.ctp-period-day.is-end {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+
+.ctp-period-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
 .ctp-filter-popover-actions {
   display: flex;
   justify-content: flex-end;

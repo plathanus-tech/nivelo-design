@@ -175,6 +175,8 @@
     categorias: [], // múltipla escolha — array de códigos; vazio = todas
     forma: '',
     status: '',
+    periodStart: null,
+    periodEnd: null,
     page: 1
   };
 
@@ -182,6 +184,8 @@
     if (state.categorias.length && state.categorias.indexOf(row.dataset.categoria) === -1) return false;
     if (state.forma && row.dataset.forma !== state.forma) return false;
     if (state.status && row.dataset.status !== state.status) return false;
+    if (state.periodStart && row.dataset.vencimento < state.periodStart) return false;
+    if (state.periodEnd && row.dataset.vencimento > state.periodEnd) return false;
     if (state.search) {
       var haystack = normalize(row.dataset.search);
       if (haystack.indexOf(normalize(state.search)) === -1) return false;
@@ -564,6 +568,7 @@
 
   function closeFiltrosPopover() {
     filtrosPopoverEl.hidden = true;
+    closePeriodPopover();
     document.removeEventListener('click', outsideFiltrosClickHandler);
   }
 
@@ -588,12 +593,177 @@
     categoriaMultiDropdown.reset();
     formaDropdown.reset('', 'Todas as formas');
     statusDropdown.reset('', 'Todos');
+    resetPeriod();
     state.categorias = [];
     state.forma = '';
     state.status = '';
     state.page = 1;
     applyFilters();
   });
+
+  // ---------- Período (intervalo de datas): Popover + calendário aninhado
+  // dentro do Agrupamento de Filtros — mesma composição já usada em
+  // Caixa/Contas a Pagar/Notas fiscais/Dashboard (dois cliques pra escolher
+  // início/fim), aplicado sobre `vencimento`. ----------
+  (function initPeriodPicker() {
+    var MONTH_NAMES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+      'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+    var trigger = document.getElementById('ctr-period-trigger');
+    var valueEl = document.getElementById('ctr-period-value');
+    var popover = document.getElementById('ctr-period-popover');
+    var startInput = document.getElementById('ctr-period-start-input');
+    var endInput = document.getElementById('ctr-period-end-input');
+    var calLabel = popover.querySelector('[data-period-label]');
+    var calGrid = popover.querySelector('[data-period-grid]');
+
+    var draft = { start: null, end: null, viewYear: 0, viewMonth: 0 };
+    var applied = null;
+
+    function pad2b(n) { return n < 10 ? '0' + n : String(n); }
+    function toInputValue(date) { return date ? date.getFullYear() + '-' + pad2b(date.getMonth() + 1) + '-' + pad2b(date.getDate()) : ''; }
+    function parseInputValue(value) {
+      if (!value) return null;
+      var parts = value.split('-');
+      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    }
+    function formatDatePt(date) { return pad2b(date.getDate()) + '/' + pad2b(date.getMonth() + 1) + '/' + date.getFullYear(); }
+    function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+    function capitalize(text) { return text.charAt(0).toUpperCase() + text.slice(1); }
+
+    function renderCalendar() {
+      calLabel.textContent = capitalize(MONTH_NAMES[draft.viewMonth]) + ' de ' + draft.viewYear;
+      var firstWeekday = new Date(draft.viewYear, draft.viewMonth, 1).getDay();
+      var daysInMonth = new Date(draft.viewYear, draft.viewMonth + 1, 0).getDate();
+      var html = '';
+      for (var e = 0; e < firstWeekday; e++) html += '<span class="ctr-period-day-empty"></span>';
+      for (var day = 1; day <= daysInMonth; day++) {
+        var date = new Date(draft.viewYear, draft.viewMonth, day);
+        var classes = ['ctr-period-day', 'text-12-regular'];
+        if (draft.start && sameDay(date, draft.start)) classes.push('is-start');
+        if (draft.end && sameDay(date, draft.end)) classes.push('is-end');
+        if (draft.start && draft.end && date > draft.start && date < draft.end) classes.push('is-in-range');
+        html += '<button type="button" class="' + classes.join(' ') + '" data-date="' + toInputValue(date) + '">' + day + '</button>';
+      }
+      calGrid.innerHTML = html;
+    }
+
+    function pickDate(date) {
+      if (!draft.start || (draft.start && draft.end)) {
+        draft.start = date;
+        draft.end = null;
+      } else if (date < draft.start) {
+        draft.end = draft.start;
+        draft.start = date;
+      } else {
+        draft.end = date;
+      }
+      startInput.value = toInputValue(draft.start);
+      endInput.value = toInputValue(draft.end);
+      renderCalendar();
+    }
+
+    calGrid.addEventListener('click', function (event) {
+      var btn = event.target.closest('.ctr-period-day');
+      if (!btn) return;
+      pickDate(parseInputValue(btn.dataset.date));
+    });
+
+    popover.querySelector('[data-period-prev]').addEventListener('click', function () {
+      draft.viewMonth--;
+      if (draft.viewMonth < 0) { draft.viewMonth = 11; draft.viewYear--; }
+      renderCalendar();
+    });
+    popover.querySelector('[data-period-next]').addEventListener('click', function () {
+      draft.viewMonth++;
+      if (draft.viewMonth > 11) { draft.viewMonth = 0; draft.viewYear++; }
+      renderCalendar();
+    });
+
+    startInput.addEventListener('change', function () {
+      var date = parseInputValue(startInput.value);
+      if (!date) return;
+      draft.start = date;
+      if (draft.end && draft.end < draft.start) draft.end = null;
+      draft.viewYear = date.getFullYear();
+      draft.viewMonth = date.getMonth();
+      renderCalendar();
+    });
+    endInput.addEventListener('change', function () {
+      var date = parseInputValue(endInput.value);
+      if (!date) return;
+      if (draft.start && date < draft.start) {
+        draft.end = draft.start;
+        draft.start = date;
+        startInput.value = toInputValue(draft.start);
+      } else {
+        draft.end = date;
+      }
+      renderCalendar();
+    });
+
+    function positionPeriodPopover() {
+      var margin = 16;
+      var width = Math.min(300, window.innerWidth - margin * 2);
+      var rect = trigger.getBoundingClientRect();
+      var left = rect.left;
+      if (left + width > window.innerWidth - margin) left = window.innerWidth - margin - width;
+      if (left < margin) left = margin;
+      popover.style.position = 'fixed';
+      popover.style.left = left + 'px';
+      popover.style.width = width + 'px';
+      popover.style.top = (rect.bottom + 4) + 'px';
+    }
+
+    function openPeriodPopover() {
+      var base = draft.start || new Date();
+      draft.viewYear = base.getFullYear();
+      draft.viewMonth = base.getMonth();
+      renderCalendar();
+      popover.hidden = false;
+      positionPeriodPopover();
+    }
+    function closePeriodPopoverInternal() { popover.hidden = true; }
+
+    trigger.addEventListener('click', function (event) {
+      event.stopPropagation();
+      if (popover.hidden) openPeriodPopover(); else closePeriodPopoverInternal();
+    });
+
+    document.getElementById('ctr-period-cancel').addEventListener('click', function () {
+      draft.start = applied ? applied.start : null;
+      draft.end = applied ? applied.end : null;
+      startInput.value = toInputValue(draft.start);
+      endInput.value = toInputValue(draft.end);
+      closePeriodPopoverInternal();
+    });
+
+    document.getElementById('ctr-period-apply').addEventListener('click', function () {
+      if (draft.start && draft.end) {
+        applied = { start: draft.start, end: draft.end };
+        valueEl.textContent = formatDatePt(draft.start) + ' até ' + formatDatePt(draft.end);
+        valueEl.classList.remove('ctr-period-placeholder');
+        state.periodStart = toInputValue(draft.start);
+        state.periodEnd = toInputValue(draft.end);
+      }
+      closePeriodPopoverInternal();
+    });
+
+    window.resetPeriodPickerCtr = function () {
+      draft = { start: null, end: null, viewYear: 0, viewMonth: 0 };
+      applied = null;
+      startInput.value = '';
+      endInput.value = '';
+      valueEl.textContent = 'Todo o período';
+      valueEl.classList.add('ctr-period-placeholder');
+      state.periodStart = null;
+      state.periodEnd = null;
+    };
+    window.closePeriodPopoverPublicCtr = closePeriodPopoverInternal;
+  })();
+
+  function closePeriodPopover() { if (window.closePeriodPopoverPublicCtr) window.closePeriodPopoverPublicCtr(); }
+  function resetPeriod() { if (window.resetPeriodPickerCtr) window.resetPeriodPickerCtr(); }
 
   // ---------- Navegação (Nova conta / Visualizar / Editar) ----------
   document.getElementById('new-conta-btn').addEventListener('click', function () {

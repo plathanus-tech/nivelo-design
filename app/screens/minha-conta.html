@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minha Conta — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tab/Tab.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-minha-conta.css" />
+</head>
+<body>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+      <div class="app-header-right">
+        <button type="button" class="btn secondary" id="notebook-btn">
+          <i data-lucide="book-open" width="16" height="16"></i>
+          <span class="app-header-notebook-label">Caderno de campo</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pessoas e empresas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos e serviços</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Fiscal · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Manifesto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="message-square-plus" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Nova conversa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group is-open" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="true" data-tooltip="Configuração · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem is-active" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
+                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta Financeira</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — MINHA CONTA ══════════════════ -->
+      <main class="app-main">
+        <div class="mc-page">
+
+          <div class="mc-header">
+            <h1 class="mc-title text-heading-6">Minha Conta</h1>
+          </div>
+
+          <div class="wrapper mc-tabs">
+            <div class="list" role="tablist" id="mc-tablist">
+              <button type="button" role="tab" aria-selected="true" class="tab active" data-tab="dados">Dados</button>
+              <button type="button" role="tab" aria-selected="false" class="tab" data-tab="seguranca">Senha</button>
+              <button type="button" role="tab" aria-selected="false" class="tab" data-tab="plano">Plano</button>
+              <button type="button" role="tab" aria-selected="false" class="tab" data-tab="pagamento">Pagamento</button>
+            </div>
+          </div>
+
+          <!-- ══════════ ABA DADOS ══════════ -->
+          <section class="mc-panel" data-panel="dados">
+            <form class="card mc-card" id="mc-dados-form" novalidate>
+
+              <div class="mc-section-head">
+                <h2 class="mc-section-title text-body-xl">Dados cadastrais</h2>
+                <button type="button" class="btn secondary sm hasLeft" id="mc-dados-edit-btn">
+                  <i data-lucide="pencil" width="14" height="14"></i> Editar
+                </button>
+              </div>
+
+              <div class="mc-section">
+                <div class="mc-grid">
+                  <label class="wrapper mc-span-2">
+                    <span class="label">Nome</span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-nome" disabled /></div>
+                  </label>
+                  <label class="wrapper">
+                    <span class="label">CPF/CNPJ</span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-documento" disabled /></div>
+                  </label>
+                  <label class="wrapper">
+                    <span class="label">Telefone</span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-telefone" disabled /></div>
+                  </label>
+                  <label class="wrapper mc-span-2">
+                    <span class="label">E-mail</span>
+                    <div class="inputWrap"><input type="email" class="input" id="mc-email" disabled /></div>
+                  </label>
+                  <label class="wrapper">
+                    <span class="label">Data de nascimento</span>
+                    <div class="inputWrap"><input type="date" class="input" id="mc-nascimento" disabled /></div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="mc-section">
+                <h2 class="mc-section-title text-body-xl">Endereço</h2>
+                <div class="mc-grid">
+                  <label class="wrapper">
+                    <span class="label">CEP</span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-cep" inputmode="numeric" disabled /></div>
+                  </label>
+                  <label class="wrapper mc-span-2">
+                    <span class="label">Rua</span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-rua" disabled /></div>
+                  </label>
+                  <label class="wrapper">
+                    <span class="label">Número</span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-numero" disabled /></div>
+                  </label>
+                  <label class="wrapper mc-span-2">
+                    <span class="label">Complemento <span class="mc-optional">(opcional)</span></span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-complemento" disabled /></div>
+                  </label>
+                  <label class="wrapper">
+                    <span class="label">Bairro</span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-bairro" disabled /></div>
+                  </label>
+                  <label class="wrapper">
+                    <span class="label">Cidade</span>
+                    <div class="inputWrap"><input type="text" class="input" id="mc-cidade" disabled /></div>
+                  </label>
+                  <div class="wrapper" id="mc-estado-field" data-dropdown>
+                    <label class="label" for="mc-estado-trigger">Estado</label>
+                    <button type="button" class="trigger" data-dropdown-trigger id="mc-estado-trigger" disabled>
+                      <span class="placeholder" data-dropdown-value>Selecione</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu>
+                      <div class="option" data-value="AC">AC</div>
+                      <div class="option" data-value="AL">AL</div>
+                      <div class="option" data-value="AP">AP</div>
+                      <div class="option" data-value="AM">AM</div>
+                      <div class="option" data-value="BA">BA</div>
+                      <div class="option" data-value="CE">CE</div>
+                      <div class="option" data-value="DF">DF</div>
+                      <div class="option" data-value="ES">ES</div>
+                      <div class="option" data-value="GO">GO</div>
+                      <div class="option" data-value="MA">MA</div>
+                      <div class="option" data-value="MT">MT</div>
+                      <div class="option" data-value="MS">MS</div>
+                      <div class="option" data-value="MG">MG</div>
+                      <div class="option" data-value="PA">PA</div>
+                      <div class="option" data-value="PB">PB</div>
+                      <div class="option" data-value="PR">PR</div>
+                      <div class="option" data-value="PE">PE</div>
+                      <div class="option" data-value="PI">PI</div>
+                      <div class="option" data-value="RJ">RJ</div>
+                      <div class="option" data-value="RN">RN</div>
+                      <div class="option" data-value="RS">RS</div>
+                      <div class="option" data-value="RO">RO</div>
+                      <div class="option" data-value="RR">RR</div>
+                      <div class="option" data-value="SC">SC</div>
+                      <div class="option" data-value="SP">SP</div>
+                      <div class="option" data-value="SE">SE</div>
+                      <div class="option" data-value="TO">TO</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mc-actions" id="mc-dados-edit-actions" hidden>
+                <button type="button" class="btn secondaryGray" id="mc-dados-cancel">Cancelar</button>
+                <button type="submit" class="btn primary" id="mc-dados-save">Salvar alterações</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- ══════════ ABA SENHA (Segurança) ══════════ -->
+          <section class="mc-panel" data-panel="seguranca" hidden>
+            <div class="card mc-card">
+              <div class="mc-section">
+                <h2 class="mc-section-title text-body-xl">Senha</h2>
+                <div class="mc-security-row">
+                  <div>
+                    <p class="mc-security-password text-body-l" id="mc-security-password">********</p>
+                    <p class="mc-security-hint text-body-s">Última alteração: <span id="mc-security-last-change">—</span></p>
+                  </div>
+                  <button type="button" class="btn secondary" id="mc-change-password-btn">Alterar senha</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══════════ ABA PLANO ══════════ -->
+          <section class="mc-panel" data-panel="plano" hidden>
+
+            <div class="card mc-card mc-plan-summary" id="mc-plan-summary">
+              <div class="mc-plan-summary-head">
+                <div>
+                  <span class="mc-plan-summary-label text-body-s">Plano atual</span>
+                  <h2 class="mc-plan-summary-name text-heading-6" id="mc-plan-name">—</h2>
+                </div>
+                <span class="badge" id="mc-plan-status" data-status="info">—</span>
+              </div>
+              <dl class="mc-plan-summary-grid">
+                <div>
+                  <dt class="text-body-s">Forma de contratação</dt>
+                  <dd id="mc-plan-modalidade">—</dd>
+                </div>
+                <div>
+                  <dt class="text-body-s">Data de início</dt>
+                  <dd id="mc-plan-inicio">—</dd>
+                </div>
+                <div>
+                  <dt class="text-body-s">Data de vencimento</dt>
+                  <dd id="mc-plan-vencimento">—</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="alert info mc-trial-card" id="mc-trial-card" hidden>
+              <span class="icon"><i data-lucide="gift" width="18" height="18"></i></span>
+              <div class="body">
+                <div class="message" id="mc-trial-message"></div>
+              </div>
+            </div>
+
+            <div class="mc-plan-choose-row">
+              <button type="button" class="btn secondary" id="mc-choose-plan-btn">Escolher outro plano</button>
+            </div>
+
+          </section>
+
+          <!-- ══════════ ABA PAGAMENTO ══════════ -->
+          <section class="mc-panel" data-panel="pagamento" hidden>
+
+            <div class="card mc-card">
+              <dl class="mc-payment-grid">
+                <div>
+                  <dt class="text-body-s">Forma de contratação atual</dt>
+                  <dd id="mc-pay-modalidade">—</dd>
+                </div>
+                <div>
+                  <dt class="text-body-s">Situação da assinatura</dt>
+                  <dd><span class="badge" id="mc-pay-status" data-status="info">—</span></dd>
+                </div>
+                <div>
+                  <dt class="text-body-s" id="mc-pay-next-label">Próxima cobrança</dt>
+                  <dd id="mc-pay-next-value">—</dd>
+                </div>
+              </dl>
+
+              <div class="alert warning mc-renewal-warning" id="mc-renewal-warning" hidden>
+                <span class="icon"><i data-lucide="triangle-alert" width="18" height="18"></i></span>
+                <div class="body">
+                  <div class="message" id="mc-renewal-warning-text"></div>
+                </div>
+              </div>
+
+              <div class="alert error mc-expired-warning" id="mc-expired-warning" hidden>
+                <span class="icon"><i data-lucide="circle-x" width="18" height="18"></i></span>
+                <div class="body">
+                  <div class="message">Seu plano expirou.</div>
+                </div>
+              </div>
+
+              <div class="mc-cancel-note text-body-s" id="mc-cancel-note" hidden></div>
+
+              <div class="mc-payment-actions">
+                <button type="button" class="btn primary" id="mc-renew-btn" hidden>Renovar licença</button>
+                <button type="button" class="btn primary" id="mc-buy-again-btn" hidden>Comprar novamente</button>
+                <button type="button" class="btn secondaryGray" id="mc-cancel-renewal-btn" hidden>Cancelar renovação</button>
+              </div>
+            </div>
+
+            <div class="card mc-card mc-history-card" id="mc-history-card">
+              <div class="cardHeader">
+                <h2 class="title">Histórico de compras</h2>
+              </div>
+              <div class="tableWrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th class="th">Data</th>
+                      <th class="th">Plano</th>
+                      <th class="th">Tipo</th>
+                      <th class="th">Valor</th>
+                      <th class="th">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mc-history-body"></tbody>
+                </table>
+              </div>
+              <div class="mc-history-empty" id="mc-history-empty" hidden>
+                <p class="text-body-s">Nenhuma compra registrada ainda.</p>
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+      </main>
+
+      <!-- ══════════ MODAL: escolher outro plano (acordeão, mesma linguagem do checkout) ══════════ -->
+      <div class="overlay" id="mc-plan-modal-overlay" hidden>
+        <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="mc-plan-modal-title">
+          <div class="header">
+            <h2 class="title" id="mc-plan-modal-title">Escolher outro plano</h2>
+            <button type="button" class="closeBtn" id="mc-plan-modal-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+          </div>
+          <div class="body">
+            <p class="text-body-s" id="mc-plan-modal-hint" hidden></p>
+            <div class="mc-modal-plan-accordion" id="mc-modal-plan-accordion"></div>
+          </div>
+          <div class="footer">
+            <button type="button" class="btn secondaryGray sm" id="mc-plan-modal-cancel">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ MODAL: upgrade de plano (proporcional, via comercial) ══════════ -->
+      <div class="overlay" id="mc-upgrade-overlay" hidden>
+        <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="mc-upgrade-title">
+          <div class="header">
+            <h2 class="title" id="mc-upgrade-title">Alterar plano</h2>
+            <button type="button" class="closeBtn" id="mc-upgrade-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+          </div>
+          <div class="body">
+            <p class="text-body-s" id="mc-upgrade-plan-line"></p>
+            <p class="text-body-s">O valor do upgrade será calculado proporcionalmente ao período restante da sua assinatura. Nosso time comercial vai te ajudar a concluir a troca.</p>
+          </div>
+          <div class="footer">
+            <button type="button" class="btn secondaryGray sm" id="mc-upgrade-cancel">Cancelar</button>
+            <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" class="btn primary sm hasLeft" id="mc-upgrade-whatsapp">
+              <span class="mc-whatsapp-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              Falar com Comercial
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ MODAL: troca de plano de assinante mensal (sem Comercial) ══════════ -->
+      <div class="overlay" id="mc-mensal-change-overlay" hidden>
+        <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="mc-mensal-change-title">
+          <div class="header">
+            <h2 class="title" id="mc-mensal-change-title">Confirmar troca de plano</h2>
+            <button type="button" class="closeBtn" id="mc-mensal-change-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+          </div>
+          <div class="body">
+            <p class="text-body-s" id="mc-mensal-change-plan-line"></p>
+            <p class="text-body-s" id="mc-mensal-change-message"></p>
+          </div>
+          <div class="footer">
+            <button type="button" class="btn secondaryGray sm" id="mc-mensal-change-cancel">Cancelar</button>
+            <a href="#" class="btn primary sm" id="mc-mensal-change-continue">Ir para pagamento</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ MODAL: cancelar renovação automática ══════════ -->
+      <div class="overlay" id="mc-cancel-overlay" hidden>
+        <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="mc-cancel-title">
+          <div class="header">
+            <h2 class="title" id="mc-cancel-title">Cancelar renovação automática</h2>
+            <button type="button" class="closeBtn" id="mc-cancel-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+          </div>
+          <div class="body">
+            <p class="text-body-s">Sua assinatura mensal não será mais renovada automaticamente. O acesso permanecerá disponível até o final do período já pago (<strong id="mc-cancel-until">—</strong>).</p>
+          </div>
+          <div class="footer">
+            <button type="button" class="btn secondaryGray sm" id="mc-cancel-back">Voltar</button>
+            <button type="button" class="btn destructive sm" id="mc-cancel-confirm">Cancelar renovação</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ MODAL: alterar senha ══════════ -->
+      <div class="overlay" id="mc-password-overlay" hidden>
+        <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="mc-password-title">
+          <div class="header">
+            <h2 class="title" id="mc-password-title">Alterar senha</h2>
+            <button type="button" class="closeBtn" id="mc-password-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+          </div>
+          <form class="body mc-password-body" id="mc-password-form" novalidate>
+            <p class="mc-password-desc text-body-s">Escolha uma nova senha segura para proteger o acesso à sua conta.</p>
+            <div class="wrapper mc-password-field" id="mc-current-password-field">
+              <span class="label">Senha atual</span>
+              <div class="inputWrap mc-password-wrap">
+                <input type="password" class="input" id="mc-current-password" autocomplete="current-password" />
+                <button type="button" class="mc-password-toggle" id="mc-toggle-current-password" aria-label="Mostrar senha" aria-pressed="false">
+                  <i data-lucide="eye" width="18" height="18"></i>
+                </button>
+              </div>
+              <span class="errorText" id="mc-current-password-error">
+                <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                <span>Senha atual incorreta.</span>
+              </span>
+            </div>
+
+            <div class="wrapper mc-password-field" id="mc-new-password-field">
+              <span class="label">Nova senha</span>
+              <div class="inputWrap mc-password-wrap">
+                <input type="password" class="input" id="mc-new-password" autocomplete="new-password" aria-describedby="mc-pwd-criteria" />
+                <button type="button" class="mc-password-toggle" id="mc-toggle-new-password" aria-label="Mostrar senha" aria-pressed="false">
+                  <i data-lucide="eye" width="18" height="18"></i>
+                </button>
+              </div>
+              <span class="errorText" id="mc-new-password-error">
+                <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                <span>Informe uma nova senha.</span>
+              </span>
+            </div>
+
+            <ul class="pwd-criteria" id="mc-pwd-criteria">
+              <li class="pwd-criteria-item text-12-regular" data-rule="length">
+                <span class="pwd-criteria-icon pwd-criteria-icon--unmet"><i data-lucide="circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-icon pwd-criteria-icon--met"><i data-lucide="check-circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-text">Pelo menos 8 caracteres</span>
+              </li>
+              <li class="pwd-criteria-item text-12-regular" data-rule="upper">
+                <span class="pwd-criteria-icon pwd-criteria-icon--unmet"><i data-lucide="circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-icon pwd-criteria-icon--met"><i data-lucide="check-circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-text">Uma letra maiúscula</span>
+              </li>
+              <li class="pwd-criteria-item text-12-regular" data-rule="lower">
+                <span class="pwd-criteria-icon pwd-criteria-icon--unmet"><i data-lucide="circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-icon pwd-criteria-icon--met"><i data-lucide="check-circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-text">Uma letra minúscula</span>
+              </li>
+              <li class="pwd-criteria-item text-12-regular" data-rule="number">
+                <span class="pwd-criteria-icon pwd-criteria-icon--unmet"><i data-lucide="circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-icon pwd-criteria-icon--met"><i data-lucide="check-circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-text">Um número</span>
+              </li>
+              <li class="pwd-criteria-item text-12-regular" data-rule="special">
+                <span class="pwd-criteria-icon pwd-criteria-icon--unmet"><i data-lucide="circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-icon pwd-criteria-icon--met"><i data-lucide="check-circle" width="14" height="14"></i></span>
+                <span class="pwd-criteria-text">Um caractere especial</span>
+              </li>
+            </ul>
+
+            <div class="wrapper mc-password-field" id="mc-confirm-password-field">
+              <span class="label">Confirmar nova senha</span>
+              <div class="inputWrap mc-password-wrap">
+                <input type="password" class="input" id="mc-confirm-password" autocomplete="new-password" />
+                <button type="button" class="mc-password-toggle" id="mc-toggle-confirm-password" aria-label="Mostrar senha" aria-pressed="false">
+                  <i data-lucide="eye" width="18" height="18"></i>
+                </button>
+              </div>
+              <span class="errorText" id="mc-confirm-password-error">
+                <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                <span>As senhas informadas não coincidem.</span>
+              </span>
+            </div>
+          </form>
+          <div class="footer">
+            <button type="button" class="btn secondaryGray sm" id="mc-password-cancel">Cancelar</button>
+            <button type="submit" form="mc-password-form" class="btn primary sm" id="mc-password-submit" disabled>Salvar nova senha</button>
+          </div>
+        </div>
+      </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/planos-data.js"></script>
+  <script src="../shared/assinatura-data.js"></script>
+  <script src="../shared/minha-conta-data.js"></script>
+  <script src="../shared/minha-conta.js"></script>
+</body>
+</html>

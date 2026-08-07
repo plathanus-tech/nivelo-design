@@ -332,6 +332,7 @@
 
   var pageTitleEl = document.getElementById('nm-page-title');
   var submitBtn = document.getElementById('nm-submit');
+  var salvarBtn = document.getElementById('nm-salvar');
   var cancelLink = document.getElementById('nm-cancel');
   var addDocumentoBtn = document.getElementById('nm-add-documento-btn');
   var form = document.getElementById('nm-form');
@@ -377,11 +378,13 @@
       ALL_INPUTS.forEach(function (el) { el.disabled = true; });
       addDocumentoBtn.hidden = true;
       submitBtn.hidden = true;
+      salvarBtn.hidden = true;
       cancelLink.textContent = 'Voltar';
     } else if (modo === 'corrigir') {
       pageTitleEl.textContent = 'Editar Manifesto';
       document.title = 'Editar Manifesto — Nivelo';
       submitBtn.textContent = 'Salvar alterações';
+      salvarBtn.hidden = true;
     }
   } else {
     addDocumento();

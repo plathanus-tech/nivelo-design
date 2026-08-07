@@ -1,0 +1,298 @@
+/* ══════════════════════════════════════════════════════════
+   MINHA CONTA — Dados / Plano / Pagamento
+   ══════════════════════════════════════════════════════════ */
+
+.mc-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.mc-header { display: flex; }
+.mc-title { color: var(--color-text-primary); margin: 0; }
+
+/* Espaçamento padrão entre os cards de cada aba (ex.: card principal → botão de ação em
+   Plano; informações da assinatura → histórico de compras em Pagamento). Guard [hidden]
+   necessário (mesmo bug hidden+display incondicional documentado dezenas de vezes neste
+   projeto) — os painéis alternam via `panel.hidden` em JS. */
+.mc-panel { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+.mc-panel[hidden] { display: none; }
+
+/* Guards do bug recorrente hidden+display incondicional deste projeto
+   (Feedback's .alert, Dialog's .overlay, Button's .btn — todos usados
+   nesta tela via `hidden`). Ver rules.md / feedback_hidden_display_guard. */
+.alert[hidden],
+.overlay[hidden],
+.btn[hidden] { display: none; }
+
+/* Colisão de 3 vias Feedback×Table×Dialog (os 3 carregados nesta tela, Dialog por último no
+   <head>) — `.body`/`.title` do Dialog (padding de modal/cor cinza/peso bold) vencem os do
+   Feedback pra QUALQUER `.alert` da página (trial/renovação/vencido/toast), não só dentro de
+   modal. Restaura os valores originais do Feedback. Mesmo fix já documentado em várias telas
+   (toast de Dashboard/Cadastro/etc.), aqui aplicado a todo `.alert`, não só ao toast. */
+.alert .body { padding: 0; color: inherit; line-height: inherit; }
+.alert .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+
+/* Colisão RadioButton×Input/Dropdown, mesmo padrão documentado dezenas de vezes neste
+   projeto: RadioButton.module.css (carregado nesta tela pra Mensal/Anual do modal de troca
+   de plano) declara `.input{opacity:0;position:absolute;width:1px;height:1px}` (esconde o
+   radio nativo) e `.option{display:inline-flex}`, que vazam pros campos de texto reais do
+   formulário de Dados e pro `.option` do MENU do Dropdown de Estado. */
+.input:not([type="radio"]) { position: static; opacity: 1; width: 100%; height: auto; }
+#mc-estado-field .menu .option { display: block; width: 100%; }
+
+/* ── Card genérico de formulário/consulta (reaproveita .card do Table) ── */
+.mc-card {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.mc-section { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.mc-section-title { color: var(--color-text-primary); margin: 0; font-weight: var(--font-weight-medium); }
+.mc-section-hint { color: var(--color-text-tertiary); margin: calc(var(--spacing-sm) * -1) 0 0; }
+.mc-optional { color: var(--color-text-tertiary); font-weight: var(--font-weight-regular); }
+
+/* Cabeçalho da seção "Dados cadastrais": título à esquerda, "Editar" no lado oposto. */
+.mc-section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); }
+.mc-section-head .mc-section-title { margin: 0; }
+
+.mc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .mc-grid { grid-template-columns: repeat(2, 1fr); }
+  .mc-span-2 { grid-column: span 2; }
+}
+
+.mc-actions { display: flex; justify-content: flex-end; gap: var(--spacing-md); }
+/* Bug real do padrão recorrente hidden+display incondicional deste projeto: sem este guard,
+   Cancelar/Salvar ficavam sempre visíveis mesmo com o atributo `hidden` correto em modo
+   leitura, porque `.mc-actions{display:flex}` (regra de autor) vence o `[hidden]` do UA. */
+.mc-actions[hidden] { display: none; }
+
+/* ── Aba Plano ── */
+.mc-plan-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+.mc-plan-summary-label { display: block; color: var(--color-text-tertiary); }
+.mc-plan-summary-name { color: var(--color-text-primary); margin: var(--spacing-2xs) 0 0; }
+
+.mc-plan-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  margin: 0;
+}
+.mc-plan-summary-grid dt { color: var(--color-text-tertiary); margin-bottom: var(--spacing-2xs); }
+.mc-plan-summary-grid dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; }
+@media (min-width: 640px) {
+  .mc-plan-summary-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.mc-plan-choose-row { display: flex; }
+
+/* ── Modal "Escolher outro plano" (acordeão, mesma linguagem visual do checkout
+   comprar-plano.html — nunca uma grade de cards de preço estilo landing page). ── */
+.mc-modal-plan-accordion { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.mc-modal-plan-empty { color: var(--color-text-tertiary); text-align: center; padding: var(--spacing-lg) 0; }
+
+.mc-modal-plan-item {
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  overflow: hidden;
+}
+.mc-modal-plan-item.is-open { border-color: var(--color-brand-500); }
+
+.mc-modal-plan-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+.mc-modal-plan-info { display: flex; flex-direction: column; gap: var(--spacing-3xs); flex: 1; min-width: 0; }
+.mc-modal-plan-name { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.mc-modal-plan-tagline { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+.mc-modal-plan-from { color: var(--color-text-tertiary); font-size: var(--font-size-sm); white-space: nowrap; flex-shrink: 0; }
+.mc-modal-plan-chevron { flex-shrink: 0; color: var(--color-text-tertiary); transition: transform var(--transition-normal); }
+.mc-modal-plan-item.is-open .mc-modal-plan-chevron { transform: rotate(180deg); }
+
+.mc-modal-plan-body { padding: 0 var(--spacing-md) var(--spacing-md); display: flex; flex-direction: column; gap: var(--spacing-md); }
+.mc-modal-plan-body[hidden] { display: none; }
+
+.mc-modal-plan-modality { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+@media (min-width: 420px) { .mc-modal-plan-modality { flex-direction: row; } }
+.mc-modal-modality-option {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color var(--transition-normal);
+}
+.mc-modal-modality-option.checked { border-color: var(--color-brand-500); border-width: var(--border-width-medium); }
+.mc-modal-modality-option:has(.input:checked) .circle { border-color: var(--color-action-primary); }
+.mc-modal-modality-option:has(.input:checked) .dot { opacity: 1; }
+.mc-modal-modality-info { display: flex; flex-direction: column; gap: var(--spacing-2xs); font-size: var(--font-size-sm); }
+.mc-modal-modality-info strong { display: flex; align-items: center; gap: var(--spacing-xs); color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.mc-modal-modality-info span:last-child { color: var(--color-text-secondary); }
+.mc-modal-modality-save {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-brand);
+  background-color: var(--color-bg-brand);
+  padding: 2px var(--spacing-xs);
+  border-radius: var(--radius-full);
+}
+/* Colisão RadioButton×Input, mesmo padrão documentado dezenas de vezes neste projeto. */
+.mc-modal-modality-option .input { position: static; opacity: 1; width: auto; height: auto; }
+
+/* Rodapé de modal com botão de rótulo longo (WhatsApp) pode "cortar" o Cancelar em telas
+   estreitas — mesmo padrão de bug já documentado (Dialog footer overflow); empilha em coluna
+   full-width abaixo de 480px. */
+#mc-upgrade-overlay .footer,
+#mc-plan-modal-overlay .footer,
+#mc-mensal-change-overlay .footer,
+#mc-password-overlay .footer {
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+@media (max-width: 480px) {
+  #mc-upgrade-overlay .footer,
+  #mc-mensal-change-overlay .footer,
+  #mc-password-overlay .footer { flex-direction: column-reverse; }
+  #mc-upgrade-overlay .footer .btn,
+  #mc-mensal-change-overlay .footer .btn,
+  #mc-password-overlay .footer .btn { width: 100%; justify-content: center; }
+}
+
+.mc-whatsapp-icon { display: inline-flex; }
+
+/* ── Aba Pagamento ── */
+.mc-payment-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  margin: 0;
+}
+.mc-payment-grid dt { color: var(--color-text-tertiary); margin-bottom: var(--spacing-2xs); }
+.mc-payment-grid dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; }
+@media (min-width: 640px) { .mc-payment-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.mc-cancel-note {
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-subtle);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+}
+
+.mc-payment-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+
+.mc-history-empty { padding: var(--spacing-xl) 0; text-align: center; color: var(--color-text-tertiary); }
+
+/* Histórico de compras: mesmo padrão de tabela do resto do sistema (cabeçalho Brand 50 +
+   caixa alta/semibold, zebra branco/gray-50) — ver page-categorias-financeiras.css. */
+.mc-history-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.mc-history-card .tr:nth-child(odd) .td { background: var(--color-bg-surface); }
+.mc-history-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.mc-history-card .tr:hover .td { filter: brightness(0.97); }
+
+/* ── Aba Segurança ── */
+.mc-security-row { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); flex-wrap: wrap; }
+.mc-security-password { color: var(--color-text-primary); margin: 0; letter-spacing: 0.15em; }
+.mc-security-hint { color: var(--color-text-tertiary); margin: var(--spacing-2xs) 0 0; }
+
+/* ── Modal "Alterar senha" (mesmo padrão de espaçamento da tela de Criar Conta:
+   .login-form{gap:16px}, título/descrição→formulário com 24px de respiro). ── */
+.mc-password-body { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.mc-password-desc { color: var(--color-text-secondary); margin: 0 0 var(--spacing-sm); }
+.mc-password-field.error .input { border-color: var(--color-action-error); }
+/* Mostrar/ocultar senha — mesmo comportamento/ícone (eye/eye-off) já usado em
+   page-login.css's `.login-toggle-password`/`.login-password-wrap`. */
+.mc-password-wrap .input { padding-right: 44px; }
+.mc-password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+}
+.mc-password-toggle:hover { color: var(--color-text-primary); background-color: var(--color-bg-subtle); }
+.mc-password-toggle:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+/* Input.module.css's `.errorText{display:flex}` é incondicional — só aparece de verdade
+   quando o `.wrapper` pai ganha `.error` via JS (mesmo padrão de nova-ideia.js/etc.). */
+.mc-password-field .errorText { display: none; }
+.mc-password-field.error .errorText { display: flex; }
+.pwd-criteria {
+  list-style: none;
+  margin: calc(var(--spacing-sm) * -1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+.pwd-criteria-item { display: flex; align-items: center; gap: var(--spacing-xs); color: var(--color-text-secondary); transition: color var(--transition-fast); }
+.pwd-criteria-icon { display: flex; align-items: center; flex-shrink: 0; }
+.pwd-criteria-icon--unmet { color: var(--color-text-tertiary); }
+.pwd-criteria-icon--met { display: none; color: var(--color-status-success-fg); }
+.pwd-criteria-item.met { color: var(--color-status-success-fg); }
+.pwd-criteria-item.met .pwd-criteria-icon--unmet { display: none; }
+.pwd-criteria-item.met .pwd-criteria-icon--met { display: flex; }
+
+/* ── Toast (mesmo padrão EXATO do resto do app — centralizado no topo, não top-right,
+   ver page-produtos.css/page-categorias-financeiras.css/etc.) ── */
+.mc-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.mc-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+
+.mc-toast { box-shadow: var(--shadow-lg); animation: mc-toast-in 0.25s ease; }
+/* Colisão Feedback×Table×Dialog já coberta de forma geral por `.alert .body`/`.alert .title`
+   acima — nada específico do toast precisa de override próprio além da animação/sombra. */
+
+@keyframes mc-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

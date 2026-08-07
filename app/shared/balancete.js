@@ -102,67 +102,135 @@
     return { root: root };
   }
 
-  // ---------- Select pesquisável (Conta/Categoria) — padrão novo, não
-  // existe em nenhuma outra tela: trigger fechado + menu com campo de
-  // busca no topo + opção fixa "Todos(as) X" sempre visível. ----------
-  function initSearchSelect(root, allLabel, items) {
-    var trigger = root.querySelector('[data-searchselect-trigger]');
-    var valueEl = root.querySelector('[data-searchselect-value]');
-    var menu = root.querySelector('[data-searchselect-menu]');
-    var input = root.querySelector('[data-searchselect-input]');
-    var optionsEl = root.querySelector('[data-searchselect-options]');
+  // ---------- Combobox (Conta/Categoria) — dropdown pesquisável no padrão
+  // Radix/shadcn: aparência de Select (chevron+trigger em `.input`, mesma
+  // altura/raio/padding/foco de qualquer outro campo do sistema), digitação
+  // dentro do próprio campo filtra a lista, navegação por teclado (↑↓ Enter
+  // Esc) além de mouse, animação de abertura/fechamento e "selected"/
+  // "is-active" (destaque do teclado) com a mesma aparência nos 2 campos —
+  // as duas telas chamam a MESMA função, então identidade visual e
+  // comportamento são garantidos por construção, não por CSS duplicado.
+  // Opção fixa "Todos(as) X" sempre no topo da lista. ----------
+  var COMBOBOX_CLOSE_MS = 140;
+
+  function initCombobox(root, allLabel, items) {
+    var input = root.querySelector('[data-combobox-input]');
+    var menu = root.querySelector('[data-combobox-menu]');
     var value = '';
+    var displayValue = ''; // '' = "Todos(as) X", mostrado via placeholder
+    var visibleOptions = [];
+    var highlightedIndex = -1;
+    var closeTimer = null;
+
+    function buildOptions(query) {
+      var normalizedQuery = normalize(query);
+      var matches = items.filter(function (it) { return normalize(it.label).indexOf(normalizedQuery) !== -1; });
+      var noResults = !!query && !matches.length;
+      var opts = [{ value: '', label: allLabel }];
+      if (!noResults) opts = opts.concat(matches);
+      return { opts: opts, noResults: noResults };
+    }
 
     function renderOptions(query) {
-      var normalizedQuery = normalize(query);
-      var html = '<div class="option' + (value === '' ? ' selected' : '') + '" data-value="">' + allLabel + '</div>';
-      var matches = items.filter(function (it) { return normalize(it.label).indexOf(normalizedQuery) !== -1; });
-      if (query && !matches.length) {
-        html += '<div class="option-empty">Nenhum resultado encontrado.</div>';
-      } else {
-        html += matches.map(function (it) {
-          return '<div class="option' + (value === it.value ? ' selected' : '') + '" data-value="' + it.value + '">' + it.label + '</div>';
-        }).join('');
-      }
-      optionsEl.innerHTML = html;
+      var built = buildOptions(query);
+      visibleOptions = built.opts;
+      if (highlightedIndex >= visibleOptions.length) highlightedIndex = visibleOptions.length - 1;
+      var html = visibleOptions.map(function (opt, i) {
+        var classes = 'option';
+        if (opt.value === value) classes += ' selected';
+        if (i === highlightedIndex) classes += ' is-active';
+        return '<div class="' + classes + '" role="option" aria-selected="' + (opt.value === value) + '" data-index="' + i + '" data-value="' + opt.value + '" data-label="' + opt.label + '">' + opt.label + '</div>';
+      }).join('');
+      if (built.noResults) html += '<div class="option-empty">Nenhum resultado encontrado.</div>';
+      menu.innerHTML = html;
     }
 
     function positionMenu() {
-      var rect = trigger.getBoundingClientRect();
+      var rect = input.getBoundingClientRect();
       var margin = 8;
       menu.style.left = rect.left + 'px';
       menu.style.width = rect.width + 'px';
       menu.style.top = (rect.bottom + 4) + 'px';
-      optionsEl.style.maxHeight = Math.min(200, window.innerHeight - rect.bottom - margin - 48) + 'px';
+      menu.style.maxHeight = Math.min(240, window.innerHeight - rect.bottom - margin) + 'px';
     }
-    function close() { menu.hidden = true; window.removeEventListener('scroll', onScroll, true); window.removeEventListener('resize', close); document.removeEventListener('click', outsideClick); }
+    function isOpen() { return !menu.hidden; }
+    function close() {
+      menu.classList.remove('is-open');
+      root.classList.remove('open');
+      input.setAttribute('aria-expanded', 'false');
+      input.value = displayValue;
+      highlightedIndex = -1;
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', positionMenu);
+      window.clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(function () { menu.hidden = true; }, COMBOBOX_CLOSE_MS);
+    }
     function onScroll(e) { if (menu.contains(e.target)) return; close(); }
-    function outsideClick(e) { if (!root.contains(e.target)) close(); }
     function open() {
-      input.value = '';
-      renderOptions('');
+      if (isOpen()) return;
+      window.clearTimeout(closeTimer);
+      renderOptions(input.value === displayValue ? '' : input.value);
+      highlightedIndex = visibleOptions.reduce(function (found, opt, i) { return opt.value === value ? i : found; }, -1);
       menu.hidden = false;
       positionMenu();
-      input.focus();
+      root.classList.add('open');
+      input.setAttribute('aria-expanded', 'true');
+      window.requestAnimationFrame(function () { menu.classList.add('is-open'); });
       window.addEventListener('scroll', onScroll, true);
-      window.addEventListener('resize', close);
-      window.setTimeout(function () { document.addEventListener('click', outsideClick); }, 0);
+      window.addEventListener('resize', positionMenu);
+    }
+    function highlight(nextIndex) {
+      if (!visibleOptions.length) return;
+      var count = visibleOptions.length;
+      highlightedIndex = ((nextIndex % count) + count) % count;
+      Array.prototype.forEach.call(menu.querySelectorAll('.option'), function (el) {
+        el.classList.toggle('is-active', Number(el.dataset.index) === highlightedIndex);
+      });
+      var activeEl = menu.querySelector('.option[data-index="' + highlightedIndex + '"]');
+      if (activeEl && activeEl.scrollIntoView) activeEl.scrollIntoView({ block: 'nearest' });
+    }
+    function selectIndex(i) {
+      var opt = visibleOptions[i];
+      if (!opt) return;
+      value = opt.value;
+      displayValue = opt.value === '' ? '' : opt.label;
+      input.value = displayValue;
+      close();
+      input.blur();
     }
 
-    trigger.addEventListener('click', function () { menu.hidden ? open() : close(); });
-    input.addEventListener('input', function () { renderOptions(input.value); });
-    optionsEl.addEventListener('click', function (e) {
+    input.addEventListener('focus', open);
+    input.addEventListener('click', open);
+    input.addEventListener('input', function () {
+      highlightedIndex = -1;
+      renderOptions(input.value);
+      if (!isOpen()) open(); else positionMenu();
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!isOpen()) open(); else highlight(highlightedIndex + 1);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!isOpen()) open(); else highlight(highlightedIndex - 1);
+      } else if (e.key === 'Enter') {
+        if (isOpen()) { e.preventDefault(); selectIndex(highlightedIndex >= 0 ? highlightedIndex : 0); }
+      } else if (e.key === 'Escape') {
+        if (isOpen()) { e.preventDefault(); close(); }
+      }
+    });
+    menu.addEventListener('mousemove', function (e) {
       var o = e.target.closest('.option');
       if (!o) return;
-      value = o.dataset.value;
-      valueEl.textContent = value === '' ? allLabel : o.textContent;
-      close();
+      var i = Number(o.dataset.index);
+      if (i !== highlightedIndex) highlight(i);
     });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) close(); });
+    menu.addEventListener('click', function (e) { var o = e.target.closest('.option'); if (o) selectIndex(Number(o.dataset.index)); });
+    document.addEventListener('click', function (e) { if (!root.contains(e.target) && isOpen()) close(); });
 
     return {
       getValue: function () { return value; },
-      getLabel: function () { return valueEl.textContent; }
+      getLabel: function () { return displayValue || allLabel; }
     };
   }
 
@@ -221,10 +289,10 @@
 
   // ---------- Filtros: Conta/Categoria/Agrupamento ----------
   var contaItems = window.NiveloContasFinanceiras.list().map(function (c) { return { value: String(c.codigo), label: c.nome }; });
-  var contaSelect = initSearchSelect(document.getElementById('conta-field'), 'Todas as contas', contaItems);
+  var contaSelect = initCombobox(document.getElementById('conta-field'), 'Todas as contas', contaItems);
 
   var categoriaItems = window.NiveloCategoriasFinanceiras.list().filter(function (c) { return c.ativo; }).map(function (c) { return { value: c.codigo, label: c.descricao }; });
-  var categoriaSelect = initSearchSelect(document.getElementById('categoria-field'), 'Todas as categorias', categoriaItems);
+  var categoriaSelect = initCombobox(document.getElementById('categoria-field'), 'Todas as categorias', categoriaItems);
 
   var agrupamentoDropdown = initDropdown(document.getElementById('agrupamento-field'));
 
@@ -349,8 +417,7 @@
     };
 
     renderReport(currentReport);
-    collapseFiltros();
-    showToast('Relatório gerado com sucesso', 'O Balancete foi atualizado conforme os filtros aplicados.');
+    setFiltrosExpanded(false);
   }
 
   // ---------- Render: cabeçalho/resumo + KPIs ----------
@@ -377,39 +444,147 @@
     if (window.lucide) lucide.createIcons();
   }
 
-  // ---------- Gráfico de barras (SVG puro) ----------
+  // ---------- Eixo X — mesma lógica de rótulos do gráfico do DRE (ver `dre.js`'s
+  // `buildAxisLabelsHTML`, cópia própria aqui por convenção do projeto: telas de relatório
+  // não compartilham JS entre si). No agrupamento por dia, "01 Mmm" só no 1º dia de cada mês
+  // representado + o dia isolado a cada 5 dias; nos demais agrupamentos, amostragem por
+  // `labelStep` (no máximo ~12 rótulos). ----------
+  function buildAxisLabelsHTML(report, labelClass) {
+    var n = report.columns.length;
+    if (report.agrupamento === 'dia') {
+      // O mês ("01 Jul") só cabe em telas largas — abaixo de 768px a coluna de cada dia fica
+      // estreita demais pro texto completo (`.dre/bal-chart-axis-month` escondido via media
+      // query, ver page-dre.css/page-balancete.css), sobrando só o número do dia ("01").
+      return report.columns.map(function (c) {
+        var day = Number(c.key.slice(8, 10));
+        var month = Number(c.key.slice(5, 7));
+        var inner = '';
+        if (day === 1) {
+          inner = '<span class="' + labelClass + '-day">01</span><span class="' + labelClass + '-month">&nbsp;' + MONTH_ABBR[month - 1] + '</span>';
+        } else if (day % 5 === 0) {
+          inner = '<span class="' + labelClass + '-day">' + c.key.slice(8, 10) + '</span>';
+        }
+        return '<span class="' + labelClass + ' text-10-medium">' + inner + '</span>';
+      }).join('');
+    }
+    var labelStep = n > 12 ? Math.ceil(n / 12) : 1;
+    return report.columns.map(function (c, j) {
+      var text = j % labelStep === 0 ? c.label : '';
+      return '<span class="' + labelClass + ' text-10-medium">' + text + '</span>';
+    }).join('');
+  }
+
+  // ---------- Gráfico de barras (SVG puro) — Entradas x Saídas lado a lado
+  // por dia/período, visual limpo (Stripe/Linear/Vercel): sem faixas de
+  // fundo (removidas por completo, competiam visualmente com as barras).
+  // Sem eixo Y numérico de propósito (mesma decisão do gráfico do DRE): as
+  // 3 gridlines horizontais antigas nunca tinham valor associado (só
+  // decorativas) — removidas em favor da linha de zero (única referência
+  // horizontal com significado real) + tooltip rico por dia no hover
+  // (valor exato de Entradas/Saídas/Saldo). Linhas verticais entre cada
+  // dia seguem como grid discreto de separação, mesma densidade do DRE. ---
   function renderChart(report) {
     var svg = document.getElementById('bal-chart-svg');
+    var axis = document.getElementById('bal-chart-axis');
     var n = report.columns.length;
     var chartW = 100, chartH = 40;
     var maxValue = Math.max(1, report.totalEntradas.concat(report.totalSaidas).reduce(function (m, v) { return Math.max(m, v); }, 0));
     var groupW = chartW / n;
-    var barW = groupW / 3;
-    var baseline = chartH - 6;
+    var groupPad = groupW * 0.14;
+    var innerW = groupW - groupPad * 2;
+    var barGap = innerW * 0.1;
+    var barW = (innerW - barGap) / 2;
+    var baseline = chartH - 1;
     var usableH = baseline - 2;
 
-    var bars = '';
-    for (var i = 0; i < n; i++) {
-      var groupX = i * groupW;
-      var hEntrada = (report.totalEntradas[i] / maxValue) * usableH;
-      var hSaida = (report.totalSaidas[i] / maxValue) * usableH;
-      bars +=
-        '<rect x="' + (groupX + groupW * 0.15) + '" y="' + (baseline - hEntrada) + '" width="' + barW + '" height="' + hEntrada + '" fill="var(--color-status-success-fg)" rx="0.6"></rect>' +
-        '<rect x="' + (groupX + groupW * 0.15 + barW + 1) + '" y="' + (baseline - hSaida) + '" width="' + barW + '" height="' + hSaida + '" fill="var(--color-status-error-fg)" rx="0.6"></rect>';
+    var gridlines = '';
+    for (var g = 1; g < n; g++) {
+      var gx = g * groupW;
+      gridlines += '<line x1="' + gx + '" y1="0" x2="' + gx + '" y2="' + baseline + '" stroke="var(--color-border-subtle)" stroke-width="0.15" stroke-opacity="0.5"></line>';
     }
 
-    var labelStep = n > 12 ? Math.ceil(n / 12) : 1;
-    var labels = '';
-    for (var j = 0; j < n; j += labelStep) {
-      var x = j * groupW + groupW / 2;
-      labels += '<text x="' + x + '" y="' + chartH + '" font-size="2.6" text-anchor="middle" fill="var(--color-text-tertiary)">' + report.columns[j].label + '</text>';
+    var bars = '';
+    var hitareas = '';
+    for (var i = 0; i < n; i++) {
+      var groupX = i * groupW + groupPad;
+      var hEntrada = (report.totalEntradas[i] / maxValue) * usableH;
+      var hSaida = (report.totalSaidas[i] / maxValue) * usableH;
+      var xEntrada = groupX;
+      var xSaida = groupX + barW + barGap;
+      bars +=
+        '<rect class="bal-chart-bar" data-idx="' + i + '" x="' + xEntrada + '" y="' + (baseline - hEntrada) + '" width="' + barW + '" height="' + Math.max(hEntrada, 0.3) + '" fill="var(--color-status-success-fg)" rx="0.5"></rect>' +
+        '<rect class="bal-chart-bar" data-idx="' + i + '" x="' + xSaida + '" y="' + (baseline - hSaida) + '" width="' + barW + '" height="' + Math.max(hSaida, 0.3) + '" fill="var(--color-status-error-fg)" rx="0.5"></rect>';
+      hitareas += '<rect class="bal-chart-hit" data-idx="' + i + '" x="' + (i * groupW) + '" y="0" width="' + groupW + '" height="' + baseline + '" fill="transparent" pointer-events="all"></rect>';
     }
 
     svg.setAttribute('viewBox', '0 0 ' + chartW + ' ' + chartH);
     svg.innerHTML =
-      '<line x1="0" y1="' + baseline + '" x2="' + chartW + '" y2="' + baseline + '" stroke="var(--color-border-subtle)" stroke-width="0.3"></line>' +
-      bars + labels;
+      gridlines +
+      '<line class="bal-chart-zero-line" x1="0" y1="' + baseline + '" x2="' + chartW + '" y2="' + baseline + '" stroke-width="0.35"></line>' +
+      bars + hitareas;
+
+    axis.innerHTML = buildAxisLabelsHTML(report, 'bal-chart-axis-label');
   }
+
+  // ---------- Tooltip do gráfico — um único tooltip por dia/período
+  // (hover em qualquer ponto da coluna, não por barra individual), com
+  // Data, Entradas, Saídas e Saldo do dia. Visual "moderno" (fundo escuro,
+  // sombra suave), criado uma vez e reaproveitado a cada hover. ----------
+  var chartTooltip = document.createElement('div');
+  chartTooltip.className = 'bal-chart-tooltip';
+  chartTooltip.setAttribute('role', 'tooltip');
+  chartTooltip.hidden = true;
+  document.body.appendChild(chartTooltip);
+
+  function positionChartTooltip(clientX, clientY) {
+    var rect = chartTooltip.getBoundingClientRect();
+    var margin = 14;
+    var left = clientX + margin;
+    var top = clientY - rect.height - margin;
+    if (left + rect.width > window.innerWidth - 8) left = clientX - rect.width - margin;
+    if (left < 8) left = 8;
+    if (top < 8) top = clientY + margin;
+    chartTooltip.style.left = left + 'px';
+    chartTooltip.style.top = top + 'px';
+  }
+
+  function showChartTooltip(clientX, clientY, idx) {
+    if (!currentReport) return;
+    var col = currentReport.columns[idx];
+    var entradas = currentReport.totalEntradas[idx];
+    var saidas = currentReport.totalSaidas[idx];
+    var saldo = entradas - saidas;
+    var headerPrefix = currentReport.agrupamento === 'dia' ? 'Data' : 'Período';
+    var headerLabel = currentReport.agrupamento === 'dia' ? formatDataPt(col.key) : col.label;
+    chartTooltip.innerHTML =
+      '<div class="bal-chart-tooltip-header">' + headerPrefix + ': ' + headerLabel + '</div>' +
+      '<div class="bal-chart-tooltip-row"><span class="bal-chart-legend-dot bal-chart-legend-dot-entrada"></span><span class="bal-chart-tooltip-label">Entradas</span><span class="bal-chart-tooltip-value">' + formatMoeda(entradas) + '</span></div>' +
+      '<div class="bal-chart-tooltip-row"><span class="bal-chart-legend-dot bal-chart-legend-dot-saida"></span><span class="bal-chart-tooltip-label">Saídas</span><span class="bal-chart-tooltip-value">' + formatMoeda(saidas) + '</span></div>' +
+      '<div class="bal-chart-tooltip-row bal-chart-tooltip-saldo"><span class="bal-chart-tooltip-label">Saldo do dia</span><span class="bal-chart-tooltip-value ' + (saldo >= 0 ? 'bal-value-positive' : 'bal-value-negative') + '">' + formatMoeda(saldo) + '</span></div>';
+    chartTooltip.hidden = false;
+    positionChartTooltip(clientX, clientY);
+  }
+  function hideChartTooltip() { chartTooltip.hidden = true; }
+
+  // Hover: ilumina (expande) as 2 barras do dia/período — Entrada e Saída juntas, já que o
+  // tooltip também é por dia, não por barra individual (ver `showChartTooltip`).
+  function clearActiveBars() {
+    Array.prototype.slice.call(document.querySelectorAll('.bal-chart-bar.is-active')).forEach(function (el) { el.classList.remove('is-active'); });
+  }
+  function setActiveBars(idx) {
+    clearActiveBars();
+    Array.prototype.slice.call(document.querySelectorAll('.bal-chart-bar[data-idx="' + idx + '"]')).forEach(function (el) { el.classList.add('is-active'); });
+  }
+
+  var chartSvgEl = document.getElementById('bal-chart-svg');
+  chartSvgEl.addEventListener('mousemove', function (e) {
+    var hit = e.target.closest('.bal-chart-hit');
+    if (!hit) { hideChartTooltip(); clearActiveBars(); return; }
+    var idx = Number(hit.dataset.idx);
+    showChartTooltip(e.clientX, e.clientY, idx);
+    setActiveBars(idx);
+  });
+  chartSvgEl.addEventListener('mouseleave', function () { hideChartTooltip(); clearActiveBars(); });
 
   // ---------- Tabela matricial (grupos expansíveis) ----------
   var collapsedGroups = {};
@@ -445,10 +620,10 @@
     );
   }
 
-  function categoriaRowHTML(label, values, parentGroup) {
+  function categoriaRowHTML(label, values, parentGroup, isEven) {
     var cells = values.map(function (v) { return '<td class="td">' + formatInt(v) + '</td>'; }).join('');
     return (
-      '<tr class="tr bal-row-level-2" data-parent-group="' + parentGroup + '">' +
+      '<tr class="tr bal-row-level-2' + (isEven ? ' bal-row-zebra' : '') + '" data-parent-group="' + parentGroup + '">' +
         '<td class="td"><span class="bal-row-label bal-row-indent-2">' + label + '</span></td>' +
         cells +
       '</tr>'
@@ -464,15 +639,15 @@
     // Entradas > Receitas > categorias
     html += groupRowHTML({ level: 0, label: 'Entradas', values: report.totalEntradas, groupId: 'entradas', toggles: true });
     html += groupRowHTML({ level: 1, label: 'Receitas', values: report.totalEntradas, groupId: 'receitas', parentGroup: 'entradas', toggles: true, indent: 1 });
-    report.categoriasReceita.forEach(function (c) {
-      html += categoriaRowHTML(c.descricao, report.valoresReceita[c.codigo], 'entradas,receitas');
+    report.categoriasReceita.forEach(function (c, i) {
+      html += categoriaRowHTML(c.descricao, report.valoresReceita[c.codigo], 'entradas,receitas', i % 2 === 1);
     });
 
     // Saídas > Despesas > categorias
     html += groupRowHTML({ level: 0, label: 'Saídas', values: report.totalSaidas, groupId: 'saidas', toggles: true });
     html += groupRowHTML({ level: 1, label: 'Despesas', values: report.totalSaidas, groupId: 'despesas', parentGroup: 'saidas', toggles: true, indent: 1 });
-    report.categoriasDespesa.forEach(function (c) {
-      html += categoriaRowHTML(c.descricao, report.valoresDespesa[c.codigo], 'saidas,despesas');
+    report.categoriasDespesa.forEach(function (c, i) {
+      html += categoriaRowHTML(c.descricao, report.valoresDespesa[c.codigo], 'saidas,despesas', i % 2 === 1);
     });
 
     // Resultado — nunca recolhível.
@@ -484,6 +659,7 @@
 
     document.getElementById('bal-tbody').innerHTML = html;
     applyRowVisibility();
+    updateScrollFade();
   }
 
   document.getElementById('bal-tbody').addEventListener('click', function (e) {
@@ -492,17 +668,76 @@
     toggleGroup(btn.dataset.groupId);
   });
 
-  // ---------- Recolher/exibir filtros ----------
-  var filtrosCard = document.getElementById('bal-filtros-card');
-  var exibirFiltrosBtn = document.getElementById('bal-exibir-filtros-btn');
+  // ---------- Rolagem horizontal da tabela: indicativo visual (fade à
+  // direita, cobrindo cabeçalho+corpo) + scrollbar espelhada ACIMA da
+  // tabela no mobile (mesmo scrollWidth, sincronizada via scroll dos dois
+  // lados) + arrastar diretamente sobre a tabela pra rolar (mouse; toque
+  // já rola nativamente via overflow-x). ----------
+  var tableWrapEl = document.getElementById('bal-tablewrap');
+  var tableScrollShell = document.querySelector('.bal-table-scroll-shell');
+  var scrollTopEl = document.getElementById('bal-table-scroll-top');
+  var scrollTopSpacer = document.getElementById('bal-table-scroll-top-spacer');
 
-  function collapseFiltros() {
-    filtrosCard.hidden = true;
-    exibirFiltrosBtn.hidden = false;
+  function updateScrollFade() {
+    if (!tableWrapEl || !tableScrollShell) return;
+    var hasMoreRight = tableWrapEl.scrollWidth - tableWrapEl.clientWidth - tableWrapEl.scrollLeft > 2;
+    tableScrollShell.classList.toggle('bal-has-hscroll', hasMoreRight);
+    if (scrollTopSpacer) scrollTopSpacer.style.width = tableWrapEl.scrollWidth + 'px';
   }
-  exibirFiltrosBtn.addEventListener('click', function () {
-    filtrosCard.hidden = false;
-    exibirFiltrosBtn.hidden = true;
+
+  if (tableWrapEl) {
+    var syncingScroll = false;
+    tableWrapEl.addEventListener('scroll', function () {
+      updateScrollFade();
+      if (scrollTopEl && !syncingScroll) {
+        syncingScroll = true;
+        scrollTopEl.scrollLeft = tableWrapEl.scrollLeft;
+        syncingScroll = false;
+      }
+    });
+    if (scrollTopEl) {
+      scrollTopEl.addEventListener('scroll', function () {
+        if (syncingScroll) return;
+        syncingScroll = true;
+        tableWrapEl.scrollLeft = scrollTopEl.scrollLeft;
+        syncingScroll = false;
+      });
+    }
+    window.addEventListener('resize', updateScrollFade);
+
+    var dragActive = false;
+    var dragStartX = 0;
+    var dragStartScroll = 0;
+    tableWrapEl.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'touch') return; // toque já rola nativamente
+      dragActive = true;
+      dragStartX = e.clientX;
+      dragStartScroll = tableWrapEl.scrollLeft;
+      tableWrapEl.classList.add('bal-dragging');
+    });
+    tableWrapEl.addEventListener('pointermove', function (e) {
+      if (!dragActive) return;
+      tableWrapEl.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
+    });
+    function stopDrag() { dragActive = false; tableWrapEl.classList.remove('bal-dragging'); }
+    tableWrapEl.addEventListener('pointerup', stopDrag);
+    tableWrapEl.addEventListener('pointercancel', stopDrag);
+    tableWrapEl.addEventListener('pointerleave', stopDrag);
+  }
+
+  // ---------- Filtros: accordion (recolhe sozinho após gerar, expande de
+  // novo no clique) ----------
+  var filtrosHeader = document.getElementById('bal-filtros-header');
+  var filtrosToggle = document.getElementById('bal-filtros-toggle');
+  var filtrosContent = document.getElementById('bal-filtros-content');
+
+  function setFiltrosExpanded(expanded) {
+    filtrosContent.hidden = !expanded;
+    filtrosToggle.setAttribute('aria-expanded', String(expanded));
+    filtrosToggle.setAttribute('aria-label', expanded ? 'Recolher filtros' : 'Expandir filtros');
+  }
+  filtrosHeader.addEventListener('click', function () {
+    setFiltrosExpanded(filtrosContent.hidden);
   });
 
   document.getElementById('bal-gerar-btn').addEventListener('click', gerarRelatorio);

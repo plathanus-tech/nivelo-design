@@ -11,6 +11,26 @@
    regras idênticas nos dois arquivos, sem colisão real.
    ══════════════════════════════════════════════════════════ */
 
+/* ── Aviso de renovação próxima (licença anual, ≤30 dias) ─────────────── */
+/* Feedback's `.alert` tem `display:flex` incondicional — mesmo bug
+   hidden+display já documentado dezenas de vezes neste projeto. */
+.dash-renewal-banner[hidden] { display: none; }
+.dash-renewal-banner { align-items: center; }
+.dash-renewal-banner .body { flex: 1; }
+.dash-renewal-banner-btn,
+#dash-renewal-banner-btn { flex-shrink: 0; }
+
+/* Mesma colisão de 3 vias (Feedback × Table × Dialog, os 3 carregados
+   globalmente nesta tela) já documentada abaixo pro toast de sucesso:
+   Dialog's `.body` (padding/cor de corpo de modal) vencia o `.body` do
+   Feedback por ser carregado por último no `<head>`. Restaura os valores
+   originais do Feedback, igual ao fix do toast — nenhum estilo novo. */
+.dash-renewal-banner .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+
 /* ── Toast de sucesso (herdado do placeholder anterior) ──────────────── */
 
 /* `top` soma a altura do Header (fixo, `--shell-header-height`) + um

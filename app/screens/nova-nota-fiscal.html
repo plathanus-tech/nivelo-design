@@ -76,7 +76,7 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos</span>
+                  <span class="app-nav-label">Produtos e serviços</span>
                 </button>
               </div>
             </div>
@@ -195,6 +195,10 @@
                       <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
                       <span class="app-nav-label">Certificado digital</span>
                     </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -278,7 +282,7 @@
             <section class="card nnf-view-section">
               <div class="cardHeader"><h2 class="title" id="nv-destinatario-title">Destinatário</h2></div>
               <dl class="nnf-view-fields">
-                <div><dt id="nv-pessoa-label">Cliente</dt><dd id="nv-pessoa-nome">—</dd></div>
+                <div><dt id="nv-pessoa-label">Cliente / Transportadora</dt><dd id="nv-pessoa-nome">—</dd></div>
                 <div><dt>CNPJ/CPF</dt><dd id="nv-pessoa-documento">—</dd></div>
                 <div><dt>UF</dt><dd id="nv-pessoa-uf">—</dd></div>
               </dl>
@@ -397,7 +401,7 @@
                 <h2 class="nnf-subsection-title">Destinatário</h2>
                 <div class="nnf-grid">
                   <div class="wrapper nnf-dropdown nnf-span-2" id="destinatario-field">
-                    <span class="label">Cliente</span>
+                    <span class="label">Cliente / Transportadora</span>
                     <button type="button" class="trigger" data-dropdown-trigger>
                       <span class="placeholder" data-dropdown-value>Selecione o cliente</span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
@@ -557,8 +561,8 @@
         <p class="text-body-s">Para emitir notas fiscais, você precisa ter um Certificado Digital cadastrado. Cadastre um certificado em <strong>Configuração &gt; Certificado Digital</strong> e tente novamente.</p>
       </div>
       <div class="footer">
-        <button type="button" class="btn secondaryGray" id="certificado-dialog-fechar">Fechar</button>
-        <button type="button" class="btn primary" id="certificado-dialog-ir">Ir para Certificado Digital</button>
+        <button type="button" class="btn secondaryGray sm" id="certificado-dialog-fechar">Fechar</button>
+        <button type="button" class="btn primary sm" id="certificado-dialog-ir">Ir para Certificado Digital</button>
       </div>
     </div>
   </div>

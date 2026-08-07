@@ -1,0 +1,320 @@
+/* ══════════════════════════════════════════════════════════
+   COMPRAR PLANO — fluxo de checkout (Plano → Modalidade → Pagamento → Confirmação)
+   Chrome minimalista de propósito (sem Sidebar): foco total na compra.
+   ══════════════════════════════════════════════════════════ */
+
+.cp-body { background-color: var(--color-bg-default); min-height: 100vh; }
+
+/* Guards do bug recorrente hidden+display incondicional deste projeto. */
+.alert[hidden],
+.overlay[hidden],
+.btn[hidden] { display: none; }
+
+/* Colisão RadioButton×Input, mesmo padrão documentado dezenas de vezes neste
+   projeto: RadioButton.module.css's `.input{opacity:0;position:absolute;
+   width:1px;height:1px}` (esconde o radio nativo) vaza pra QUALQUER
+   `<input class="input">` de texto real da página, já que os dois carregam
+   como CSS global cru. Sem isso, os campos do cartão ficam invisíveis. */
+.input:not([type="radio"]) { position: static; opacity: 1; width: 100%; height: auto; }
+/* RadioButton.module.css's `.option{display:inline-flex}` também vaza pro
+   `.option` do MENU do Dropdown (mesmo nome de classe, componente
+   diferente) — sem isso, as opções de parcelamento ficam lado a lado em vez
+   de empilhadas. Escopado só ao menu de parcelas, sem tocar no `.option`
+   real do RadioButton (Cartão/PIX). */
+#cp-parcelas-menu .option { display: block; width: 100%; }
+
+.cp-shell { display: flex; flex-direction: column; min-height: 100vh; }
+
+.cp-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+  background-color: var(--color-bg-surface);
+}
+.cp-logo { height: 28px; }
+.cp-exit-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+}
+.cp-exit-link:hover { color: var(--color-text-primary); text-decoration: underline; }
+
+.cp-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-3xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.cp-context-banner {
+  background-color: var(--color-bg-brand);
+  color: var(--color-text-brand);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+.cp-context-banner[hidden] { display: none; }
+
+/* ── Indicador de etapas (mesma linguagem visual do wizard de Criar Conta/Nova Fazenda) ── */
+.cp-steps[hidden] { display: none; }
+.cp-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: var(--spacing-sm);
+}
+.cp-step { display: flex; align-items: center; gap: var(--spacing-xs); }
+.cp-step-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-gray-100);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  flex-shrink: 0;
+}
+.cp-step.is-current .cp-step-circle { background-color: var(--color-brand-500); color: var(--color-gray-white); }
+.cp-step.is-complete .cp-step-circle { background-color: var(--color-status-success-fg); color: var(--color-gray-white); }
+.cp-step-label { color: var(--color-text-tertiary); font-size: var(--font-size-sm); }
+.cp-step.is-current .cp-step-label { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.cp-step-connector { width: 32px; height: var(--border-width-thin); background-color: var(--color-border-muted); }
+
+/* ── Painéis de etapa ── */
+.cp-step-panel[hidden] { display: none; }
+.cp-step-panel { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+.cp-step-head { text-align: center; display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.cp-step-title { color: var(--color-text-primary); margin: 0; }
+.cp-step-sub { color: var(--color-text-secondary); margin: 0; }
+
+.cp-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  align-self: flex-start;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  padding: 0;
+}
+.cp-back-link:hover { color: var(--color-text-primary); }
+
+.cp-step-actions { display: flex; justify-content: center; }
+
+/* Ação da Etapa de pagamento: Voltar sempre à esquerda, Confirmar pagamento (Cartão) ou
+   Verificar pagamento (PIX) sempre à direita — nunca os dois botões de ação juntos. */
+.cp-payment-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+/* ── Etapa 1: acordeão de planos (plano + modalidade no mesmo passo) ──
+   Deliberadamente NÃO é uma grade de cards de preço lado a lado (isso é o
+   visual da landing page) — aqui é uma lista vertical, um item por linha,
+   que expande in-place. Contexto é "alterar/contratar dentro do produto",
+   não "conhecer os planos pela primeira vez". */
+.cp-plan-accordion { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+
+.cp-plan-item {
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  overflow: hidden;
+  transition: border-color var(--transition-normal);
+}
+.cp-plan-item.is-open { border-color: var(--color-brand-500); }
+
+.cp-plan-item-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+.cp-plan-item-info { display: flex; flex-direction: column; gap: var(--spacing-3xs); flex: 1; min-width: 0; }
+.cp-plan-item-name { display: flex; align-items: center; gap: var(--spacing-sm); color: var(--color-text-primary); font-size: var(--font-size-base); font-weight: var(--font-weight-medium); }
+.cp-plan-item-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-brand);
+  background-color: var(--color-bg-brand);
+  padding: 2px var(--spacing-xs);
+  border-radius: var(--radius-full);
+}
+.cp-plan-item-tagline { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+.cp-plan-item-from { color: var(--color-text-tertiary); font-size: var(--font-size-sm); white-space: nowrap; flex-shrink: 0; }
+.cp-plan-item-chevron { flex-shrink: 0; color: var(--color-text-tertiary); transition: transform var(--transition-normal); }
+.cp-plan-item.is-open .cp-plan-item-chevron { transform: rotate(180deg); }
+
+.cp-plan-item-body { padding: 0 var(--spacing-lg) var(--spacing-lg); display: flex; flex-direction: column; gap: var(--spacing-md); }
+.cp-plan-item-body[hidden] { display: none; }
+
+.cp-plan-item-features { list-style: none; margin: 0; padding: var(--spacing-md) 0; border-top: var(--border-width-thin) solid var(--color-border-subtle); display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.cp-plan-item-features li { display: flex; align-items: flex-start; gap: var(--spacing-xs); font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+.cp-plan-item-features li i { flex-shrink: 0; margin-top: 2px; color: var(--color-action-success); }
+
+.cp-plan-modality-options { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+@media (min-width: 480px) { .cp-plan-modality-options { flex-direction: row; } }
+
+.cp-plan-modality-option {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color var(--transition-normal);
+}
+.cp-plan-modality-option.checked { border-color: var(--color-brand-500); border-width: var(--border-width-medium); }
+.cp-plan-modality-info { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.cp-plan-modality-info strong { display: flex; align-items: center; gap: var(--spacing-xs); color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.cp-plan-modality-price { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+.cp-plan-modality-price small { display: block; color: var(--color-text-tertiary); font-size: var(--font-size-xs); }
+.cp-plan-modality-save {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-brand);
+  background-color: var(--color-bg-brand);
+  padding: 2px var(--spacing-xs);
+  border-radius: var(--radius-full);
+}
+
+/* ── Etapa 2: pagamento ── */
+.cp-payment-layout { display: grid; grid-template-columns: 1fr; gap: var(--spacing-lg); align-items: start; }
+@media (min-width: 900px) { .cp-payment-layout { grid-template-columns: 1fr 320px; } }
+
+/* Mobile: resumo da compra vem ANTES do formulário (pedido explícito) — no desktop (grid de
+   2 colunas) a ordem visual volta ao normal (formulário à esquerda, resumo à direita). */
+.cp-summary-card { order: -1; }
+@media (min-width: 900px) { .cp-summary-card { order: 0; } }
+
+.cp-payment-form { display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+.cp-method-choice { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.cp-method-choice[hidden] { display: none; }
+.cp-method-options { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+@media (min-width: 480px) { .cp-method-options { flex-direction: row; } }
+.cp-method-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.cp-method-option:has(.input:checked) { border-color: var(--color-brand-500); }
+.cp-method-option span:last-child { display: inline-flex; align-items: center; gap: var(--spacing-2xs); }
+/* Garante o dot/borda marcados mesmo se a classe `.checked` (que o
+   RadioButton.module.css usa pra pintar o dot) não tiver sido sincronizada
+   via JS a tempo — `:has()` reflete o estado real do input nativo direto. */
+.cp-method-option:has(.input:checked) .circle { border-color: var(--color-action-primary); }
+.cp-method-option:has(.input:checked) .dot { opacity: 1; }
+.cp-plan-modality-option:has(.input:checked) .circle { border-color: var(--color-action-primary); }
+.cp-plan-modality-option:has(.input:checked) .dot { opacity: 1; }
+
+.cp-card-fields { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.cp-card-fields[hidden] { display: none; }
+.cp-card-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); }
+
+.cp-recorrencia-note { color: var(--color-text-tertiary); margin: 0; }
+.cp-recorrencia-note[hidden] { display: none; }
+
+.cp-pix-panel { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); text-align: center; }
+.cp-pix-panel[hidden] { display: none; }
+.cp-pix-qr { width: 200px; height: 200px; border: var(--border-width-thin) solid var(--color-border-muted); border-radius: var(--radius-sm); overflow: hidden; }
+.cp-pix-qr svg { width: 100%; height: 100%; display: block; }
+.cp-pix-copy-row { display: flex; gap: var(--spacing-sm); width: 100%; max-width: 380px; }
+.cp-pix-copy-row .wrapper { flex: 1; }
+.cp-pix-instructions { text-align: left; color: var(--color-text-secondary); margin: 0; padding-left: var(--spacing-lg); display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.cp-pix-status { display: flex; }
+
+.cp-coupon-row { display: flex; align-items: flex-end; gap: var(--spacing-sm); }
+.cp-coupon-input { flex: 1; }
+.cp-coupon-feedback { margin: calc(var(--spacing-sm) * -1) 0 0; }
+.cp-coupon-feedback[hidden] { display: none; }
+.cp-coupon-feedback.is-success { color: var(--color-status-success-fg); }
+.cp-coupon-feedback.is-error { color: var(--color-status-error-fg); }
+
+.cp-summary-card { padding: var(--spacing-lg); display: flex; flex-direction: column; gap: var(--spacing-md); position: sticky; top: var(--spacing-lg); }
+.cp-summary-title { color: var(--color-text-primary); margin: 0; }
+.cp-summary-grid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin: 0; }
+.cp-summary-grid > div { display: flex; justify-content: space-between; gap: var(--spacing-sm); }
+.cp-summary-grid dt { color: var(--color-text-tertiary); }
+.cp-summary-grid dd { color: var(--color-text-primary); margin: 0; text-align: right; }
+.cp-summary-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+  color: var(--color-text-primary);
+}
+.cp-summary-total-row strong { font-size: var(--font-size-xl); font-family: var(--font-heading); font-weight: var(--font-weight-medium); }
+
+/* ── Confirmação ── */
+.cp-confirmation { align-items: center; text-align: center; }
+.cp-confirmation-icon { color: var(--color-status-success-fg); }
+.cp-confirmation-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: 0;
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 420px;
+}
+.cp-confirmation-grid > div { display: flex; justify-content: space-between; }
+.cp-confirmation-grid dt { color: var(--color-text-tertiary); }
+.cp-confirmation-grid dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; }
+
+/* ── Overlay de carregamento ── */
+.cp-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  background-color: color-mix(in srgb, var(--color-gray-white) 88%, transparent);
+  color: var(--color-text-secondary);
+}
+.cp-loading-overlay[hidden] { display: none; }
+.cp-loading-spinner { color: var(--color-brand-500); animation: cp-spin 0.8s linear infinite; }
+@keyframes cp-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .cp-loading-spinner { animation: none; }
+}

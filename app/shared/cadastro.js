@@ -22,14 +22,27 @@
   var criteriaItems = Array.prototype.slice.call(document.querySelectorAll('.pwd-criteria-item'));
   var submitBtn = document.getElementById('signup-submit');
 
-  // ---------- Máscara de CPF (mesma regra do Login) ----------
-  function formatCPF(value) {
-    var digits = value.replace(/\D/g, '').slice(0, 11);
+  // ---------- Documento único (CPF ou CNPJ): máscara auto-detectada por
+  // tamanho, mesma técnica já usada em login.js/novo-manifesto.js — formata
+  // como CPF enquanto tiver até 11 dígitos, vira CNPJ a partir do 12º. ----------
+  function formatCPF(digits) {
     var out = digits.slice(0, 3);
     if (digits.length > 3) out += '.' + digits.slice(3, 6);
     if (digits.length > 6) out += '.' + digits.slice(6, 9);
     if (digits.length > 9) out += '-' + digits.slice(9, 11);
     return out;
+  }
+  function formatCNPJ(digits) {
+    var out = digits.slice(0, 2);
+    if (digits.length > 2) out += '.' + digits.slice(2, 5);
+    if (digits.length > 5) out += '.' + digits.slice(5, 8);
+    if (digits.length > 8) out += '/' + digits.slice(8, 12);
+    if (digits.length > 12) out += '-' + digits.slice(12, 14);
+    return out;
+  }
+  function formatCpfCnpjAuto(value) {
+    var digits = value.replace(/\D/g, '').slice(0, 14);
+    return digits.length > 11 ? formatCNPJ(digits) : formatCPF(digits);
   }
 
   function isValidCPF(value) {
@@ -51,13 +64,40 @@
     return digits.slice(9, 11) === String(d1) + String(d2);
   }
 
+  function isValidCNPJ(value) {
+    var digits = value.replace(/\D/g, '');
+    if (digits.length !== 14) return false;
+    if (/^(\d)\1{13}$/.test(digits)) return false;
+
+    function checkDigit(base, weights) {
+      var sum = 0;
+      for (var i = 0; i < base.length; i++) {
+        sum += parseInt(base.charAt(i), 10) * weights[i];
+      }
+      var rest = sum % 11;
+      return rest < 2 ? 0 : 11 - rest;
+    }
+
+    var w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    var w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    var base = digits.slice(0, 12);
+    var d1 = checkDigit(base, w1);
+    var d2 = checkDigit(base + d1, w2);
+    return digits.slice(12, 14) === String(d1) + String(d2);
+  }
+
+  function isValidCPF_orCNPJ(value) {
+    var digits = value.replace(/\D/g, '');
+    return digits.length > 11 ? isValidCNPJ(value) : isValidCPF(value);
+  }
+
   cpfInput.addEventListener('input', function () {
-    cpfInput.value = formatCPF(cpfInput.value);
-    if (cpfField.classList.contains('error')) setFieldError(cpfField, !isValidCPF(cpfInput.value));
+    cpfInput.value = formatCpfCnpjAuto(cpfInput.value);
+    if (cpfField.classList.contains('error')) setFieldError(cpfField, !isValidCPF_orCNPJ(cpfInput.value));
   });
   cpfInput.addEventListener('blur', function () {
     if (!cpfInput.value) { setFieldError(cpfField, false); return; }
-    setFieldError(cpfField, !isValidCPF(cpfInput.value));
+    setFieldError(cpfField, !isValidCPF_orCNPJ(cpfInput.value));
   });
 
   // ---------- Máscara de telefone (mesma regra de Recuperar Senha) ----------
@@ -161,10 +201,10 @@
       hasError = true;
     }
     if (!cpfInput.value) {
-      setFieldError(cpfField, true, 'Informe seu CPF.', cpfErrorText);
+      setFieldError(cpfField, true, 'Informe seu CPF ou CNPJ.', cpfErrorText);
       hasError = true;
-    } else if (!isValidCPF(cpfInput.value)) {
-      setFieldError(cpfField, true, 'Informe um CPF válido.', cpfErrorText);
+    } else if (!isValidCPF_orCNPJ(cpfInput.value)) {
+      setFieldError(cpfField, true, 'Informe um CPF ou CNPJ válido.', cpfErrorText);
       hasError = true;
     }
     if (!phoneInput.value) {
@@ -206,7 +246,7 @@
 
   if (state === 'required') {
     setFieldError(nameField, true, 'Informe seu nome.', nameErrorText);
-    setFieldError(cpfField, true, 'Informe seu CPF.', cpfErrorText);
+    setFieldError(cpfField, true, 'Informe seu CPF ou CNPJ.', cpfErrorText);
     setFieldError(phoneField, true, 'Informe seu telefone.', phoneErrorText);
     setFieldError(newpassField, true, 'Crie sua senha.', newpassErrorText);
   }
