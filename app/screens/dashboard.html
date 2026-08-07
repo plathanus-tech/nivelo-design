@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — Nivelo</title>
@@ -147,8 +148,8 @@
                   <span class="app-nav-label">Meus números</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
-                  <span class="app-nav-icon"><i data-lucide="message-square-plus" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Nova conversa</span>
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
                 </button>
               </div>
             </div>
@@ -725,12 +726,15 @@
   <div class="overlay" id="plan-expired-overlay" hidden>
     <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="plan-expired-title">
       <div class="header">
-        <h2 class="title" id="plan-expired-title">Seu plano expirou.</h2>
+        <h2 class="title" id="plan-expired-title">Seu plano expirou</h2>
       </div>
       <div class="body">
         <p class="text-body-s">Sua assinatura venceu e o acesso ao sistema foi pausado. Compre novamente para continuar usando o Nivelo.</p>
       </div>
       <div class="footer">
+        <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" class="btn secondary sm" id="plan-expired-contact">
+          Falar com administrador
+        </a>
         <button type="button" class="btn primary sm" id="plan-expired-buy">Comprar novamente</button>
       </div>
     </div>

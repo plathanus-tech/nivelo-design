@@ -155,7 +155,7 @@ window.PROTO_NAV_CONFIG = {
         },
         {
           id: 'nova-conversa',
-          label: 'Nova conversa',
+          label: 'Histórico',
           desktop: '../app/screens/nova-conversa.html'
         }
       ]
@@ -385,6 +385,53 @@ window.PROTO_NAV_CONFIG = {
           id: 'fiscal-nota-entrada',
           label: 'Fiscal',
           desktop: '../app/screens/fiscal.html'
+        },
+        // Épico "Minha Conta" (`type:'flow'`) — reorganiza a jornada "Minha
+        // Conta" pra dentro de Configuração; nenhuma tela/estado existente
+        // foi alterado, só a posição na árvore do navegador de protótipo.
+        {
+          id: 'minha-conta-epico',
+          label: 'Minha Conta',
+          type: 'flow',
+          screens: [
+            {
+              id: 'minha-conta-dados',
+              label: 'Minha Conta',
+              desktop: '../app/screens/minha-conta.html#tab=dados'
+            },
+            {
+              id: 'minha-conta-plano',
+              label: 'Minha Conta · Plano',
+              desktop: '../app/screens/minha-conta.html#tab=plano',
+              variants: [
+                { id: 'minha-conta-plano-teste', label: 'Período de teste', desktop: '../app/screens/minha-conta.html#tab=plano&state=teste' },
+                { id: 'minha-conta-plano-mensal', label: 'Ativo · Licença mensal', desktop: '../app/screens/minha-conta.html#tab=plano&state=mensal' },
+                { id: 'minha-conta-plano-aguardando', label: 'Aguardando pagamento', desktop: '../app/screens/minha-conta.html#tab=plano&state=aguardando' },
+                { id: 'minha-conta-plano-cancelado', label: 'Cancelado', desktop: '../app/screens/minha-conta.html#tab=plano&state=cancelado' }
+              ]
+            },
+            {
+              id: 'minha-conta-pagamento',
+              label: 'Minha Conta · Pagamento',
+              desktop: '../app/screens/minha-conta.html#tab=pagamento',
+              variants: [
+                { id: 'minha-conta-pagamento-mensal', label: 'Mensal · renovação automática ativa', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=mensal' },
+                { id: 'minha-conta-pagamento-mensal-cancelada', label: 'Mensal · renovação cancelada', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=mensal-cancelada' },
+                { id: 'minha-conta-pagamento-renovacaoproxima', label: 'Anual · vencendo em breve (aviso)', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=renovacaoproxima' },
+                { id: 'minha-conta-pagamento-vencido', label: 'Anual · plano vencido', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=vencido' },
+                { id: 'minha-conta-pagamento-aguardando', label: 'Aguardando pagamento', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=aguardando' }
+              ]
+            },
+            {
+              id: 'comprar-plano',
+              label: 'Contratar plano (fluxo de compra)',
+              desktop: '../app/screens/comprar-plano.html',
+              variants: [
+                { id: 'comprar-plano-renovacao', label: 'Via renovação de licença', desktop: '../app/screens/comprar-plano.html?motivo=renovacao' },
+                { id: 'comprar-plano-vencido', label: 'Via plano vencido', desktop: '../app/screens/comprar-plano.html?motivo=vencido' }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -674,44 +721,59 @@ window.PROTO_NAV_CONFIG = {
       ]
     },
     {
-      id: 'minha-conta',
-      label: 'Jornada · Minha Conta',
+      id: 'admin',
+      label: 'Jornada · Admin',
       screens: [
         {
-          id: 'minha-conta-dados',
-          label: 'Minha Conta',
-          desktop: '../app/screens/minha-conta.html#tab=dados'
-        },
-        {
-          id: 'minha-conta-plano',
-          label: 'Minha Conta · Plano',
-          desktop: '../app/screens/minha-conta.html#tab=plano',
+          id: 'admin-login',
+          label: 'Login (admin)',
+          desktop: '../admin/screens/login.html',
           variants: [
-            { id: 'minha-conta-plano-teste', label: 'Período de teste', desktop: '../app/screens/minha-conta.html#tab=plano&state=teste' },
-            { id: 'minha-conta-plano-mensal', label: 'Ativo · Licença mensal', desktop: '../app/screens/minha-conta.html#tab=plano&state=mensal' },
-            { id: 'minha-conta-plano-aguardando', label: 'Aguardando pagamento', desktop: '../app/screens/minha-conta.html#tab=plano&state=aguardando' },
-            { id: 'minha-conta-plano-cancelado', label: 'Cancelado', desktop: '../app/screens/minha-conta.html#tab=plano&state=cancelado' }
+            { id: 'admin-login-invalid', label: 'Campos inválidos', desktop: '../admin/screens/login.html#state=invalid' },
+            { id: 'admin-login-loading', label: 'Loading', desktop: '../admin/screens/login.html#state=loading' },
+            { id: 'admin-login-error', label: 'Erro de autenticação', desktop: '../admin/screens/login.html#state=error' },
+            { id: 'admin-login-passwordchanged', label: 'Senha atualizada com sucesso', desktop: '../admin/screens/login.html#state=passwordchanged' }
           ]
         },
         {
-          id: 'minha-conta-pagamento',
-          label: 'Minha Conta · Pagamento',
-          desktop: '../app/screens/minha-conta.html#tab=pagamento',
-          variants: [
-            { id: 'minha-conta-pagamento-mensal', label: 'Mensal · renovação automática ativa', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=mensal' },
-            { id: 'minha-conta-pagamento-mensal-cancelada', label: 'Mensal · renovação cancelada', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=mensal-cancelada' },
-            { id: 'minha-conta-pagamento-renovacaoproxima', label: 'Anual · vencendo em breve (aviso)', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=renovacaoproxima' },
-            { id: 'minha-conta-pagamento-vencido', label: 'Anual · plano vencido', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=vencido' },
-            { id: 'minha-conta-pagamento-aguardando', label: 'Aguardando pagamento', desktop: '../app/screens/minha-conta.html#tab=pagamento&state=aguardando' }
-          ]
-        },
-        {
-          id: 'comprar-plano',
-          label: 'Contratar plano (fluxo de compra)',
-          desktop: '../app/screens/comprar-plano.html',
-          variants: [
-            { id: 'comprar-plano-renovacao', label: 'Via renovação de licença', desktop: '../app/screens/comprar-plano.html?motivo=renovacao' },
-            { id: 'comprar-plano-vencido', label: 'Via plano vencido', desktop: '../app/screens/comprar-plano.html?motivo=vencido' }
+          id: 'admin-recuperar-senha-flow',
+          label: 'Recuperar senha (admin)',
+          type: 'flow',
+          screens: [
+            {
+              id: 'admin-recuperar-senha',
+              label: 'Recuperar senha',
+              desktop: '../admin/screens/recuperar-senha.html',
+              variants: [
+                { id: 'admin-recuperar-senha-required', label: 'Campo obrigatório', desktop: '../admin/screens/recuperar-senha.html#state=required' },
+                { id: 'admin-recuperar-senha-invalid', label: 'E-mail inválido', desktop: '../admin/screens/recuperar-senha.html#state=invalid' },
+                { id: 'admin-recuperar-senha-senderror', label: 'Erro ao enviar código', desktop: '../admin/screens/recuperar-senha.html#state=senderror' }
+              ]
+            },
+            {
+              id: 'admin-codigo-verificacao',
+              label: 'Código de verificação',
+              desktop: '../admin/screens/codigo-verificacao.html',
+              variants: [
+                { id: 'admin-codigo-verificacao-incorrect', label: 'Código incorreto', desktop: '../admin/screens/codigo-verificacao.html#state=incorrect' },
+                { id: 'admin-codigo-verificacao-expired', label: 'Código expirado', desktop: '../admin/screens/codigo-verificacao.html#state=expired' },
+                { id: 'admin-codigo-verificacao-toomany', label: 'Muitas tentativas', desktop: '../admin/screens/codigo-verificacao.html#state=toomany' },
+                { id: 'admin-codigo-verificacao-commerror', label: 'Erro de comunicação', desktop: '../admin/screens/codigo-verificacao.html#state=commerror' }
+              ]
+            },
+            {
+              id: 'admin-criar-nova-senha',
+              label: 'Criar nova senha',
+              desktop: '../admin/screens/criar-nova-senha.html',
+              variants: [
+                { id: 'admin-criar-nova-senha-required', label: 'Campos obrigatórios', desktop: '../admin/screens/criar-nova-senha.html#state=required' },
+                { id: 'admin-criar-nova-senha-criteriaunmet', label: 'Critérios não atendidos', desktop: '../admin/screens/criar-nova-senha.html#state=criteriaunmet' },
+                { id: 'admin-criar-nova-senha-mismatch', label: 'Senhas diferentes', desktop: '../admin/screens/criar-nova-senha.html#state=mismatch' },
+                { id: 'admin-criar-nova-senha-sameasold', label: 'Senha igual à anterior', desktop: '../admin/screens/criar-nova-senha.html#state=sameasold' },
+                { id: 'admin-criar-nova-senha-saveerror', label: 'Erro ao salvar', desktop: '../admin/screens/criar-nova-senha.html#state=saveerror' },
+                { id: 'admin-criar-nova-senha-success', label: 'Sucesso', desktop: '../admin/screens/login.html#state=passwordchanged' }
+              ]
+            }
           ]
         }
       ]

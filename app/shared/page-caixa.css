@@ -60,8 +60,18 @@
 }
 
 .caixa-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
   padding: var(--spacing-md) var(--spacing-md);
   border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+@media (min-width: 768px) {
+  .caixa-filter-bar {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
 }
 
 .caixa-filters {
@@ -73,8 +83,42 @@
 
 .caixa-filter { width: 100%; }
 @media (min-width: 768px) {
-  .caixa-filter { width: auto; flex: 0 1 220px; min-width: 180px; }
-  .caixa-filter-search { flex: 1 1 320px; min-width: 260px; }
+  /* Busca/Filtros/Exportar Excel na mesma linha: o grupo de filtros nunca
+     quebra linha no desktop (era `flex-wrap:wrap`, que empurrava "Filtros"
+     pra baixo quando a linha ficava estreita) — o grupo cresce (`flex:1`)
+     pra ocupar todo o espaço até o botão Exportar Excel, e dentro dele a
+     busca ocupa a largura máxima disponível (só o trigger de Filtros fica
+     na largura natural do conteúdo). */
+  .caixa-filters { flex: 1 1 auto; flex-wrap: nowrap; }
+  .caixa-filter { width: auto; flex: 0 0 auto; min-width: 0; }
+  .caixa-filter-search { flex: 1 1 auto; min-width: 140px; }
+}
+
+/* "Exportar Excel" — mesmo tratamento visual/posicionamento do botão já
+   usado em Estoque (page-estoque.css's #estoque-export-btn), pra manter o
+   mesmo padrão em toda tabela do sistema com exportação. */
+#caixa-export-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border-muted);
+  color: var(--color-text-secondary);
+  gap: var(--spacing-xs);
+}
+#caixa-export-btn:hover:not(:disabled) {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-300);
+  color: var(--color-text-primary);
+}
+#caixa-export-btn:active:not(:disabled) {
+  background: var(--color-gray-100);
+}
+@media (min-width: 768px) {
+  #caixa-export-btn { width: auto; }
 }
 
 .caixa-filters .caixa-filter.caixa-filter-search .input {

@@ -246,6 +246,18 @@
   }
 }
 
+/* Modal "Seu plano expirou" ganhou o mesmo 2º botão (secundário, "Falar com
+   administrador") do bloqueio de trial acima — mesmo risco de overflow no
+   Dialog `md` em telas estreitas, mesmo fix. */
+@media (max-width: 480px) {
+  #plan-expired-overlay .footer {
+    flex-direction: column;
+  }
+  #plan-expired-overlay .footer .btn {
+    width: 100%;
+  }
+}
+
 /* ── Filtros (Fazenda / Período) ──────────────────────────────────────── */
 
 .dashboard-filters {

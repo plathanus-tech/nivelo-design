@@ -936,6 +936,32 @@
     if (window.lucide) lucide.createIcons();
   }
 
+  // ---------- Exportar Excel (mesmo padrão exato de Estoque: CSV com BOM,
+  // respeita busca/filtros aplicados, não a paginação nem o dataset inteiro,
+  // exclui a coluna Ações). ----------
+  function exportToExcel() {
+    var rows = Array.prototype.slice.call(tbody.querySelectorAll('.tr')).filter(function (row) { return !row.classList.contains('is-filtered-out'); });
+    var headers = ['Cliente', 'Nº Documento', 'Histórico', 'Vencimento', 'Valor', 'Data de Emissão', 'Categoria', 'Status'];
+    var lines = [headers.join(';')];
+    rows.forEach(function (row) {
+      var values = [0, 1, 2, 3, 4, 5, 6, 7].map(function (i) { return cellText(row.children[i]); });
+      lines.push(values.join(';'));
+    });
+
+    var BOM = String.fromCharCode(0xFEFF);
+    var csv = BOM + lines.join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'contas-a-receber.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+  document.getElementById('ctr-export-btn').addEventListener('click', exportToExcel);
+
   // ---------- Boot: estado de carregamento breve > conteúdo real ----------
   var tableCard = document.querySelector('.ctr-table-card');
   tableCard.classList.add('is-loading');
