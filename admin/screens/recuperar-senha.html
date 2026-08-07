@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar senha — Nivelo Admin</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../shared/page-admin-login.css" />
+  <link rel="stylesheet" href="../shared/page-admin-recuperar-senha.css" />
+</head>
+<body class="admin-login-screen">
+
+  <div class="admin-login-shell">
+
+    <aside class="admin-login-panel" aria-hidden="true">
+      <img class="admin-login-panel-img" src="../../admin nivelo.png" alt="" />
+      <div class="admin-login-panel-overlay"></div>
+      <div class="admin-login-panel-copy">
+        <img class="admin-login-panel-logo" src="../../NIVELO branco header.svg" alt="Nivelo" />
+        <p class="admin-login-panel-heading">Gestão da plataforma em um só lugar</p>
+        <p class="admin-login-panel-text">Gerencie clientes, assinaturas, usuários e configurações da Nivelo com segurança, controle e eficiência</p>
+      </div>
+    </aside>
+
+    <main class="admin-login-page">
+    <img
+      class="admin-login-logo"
+      src="../../NIVELO azul header.svg"
+      alt="Nivelo"
+    />
+    <div class="admin-login-card">
+
+      <header class="admin-login-header">
+        <h1 class="admin-login-title text-heading-6">Recuperar senha</h1>
+        <p class="admin-login-sub">Informe seu e-mail para receber um código de verificação.</p>
+      </header>
+
+      <!-- Feedback: erro ao enviar o código -->
+      <div class="alert error admin-login-alert" role="alert" id="admin-send-error-banner" hidden>
+        <span class="icon"><i data-lucide="circle-x" width="18" height="18"></i></span>
+        <div class="body">
+          <div class="title">Não foi possível enviar o código de verificação</div>
+          <div class="message">Tente novamente.</div>
+        </div>
+      </div>
+
+      <form class="admin-login-form" id="admin-recover-form" data-state="idle" novalidate>
+
+        <!-- Campo E-mail (Input) -->
+        <div class="wrapper admin-login-field" id="admin-recover-email-field">
+          <label class="label admin-login-field-label" for="admin-recover-email">E-mail</label>
+          <div class="inputWrap">
+            <input
+              class="input admin-login-field-input"
+              type="email"
+              inputmode="email"
+              autocomplete="username"
+              id="admin-recover-email"
+              name="email"
+              placeholder="seuemail@nivelo.com.br"
+              aria-describedby="admin-recover-email-error"
+            />
+          </div>
+          <span class="errorText" id="admin-recover-email-error">
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            <span class="admin-recover-email-error-text">Informe seu e-mail.</span>
+          </span>
+        </div>
+
+        <div class="admin-login-button-row">
+          <!-- Ação principal -->
+          <button type="submit" class="btn primary admin-login-submit admin-login-full-btn" id="admin-recover-submit">
+            <span class="admin-login-submit-label">Receber código</span>
+            <span class="admin-login-submit-label-retry">Tentar novamente</span>
+            <span class="admin-login-submit-spinner" aria-hidden="true"></span>
+          </button>
+
+          <!-- Ação secundária: voltar -->
+          <a href="../screens/login.html" class="btn secondary admin-login-full-btn" id="admin-back-to-login-link">
+            Voltar para o Login
+          </a>
+        </div>
+      </form>
+
+    </div>
+    </main>
+
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/admin-recuperar-senha.js"></script>
+</body>
+</html>

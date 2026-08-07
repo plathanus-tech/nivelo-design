@@ -1,18 +1,18 @@
 /* ══════════════════════════════════════════════════════════
    window.NiveloAssistente — histórico de conversas do Assistente de IA
-   (Assistente IA > Nova conversa). Mesma convenção IIFE dos demais módulos
+   (Assistente IA > Histórico). Mesma convenção IIFE dos demais módulos
    de dados do protótipo (array em memória, sem persistência entre reloads —
    mesmo princípio documentado em manifestos-data.js/produtos-data.js).
 
+   Toda conversa acontece via WhatsApp (o sistema não inicia/recebe
+   conversas direto) — por isso não há mais um campo de origem por
+   conversa.
+
    Cada conversa: {
-     id, titulo, origem: 'sistema' | 'whatsapp', criadaEm (ISO),
+     id, titulo, criadaEm (ISO),
      mensagens: [{ id, autor: 'usuario' | 'assistente', tipo: 'texto' | 'audio',
                    conteudo (texto) | duracaoSeg (audio), horario (ISO) }]
-   }
-
-   Conversas iniciadas pelo WhatsApp e pelo Sistema usam o MESMO histórico,
-   diferenciando-se só pelo campo `origem` — nunca duas listas separadas
-   (nota de desenvolvimento explícita do pedido). */
+   } */
 (function () {
   'use strict';
 
@@ -23,21 +23,10 @@
     return d.toISOString();
   }
 
-  var seq = 0;
-  function novoId() {
-    seq += 1;
-    return 'conv-' + Date.now() + '-' + seq;
-  }
-  function novoMsgId() {
-    seq += 1;
-    return 'msg-' + Date.now() + '-' + seq;
-  }
-
   var CONVERSAS = [
     {
       id: 'conv-seed-1',
       titulo: 'Solicitação de Nota Fiscal',
-      origem: 'whatsapp',
       criadaEm: iso(0, 9, 12),
       mensagens: [
         { id: 'm1', autor: 'usuario', tipo: 'texto', conteudo: 'Preciso emitir uma nota fiscal de venda de soja', horario: iso(0, 9, 12) },
@@ -49,7 +38,6 @@
     {
       id: 'conv-seed-2',
       titulo: 'Registro de colheita — Talhão 02',
-      origem: 'sistema',
       criadaEm: iso(1, 14, 30),
       mensagens: [
         { id: 'm5', autor: 'usuario', tipo: 'texto', conteudo: 'Registrar colheita de 320 sacas de soja no talhão 02 de hoje', horario: iso(1, 14, 30) },
@@ -61,7 +49,6 @@
     {
       id: 'conv-seed-3',
       titulo: 'Despesa com adubo',
-      origem: 'whatsapp',
       criadaEm: iso(3, 8, 5),
       mensagens: [
         { id: 'm9', autor: 'usuario', tipo: 'audio', duracaoSeg: 8, horario: iso(3, 8, 5) },
@@ -71,7 +58,6 @@
     {
       id: 'conv-seed-4',
       titulo: 'Venda de café — Talhão 05',
-      origem: 'sistema',
       criadaEm: iso(5, 11, 0),
       mensagens: [
         { id: 'm11', autor: 'usuario', tipo: 'texto', conteudo: 'Quero anotar uma venda de café do talhão 05, 40 sacas', horario: iso(5, 11, 0) },
@@ -83,7 +69,6 @@
     {
       id: 'conv-seed-5',
       titulo: 'Dúvida sobre previsão do tempo',
-      origem: 'whatsapp',
       criadaEm: iso(7, 16, 40),
       mensagens: [
         { id: 'm15', autor: 'usuario', tipo: 'texto', conteudo: 'Vai chover essa semana?', horario: iso(7, 16, 40) },
@@ -93,7 +78,6 @@
     {
       id: 'conv-seed-6',
       titulo: 'Nota fiscal — devolução',
-      origem: 'sistema',
       criadaEm: iso(9, 10, 15),
       mensagens: [
         { id: 'm17', autor: 'usuario', tipo: 'texto', conteudo: 'Como emito uma nota de devolução?', horario: iso(9, 10, 15) },
@@ -114,58 +98,8 @@
     return CONVERSAS.filter(function (c) { return c.id === id; })[0] || null;
   }
 
-  function create(origem) {
-    var nova = {
-      id: novoId(),
-      titulo: 'Nova conversa',
-      origem: origem || 'sistema',
-      criadaEm: new Date().toISOString(),
-      mensagens: []
-    };
-    CONVERSAS.unshift(nova);
-    return nova;
-  }
-
-  function addMensagem(conversaId, mensagem) {
-    var conversa = findById(conversaId);
-    if (!conversa) return null;
-    var completa = Object.assign({ id: novoMsgId(), horario: new Date().toISOString() }, mensagem);
-    conversa.mensagens.push(completa);
-    // Título automático a partir da 1ª mensagem do usuário, enquanto a
-    // conversa ainda estiver com o título padrão.
-    if (conversa.titulo === 'Nova conversa' && mensagem.autor === 'usuario' && mensagem.tipo === 'texto') {
-      conversa.titulo = mensagem.conteudo.length > 48 ? (mensagem.conteudo.slice(0, 48).trim() + '…') : mensagem.conteudo;
-    }
-    return completa;
-  }
-
-  // ---------- Motor de resposta (mock) ----------
-  // Só reconhece 2 temas: notas fiscais e Caderno de Campo. Qualquer outro
-  // assunto recebe a mensagem padrão de indisponibilidade (regra explícita
-  // do pedido).
-  var RE_NOTA_FISCAL = /\bnota(s)? fiscal(is)?\b|\bnf-?e\b|\bemitir nota\b|\bdevolu[cç][aã]o\b/i;
-  var RE_CADERNO_CAMPO = /\bcaderno de campo\b|\bcolheita\b|\btalh[aã]o\b|\bdespesa\b|\bvenda\b|\banota[cç][aã]o\b|\bregistr(ar|o)\b/i;
-
-  function gerarResposta(textoUsuario) {
-    if (RE_NOTA_FISCAL.test(textoUsuario)) {
-      return 'Posso te ajudar com a emissão de notas fiscais! Me diga o destinatário, os itens e a quantidade que eu oriento no preenchimento — ou acesse Vendas > Notas fiscais > Nova Nota Fiscal a qualquer momento.';
-    }
-    if (RE_CADERNO_CAMPO.test(textoUsuario)) {
-      return 'Posso registrar isso no Caderno de Campo. Me diga a fazenda, o talhão e os detalhes (despesa, venda ou colheita) que eu confirmo antes de salvar.';
-    }
-    return 'No momento, posso ajudar apenas com solicitações de notas fiscais e registros no Caderno de Campo. Poderia reformular seu pedido dentro desses temas?';
-  }
-
-  function gerarRespostaAudio() {
-    return 'Recebi sua mensagem de voz! No momento ainda não consigo transcrever áudios automaticamente — poderia repetir sua solicitação por texto? Posso ajudar com notas fiscais ou registros no Caderno de Campo.';
-  }
-
   window.NiveloAssistente = {
     list: list,
-    findById: findById,
-    create: create,
-    addMensagem: addMensagem,
-    gerarResposta: gerarResposta,
-    gerarRespostaAudio: gerarRespostaAudio
+    findById: findById
   };
 })();

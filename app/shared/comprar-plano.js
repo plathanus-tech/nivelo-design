@@ -262,6 +262,15 @@
     });
   }
 
+  // Checkbox "Salvar este cartão" — Checkbox.module.css pinta o estado marcado via
+  // classe `.checked` no `<label>`, nunca via `:checked` do input nativo.
+  var saveCardCheckbox = document.getElementById('cp-save-card');
+  if (saveCardCheckbox) {
+    saveCardCheckbox.addEventListener('change', function () {
+      saveCardCheckbox.closest('.cp-save-card-checkbox').classList.toggle('checked', saveCardCheckbox.checked);
+    });
+  }
+
   Array.prototype.slice.call(document.querySelectorAll('input[name="cp-metodo"]')).forEach(function (radio) {
     radio.addEventListener('change', function () {
       pedido.metodo = radio.value;

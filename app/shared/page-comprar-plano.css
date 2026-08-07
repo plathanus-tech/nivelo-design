@@ -15,13 +15,43 @@
    width:1px;height:1px}` (esconde o radio nativo) vaza pra QUALQUER
    `<input class="input">` de texto real da página, já que os dois carregam
    como CSS global cru. Sem isso, os campos do cartão ficam invisíveis. */
-.input:not([type="radio"]) { position: static; opacity: 1; width: 100%; height: auto; }
+.input:not([type="radio"]):not([type="checkbox"]) { position: static; opacity: 1; width: 100%; height: auto; }
 /* RadioButton.module.css's `.option{display:inline-flex}` também vaza pro
    `.option` do MENU do Dropdown (mesmo nome de classe, componente
    diferente) — sem isso, as opções de parcelamento ficam lado a lado em vez
    de empilhadas. Escopado só ao menu de parcelas, sem tocar no `.option`
    real do RadioButton (Cartão/PIX). */
 #cp-parcelas-menu .option { display: block; width: 100%; }
+
+/* Checkbox "Salvar este cartão" — mesma colisão Input×Checkbox já documentada
+   em page-login.css: Checkbox.module.css's `.wrapper{display:inline-flex}`
+   (0,0,1,0) perde pra Input.module.css's `.wrapper:not([hidden]){display:
+   flex}` (0,0,2,0), então precisa de um seletor de 2 classes pra restaurar o
+   layout em linha. Checkbox.module.css também não esconde `.mark` quando não
+   marcado (só pinta o fundo do `.box` via `.checked`) — sem o fix abaixo, o
+   ícone de check ficaria sempre visível. */
+.wrapper.cp-save-card-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: auto;
+  cursor: pointer;
+}
+/* Checkbox.module.css's `.wrapper{align-items:center}` (regra crua, sem relação de
+   especificidade com nada em Input.module.css, que nunca declara align-items pra
+   `.wrapper`) vaza pra QUALQUER outro `.wrapper` da página — encolhia o `.inputWrap`
+   dos campos de cartão/cupom (e o trigger de Parcelamento) pro tamanho do conteúdo em
+   vez de esticar (`stretch`, o padrão real do componente), centralizando-os. */
+.wrapper:not(.cp-save-card-checkbox) { align-items: stretch; }
+.cp-save-card-checkbox .mark { display: none; }
+.cp-save-card-checkbox.checked .mark { display: flex; align-items: center; justify-content: center; }
+.cp-save-card-checkbox .label { color: var(--color-text-secondary); }
+/* RadioButton.module.css's `.label{font-weight:bold}` (rótulo do grupo Cartão/PIX) vaza
+   pro `.label` do checkbox por especificidade — mesmo fix (2 classes) já usado em
+   page-login.css's `.label.login-checkbox-label`. Peso Regular é o padrão real do
+   componente Checkbox (ver comentário em Checkbox.module.css: vem de `.text-16-regular`). */
+.label.cp-save-card-label { font-weight: var(--font-weight-regular); }
 
 .cp-shell { display: flex; flex-direction: column; min-height: 100vh; }
 

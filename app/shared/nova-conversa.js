@@ -3,19 +3,10 @@
 
   if (window.lucide) lucide.createIcons();
 
-  var ORIGEM_LABEL = { sistema: 'Via Sistema', whatsapp: 'Via WhatsApp' };
   var HISTORY_PAGE_SIZE = 5;
 
   var titleEl = document.getElementById('nc-title');
-  var originEl = document.getElementById('nc-origin');
   var messagesEl = document.getElementById('nc-messages');
-  var typingEl = document.getElementById('nc-typing');
-  var form = document.getElementById('nc-form');
-  var input = document.getElementById('nc-input');
-  var micBtn = document.getElementById('nc-mic-btn');
-  var recordingIndicator = document.getElementById('nc-recording-indicator');
-  var recordingTimeEl = document.getElementById('nc-recording-time');
-  var newBtn = document.getElementById('nc-new-btn');
   var historyList = document.getElementById('nc-history-list');
   var loadMoreBtn = document.getElementById('nc-loadmore-btn');
 
@@ -120,25 +111,25 @@
     var conversa = currentConversaId ? window.NiveloAssistente.findById(currentConversaId) : null;
 
     if (!conversa) {
-      titleEl.textContent = 'Nova conversa';
-      originEl.textContent = ORIGEM_LABEL.sistema;
+      titleEl.textContent = 'Selecione uma conversa';
       messagesEl.innerHTML =
         '<div class="nc-empty" id="nc-empty">' +
-          '<i data-lucide="bot" width="32" height="32"></i>' +
-          '<p class="text-body-s">Envie uma mensagem para começar. Posso ajudar com <strong>notas fiscais</strong> e <strong>registros no Caderno de Campo</strong>.</p>' +
+          '<i data-lucide="message-square" width="32" height="32"></i>' +
+          '<p class="text-body-s">Selecione uma conversa no histórico para visualizar as mensagens.</p>' +
         '</div>';
       if (window.lucide) lucide.createIcons();
       return;
     }
 
     titleEl.textContent = conversa.titulo;
-    originEl.textContent = ORIGEM_LABEL[conversa.origem] || ORIGEM_LABEL.sistema;
     messagesEl.innerHTML = conversa.mensagens.map(buildMensagemHTML).join('');
     if (window.lucide) lucide.createIcons();
     scrollToBottom();
   }
 
   // ---------- Histórico ----------
+  // Todas as conversas acontecem via WhatsApp agora — sem indicação de
+  // origem por conversa (o sistema não inicia/recebe conversas direto).
   function renderHistory() {
     var todas = window.NiveloAssistente.list();
     var visiveis = todas.slice(0, historyVisibleCount);
@@ -149,7 +140,7 @@
       return (
         '<button type="button" class="nc-history-item' + (ativa ? ' is-active' : '') + '" data-id="' + conversa.id + '">' +
           '<span class="nc-history-item-title text-body-s">' + conversa.titulo + '</span>' +
-          '<span class="nc-history-item-meta text-10-regular">' + formatData(dataRef) + ' · ' + (ORIGEM_LABEL[conversa.origem] || ORIGEM_LABEL.sistema) + '</span>' +
+          '<span class="nc-history-item-meta text-10-regular">' + formatData(dataRef) + '</span>' +
         '</button>'
       );
     }).join('');
@@ -167,91 +158,6 @@
   loadMoreBtn.addEventListener('click', function () {
     historyVisibleCount += HISTORY_PAGE_SIZE;
     renderHistory();
-  });
-
-  newBtn.addEventListener('click', function () {
-    currentConversaId = null;
-    renderConversaAtual();
-    renderHistory();
-    input.focus();
-  });
-
-  // ---------- Indicador de digitação + resposta do assistente ----------
-  function enviarComoUsuario(mensagemParcial) {
-    if (!currentConversaId) {
-      var nova = window.NiveloAssistente.create('sistema');
-      currentConversaId = nova.id;
-    }
-    window.NiveloAssistente.addMensagem(currentConversaId, Object.assign({ autor: 'usuario' }, mensagemParcial));
-    renderConversaAtual();
-    renderHistory();
-
-    typingEl.hidden = false;
-    scrollToBottom();
-    var atraso = 700 + Math.random() * 700;
-    window.setTimeout(function () {
-      var resposta = mensagemParcial.tipo === 'audio'
-        ? window.NiveloAssistente.gerarRespostaAudio()
-        : window.NiveloAssistente.gerarResposta(mensagemParcial.conteudo);
-      window.NiveloAssistente.addMensagem(currentConversaId, { autor: 'assistente', tipo: 'texto', conteudo: resposta });
-      typingEl.hidden = true;
-      renderConversaAtual();
-      renderHistory();
-    }, atraso);
-  }
-
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
-    var texto = input.value.trim();
-    if (!texto) return;
-    input.value = '';
-    enviarComoUsuario({ tipo: 'texto', conteudo: texto });
-  });
-
-  // ---------- Gravação de voz (mock — sem captura de áudio real) ----------
-  var isRecording = false;
-  var recordingStartedAt = null;
-  var recordingIntervalId = null;
-
-  function updateRecordingTime() {
-    var segundos = Math.floor((Date.now() - recordingStartedAt) / 1000);
-    var m = Math.floor(segundos / 60);
-    var s = segundos % 60;
-    recordingTimeEl.textContent = m + ':' + String(s).padStart(2, '0');
-  }
-
-  function startRecording() {
-    isRecording = true;
-    micBtn.classList.add('is-recording');
-    micBtn.setAttribute('aria-pressed', 'true');
-    micBtn.innerHTML = '<i data-lucide="square" width="16" height="16"></i>';
-    input.disabled = true;
-    recordingIndicator.hidden = false;
-    recordingStartedAt = Date.now();
-    updateRecordingTime();
-    recordingIntervalId = window.setInterval(updateRecordingTime, 500);
-    if (window.lucide) lucide.createIcons();
-  }
-
-  function stopRecording(enviar) {
-    isRecording = false;
-    micBtn.classList.remove('is-recording');
-    micBtn.setAttribute('aria-pressed', 'false');
-    micBtn.innerHTML = '<i data-lucide="mic" width="18" height="18"></i>';
-    input.disabled = false;
-    recordingIndicator.hidden = true;
-    window.clearInterval(recordingIntervalId);
-    if (window.lucide) lucide.createIcons();
-
-    if (enviar) {
-      var duracaoSeg = Math.max(1, Math.round((Date.now() - recordingStartedAt) / 1000));
-      enviarComoUsuario({ tipo: 'audio', duracaoSeg: duracaoSeg });
-    }
-  }
-
-  micBtn.addEventListener('click', function () {
-    if (isRecording) stopRecording(true);
-    else startRecording();
   });
 
   renderConversaAtual();

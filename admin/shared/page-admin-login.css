@@ -1,0 +1,358 @@
+/* ══════════════════════════════════════════════════════════
+   ADMIN LOGIN — cópia estrutural de app/shared/page-login.css
+   (mesma identidade visual do fluxo de autenticação do produto:
+   layout de 2 colunas, card sobreposto à imagem, tipografia,
+   espaçamento, cores, animações). Classes com prefixo `admin-`
+   pra não colidir com `app/` (cada superfície tem seu shared/
+   próprio, ver admin/CLAUDE.md) — mesmos valores/tokens, nunca
+   um hardcoded novo.
+   ══════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.admin-login-screen {
+  background-color: var(--color-gray-50);
+  background-image:
+    radial-gradient(ellipse 1200px 900px at 85% 15%, rgba(23, 82, 176, 0.08), transparent 65%),
+    radial-gradient(ellipse 900px 700px at 75% 95%, rgba(23, 82, 176, 0.05), transparent 65%);
+  background-repeat: no-repeat;
+}
+
+img { max-width: 100%; display: block; }
+
+/* ══════════════════════════════════════════════════════════
+   COLISÃO DE CLASSES ENTRE COMPONENTES DO STORYBOOK
+   Mesma causa raiz já documentada em app/shared/page-login.css:
+   Input.module.css e Checkbox.module.css compartilham `.wrapper`/
+   `.label`/`.input`, carregados juntos como stylesheets globais.
+   ══════════════════════════════════════════════════════════ */
+
+.wrapper.admin-login-field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: var(--spacing-xs);
+  text-align: left;
+}
+.wrapper.admin-login-checkbox {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  user-select: none;
+  padding: var(--spacing-xs) 0;
+}
+
+.label.admin-login-field-label { font-weight: var(--font-weight-medium); }
+.label.admin-login-checkbox-label { font-weight: var(--font-weight-regular); }
+
+.input.admin-login-field-input { position: static; width: 100%; height: 44px; opacity: 1; }
+.input.admin-login-checkbox-input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+.admin-login-checkbox .mark { display: none; }
+.admin-login-checkbox.checked .mark { display: flex; align-items: center; justify-content: center; }
+
+.wrapper.admin-login-field.error { background: transparent; border-color: transparent; }
+
+.errorText { display: none; }
+.wrapper.admin-login-field.error .errorText { display: flex; }
+
+/* ══════════════════════════════════════════════════════════
+   LAYOUT — shell de duas colunas (desktop 1024px+) / centralizado (mobile)
+   ══════════════════════════════════════════════════════════ */
+
+.admin-login-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-login-panel { display: none; }
+
+.admin-login-page {
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg) var(--spacing-md);
+}
+
+.admin-login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 600px;
+  background-color: color-mix(in srgb, var(--color-bg-surface) 98%, var(--color-brand-500) 2%);
+  border: var(--border-width-thin) solid color-mix(in srgb, var(--color-border-subtle) 85%, var(--color-brand-500) 15%);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+  .admin-login-page { padding: var(--spacing-3xl) var(--spacing-2xl); }
+  .admin-login-card { padding: var(--spacing-3xl) var(--spacing-2xl); }
+}
+
+@media (min-width: 1024px) {
+  .admin-login-shell { flex-direction: row; }
+
+  .admin-login-panel {
+    display: block;
+    position: relative;
+    flex: 0 0 65%;
+    overflow: hidden;
+  }
+  .admin-login-panel-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+    mask-image: linear-gradient(
+      90deg,
+      black 10%,
+      rgba(0, 0, 0, 0.9) 35%,
+      rgba(0, 0, 0, 0.65) 55%,
+      rgba(0, 0, 0, 0.32) 72%,
+      rgba(0, 0, 0, 0.08) 88%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      black 10%,
+      rgba(0, 0, 0, 0.9) 35%,
+      rgba(0, 0, 0, 0.65) 55%,
+      rgba(0, 0, 0, 0.32) 72%,
+      rgba(0, 0, 0, 0.08) 88%,
+      transparent 100%
+    );
+  }
+  .admin-login-panel-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--color-brand-950) 10%, transparent) 0%,
+      color-mix(in srgb, var(--color-brand-600) 7%, transparent) 100%
+    );
+    mask-image: linear-gradient(90deg, black 0%, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, black 0%, black 70%, transparent 100%);
+  }
+
+  .admin-login-panel-copy {
+    position: absolute;
+    left: var(--spacing-2xl);
+    bottom: var(--spacing-3xl);
+    max-width: 380px;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: color-mix(in srgb, var(--color-brand-950) 28%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: var(--border-width-thin) solid color-mix(in srgb, var(--color-gray-white) 14%, transparent);
+    border-radius: var(--radius-md);
+  }
+  .admin-login-panel-logo {
+    height: 34px;
+    width: auto;
+    margin: 0 0 var(--spacing-md);
+  }
+  .admin-login-panel-heading {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-white);
+    line-height: var(--line-height-snug);
+    margin: 0 0 var(--spacing-xs);
+  }
+  .admin-login-panel-text {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-light);
+    color: color-mix(in srgb, var(--color-gray-white) 82%, transparent);
+    line-height: var(--line-height-normal);
+    margin: 0;
+  }
+
+  .admin-login-page {
+    flex: 1;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-left: var(--spacing-3xl);
+  }
+
+  .admin-login-card {
+    width: clamp(420px, 40vw, 600px);
+    margin-left: -200px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   CABEÇALHO
+   ══════════════════════════════════════════════════════════ */
+
+.admin-login-header {
+  text-align: left;
+  margin-bottom: var(--spacing-lg);
+}
+
+.admin-login-logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  margin: 0 auto calc(var(--spacing-2xl) - 12px);
+}
+
+@media (min-width: 1024px) {
+  .admin-login-logo { display: none; }
+}
+
+.admin-login-title {
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.admin-login-sub {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-light);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .admin-login-title { font-size: var(--font-size-display-sm); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ALERTA (Feedback)
+   ══════════════════════════════════════════════════════════ */
+
+.admin-login-alert { margin-bottom: var(--spacing-lg); }
+.admin-login-alert[hidden] { display: none; }
+
+/* ══════════════════════════════════════════════════════════
+   FORMULÁRIO — mesma escala de espaçamento de app/shared/page-login.css
+   ══════════════════════════════════════════════════════════ */
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.admin-login-password-wrap .input { padding-right: 44px; }
+
+.admin-login-toggle-password {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+}
+.admin-login-toggle-password:hover { color: var(--color-text-primary); background-color: var(--color-bg-subtle); }
+.admin-login-toggle-password:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.admin-login-toggle-password:disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+
+.admin-login-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-top: calc(var(--spacing-sm) * -1);
+}
+
+.admin-login-forgot-link {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-link);
+  text-decoration: none;
+}
+.admin-login-forgot-link:hover { color: var(--color-text-link-hover); text-decoration: underline; }
+.admin-login-forgot-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+.admin-login-submit {
+  position: relative;
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--spacing-sm);
+}
+
+.admin-login-button-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+.admin-login-button-row .admin-login-submit { margin-top: 0; }
+
+.admin-login-full-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.admin-login-submit-label-retry { display: none; }
+
+.admin-login-submit-spinner {
+  display: none;
+  width: 18px;
+  height: 18px;
+  border: var(--border-width-medium) solid color-mix(in srgb, var(--color-gray-white) 40%, transparent);
+  border-top-color: var(--color-gray-white);
+  border-radius: var(--radius-full);
+  animation: admin-login-spin 0.6s linear infinite;
+}
+
+@keyframes admin-login-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ESTADOS DO FORMULÁRIO (idle / invalid / loading / error / senderror)
+   Controlados via [data-state] no <form>, setado por cada *.js a
+   partir de #state= na URL (hash, não query string — mesmo motivo já
+   documentado em app/shared/login.js: sobrevive a qualquer redirect
+   de servidor estático) — só pra demonstração no protótipo.
+   ══════════════════════════════════════════════════════════ */
+
+[data-state="loading"] .admin-login-submit-label { visibility: hidden; }
+[data-state="loading"] .admin-login-submit-spinner {
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -9px 0 0 -9px;
+}
+
+[data-state="senderror"] .admin-login-submit-label { display: none; }
+[data-state="senderror"] .admin-login-submit-label-retry { display: inline; }

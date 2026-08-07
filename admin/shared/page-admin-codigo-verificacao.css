@@ -1,0 +1,99 @@
+/* ══════════════════════════════════════════════════════════
+   CÓDIGO DE VERIFICAÇÃO (ADMIN) — tela 2 do fluxo de recuperação de
+   senha. Cópia estrutural de app/shared/page-codigo-verificacao.css
+   (mesmo componente OTP — 6 `Input` avulsos, contagem regressiva e
+   link de reenvio), só com os seletores de botão ajustados pro
+   prefixo `admin-login-*` usado em page-admin-login.css.
+   ══════════════════════════════════════════════════════════ */
+
+.otp-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.otp-inputs {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  width: 100%;
+}
+
+.input.otp-digit {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  text-align: center;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.otp-error { display: none; }
+.otp-group.error .otp-error { display: flex; }
+
+/* Mesma colisão de `.error` (Feedback × Input) já documentada em
+   app/shared/page-login.css — Feedback.module.css define um `.error`
+   bare que, carregado como stylesheet global, também pinta
+   `.otp-group.error`. */
+.otp-group.error { background: transparent; border-color: transparent; }
+
+.otp-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  margin-top: calc(var(--spacing-xs) * -1);
+}
+.otp-countdown-label {
+  color: var(--color-text-secondary);
+}
+.otp-countdown-time {
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.otp-countdown.is-ending .otp-countdown-time { color: var(--color-status-orange-fg); }
+
+.otp-resend {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+.otp-resend-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-link);
+  cursor: pointer;
+}
+.otp-resend-link:hover { color: var(--color-text-link-hover); text-decoration: underline; }
+.otp-resend-link:focus-visible {
+  outline: var(--border-width-medium) solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+.otp-resend-link:disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+
+.otp-resend-link.is-confirmed:disabled {
+  color: var(--color-status-success-fg);
+}
+
+[data-state="expired"] .otp-countdown,
+[data-state="expired"] .otp-resend,
+[data-state="toomany"] .otp-countdown,
+[data-state="toomany"] .otp-resend {
+  display: none;
+}
+
+[data-state="expired"] .admin-login-submit-label,
+[data-state="toomany"] .admin-login-submit-label {
+  display: none;
+}
+[data-state="expired"] .admin-login-submit-label-retry,
+[data-state="toomany"] .admin-login-submit-label-retry {
+  display: inline;
+}

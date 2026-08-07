@@ -26,6 +26,7 @@
       dataInicio: '2026-02-15',
       dataVencimento: '2027-02-15',
       renovacaoAutomatica: true,
+      cartao: { bandeira: 'Mastercard', final: '4521' },
       historico: [
         { data: '2026-02-15', plano: 'Gestão Completa + WhatsApp', tipo: 'Anual', valor: 1910.4, status: 'Pago' }
       ]
@@ -37,6 +38,7 @@
       dataInicio: '2026-07-26',
       dataVencimento: '2026-08-02',
       renovacaoAutomatica: false,
+      cartao: null,
       historico: []
     },
     mensal: {
@@ -46,6 +48,7 @@
       dataInicio: '2026-05-05',
       dataVencimento: '2026-08-05',
       renovacaoAutomatica: true,
+      cartao: { bandeira: 'Visa', final: '1234' },
       historico: [
         { data: '2026-05-05', plano: 'Fiscal + WhatsApp', tipo: 'Mensal', valor: 99, status: 'Pago' },
         { data: '2026-06-05', plano: 'Fiscal + WhatsApp', tipo: 'Mensal', valor: 99, status: 'Pago' },
@@ -59,6 +62,7 @@
       dataInicio: '2026-05-05',
       dataVencimento: '2026-08-05',
       renovacaoAutomatica: false,
+      cartao: { bandeira: 'Visa', final: '1234' },
       historico: [
         { data: '2026-06-05', plano: 'Fiscal + WhatsApp', tipo: 'Mensal', valor: 99, status: 'Pago' },
         { data: '2026-07-05', plano: 'Fiscal + WhatsApp', tipo: 'Mensal', valor: 99, status: 'Pago' }
@@ -71,6 +75,7 @@
       dataInicio: '2025-08-01',
       dataVencimento: '2026-08-01',
       renovacaoAutomatica: true,
+      cartao: { bandeira: 'Visa', final: '7789' },
       historico: [
         { data: '2025-08-01', plano: 'Gestão Completa', tipo: 'Anual', valor: 1622.4, status: 'Pago' }
       ]
@@ -82,6 +87,7 @@
       dataInicio: '2026-04-01',
       dataVencimento: '2026-07-01',
       renovacaoAutomatica: false,
+      cartao: { bandeira: 'Mastercard', final: '9042' },
       historico: [
         { data: '2026-04-01', plano: 'Fiscal', tipo: 'Mensal', valor: 29.9, status: 'Pago' },
         { data: '2026-05-01', plano: 'Fiscal', tipo: 'Mensal', valor: 29.9, status: 'Pago' },
@@ -95,6 +101,7 @@
       dataInicio: '2025-08-10',
       dataVencimento: '2026-08-15',
       renovacaoAutomatica: true,
+      cartao: { bandeira: 'Mastercard', final: '4521' },
       historico: [
         { data: '2025-08-10', plano: 'Gestão Completa + WhatsApp', tipo: 'Anual', valor: 1910.4, status: 'Pago' }
       ]
@@ -106,6 +113,7 @@
       dataInicio: '2025-07-01',
       dataVencimento: '2026-07-20',
       renovacaoAutomatica: true,
+      cartao: { bandeira: 'Visa', final: '3308' },
       historico: [
         { data: '2025-07-01', plano: 'Gestão Completa', tipo: 'Anual', valor: 1622.4, status: 'Pago' }
       ]

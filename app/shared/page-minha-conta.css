@@ -37,9 +37,61 @@
    projeto: RadioButton.module.css (carregado nesta tela pra Mensal/Anual do modal de troca
    de plano) declara `.input{opacity:0;position:absolute;width:1px;height:1px}` (esconde o
    radio nativo) e `.option{display:inline-flex}`, que vazam pros campos de texto reais do
-   formulário de Dados e pro `.option` do MENU do Dropdown de Estado. */
-.input:not([type="radio"]) { position: static; opacity: 1; width: 100%; height: auto; }
-#mc-estado-field .menu .option { display: block; width: 100%; }
+   formulário de Dados e pro `.option` do MENU do Dropdown de Estado/Motivo do cancelamento.
+   `[type="checkbox"]` também excluído (Checkbox.module.css, modal de cancelar renovação). */
+.input:not([type="radio"]):not([type="checkbox"]) { position: static; opacity: 1; width: 100%; height: auto; }
+#mc-estado-field .menu .option,
+#mc-cancel-reason-field .menu .option { display: block; width: 100%; }
+
+/* Checkbox.module.css's `.wrapper{align-items:center}` (regra crua, sem relação de
+   especificidade com Input.module.css, que nunca declara align-items pra `.wrapper`) vaza
+   pra QUALQUER outro `.wrapper` da página — centralizava o tablist (`.wrapper.mc-tabs`) e
+   encolhia label/inputWrap de todos os campos de formulário (Dados, modais de senha/cartão/
+   cancelar renovação) em vez de esticar (`stretch`, o padrão real do componente). */
+.wrapper:not(.mc-cancel-checkbox):not(.mc-card-save-checkbox) { align-items: stretch; }
+
+/* Checkbox "Estou ciente..." (modal Cancelar renovação) — mesma colisão Input×Checkbox já
+   documentada em page-login.css/page-comprar-plano.css: Checkbox.module.css's
+   `.wrapper{display:inline-flex}` perde pra Input's `.wrapper:not([hidden]){display:flex}`
+   por especificidade, e o `.mark` não é escondido por padrão pelo próprio componente. */
+.wrapper.mc-cancel-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: auto;
+  cursor: pointer;
+}
+.mc-cancel-checkbox .mark { display: none; }
+.mc-cancel-checkbox.checked .mark { display: flex; align-items: center; justify-content: center; }
+.mc-cancel-checkbox .label { color: var(--color-text-secondary); }
+/* RadioButton.module.css's `.label{font-weight:bold}` (rótulo do grupo Mensal/Anual do modal
+   de troca de plano, também carregado nesta tela) vaza pro `.label` deste checkbox por
+   especificidade — mesmo fix de 2 classes já usado em page-login.css/page-comprar-plano.css. */
+.label.mc-cancel-checkbox-label { font-weight: var(--font-weight-regular); }
+
+.mc-cancel-body { display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+/* Checkbox "Salvar este cartão" (modal Alterar cartão) — mesmo padrão exato do checkbox
+   acima/de page-comprar-plano.css: layout em linha + `.mark` escondido por padrão + peso
+   Regular no texto (RadioButton.module.css não é carregado aqui, mas o `.label` genérico
+   de Input.module.css já é Medium — o Checkbox real usa Regular via `.text-16-regular`). */
+.wrapper.mc-card-save-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: auto;
+  cursor: pointer;
+}
+.mc-card-save-checkbox .mark { display: none; }
+.mc-card-save-checkbox.checked .mark { display: flex; align-items: center; justify-content: center; }
+.mc-card-save-checkbox .label { color: var(--color-text-secondary); }
+.label.mc-card-save-label { font-weight: var(--font-weight-regular); }
+
+/* Validade + CVV lado a lado (modal Alterar cartão), mesmo padrão de `.cp-card-row` já
+   usado no fluxo de adicionar cartão em page-comprar-plano.css. */
+.mc-card-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); }
 
 /* ── Card genérico de formulário/consulta (reaproveita .card do Table) ── */
 .mc-card {
@@ -53,6 +105,13 @@
 .mc-section-title { color: var(--color-text-primary); margin: 0; font-weight: var(--font-weight-medium); }
 .mc-section-hint { color: var(--color-text-tertiary); margin: calc(var(--spacing-sm) * -1) 0 0; }
 .mc-optional { color: var(--color-text-tertiary); font-weight: var(--font-weight-regular); }
+
+/* Título do card "Cartão de pagamento": estava em `text-body-xl`/Medium (20px), destoando
+   do text-style de título de card já padronizado no resto do sistema (18px/Bold/
+   text-primary — mesmo usado no cabeçalho de "Histórico de compras" logo abaixo, e em
+   praticamente todo card de dados do app, ex. Estoque/Dashboard). Escopado só a este card,
+   sem tocar em "Dados cadastrais"/"Senha", que não foram mencionados. */
+#mc-card-card .mc-section-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); }
 
 /* Cabeçalho da seção "Dados cadastrais": título à esquerda, "Editar" no lado oposto. */
 .mc-section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); }

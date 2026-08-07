@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contratar plano — Nivelo</title>
@@ -12,6 +13,7 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Checkbox/Checkbox.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
@@ -121,6 +123,14 @@
               </div>
 
               <p class="cp-recorrencia-note text-body-s" id="cp-recorrencia-note" hidden>A assinatura será renovada automaticamente todos os meses.</p>
+
+              <label class="wrapper cp-save-card-checkbox" for="cp-save-card">
+                <input type="checkbox" class="input cp-save-card-input" id="cp-save-card" />
+                <span class="box">
+                  <span class="mark"><i data-lucide="check" width="12" height="12"></i></span>
+                </span>
+                <span class="label cp-save-card-label">Salvar este cartão para facilitar pagamentos futuros</span>
+              </label>
             </div>
 
             <div class="cp-coupon-row">

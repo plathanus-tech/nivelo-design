@@ -1,0 +1,33 @@
+/* ══════════════════════════════════════════════════════════
+   CRIAR NOVA SENHA (ADMIN) — tela 4 do fluxo de recuperação de
+   senha. Cópia estrutural de app/shared/page-criar-nova-senha.css
+   (lista de critérios de segurança, exibida dinamicamente conforme
+   o usuário digita).
+   ══════════════════════════════════════════════════════════ */
+
+.pwd-criteria {
+  list-style: none;
+  margin: calc(var(--spacing-sm) * -1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.pwd-criteria-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.pwd-criteria-icon { display: flex; align-items: center; flex-shrink: 0; }
+.pwd-criteria-icon--unmet { color: var(--color-text-tertiary); }
+.pwd-criteria-icon--met { display: none; color: var(--color-status-success-fg); }
+
+.pwd-criteria-item.met { color: var(--color-status-success-fg); }
+.pwd-criteria-item.met .pwd-criteria-icon--unmet { display: none; }
+.pwd-criteria-item.met .pwd-criteria-icon--met { display: flex; }
+
+.wrapper.admin-login-field.mismatch .input { border-color: var(--color-action-error); }

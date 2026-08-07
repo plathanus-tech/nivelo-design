@@ -77,7 +77,10 @@
   // ══════════════════════════════════════════════════════════
   (function () {
     var conta = window.NiveloMinhaConta.getConta();
-    var dadosInputs = ['mc-nome', 'mc-documento', 'mc-email', 'mc-telefone', 'mc-cep', 'mc-rua', 'mc-numero', 'mc-complemento', 'mc-bairro', 'mc-cidade', 'mc-nascimento'];
+    // CPF/CNPJ ("mc-documento") fica de fora de propósito — é usado para
+    // identificar o usuário, então permanece travado mesmo em modo Editar
+    // (nunca entra no toggle de disabled, nem visualmente nem no submit).
+    var dadosInputs = ['mc-nome', 'mc-email', 'mc-telefone', 'mc-cep', 'mc-rua', 'mc-numero', 'mc-complemento', 'mc-bairro', 'mc-cidade', 'mc-nascimento'];
 
     function fillFields(data) {
       document.getElementById('mc-nome').value = data.nome;
@@ -329,12 +332,16 @@
     function closePlanModal() { planModalOverlay.hidden = true; }
 
     // Período de teste: "Contratar agora" pula direto pro checkout (contratação nova),
-    // sem passar pelo modal de troca (que é só pra quem já é assinante).
+    // sem passar pelo modal de troca (que é só pra quem já é assinante). Licença anual
+    // ativa: o modal só lista upgrades (ver isAnualAtivo/openPlanModal acima), então o
+    // rótulo "Melhorar meu plano" descreve o CTA com mais precisão do que "Escolher outro
+    // plano" — não se aplica a anual aguardando pagamento, onde a troca não é só upgrade.
     var chooseBtn = document.getElementById('mc-choose-plan-btn');
     if (assinatura.status === 'teste') {
       chooseBtn.textContent = 'Contratar agora';
       chooseBtn.addEventListener('click', function () { window.location.href = 'comprar-plano.html'; });
     } else {
+      if (isAnualAtivo) chooseBtn.textContent = 'Melhorar meu plano';
       chooseBtn.addEventListener('click', openPlanModal);
     }
     document.getElementById('mc-plan-modal-close').addEventListener('click', closePlanModal);
@@ -481,19 +488,73 @@
       window.location.href = 'comprar-plano.html?motivo=vencido';
     });
 
-    // ---------- Cancelar renovação (modal de confirmação) ----------
+    // ---------- Cancelar renovação (modal de confirmação: motivo + ciência explícita) ----------
     var cancelOverlay = document.getElementById('mc-cancel-overlay');
+    var cancelConfirmBtn = document.getElementById('mc-cancel-confirm');
+    var cancelReasonField = document.getElementById('mc-cancel-reason-field');
+    var cancelReasonTrigger = document.getElementById('mc-cancel-reason-trigger');
+    var cancelReasonMenu = document.getElementById('mc-cancel-reason-menu');
+    var cancelReasonValueEl = cancelReasonTrigger.querySelector('[data-dropdown-value]');
+    var cancelCheckbox = document.getElementById('mc-cancel-confirm-checkbox');
+    var cancelCheckboxWrapper = cancelCheckbox.closest('.mc-cancel-checkbox');
+
+    function updateCancelConfirmState() {
+      cancelConfirmBtn.disabled = !cancelReasonField.dataset.value || !cancelCheckbox.checked;
+    }
+    // position:fixed calculado via JS (não o `position:absolute` padrão do componente) —
+    // o `.body` do Dialog tem overflow:auto, que cortaria o menu se ficasse relativo ao
+    // `.wrapper`, mesma técnica já usada em outros dropdowns dentro de modal neste projeto.
+    function positionCancelReasonMenu() {
+      var rect = cancelReasonTrigger.getBoundingClientRect();
+      cancelReasonMenu.style.position = 'fixed';
+      cancelReasonMenu.style.left = rect.left + 'px';
+      cancelReasonMenu.style.top = (rect.bottom + 4) + 'px';
+      cancelReasonMenu.style.width = rect.width + 'px';
+    }
+    function closeCancelReasonMenu() { cancelReasonField.classList.remove('open'); }
+    cancelReasonTrigger.addEventListener('click', function () {
+      var opening = !cancelReasonField.classList.contains('open');
+      cancelReasonField.classList.toggle('open');
+      if (opening) positionCancelReasonMenu();
+    });
+    cancelReasonMenu.addEventListener('click', function (event) {
+      var optionEl = event.target.closest('.option');
+      if (!optionEl) return;
+      Array.prototype.slice.call(cancelReasonMenu.querySelectorAll('.option')).forEach(function (o) { o.classList.remove('selected'); });
+      optionEl.classList.add('selected');
+      cancelReasonValueEl.textContent = optionEl.textContent;
+      cancelReasonValueEl.classList.remove('placeholder');
+      cancelReasonField.dataset.value = optionEl.dataset.value;
+      closeCancelReasonMenu();
+      updateCancelConfirmState();
+    });
+    document.addEventListener('click', function (event) {
+      if (!cancelReasonField.contains(event.target)) closeCancelReasonMenu();
+    });
+    cancelCheckbox.addEventListener('change', function () {
+      cancelCheckboxWrapper.classList.toggle('checked', cancelCheckbox.checked);
+      updateCancelConfirmState();
+    });
+
     document.getElementById('mc-cancel-renewal-btn').addEventListener('click', function () {
       document.getElementById('mc-cancel-until').textContent = formatBRDate(assinatura.dataVencimento);
+      cancelReasonValueEl.textContent = 'Selecione um motivo';
+      cancelReasonValueEl.classList.add('placeholder');
+      delete cancelReasonField.dataset.value;
+      Array.prototype.slice.call(cancelReasonMenu.querySelectorAll('.option')).forEach(function (o) { o.classList.remove('selected'); });
+      cancelCheckbox.checked = false;
+      cancelCheckboxWrapper.classList.remove('checked');
+      updateCancelConfirmState();
       cancelOverlay.hidden = false;
     });
-    function closeCancelModal() { cancelOverlay.hidden = true; }
+    function closeCancelModal() { cancelOverlay.hidden = true; closeCancelReasonMenu(); }
     document.getElementById('mc-cancel-close').addEventListener('click', closeCancelModal);
     document.getElementById('mc-cancel-back').addEventListener('click', closeCancelModal);
     cancelOverlay.addEventListener('click', function (event) {
       if (event.target === cancelOverlay) closeCancelModal();
     });
-    document.getElementById('mc-cancel-confirm').addEventListener('click', function () {
+    cancelConfirmBtn.addEventListener('click', function () {
+      if (cancelConfirmBtn.disabled) return;
       closeCancelModal();
       document.getElementById('mc-cancel-renewal-btn').hidden = true;
       var note = document.getElementById('mc-cancel-note');
@@ -501,6 +562,89 @@
       note.textContent = 'Renovação automática cancelada. O acesso permanecerá disponível até ' + formatBRDate(assinatura.dataVencimento) + '.';
       showToast('Renovação cancelada', 'Sua assinatura não será mais renovada automaticamente.');
     });
+
+    // ---------- Cartão de pagamento ----------
+    // Recorrente (mensal): mostra o cartão e permite alterar (afeta as próximas cobranças).
+    // Anual: o pagamento já foi processado/parcelado para esta contratação, então o cartão
+    // é só informativo — nunca oferece alterar (não existe "próxima cobrança" pra afetar).
+    var cardCard = document.getElementById('mc-card-card');
+    if (assinatura.cartao) {
+      cardCard.hidden = false;
+      var cardMaskedEl = document.getElementById('mc-card-masked');
+      var cardHintEl = document.getElementById('mc-card-hint');
+      var changeCardBtn = document.getElementById('mc-change-card-btn');
+      function renderCardInfo() {
+        cardMaskedEl.textContent = assinatura.cartao.bandeira + ' •••• ' + assinatura.cartao.final;
+      }
+      renderCardInfo();
+      if (assinatura.modalidade === 'mensal') {
+        cardHintEl.textContent = 'Usado na cobrança mensal da sua assinatura.';
+        changeCardBtn.hidden = false;
+      } else {
+        cardHintEl.textContent = 'Pagamento desta contratação já processado com este cartão.';
+      }
+
+      var cardOverlay = document.getElementById('mc-card-overlay');
+      var cardForm = document.getElementById('mc-card-form');
+      var cardNumberField = document.getElementById('mc-card-number-field');
+      var cardNumberInput = document.getElementById('mc-card-number');
+      var cardNameField = document.getElementById('mc-card-name-field');
+      var cardNameInput = document.getElementById('mc-card-name');
+      var cardExpiryField = document.getElementById('mc-card-expiry-field');
+      var cardExpiryInput = document.getElementById('mc-card-expiry');
+      var cardCvvField = document.getElementById('mc-card-cvv-field');
+      var cardCvvInput = document.getElementById('mc-card-cvv');
+      var cardSaveCheckbox = document.getElementById('mc-card-save');
+      var cardSaveWrapper = cardSaveCheckbox.closest('.mc-card-save-checkbox');
+      function openCardModal() {
+        cardNumberInput.value = '';
+        cardNameInput.value = '';
+        cardExpiryInput.value = '';
+        cardCvvInput.value = '';
+        cardSaveCheckbox.checked = false;
+        cardSaveWrapper.classList.remove('checked');
+        [cardNumberField, cardNameField, cardExpiryField, cardCvvField].forEach(function (f) { f.classList.remove('error'); });
+        cardOverlay.hidden = false;
+      }
+      function closeCardModal() { cardOverlay.hidden = true; }
+      changeCardBtn.addEventListener('click', openCardModal);
+      document.getElementById('mc-card-modal-close').addEventListener('click', closeCardModal);
+      document.getElementById('mc-card-modal-cancel').addEventListener('click', closeCardModal);
+      cardOverlay.addEventListener('click', function (event) {
+        if (event.target === cardOverlay) closeCardModal();
+      });
+      cardNumberInput.addEventListener('input', function () {
+        var digits = cardNumberInput.value.replace(/\D/g, '').slice(0, 16);
+        cardNumberInput.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+      });
+      cardExpiryInput.addEventListener('input', function () {
+        var digits = cardExpiryInput.value.replace(/\D/g, '').slice(0, 4);
+        cardExpiryInput.value = digits.length > 2 ? digits.slice(0, 2) + '/' + digits.slice(2) : digits;
+      });
+      cardCvvInput.addEventListener('input', function () { cardCvvInput.value = cardCvvInput.value.replace(/\D/g, '').slice(0, 4); });
+      cardSaveCheckbox.addEventListener('change', function () {
+        cardSaveWrapper.classList.toggle('checked', cardSaveCheckbox.checked);
+      });
+      cardForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var digits = cardNumberInput.value.replace(/\D/g, '');
+        var valid = true;
+        [
+          [cardNumberField, digits.length >= 13],
+          [cardNameField, !!cardNameInput.value.trim()],
+          [cardExpiryField, cardExpiryInput.value.length >= 5],
+          [cardCvvField, cardCvvInput.value.length >= 3]
+        ].forEach(function (pair) {
+          pair[0].classList.toggle('error', !pair[1]);
+          if (!pair[1]) valid = false;
+        });
+        if (!valid) return;
+        assinatura.cartao = { bandeira: assinatura.cartao.bandeira, final: digits.slice(-4) };
+        renderCardInfo();
+        closeCardModal();
+        showToast('Cartão atualizado', 'O novo cartão será usado nas próximas cobranças.');
+      });
+    }
 
     // ---------- Histórico de compras ----------
     var historyBody = document.getElementById('mc-history-body');

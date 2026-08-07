@@ -1,0 +1,55 @@
+/* ─────────────────────────────────────────────────────────
+ * Helvetica Neue — relative paths for file:// preview
+ * Overrides the absolute /fonts/ paths from tokens.css
+ * Cópia idêntica de app/shared/fonts.css — admin/ tem seu
+ * próprio shared/, mesma convenção já usada entre app/ e landing/.
+ * ───────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('../../Storybook-Nivelo/public/fonts/helveticaneue-light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('../../Storybook-Nivelo/public/fonts/helveticaneue-lightitalic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('../../Storybook-Nivelo/public/fonts/helveticaneue.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('../../Storybook-Nivelo/public/fonts/helveticaneue-medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('../../Storybook-Nivelo/public/fonts/helveticaneue-mediumitalic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('../../Storybook-Nivelo/public/fonts/helveticaneue-bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('../../Storybook-Nivelo/public/fonts/helveticaneue-bolditalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+}

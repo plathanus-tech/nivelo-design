@@ -31,6 +31,7 @@
   var thumbObserver = null;
   var hoverHideTimer = null;
   var allEntries = flattenAll();
+  var matchIndex = buildMatchIndex();
 
   function loadState() {
     try {
@@ -81,6 +82,65 @@
   function getSrc(ref, device) {
     if (device === 'mobile' && ref.mobile) return ref.mobile;
     return ref.desktop;
+  }
+
+  // ---------- Sincronização com navegação real dentro do iframe ----------
+  // O cliente clica em links de verdade dentro do protótipo (ex: Sidebar,
+  // "Ver detalhes", redirecionamentos de formulário) sem passar pela árvore
+  // deste navegador — sem isso, a tela realmente exibida podia divergir do
+  // item destacado na lista, confundindo quem está conferindo telas/
+  // variantes. `matchIndex` resolve, pra cada entrada da árvore, o
+  // pathname/query/hash reais da URL (desktop E mobile, já que algumas
+  // telas usam arquivos diferentes por device) — usado por
+  // `findMatchingEntry()` pra descobrir qual entrada da árvore corresponde
+  // à URL atual do iframe sempre que ele navega por conta própria.
+  function resolveUrlParts(url) {
+    if (!url) return null;
+    try {
+      var u = new URL(url, document.baseURI);
+      return { pathname: u.pathname, search: u.search, hash: u.hash };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function buildMatchIndex() {
+    var index = [];
+    allEntries.forEach(function (entry) {
+      [getSrc(entry.ref, 'desktop'), getSrc(entry.ref, 'mobile')].forEach(function (url) {
+        var parts = resolveUrlParts(url);
+        if (parts) index.push({ entry: entry, pathname: parts.pathname, search: parts.search, hash: parts.hash });
+      });
+    });
+    return index;
+  }
+
+  // 3 níveis de precisão, do mais específico pro mais genérico — sempre
+  // prefere uma entrada sem hash/query quando várias baterem (a tela "base",
+  // não uma variante específica), já que a maioria das navegações reais do
+  // produto não carrega o hash/query artificial que só existe pra
+  // demonstração de variante neste navegador.
+  function findMatchingEntry(pathname, search, hash) {
+    var exact = matchIndex.filter(function (m) {
+      return m.pathname === pathname && m.search === search && m.hash === hash;
+    });
+    if (exact.length) return exact[0].entry;
+
+    var samePathAndSearch = matchIndex.filter(function (m) {
+      return m.pathname === pathname && m.search === search;
+    });
+    if (samePathAndSearch.length) {
+      var noHash = samePathAndSearch.filter(function (m) { return m.hash === ''; })[0];
+      return (noHash || samePathAndSearch[0]).entry;
+    }
+
+    var samePath = matchIndex.filter(function (m) { return m.pathname === pathname; });
+    if (samePath.length) {
+      var plain = samePath.filter(function (m) { return m.hash === '' && m.search === ''; })[0];
+      return (plain || samePath[0]).entry;
+    }
+
+    return null;
   }
 
   function journeyKey(journey) {
@@ -380,9 +440,6 @@
     var entry = findEntry(id);
     if (!entry) return;
 
-    state.screenId = id;
-    saveState();
-
     var src = getSrc(entry.ref, state.device);
     var currentAttr = els.mainFrame.getAttribute('src') || '';
     var currentPath = currentAttr.split('#')[0];
@@ -402,17 +459,59 @@
       els.mainFrame.src = src;
     }
 
-    els.openRaw.href = src;
+    applySelection(entry);
+  }
+
+  // Atualiza só o estado/destaque da árvore (nunca o `src` do iframe) — usado
+  // tanto pelo clique na árvore (depois de já ter navegado) quanto pela
+  // sincronização automática quando o PRÓPRIO conteúdo do iframe navega
+  // (ver `onFrameNavigated` abaixo), caso em que o iframe já está na tela
+  // certa e recarregá-lo de novo perderia o estado real da navegação.
+  function applySelection(entry) {
+    state.screenId = entry.id;
+    saveState();
+
+    els.openRaw.href = getSrc(entry.ref, state.device);
     els.currentLabel.textContent =
       entry.journey.label + ' / ' +
       (entry.flow ? entry.flow.label + ' / ' : '') +
       entry.screen.label + (entry.isVariant ? ' / ' + entry.ref.label : '');
 
-    highlightActive(id);
+    highlightActive(entry.id);
     try {
-      history.replaceState(null, '', '#' + id);
+      history.replaceState(null, '', '#' + entry.id);
     } catch (e) {}
   }
+
+  // O cliente navega dentro do protótipo por conta própria (Sidebar, links
+  // "Ver detalhes", redirecionamentos pós-formulário) sem passar pela árvore
+  // — cada navegação real do iframe (load de página nova OU troca de hash
+  // dentro da mesma página, ex. abas controladas por `#tab=`) tenta
+  // encontrar a entrada correspondente e realça ela, sem tocar no `src` do
+  // iframe (que já está correto, foi o próprio usuário que navegou).
+  //
+  // Lê a URL via `postMessage` (enviada pela própria tela, `nav-sync.js`),
+  // nunca acessando `iframe.contentWindow.location` direto — isso é
+  // bloqueado pelo navegador quando o protótipo é aberto via `file://`
+  // (duplo clique): cada arquivo local vira uma origem isolada aos olhos do
+  // Chrome, e ler a location de um iframe de outra "origem" lança
+  // SecurityError, mesmo sendo tudo local. `postMessage` funciona
+  // independente disso, então essa é a única forma robusta pros dois casos
+  // (servidor local E arquivo aberto direto).
+  function onNavSyncMessage(event) {
+    var data = event.data;
+    if (!data || data.source !== 'nivelo-proto-nav' || !data.href) return;
+
+    var parts = resolveUrlParts(data.href);
+    if (!parts) return;
+
+    var matched = findMatchingEntry(parts.pathname, parts.search, parts.hash);
+    if (matched && matched.id !== state.screenId) {
+      applySelection(matched);
+    }
+  }
+
+  window.addEventListener('message', onNavSyncMessage);
 
   function highlightActive(id) {
     var items = els.tree.querySelectorAll('.pn-item');
