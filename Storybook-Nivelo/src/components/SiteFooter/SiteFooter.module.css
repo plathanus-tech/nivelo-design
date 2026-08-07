@@ -84,11 +84,19 @@
   outline-offset: 3px;
 }
 
-/* Telefone de vendas */
+/* Telefone (Vendas/Suporte etc.) */
 .phoneBlock {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-2xs);
+}
+/* +8px de respiro entre Redes sociais/1º bloco de telefone/2º bloco de
+   telefone (mesmo padrão de `page-v3.css`) — só entre esses blocos, sem
+   alterar o gap logo→redes sociais (que continua no `gap` padrão do
+   `.brand`). */
+.social + .phoneBlock,
+.phoneBlock + .phoneBlock {
+  margin-top: var(--spacing-sm);
 }
 
 .phoneLabel {

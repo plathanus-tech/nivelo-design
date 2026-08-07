@@ -82,7 +82,7 @@ CSS classes (para uso em HTML via `<link>`):
 Rodapé da landing page. 3 colunas: Institucional (logo + redes + telefone), Navegação, Legal.
 Mobile: empilhado. Desktop (768px+): linha horizontal.
 
-Props: `logoSrc`, `logoAlt`, `socialLinks[]`, `phone`, `phoneDisplay`, `navLinks[]`, `legalLinks[]`, `copyright`
+Props: `logoSrc`, `logoAlt`, `socialLinks[]`, `phoneBlocks[]` (`{label, phone, phoneDisplay}` — 0, 1 ou mais, ex. Vendas+Suporte), `navLinks[]`, `legalLinks[]`, `copyright`
 
 CSS classes (para uso em HTML via `<link>`):
 `.footer` `.inner` `.columns` `.brand` `.logoLink` `.social` `.phoneBlock` `.phoneLabel`

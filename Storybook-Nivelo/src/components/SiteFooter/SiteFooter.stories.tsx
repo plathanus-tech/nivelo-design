@@ -16,11 +16,16 @@ const IconFacebook = () => (
   </svg>
 );
 
-const IconLinkedIn = () => (
+const IconTikTok = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-    <rect x="2" y="9" width="4" height="12"/>
-    <circle cx="4" cy="4" r="2"/>
+    <path d="M9 12a4 4 0 1 0 4 4V4a6 6 0 0 0 6 6"/>
+  </svg>
+);
+
+const IconYouTube = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
+    <path d="m10 15 5-3-5-3z"/>
   </svg>
 );
 
@@ -40,10 +45,13 @@ export const Default: Story = {
     socialLinks: [
       { label: 'Instagram da Nivelo', href: '#', icon: <IconInstagram /> },
       { label: 'Facebook da Nivelo',  href: '#', icon: <IconFacebook /> },
-      { label: 'LinkedIn da Nivelo',  href: '#', icon: <IconLinkedIn /> },
+      { label: 'TikTok da Nivelo',    href: '#', icon: <IconTikTok /> },
+      { label: 'YouTube da Nivelo',   href: '#', icon: <IconYouTube /> },
     ],
-    phone:        '+5511999999999',
-    phoneDisplay: '(11) 99999-9999',
+    phoneBlocks: [
+      { label: 'Vendas',  phone: '+5511999999999', phoneDisplay: '(11) 99999-9999' },
+      { label: 'Suporte', phone: '+5511988888888', phoneDisplay: '(11) 98888-8888' },
+    ],
     navLinks: [
       { label: 'Funcionalidades',    href: '#funcionalidades' },
       { label: 'Planos',             href: '#planos' },
@@ -56,7 +64,7 @@ export const Default: Story = {
       { label: 'Politica de Privacidade', onClick: () => alert('Privacidade') },
       { label: 'LGPD',                 onClick: () => alert('LGPD') },
     ],
-    copyright: '© 2025 Nivelo. Todos os direitos reservados.',
+    copyright: '© 2026 Nivelo',
   },
 };
 
@@ -72,7 +80,6 @@ export const SemTelefone: Story = {
   name: 'Sem telefone',
   args: {
     ...Default.args,
-    phone:        undefined,
-    phoneDisplay: undefined,
+    phoneBlocks: [],
   },
 };

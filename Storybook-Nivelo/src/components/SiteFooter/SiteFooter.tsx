@@ -17,16 +17,23 @@ export interface FooterLegalLink {
   onClick: () => void;
 }
 
+export interface FooterPhoneBlock {
+  /** Rótulo acima do número (ex: "Vendas", "Suporte") */
+  label: string;
+  /** Número para href tel: (ex: "+5511999999999") */
+  phone: string;
+  /** Número formatado para exibição (ex: "(11) 99999-9999") */
+  phoneDisplay: string;
+}
+
 export interface SiteFooterProps {
   /** Logo exibida no rodapé (versão branca recomendada) */
   logoSrc: string;
   logoAlt?: string;
   /** Links de redes sociais */
   socialLinks?: FooterSocialLink[];
-  /** Número para href tel: (ex: "+5511999999999") */
-  phone?: string;
-  /** Número formatado para exibição (ex: "(11) 99999-9999") */
-  phoneDisplay?: string;
+  /** Blocos de telefone (Vendas, Suporte etc.) — 0, 1 ou mais */
+  phoneBlocks?: FooterPhoneBlock[];
   /** Links da coluna Navegação */
   navLinks?: FooterNavLink[];
   /** Links legais da coluna Legal (Termos, Privacidade, LGPD) */
@@ -39,11 +46,10 @@ export function SiteFooter({
   logoSrc,
   logoAlt = 'Nivelo',
   socialLinks = [],
-  phone,
-  phoneDisplay,
+  phoneBlocks = [],
   navLinks = [],
   legalLinks = [],
-  copyright = '© 2025 Nivelo. Todos os direitos reservados.',
+  copyright = '© 2026 Nivelo',
 }: SiteFooterProps) {
   return (
     <footer className={styles.footer} role="contentinfo">
@@ -73,14 +79,14 @@ export function SiteFooter({
               </div>
             )}
 
-            {phone && phoneDisplay && (
-              <div className={styles.phoneBlock}>
-                <p className={`${styles.phoneLabel} text-10-regular`}>Vendas</p>
-                <a href={`tel:${phone}`} className={`${styles.phoneNumber} text-subtitle-l`}>
-                  {phoneDisplay}
+            {phoneBlocks.map(block => (
+              <div key={block.label} className={styles.phoneBlock}>
+                <p className={`${styles.phoneLabel} text-10-regular`}>{block.label}</p>
+                <a href={`tel:${block.phone}`} className={`${styles.phoneNumber} text-subtitle-l`}>
+                  {block.phoneDisplay}
                 </a>
               </div>
-            )}
+            ))}
           </div>
 
           {/* Coluna 2: Navegação */}
