@@ -1,0 +1,16 @@
+import{j as e}from"./jsx-runtime-DiklIkkE.js";import{r as O}from"./index-DRjF_FHU.js";import{C as b}from"./chevron-down-nqZkofZo.js";import"./createLucideIcon-B3K6bXbU.js";const A="_accordion_46934_1",D="_item_46934_3",C="_trigger_46934_12",N="_chevron_46934_33",k="_open_46934_39",q="_panel_46934_41",M="_content_46934_50",s={accordion:A,item:D,trigger:C,chevron:N,open:k,panel:q,content:M};function j({items:i,allowMultiple:y=!1,defaultOpenIndex:S=[]}){const[d,w]=O.useState(new Set(S)),I=n=>{w(t=>{const o=new Set(t);return o.has(n)?o.delete(n):(y||o.clear(),o.add(n)),o})};return e.jsx("div",{className:s.accordion,children:i.map((n,t)=>e.jsxs("div",{className:[s.item,d.has(t)?s.open:""].join(" "),children:[e.jsxs("button",{className:`${s.trigger} text-subtitle-m`,onClick:()=>I(t),"aria-expanded":d.has(t),children:[e.jsx("span",{children:n.title}),e.jsx("span",{className:s.chevron,children:e.jsx(b,{size:16})})]}),e.jsx("div",{className:s.panel,"aria-hidden":!d.has(t),children:e.jsx("div",{className:`${s.content} text-body-m`,children:n.content})})]},t))})}j.__docgenInfo={description:"",methods:[],displayName:"Accordion",props:{items:{required:!0,tsType:{name:"Array",elements:[{name:"AccordionItem"}],raw:"AccordionItem[]"},description:""},allowMultiple:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}},defaultOpenIndex:{required:!1,tsType:{name:"Array",elements:[{name:"number"}],raw:"number[]"},description:"",defaultValue:{value:"[]",computed:!1}}}};const l=[{title:"O que é o Prana Design System?",content:"O Prana Design System é uma biblioteca de componentes e tokens de design criada para padronizar a experiência visual dos produtos Prana."},{title:"Como instalar os componentes?",content:'Importe diretamente do pacote: `import { Button } from "@prana/design-system"`. Certifique-se de importar também o arquivo de tokens CSS.'},{title:"Suporte a dark mode?",content:"Sim. Todos os tokens semânticos possuem versões Light e Dark configuradas no Figma, prontas para serem usadas com `prefers-color-scheme` ou um seletor de tema."}],V={title:"Components/Accordion",component:j,tags:["autodocs"],decorators:[i=>e.jsx("div",{style:{width:480},children:e.jsx(i,{})})]},a={args:{items:l}},r={args:{items:l,defaultOpenIndex:[0]}},c={args:{items:l,allowMultiple:!0,defaultOpenIndex:[0,1]}};var m,p,u;a.parameters={...a.parameters,docs:{...(m=a.parameters)==null?void 0:m.docs,source:{originalSource:`{
+  args: {
+    items
+  }
+}`,...(u=(p=a.parameters)==null?void 0:p.docs)==null?void 0:u.source}}};var f,g,x;r.parameters={...r.parameters,docs:{...(f=r.parameters)==null?void 0:f.docs,source:{originalSource:`{
+  args: {
+    items,
+    defaultOpenIndex: [0]
+  }
+}`,...(x=(g=r.parameters)==null?void 0:g.docs)==null?void 0:x.source}}};var _,h,v;c.parameters={...c.parameters,docs:{...(_=c.parameters)==null?void 0:_.docs,source:{originalSource:`{
+  args: {
+    items,
+    allowMultiple: true,
+    defaultOpenIndex: [0, 1]
+  }
+}`,...(v=(h=c.parameters)==null?void 0:h.docs)==null?void 0:v.source}}};const $=["Default","DefaultOpen","AllowMultiple"];export{c as AllowMultiple,a as Default,r as DefaultOpen,$ as __namedExportsOrder,V as default};
