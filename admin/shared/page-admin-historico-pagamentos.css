@@ -1,0 +1,272 @@
+/*
+ * Histórico de Pagamentos (Backoffice > Assinantes > Histórico). Visão financeira geral do
+ * sistema — nunca duplica as ações de gestão do cliente (Alterar plano/Bloquear/Liberar/
+ * Conceder dias), que continuam só em Assinantes. Mesma arquitetura de página das demais telas
+ * do admin: `.card` transparente no mobile, sólido a partir de 768px; tabela real desktop +
+ * Cards mobile; Ações sticky à direita; toast de sucesso; paginação real (10/página, mesmo
+ * algoritmo já usado em Contas a Receber/Contas a Pagar do cliente).
+ */
+
+.hp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.hp-title { color: var(--color-text-primary); margin: 0; }
+.hp-subtitle { color: var(--color-text-secondary); margin: 0; }
+
+/* ---------- Filtro ativo por cliente (chegando do perfil do assinante) ---------- */
+.hp-active-client-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-brand);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+.hp-active-client-note[hidden] { display: none; }
+
+/* ---------- Resumo financeiro — mesma cópia estrutural exata do padrão já usado em
+   Estoque/Caixa/Contas a Pagar/Receber do cliente (tamanho fixo 12px/24px em qualquer
+   largura, decisão de padronização já feita nesses módulos). ---------- */
+.hp-summary-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) { .hp-summary-row { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .hp-summary-row { grid-template-columns: repeat(4, 1fr); } }
+
+.hp-summary-card { padding: var(--spacing-md); }
+.hp-summary-card .cardHeader { padding: 0; margin-bottom: var(--spacing-sm); }
+.hp-summary-title-row { display: flex; align-items: center; gap: var(--spacing-xs); }
+.hp-summary-icon { display: inline-flex; color: var(--color-text-brand); flex-shrink: 0; }
+.hp-summary-card .title { font-size: 12px; font-weight: var(--font-weight-bold); }
+.hp-summary-body { display: flex; }
+.hp-summary-value {
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+}
+
+.card.hp-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.hp-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+/* ---------- Busca + Filtros ---------- */
+.hp-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+.hp-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+.hp-filter { width: 100%; }
+@media (min-width: 768px) {
+  .hp-filter { width: auto; flex: 0 1 220px; min-width: 180px; }
+  .hp-filter-search { flex: 1 1 280px; min-width: 240px; }
+}
+.hp-filters .hp-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+#hp-filtros-trigger-root .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  justify-content: flex-start;
+  gap: var(--spacing-xs);
+}
+.hp-filtros-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-tertiary); }
+
+.hp-filter-popover:not([hidden]) {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: calc(100vh - var(--spacing-xl));
+  overflow-y: auto;
+}
+.hp-filter-popover .trigger { height: 36px; font-size: var(--font-size-sm); padding: var(--spacing-xs) var(--spacing-sm); }
+.hp-filter-popover .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
+.hp-filter-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.hp-period-custom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-md);
+}
+.hp-period-custom[hidden] { display: none; }
+
+/* ---------- Tabela (desktop) ---------- */
+.hp-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  min-height: 40px;
+  white-space: normal;
+  line-height: 1.3;
+  vertical-align: middle;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.hp-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+.hp-table-card .td { padding: var(--spacing-xs) var(--spacing-sm); border-color: var(--color-gray-200); }
+.hp-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.hp-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+
+.hp-table-card .table { table-layout: fixed; width: 100%; min-width: 1220px; }
+.hp-table-card .th:nth-child(1) { width: 110px; } /* Data */
+.hp-table-card .th:nth-child(2) { width: auto; }  /* Cliente — preenche o resto */
+.hp-table-card .th:nth-child(3) { width: 160px; } /* Descrição */
+.hp-table-card .th:nth-child(4) { width: 170px; } /* Plano */
+.hp-table-card .th:nth-child(5) { width: 110px; } /* Valor */
+.hp-table-card .th:nth-child(6) { width: 100px; } /* Desconto */
+.hp-table-card .th:nth-child(7) { width: 110px; } /* Valor final */
+.hp-table-card .th:nth-child(8) { width: 120px; } /* Status */
+.hp-table-card .th:nth-child(9) { width: 120px; } /* Ações */
+
+.hp-table-card .th:last-child,
+.hp-table-card .td:last-child { position: sticky; right: 0; z-index: 2; }
+.hp-table-card .td:last-child { box-shadow: -2px 0 4px rgba(3, 13, 32, 0.06); }
+
+.hp-cliente-nome { color: var(--color-text-primary); }
+.hp-cliente-email { color: var(--color-text-tertiary); display: block; }
+.hp-valor-desconto { color: var(--color-status-success-fg); }
+
+.hp-table-card .tableWrap { overflow-x: auto; }
+
+/* ---------- Cards (Mobile) ---------- */
+.hp-cards { display: flex; flex-direction: column; gap: var(--spacing-sm); padding-top: var(--spacing-md); }
+@media (min-width: 768px) { .hp-cards { display: none; } }
+.hp-table-card .tableWrap { display: none; }
+@media (min-width: 768px) { .hp-table-card .tableWrap { display: block; } }
+
+.hp-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.hp-mobile-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-sm); }
+.hp-mobile-card-name { color: var(--color-text-primary); }
+.hp-mobile-card-email { color: var(--color-text-tertiary); }
+.hp-mobile-card-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); }
+.hp-mobile-card-fields dt, .hp-mobile-card-fields dd { margin: 0; text-align: left; }
+.hp-mobile-card-fields dt { color: var(--color-text-tertiary); }
+.hp-mobile-card-fields dd { color: var(--color-text-primary); }
+.hp-mobile-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.hp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.hp-empty[hidden] { display: none; }
+
+/* ---------- Paginação ---------- */
+.hp-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+.hp-pagination[hidden] { display: none; }
+.hp-pagination-info { color: var(--color-text-tertiary); }
+.hp-pagination-controls { display: flex; align-items: center; gap: var(--spacing-2xs); }
+.hp-pagination-pages { display: flex; align-items: center; gap: var(--spacing-2xs); }
+.hp-pagination-page {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--spacing-2xs);
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+.hp-pagination-page:hover { background: var(--color-bg-subtle); }
+.hp-pagination-page.is-active {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+  cursor: default;
+}
+.hp-pagination-page.is-active:hover { background: var(--color-action-primary); }
+@media (max-width: 479px) {
+  .hp-pagination { flex-direction: column; align-items: stretch; text-align: center; }
+}
+
+/* Guard obrigatório: `Table.module.css`'s `.actionBtn` tem `display` incondicional. */
+.hp-empty .btn[hidden] { display: none; }
+
+/* Toast — mesmo padrão exato já estabelecido em Usuários/Planos/Assinantes. */
+.hp-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.hp-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.hp-toast { box-shadow: var(--shadow-lg); animation: hp-toast-in 0.25s ease; }
+.hp-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.hp-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes hp-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

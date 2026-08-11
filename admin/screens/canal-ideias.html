@@ -4,15 +4,28 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel Administrativo — Estrutura do menu — Nivelo</title>
+  <title>Canal de Ideias — Painel Administrativo — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Chip/Chip.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/VoteButton/VoteButton.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
   <link rel="stylesheet" href="../shared/page-admin-shell.css" />
+  <link rel="stylesheet" href="../shared/page-admin-common.css" />
+  <link rel="stylesheet" href="../shared/page-admin-canal-ideias.css" />
 </head>
 <body>
+
+  <!-- Toast (ideia excluída / comentário adicionado, quando chega por redirect) -->
+  <div class="ideias-toast-region" id="toast-region" aria-live="polite"></div>
 
   <div class="app-shell" id="app-shell">
 
@@ -55,7 +68,6 @@
               <span class="app-nav-label">Usuários</span>
             </button>
 
-            <!-- Assinantes (expansível: Planos / Assinantes / Histórico) -->
             <div class="app-nav-group" id="group-assinantes">
               <button type="button" class="app-nav-item" data-group-toggle="group-assinantes" aria-expanded="false" data-tooltip="Assinantes · opções">
                 <span class="app-nav-icon"><i data-lucide="credit-card" width="20" height="20"></i></span>
@@ -88,7 +100,7 @@
               <span class="app-nav-label">Vídeos</span>
             </button>
 
-            <button type="button" class="app-nav-item" data-nav="admin-canal-ideias" data-tooltip="Canal de ideias">
+            <button type="button" class="app-nav-item is-active" data-nav="admin-canal-ideias" data-tooltip="Canal de ideias">
               <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
               <span class="app-nav-label">Canal de ideias</span>
             </button>
@@ -106,16 +118,63 @@
         </div>
       </aside>
 
-      <!-- ══════════════════ CONTEÚDO PRINCIPAL (placeholder) ══════════════════ -->
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — CANAL DE IDEIAS ══════════════════
+           Mesma estrutura/layout/comportamento do Canal de Ideias do Cliente
+           (app/screens/canal-ideias.html) — a única diferença é o botão "Excluir
+           ideia" em cada card (ver `admin/shared/canal-ideias.js`). -->
       <main class="app-main">
-        <div class="app-main-placeholder">
-          <h1 class="app-main-placeholder-title">Área de conteúdo principal</h1>
-          <p class="app-main-placeholder-text">
-            Esta etapa cobre apenas a estrutura global de navegação do painel
-            administrativo (Header + Sidebar). Nenhum item começa selecionado
-            por padrão — o conteúdo de cada seção será construído em etapas
-            futuras.
-          </p>
+        <div class="ideias-page">
+
+          <div class="ideias-header">
+            <div class="ideias-header-text">
+              <h1 class="ideias-title text-heading-6">Canal de Ideias</h1>
+              <p class="ideias-description text-body-s">Espaço colaborativo onde os clientes compartilham sugestões e votam nas ideias que podem melhorar o Nivelo.</p>
+            </div>
+            <button type="button" class="btn primary hasLeft" id="nova-ideia-btn">
+              <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
+              Nova ideia
+            </button>
+          </div>
+
+          <div class="ideias-controls">
+            <div class="wrapper ideias-search">
+              <div class="inputWrap hasLeft">
+                <span class="iconLeft"><i data-lucide="search" width="18" height="18"></i></span>
+                <input type="text" class="input" id="ideias-search-input" placeholder="Buscar ideias..." />
+              </div>
+            </div>
+
+            <div class="wrapper ideias-sort" id="dropdown-ordenar" data-dropdown data-value="votos">
+              <button type="button" class="trigger" data-dropdown-trigger>
+                <i data-lucide="arrow-up-down" width="14" height="14"></i>
+                <span data-dropdown-value>Mais votadas</span>
+                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="menu" data-dropdown-menu>
+                <div class="option selected" data-value="votos">Mais votadas</div>
+                <div class="option" data-value="recentes">Mais recentes</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ideias-chip-nav" id="ideias-chip-nav">
+            <button type="button" class="actionBtn ideias-chip-nav-btn ideias-chip-nav-prev" id="ideias-chip-prev" aria-label="Ver categorias anteriores" hidden>
+              <i data-lucide="chevron-left" width="16" height="16"></i>
+            </button>
+            <div class="row ideias-chip-row" id="ideias-chip-row"></div>
+            <button type="button" class="actionBtn ideias-chip-nav-btn ideias-chip-nav-next" id="ideias-chip-next" aria-label="Ver mais categorias" hidden>
+              <i data-lucide="chevron-right" width="16" height="16"></i>
+            </button>
+          </div>
+
+          <div class="ideias-feed" id="ideias-feed"></div>
+
+          <div class="ideias-empty" id="ideias-empty" hidden>
+            <span class="ideias-empty-icon"><i data-lucide="search-x" width="28" height="28"></i></span>
+            <p class="ideias-empty-title text-subtitle-s">Nenhuma ideia encontrada</p>
+            <p class="ideias-empty-subtitle text-body-s">Tente buscar por outro termo ou escolher outra categoria.</p>
+          </div>
+
         </div>
       </main>
 
@@ -123,9 +182,27 @@
 
   </div>
 
+  <!-- Tooltip compartilhado da Sidebar retraída -->
   <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <!-- Modal: Excluir ideia (exclusivo do admin) -->
+  <div class="overlay" id="delete-idea-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="delete-idea-dialog-title">
+      <div class="header">
+        <h2 class="title" id="delete-idea-dialog-title">—</h2>
+        <button type="button" class="closeBtn" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body"><p class="text-body-s">Tem certeza que deseja excluir esta ideia? Essa ação não pode ser desfeita.</p></div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray sm" data-dialog-cancel>Cancelar</button>
+        <button type="button" class="btn destructive sm" id="delete-idea-confirm-btn">Excluir</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/admin-shell.js"></script>
+  <script src="../shared/ideias-data.js"></script>
+  <script src="../shared/canal-ideias.js"></script>
 </body>
 </html>

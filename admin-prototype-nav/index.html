@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Navegador de Protótipo — Admin — Nivelo</title>
+  <link rel="stylesheet" href="nav.css" />
+</head>
+<body>
+  <div class="pn-root">
+    <aside class="pn-sidebar" id="pn-sidebar">
+      <div class="pn-sidebar-header">
+        <div class="pn-brand">
+          <i data-lucide="shield" width="16" height="16"></i>
+          <span>Navegador de Protótipo — Admin</span>
+        </div>
+
+        <div class="pn-device-switch" id="pn-device-switch" role="tablist" aria-label="Alternar dispositivo">
+          <button type="button" class="pn-device-btn is-active" data-device="desktop" role="tab" aria-selected="true">
+            <i data-lucide="monitor" width="14" height="14"></i> Desktop
+          </button>
+          <button type="button" class="pn-device-btn" data-device="mobile" role="tab" aria-selected="false">
+            <i data-lucide="smartphone" width="14" height="14"></i> Mobile
+          </button>
+        </div>
+
+        <button type="button" class="pn-dev-notes-toggle" id="pn-dev-notes-toggle" aria-pressed="false">
+          <i data-lucide="code" width="14" height="14"></i>
+          <span>Notas para desenvolvimento</span>
+          <span class="pn-dev-notes-state">Off</span>
+        </button>
+
+        <label class="pn-search">
+          <i data-lucide="search" width="14" height="14"></i>
+          <input type="text" id="pn-search-input" placeholder="Buscar tela..." autocomplete="off" />
+        </label>
+      </div>
+
+      <nav class="pn-tree" id="pn-tree" aria-label="Telas do painel administrativo"></nav>
+    </aside>
+
+    <button
+      type="button"
+      class="pn-sidebar-toggle"
+      id="pn-sidebar-toggle"
+      aria-label="Recolher sidebar"
+      aria-expanded="true"
+      aria-controls="pn-sidebar"
+    >
+      <i data-lucide="chevron-left" width="14" height="14"></i>
+    </button>
+
+    <main class="pn-viewport" id="pn-viewport">
+      <div class="pn-viewport-topbar">
+        <span class="pn-current-label" id="pn-current-label">—</span>
+        <a class="pn-open-raw" id="pn-open-raw" href="#" target="_blank" rel="noopener noreferrer">
+          Abrir em nova aba <i data-lucide="external-link" width="12" height="12"></i>
+        </a>
+      </div>
+      <div class="pn-frame-wrap" id="pn-frame-wrap" data-device="desktop">
+        <iframe id="pn-main-frame" title="Prévia da tela"></iframe>
+      </div>
+    </main>
+  </div>
+
+  <div class="pn-hover-preview" id="pn-hover-preview">
+    <div class="pn-hover-preview-inner" id="pn-hover-preview-inner"></div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="nav.config.js"></script>
+  <script src="nav.js"></script>
+</body>
+</html>

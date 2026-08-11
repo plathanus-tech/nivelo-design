@@ -719,64 +719,13 @@ window.PROTO_NAV_CONFIG = {
           desktop: '../app/screens/videos.html'
         }
       ]
-    },
-    {
-      id: 'admin',
-      label: 'Jornada · Admin',
-      screens: [
-        {
-          id: 'admin-login',
-          label: 'Login (admin)',
-          desktop: '../admin/screens/login.html',
-          variants: [
-            { id: 'admin-login-invalid', label: 'Campos inválidos', desktop: '../admin/screens/login.html#state=invalid' },
-            { id: 'admin-login-loading', label: 'Loading', desktop: '../admin/screens/login.html#state=loading' },
-            { id: 'admin-login-error', label: 'Erro de autenticação', desktop: '../admin/screens/login.html#state=error' },
-            { id: 'admin-login-passwordchanged', label: 'Senha atualizada com sucesso', desktop: '../admin/screens/login.html#state=passwordchanged' }
-          ]
-        },
-        {
-          id: 'admin-recuperar-senha-flow',
-          label: 'Recuperar senha (admin)',
-          type: 'flow',
-          screens: [
-            {
-              id: 'admin-recuperar-senha',
-              label: 'Recuperar senha',
-              desktop: '../admin/screens/recuperar-senha.html',
-              variants: [
-                { id: 'admin-recuperar-senha-required', label: 'Campo obrigatório', desktop: '../admin/screens/recuperar-senha.html#state=required' },
-                { id: 'admin-recuperar-senha-invalid', label: 'E-mail inválido', desktop: '../admin/screens/recuperar-senha.html#state=invalid' },
-                { id: 'admin-recuperar-senha-senderror', label: 'Erro ao enviar código', desktop: '../admin/screens/recuperar-senha.html#state=senderror' }
-              ]
-            },
-            {
-              id: 'admin-codigo-verificacao',
-              label: 'Código de verificação',
-              desktop: '../admin/screens/codigo-verificacao.html',
-              variants: [
-                { id: 'admin-codigo-verificacao-incorrect', label: 'Código incorreto', desktop: '../admin/screens/codigo-verificacao.html#state=incorrect' },
-                { id: 'admin-codigo-verificacao-expired', label: 'Código expirado', desktop: '../admin/screens/codigo-verificacao.html#state=expired' },
-                { id: 'admin-codigo-verificacao-toomany', label: 'Muitas tentativas', desktop: '../admin/screens/codigo-verificacao.html#state=toomany' },
-                { id: 'admin-codigo-verificacao-commerror', label: 'Erro de comunicação', desktop: '../admin/screens/codigo-verificacao.html#state=commerror' }
-              ]
-            },
-            {
-              id: 'admin-criar-nova-senha',
-              label: 'Criar nova senha',
-              desktop: '../admin/screens/criar-nova-senha.html',
-              variants: [
-                { id: 'admin-criar-nova-senha-required', label: 'Campos obrigatórios', desktop: '../admin/screens/criar-nova-senha.html#state=required' },
-                { id: 'admin-criar-nova-senha-criteriaunmet', label: 'Critérios não atendidos', desktop: '../admin/screens/criar-nova-senha.html#state=criteriaunmet' },
-                { id: 'admin-criar-nova-senha-mismatch', label: 'Senhas diferentes', desktop: '../admin/screens/criar-nova-senha.html#state=mismatch' },
-                { id: 'admin-criar-nova-senha-sameasold', label: 'Senha igual à anterior', desktop: '../admin/screens/criar-nova-senha.html#state=sameasold' },
-                { id: 'admin-criar-nova-senha-saveerror', label: 'Erro ao salvar', desktop: '../admin/screens/criar-nova-senha.html#state=saveerror' },
-                { id: 'admin-criar-nova-senha-success', label: 'Sucesso', desktop: '../admin/screens/login.html#state=passwordchanged' }
-              ]
-            }
-          ]
-        }
-      ]
     }
   ]
 };
+
+/*
+ * Nota: o painel administrativo (`admin/`) tem seu PRÓPRIO navegador de
+ * protótipo, separado deste — ver `admin-prototype-nav/` (mesma ferramenta,
+ * config própria, acessado por um link/pasta diferente). As telas de
+ * `admin/` não são registradas aqui.
+ */

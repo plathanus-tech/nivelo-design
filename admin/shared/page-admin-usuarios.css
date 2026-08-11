@@ -1,0 +1,323 @@
+/* ══════════════════════════════════════════════════════════
+   USUÁRIOS (ADMIN) — Gerenciamento de usuários do sistema (consulta,
+   cadastro, alteração de status). Mesmos padrões já usados no produto
+   (Categorias de receitas e despesas/Contas Bancárias): `Table` como Card
+   genérico, busca+FilterPopover fundidos com a tabela, Cards no mobile,
+   modal de confirmação Ativar/Desativar, modal de cadastro.
+   Sem paginação — mesmo raciocínio já usado em Fazendas/Categorias pro
+   volume esperado (equipe interna, não um catálogo de clientes).
+   ══════════════════════════════════════════════════════════ */
+
+.usr-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.usr-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .usr-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+/* Layout (display/flex-direction/gap) vem do padrão compartilhado `.app-page-header-text`
+   (ver `page-admin-common.css`) — nada declarado aqui pra não competir com ele. */
+
+.usr-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.usr-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0;
+  max-width: 560px;
+}
+
+#new-usuario-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  #new-usuario-btn {
+    width: auto;
+  }
+}
+
+/* ── Busca/Filtros fundidos com a tabela ──────────────────────────────── */
+.card.usr-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.usr-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.usr-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.usr-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.usr-filter {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .usr-filter {
+    width: auto;
+    flex: 0 1 220px;
+    min-width: 180px;
+  }
+  .usr-filter-search {
+    flex: 1 1 280px;
+    min-width: 240px;
+  }
+}
+
+.usr-filters .usr-filter.usr-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+/* ── Agrupamento de Filtros (FilterPopover) ───────────────────────────── */
+#usr-filtros-trigger-root .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  justify-content: flex-start;
+  gap: var(--spacing-xs);
+}
+.usr-filtros-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+.usr-filter-popover:not([hidden]) {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.usr-filter-popover .trigger {
+  height: 36px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.usr-filter-popover .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.usr-filter-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Tabela (desktop) / Cards (mobile) ─────────────────────────────────── */
+
+.usr-table-card .tableWrap {
+  display: none;
+  padding-top: 0;
+}
+
+.usr-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .usr-table-card .tableWrap {
+    display: block;
+  }
+  .usr-cards {
+    display: none;
+  }
+}
+
+.usr-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  min-height: 40px;
+  white-space: normal;
+  line-height: 1.3;
+  vertical-align: middle;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.usr-table-card .th.sortable .thInner { gap: var(--spacing-sm); white-space: normal; }
+.usr-table-card .sortIcon { color: var(--color-gray-500); flex-shrink: 0; }
+.usr-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.usr-table-card .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.usr-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.usr-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.usr-table-card .tr:hover .td { filter: brightness(0.97); }
+
+.usr-table-card .table {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 720px;
+}
+.usr-table-card .th:nth-child(1) { width: auto; }  /* Nome — preenche o resto */
+.usr-table-card .th:nth-child(2) { width: 30%; }   /* E-mail */
+.usr-table-card .th:nth-child(3) { width: 140px; } /* Perfil */
+.usr-table-card .th:nth-child(4) { width: 110px; } /* Status */
+.usr-table-card .th:nth-child(5) { width: 90px; }  /* Ações */
+
+.usr-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.usr-empty:not([hidden]) { display: flex; }
+.usr-empty p { margin: 0; }
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.usr-mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.usr-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.usr-mobile-card-name {
+  color: var(--color-text-primary);
+}
+
+.usr-mobile-card-email {
+  color: var(--color-text-tertiary);
+}
+
+.usr-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+
+.usr-mobile-card-fields dt {
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+
+.usr-mobile-card-fields dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.usr-mobile-card-actions {
+  justify-content: flex-end;
+  padding: var(--spacing-sm) 0 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Modal "Adicionar usuário" — mesmo padrão de Dialog sm reaproveitado
+   já usado em Conta Financeira/Meus números do WhatsApp. ──────────────── */
+.usr-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* ── Toast de sucesso ──────────────────────────────────────────────────── */
+.usr-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.usr-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+.usr-toast {
+  box-shadow: var(--shadow-lg);
+  animation: usr-toast-in 0.25s ease;
+}
+.usr-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.usr-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+@keyframes usr-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   hidden+display incondicional já documentado dezenas de vezes no produto. */
+.overlay[hidden] { display: none; }

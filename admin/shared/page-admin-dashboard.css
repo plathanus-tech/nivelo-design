@@ -1,0 +1,209 @@
+/*
+ * Dashboard (Backoffice > Dashboard). Primeira tela do sidebar — só leitura/navegação, sem
+ * criação de padrão visual novo: cards de KPI reaproveitam a mesma estrutura exata já usada em
+ * Cupons e Afiliados/Histórico de Pagamentos (`.card` > `.cardHeader` > `.title` + valor grande),
+ * badges de faixa usam `.badge`/`.badgeDot` de `Table.module.css` (`data-status`), e o gráfico de
+ * evolução financeira usa a mesma técnica de SVG puro já usada em `cupom-detalhe.js` (não existe
+ * lib de chart no projeto).
+ */
+
+.dash-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dash-title { color: var(--color-text-primary); margin: 0; }
+.dash-subtitle { color: var(--color-text-secondary); margin: 0; }
+
+.dash-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.dash-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.dash-section-period { color: var(--color-text-tertiary); margin: calc(-1 * var(--spacing-sm)) 0 0; }
+
+/* ---------- Cards de KPI — mesma cópia estrutural exata do padrão de Cupons e Afiliados
+   (`.cup-summary-*`)/Histórico de Pagamentos (`.hp-summary-*`), com o card inteiro clicável
+   (`<a class="card dash-kpi-card">`) quando o indicador leva a uma lista filtrada. ---------- */
+.dash-kpi-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) { .dash-kpi-row { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1200px) { .dash-kpi-row { grid-template-columns: repeat(4, 1fr); } }
+
+.dash-kpi-card {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  text-decoration: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+a.dash-kpi-card:hover { box-shadow: var(--shadow-sm); border-color: var(--color-border-default); }
+.dash-kpi-card .cardHeader { padding: 0; margin-bottom: var(--spacing-sm); }
+.dash-kpi-title-row { display: flex; align-items: center; gap: var(--spacing-xs); }
+.dash-kpi-icon { display: inline-flex; color: var(--color-text-brand); flex-shrink: 0; }
+.dash-kpi-card .title { font-size: 12px; font-weight: var(--font-weight-bold); }
+.dash-kpi-body { display: flex; }
+.dash-kpi-value {
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+}
+.dash-kpi-hint { color: var(--color-text-tertiary); margin: 0; }
+
+/* ---------- Requer atenção — maior destaque visual (pedido explícito). ---------- */
+.dash-section-attention .dash-section-title { color: var(--color-status-warning-fg); }
+.dash-section-attention .dash-section-title i { color: var(--color-status-warning-fg); }
+
+.dash-attention-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 900px) { .dash-attention-row { grid-template-columns: repeat(2, 1fr); } }
+
+.dash-attention-card {
+  padding: var(--spacing-md);
+  border-left: 4px solid var(--color-status-warning-fg);
+}
+.dash-attention-card .cardHeader { padding: 0; margin-bottom: var(--spacing-2xs); }
+.dash-attention-hint { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); }
+
+.dash-faixa-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+.dash-faixa-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+}
+.dash-faixa-row + .dash-faixa-row { border-top: var(--border-width-thin) solid var(--color-border-subtle); }
+.dash-faixa-count { color: var(--color-text-secondary); font-weight: var(--font-weight-medium); }
+
+/* ---------- Acesso dos clientes ---------- */
+.dash-acesso-card { padding: var(--spacing-md); display: flex; flex-direction: column; gap: var(--spacing-md); }
+.dash-acesso-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+.dash-acesso-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  text-decoration: none;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  transition: background 0.15s ease;
+}
+.dash-acesso-stat:hover { background: var(--color-bg-subtle); }
+.dash-acesso-value { font-size: 28px; font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
+.dash-acesso-label { color: var(--color-text-tertiary); }
+
+.dash-acesso-bar {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--color-gray-100);
+}
+.dash-acesso-bar-segment.is-recente { background: var(--color-status-success-fg); }
+.dash-acesso-bar-segment.is-antigo { background: var(--color-status-error-fg); }
+.dash-acesso-bar-legend { display: flex; flex-wrap: wrap; gap: var(--spacing-lg); color: var(--color-text-tertiary); }
+.dash-acesso-bar-legend span { display: inline-flex; align-items: center; gap: var(--spacing-2xs); }
+.dash-acesso-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dash-acesso-dot.is-recente { background: var(--color-status-success-fg); }
+.dash-acesso-dot.is-antigo { background: var(--color-status-error-fg); }
+
+.dash-risco-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.dash-risco-note p { margin: 0; color: var(--color-text-secondary); }
+
+/* ---------- Gráfico — mesma técnica exata de `.cupdet-chart` (SVG puro). ---------- */
+.dash-chart-card { padding: var(--spacing-md); }
+.dash-chart-card .cardHeader { padding: 0; margin-bottom: var(--spacing-sm); }
+.dash-chart, .dash-acesso-chart { width: 100%; overflow-x: auto; }
+.dash-chart svg { display: block; width: 100%; height: 200px; }
+.dash-chart-bar { fill: var(--color-action-primary); }
+.dash-chart-empty { color: var(--color-text-tertiary); text-align: center; padding: var(--spacing-lg) 0; margin: 0; }
+.dash-chart-label { font-size: 11px; fill: var(--color-text-tertiary); }
+.dash-chart-value { font-size: 11px; fill: var(--color-text-secondary); font-weight: var(--font-weight-medium); }
+
+/* ---------- Ranking de cupons mais utilizados ---------- */
+.dash-ranking-card { padding: var(--spacing-md); }
+.dash-ranking-card .cardHeader { padding: 0; margin-bottom: var(--spacing-sm); }
+.dash-ranking-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  counter-reset: dash-ranking;
+}
+/* Padding simétrico (topo/base) em cada item — `--spacing-md` entre o conteúdo e o divisor,
+   acima e abaixo, em qualquer item da lista, igual em desktop e mobile (sem `gap` no
+   `.dash-ranking-list`, que quebraria essa simetria somando-se de forma desigual ao padding do
+   item vizinho). */
+.dash-ranking-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+.dash-ranking-row + .dash-ranking-row { border-top: var(--border-width-thin) solid var(--color-border-subtle); }
+.dash-ranking-row::before {
+  counter-increment: dash-ranking;
+  content: counter(dash-ranking);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+.dash-ranking-codigo { font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
+.dash-ranking-nome { color: var(--color-text-tertiary); }
+/* Mobile first: sem `margin-left:auto` — a contagem flui à esquerda junto com o resto do
+   conteúdo do item (mesmo alinhamento de `.dash-ranking-codigo`/`.dash-ranking-nome`) em vez de
+   ficar empurrada/centralizada de forma diferente quando a linha quebra. Só a partir de 640px,
+   com espaço suficiente para tudo numa única linha, ela vai para a direita. */
+.dash-ranking-count { color: var(--color-text-secondary); font-weight: var(--font-weight-medium); }
+@media (min-width: 640px) {
+  .dash-ranking-count { margin-left: auto; }
+}

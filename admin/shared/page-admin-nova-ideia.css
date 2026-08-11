@@ -1,0 +1,85 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA IDEIA (ADMIN) — cópia exata de app/shared/page-nova-ideia.css. Sem
+   nenhuma diferença de moderação nesta tela (a moderação vive na
+   listagem/detalhe do Canal de Ideias).
+   ══════════════════════════════════════════════════════════ */
+
+.nova-ideia-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.nova-ideia-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  align-self: flex-start;
+}
+.nova-ideia-back:hover {
+  color: var(--color-action-primary);
+}
+
+.nova-ideia-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nova-ideia-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.nova-ideia-description {
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+.nova-ideia-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+
+.nova-ideia-textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: var(--line-height-normal);
+}
+
+/* Mensagem de erro: mesmo padrão já usado em todo o admin — `.errorText` só
+   aparece quando `.wrapper` ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* Mesmo padrão de rodapé de formulário já usado em todo o admin: Cancelar
+   sempre antes de Publicar no HTML, mas Publicar (ação principal) fica
+   visualmente por último — em cima no mobile (`column-reverse`) e à
+   direita no desktop (`row` + `flex-end`). */
+.nova-ideia-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
+@media (min-width: 480px) {
+  .nova-ideia-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .nova-ideia-actions .btn {
+    flex: 0 0 auto;
+    min-width: 160px;
+  }
+}

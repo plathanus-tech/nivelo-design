@@ -1,0 +1,105 @@
+/*
+ * Detalhe do Pagamento (Backoffice > Assinantes > Histórico > Detalhe). Mesma estrutura visual
+ * do padrão "Ver detalhes" já usado em Assinantes/Estoque do cliente: cabeçalho voltar/título/
+ * badge + ação contextual, estado "não encontrado", cards de seção (`.card`/`.cardHeader`/
+ * `.title` + `dl`/`dt`/`dd`). Nunca duplica ações de gestão do cliente (Alterar plano/Bloquear/
+ * Liberar/Conceder dias) — aqui só "Ver perfil do assinante", que leva pra Assinantes.
+ */
+
+.hpdet-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+#hpdet-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hpdet-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+
+.hpdet-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.hpdet-back:hover { color: var(--color-text-primary); }
+
+.hpdet-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .hpdet-title-row { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+
+.hpdet-title-block { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-sm); }
+.hpdet-title { color: var(--color-text-primary); margin: 0; }
+
+.hpdet-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.hpdet-not-found:not([hidden]) { display: flex; }
+.hpdet-not-found p { margin: 0; }
+
+.hpdet-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+/* Bug real já documentado (Table.module.css's `.cardHeader{flex-direction:column}`
+   não redeclarado aqui, sobrevive por cascata — mesmo fix já usado em Assinantes). */
+.hpdet-section .cardHeader { padding: 0; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: var(--spacing-sm); }
+.hpdet-section .cardHeader .title { text-align: left; }
+
+.hpdet-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: 0;
+}
+@media (min-width: 768px) { .hpdet-fields { grid-template-columns: repeat(3, 1fr); } }
+.hpdet-fields dt { font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0 0 2px; }
+.hpdet-fields dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; }
+
+.hpdet-nf-text { color: var(--color-text-secondary); margin: 0; }
+
+/* Guard obrigatório: `.btn` (Button.module.css) tem `display:inline-flex` incondicional. */
+.hpdet-title-row .btn[hidden] { display: none; }
+
+/* Toast — mesmo padrão exato do resto do admin. */
+.hpdet-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.hpdet-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.hpdet-toast { box-shadow: var(--shadow-lg); animation: hpdet-toast-in 0.25s ease; }
+.hpdet-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.hpdet-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes hpdet-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

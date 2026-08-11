@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhe do assinante — Painel Administrativo — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
+  <link rel="stylesheet" href="../shared/page-admin-shell.css" />
+  <link rel="stylesheet" href="../shared/page-admin-common.css" />
+  <link rel="stylesheet" href="../shared/page-admin-assinante-detalhe.css" />
+</head>
+<body>
+
+  <div class="assndet-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Painel administrativo</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="admin-dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-usuarios" data-tooltip="Usuários">
+              <span class="app-nav-icon"><i data-lucide="users" width="20" height="20"></i></span>
+              <span class="app-nav-label">Usuários</span>
+            </button>
+
+            <div class="app-nav-group is-open" id="group-assinantes">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assinantes" aria-expanded="true" data-tooltip="Assinantes · opções">
+                <span class="app-nav-icon"><i data-lucide="credit-card" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assinantes</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-planos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Planos</span>
+                </button>
+                <button type="button" class="app-nav-subitem is-active" data-nav="admin-assinantes-lista">
+                  <span class="app-nav-icon"><i data-lucide="user-check" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Assinantes</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-historico">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="admin-cupons" data-tooltip="Cupons e afiliados">
+              <span class="app-nav-icon"><i data-lucide="ticket-percent" width="20" height="20"></i></span>
+              <span class="app-nav-label">Cupons e afiliados</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="admin-sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — DETALHE DO ASSINANTE ══════════════════ -->
+      <main class="app-main">
+        <div class="assndet-page">
+
+          <div class="assndet-header">
+            <a href="assinantes.html" class="assndet-back">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <div class="assndet-title-row">
+              <div class="assndet-title-block">
+                <h1 class="assndet-title text-heading-6" id="assndet-titulo">—</h1>
+                <span class="badge" id="assndet-situacao-badge" data-status="info"><span class="badgeDot"></span>—</span>
+                <span class="badge" id="assndet-acesso-badge" data-status="info"><span class="badgeDot"></span>—</span>
+              </div>
+              <div class="assndet-actions">
+                <button type="button" class="btn destructive sm" id="assndet-bloquear-btn">Bloquear cliente</button>
+                <button type="button" class="btn primary sm" id="assndet-liberar-btn">Liberar cliente</button>
+                <div class="wrapper assndet-manage-menu-root" id="assndet-manage-menu">
+                  <button type="button" class="btn secondary sm" id="assndet-manage-btn">Gerenciar assinatura</button>
+                  <div class="menu" data-dropdown-menu>
+                    <div class="option" data-value="plano">Alterar plano</div>
+                    <div class="option" data-value="dias">Conceder dias gratuitos</div>
+                    <div class="option" data-value="link">Gerar link de pagamento</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="assndet-not-found" class="assndet-not-found" hidden>
+            <i data-lucide="search-x" width="28" height="28"></i>
+            <p class="text-14-regular">Assinante não encontrado.</p>
+            <a href="assinantes.html" class="btn secondary">Voltar para Assinantes</a>
+          </div>
+
+          <div id="assndet-content">
+
+            <!-- Dados do cliente -->
+            <section class="card assndet-section">
+              <div class="cardHeader"><h2 class="title">Dados do cliente</h2></div>
+              <dl class="assndet-fields">
+                <div><dt>Nome</dt><dd id="di-nome">—</dd></div>
+                <div><dt>E-mail</dt><dd id="di-email">—</dd></div>
+                <div><dt>Telefone/WhatsApp</dt><dd id="di-telefone">—</dd></div>
+                <div><dt>Data de cadastro</dt><dd id="di-cadastro">—</dd></div>
+                <div><dt>Último acesso</dt><dd id="di-ultimo-acesso">—</dd></div>
+              </dl>
+            </section>
+
+            <!-- Assinatura -->
+            <section class="card assndet-section">
+              <div class="cardHeader"><h2 class="title">Assinatura</h2></div>
+              <dl class="assndet-fields">
+                <div><dt>Plano atual</dt><dd id="as-plano">—</dd></div>
+                <div><dt>Status da assinatura</dt><dd id="as-status">—</dd></div>
+                <div><dt>Forma de contratação</dt><dd id="as-forma-contratacao">—</dd></div>
+                <div><dt>Data de início</dt><dd id="as-inicio">—</dd></div>
+                <div><dt>Data de vencimento</dt><dd id="as-vencimento">—</dd></div>
+                <div><dt>Próxima renovação</dt><dd id="as-proxima-renovacao">—</dd></div>
+                <div><dt>Situação do acesso</dt><dd id="as-acesso">—</dd></div>
+              </dl>
+
+              <!-- Link de pagamento gerado (via "Gerar link de pagamento", menu Gerenciar assinatura) -->
+              <div class="assndet-link-box" id="assndet-link-box" hidden>
+                <div class="assndet-link-header">
+                  <i data-lucide="link" width="14" height="14"></i>
+                  <span class="text-body-xs">Link de pagamento gerado</span>
+                </div>
+                <div class="assndet-link-row">
+                  <span class="assndet-link-url text-body-s" id="assndet-link-url">—</span>
+                  <button type="button" class="actionBtn" id="assndet-link-copy-btn" aria-label="Copiar link">
+                    <i data-lucide="copy" width="16" height="16"></i>
+                    <span class="tip text-body-xs top"><span class="arrow"></span>Copiar link</span>
+                  </button>
+                </div>
+                <p class="assndet-link-expiracao text-body-xs" id="assndet-link-expiracao">—</p>
+              </div>
+            </section>
+
+            <!-- Período de teste -->
+            <section class="card assndet-section" id="assndet-teste-section" hidden>
+              <div class="cardHeader"><h2 class="title">Período de teste</h2></div>
+              <dl class="assndet-fields">
+                <div><dt>Data de início do teste</dt><dd id="teste-inicio">—</dd></div>
+                <div><dt>Quantidade padrão de dias gratuitos</dt><dd id="teste-dias-padrao">—</dd></div>
+                <div><dt>Dias concedidos manualmente</dt><dd id="teste-dias-manuais">—</dd></div>
+                <div><dt>Data de término do teste</dt><dd id="teste-fim">—</dd></div>
+                <div><dt>Dias restantes</dt><dd id="teste-restantes">—</dd></div>
+              </dl>
+            </section>
+
+            <!-- Uso de IA -->
+            <section class="card assndet-section">
+              <div class="cardHeader"><h2 class="title">Uso de IA</h2></div>
+              <div class="assndet-headline" id="ia-total">—</div>
+              <p class="assndet-headline-caption text-body-s">Total de tokens consumidos pelo agente de IA via WhatsApp. Informação apenas de acompanhamento nesta versão.</p>
+            </section>
+
+            <!-- Pagamentos -->
+            <section class="card assndet-section">
+              <div class="cardHeader">
+                <h2 class="title">Pagamentos</h2>
+                <a class="btn secondaryGray sm" id="assndet-historico-link" href="historico-pagamentos.html">Ver histórico completo</a>
+              </div>
+              <dl class="assndet-fields">
+                <div><dt>Último pagamento</dt><dd id="pag-ultimo">—</dd></div>
+                <div><dt>Próximo pagamento/vencimento</dt><dd id="pag-proximo">—</dd></div>
+                <div><dt>Valor da assinatura</dt><dd id="pag-valor">—</dd></div>
+                <div><dt>Status do último pagamento</dt><dd id="pag-status">—</dd></div>
+              </dl>
+              <div class="assndet-pagamentos-table">
+                <table class="table">
+                  <thead>
+                    <tr class="headerRow">
+                      <th class="th">Data</th>
+                      <th class="th">Descrição</th>
+                      <th class="th">Valor</th>
+                      <th class="th">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pag-tbody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Cupom e afiliado -->
+            <section class="card assndet-section" id="assndet-cupom-section" hidden>
+              <div class="cardHeader"><h2 class="title">Cupom e afiliado</h2></div>
+              <dl class="assndet-fields">
+                <div><dt>Cupom utilizado</dt><dd id="cup-codigo">—</dd></div>
+                <div><dt>Afiliado responsável</dt><dd id="cup-afiliado">—</dd></div>
+                <div><dt>Data de utilização</dt><dd id="cup-data">—</dd></div>
+              </dl>
+            </section>
+
+            <!-- Histórico da assinatura -->
+            <section class="card assndet-section">
+              <div class="cardHeader"><h2 class="title">Histórico da assinatura</h2></div>
+              <ul class="assndet-timeline" id="assndet-timeline"></ul>
+            </section>
+
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <!-- Modal: Alterar plano -->
+  <div class="overlay" id="assndet-plano-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="assndet-plano-dialog-title">
+      <div class="header">
+        <h2 class="title" id="assndet-plano-dialog-title">Alterar plano</h2>
+        <button type="button" class="closeBtn" id="assndet-plano-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="assndet-form-grid">
+          <div class="wrapper" id="assndet-plano-dropdown" data-dropdown>
+            <label class="label">Novo plano</label>
+            <button type="button" class="trigger" data-dropdown-trigger>
+              <span data-dropdown-value>Selecione um plano</span>
+              <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+            </button>
+            <div class="menu" data-dropdown-menu></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray sm" id="assndet-plano-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="assndet-plano-dialog-save">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Bloquear / Liberar cliente -->
+  <div class="overlay" id="assndet-acesso-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="assndet-acesso-dialog-title">
+      <div class="header">
+        <h2 class="title" id="assndet-acesso-dialog-title">—</h2>
+        <button type="button" class="closeBtn" id="assndet-acesso-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <p class="text-body-s" id="assndet-acesso-dialog-message">—</p>
+        <div class="wrapper assndet-form-grid" id="assndet-motivo-field" hidden>
+          <label class="label" for="assndet-motivo-input">Motivo do bloqueio <span class="assndet-upgrade-note">(opcional)</span></label>
+          <div class="inputWrap">
+            <textarea class="input assndet-motivo-textarea" id="assndet-motivo-input" placeholder="Descreva o motivo do bloqueio"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray sm" id="assndet-acesso-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn destructive sm" id="assndet-acesso-dialog-confirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Conceder dias gratuitos -->
+  <div class="overlay" id="assndet-dias-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="assndet-dias-dialog-title">
+      <div class="header">
+        <h2 class="title" id="assndet-dias-dialog-title">Conceder dias gratuitos</h2>
+        <button type="button" class="closeBtn" id="assndet-dias-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="assndet-form-grid">
+          <div class="wrapper" id="assndet-dias-field">
+            <label class="label" for="assndet-dias-input">Quantidade de dias</label>
+            <div class="inputWrap">
+              <input class="input" type="number" min="1" id="assndet-dias-input" placeholder="Ex.: 7" />
+            </div>
+            <span class="errorText">
+              <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+              Informe uma quantidade de dias maior que zero.
+            </span>
+          </div>
+          <p class="assndet-upgrade-note text-body-xs">A alteração é específica deste cliente e não altera a configuração padrão do sistema.</p>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray sm" id="assndet-dias-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="assndet-dias-dialog-save">Conceder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Gerar link de pagamento (upgrade) -->
+  <div class="overlay" id="assndet-link-dialog-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="assndet-link-dialog-title">
+      <div class="header">
+        <h2 class="title" id="assndet-link-dialog-title">Gerar link de pagamento</h2>
+        <button type="button" class="closeBtn" id="assndet-link-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="assndet-form-grid">
+          <div class="wrapper" id="assndet-link-plano-dropdown" data-dropdown>
+            <label class="label">Novo plano anual</label>
+            <button type="button" class="trigger" data-dropdown-trigger>
+              <span data-dropdown-value>Selecione o novo plano anual</span>
+              <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+            </button>
+            <div class="menu" data-dropdown-menu></div>
+          </div>
+
+          <dl class="assndet-upgrade-recap" id="assndet-link-recap" hidden>
+            <div class="assndet-upgrade-recap-row"><dt>Plano atual</dt><dd id="link-plano-atual">—</dd></div>
+            <div class="assndet-upgrade-recap-row"><dt>Novo plano</dt><dd id="link-plano-novo">—</dd></div>
+            <div class="assndet-upgrade-recap-row"><dt>Período restante</dt><dd id="link-periodo-restante">—</dd></div>
+            <div class="assndet-upgrade-recap-row"><dt>Valor proporcional do upgrade</dt><dd id="link-valor-proporcional">—</dd></div>
+            <div class="assndet-upgrade-recap-row"><dt>Próxima renovação</dt><dd id="link-proxima-renovacao">—</dd></div>
+          </dl>
+
+          <div class="wrapper">
+            <label class="label" for="assndet-link-valor-final-input">Valor final do link</label>
+            <div class="inputWrap">
+              <input class="input" type="text" inputmode="numeric" id="assndet-link-valor-final-input" placeholder="R$ 0,00" />
+            </div>
+            <span class="assndet-upgrade-adjusted-note text-body-xs" id="assndet-link-ajustado-note" hidden>
+              Valor ajustado manualmente pelo administrador para negociação comercial.
+            </span>
+          </div>
+
+          <p class="assndet-upgrade-note text-body-xs">O upgrade não reinicia o período anual da assinatura, a data de renovação permanece a mesma, só o valor cobrado é proporcional ao período restante.</p>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray sm" id="assndet-link-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="assndet-link-dialog-gerar">Gerar link de pagamento</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/admin-shell.js"></script>
+  <script src="../shared/planos-data.js"></script>
+  <script src="../shared/assinantes-data.js"></script>
+  <script src="../shared/assinante-detalhe.js"></script>
+</body>
+</html>

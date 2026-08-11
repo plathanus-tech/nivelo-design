@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planos — Painel Administrativo — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../shared/page-admin-shell.css" />
+  <link rel="stylesheet" href="../shared/page-admin-common.css" />
+  <link rel="stylesheet" href="../shared/page-admin-planos.css" />
+</head>
+<body>
+
+  <div class="pln-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Painel administrativo</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="admin-dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-usuarios" data-tooltip="Usuários">
+              <span class="app-nav-icon"><i data-lucide="users" width="20" height="20"></i></span>
+              <span class="app-nav-label">Usuários</span>
+            </button>
+
+            <div class="app-nav-group is-open" id="group-assinantes">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assinantes" aria-expanded="true" data-tooltip="Assinantes · opções">
+                <span class="app-nav-icon"><i data-lucide="credit-card" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assinantes</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem is-active" data-nav="admin-assinantes-planos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Planos</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-lista">
+                  <span class="app-nav-icon"><i data-lucide="user-check" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Assinantes</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-historico">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="admin-cupons" data-tooltip="Cupons e afiliados">
+              <span class="app-nav-icon"><i data-lucide="ticket-percent" width="20" height="20"></i></span>
+              <span class="app-nav-label">Cupons e afiliados</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="admin-sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — PLANOS ══════════════════ -->
+      <main class="app-main">
+        <div class="pln-page">
+
+          <div class="pln-header app-page-header-text">
+            <h1 class="pln-title text-heading-6">Planos</h1>
+            <p class="pln-subtitle text-body-s">Gerencie os valores, benefícios e o status dos planos de assinatura disponíveis no sistema.</p>
+          </div>
+
+          <div class="card pln-list-card">
+            <section class="pln-table-card">
+              <div class="tableWrap">
+                <table class="table">
+                  <thead>
+                    <tr class="headerRow">
+                      <th class="th">Nome do plano</th>
+                      <th class="th">Descrição</th>
+                      <th class="th">Valor mensal</th>
+                      <th class="th">Valor anual</th>
+                      <th class="th">Status</th>
+                      <th class="th">Assinantes ativos</th>
+                      <th class="th">Última alteração</th>
+                      <th class="th">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pln-tbody"></tbody>
+                </table>
+              </div>
+
+              <div class="pln-cards" id="pln-cards"></div>
+            </section>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <!-- Modal: Editar plano -->
+  <div class="overlay" id="pln-edit-dialog-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="pln-edit-dialog-title">
+      <div class="header">
+        <h2 class="title" id="pln-edit-dialog-title">Editar plano</h2>
+        <button type="button" class="closeBtn" id="pln-edit-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <form id="pln-edit-form" novalidate>
+        <div class="body">
+          <div class="pln-form-grid">
+            <div class="wrapper pln-span-2">
+              <label class="label" for="pln-edit-nome">Nome do plano</label>
+              <div class="inputWrap">
+                <input class="input" type="text" id="pln-edit-nome" disabled />
+              </div>
+            </div>
+
+            <div class="wrapper pln-span-2">
+              <label class="label" for="pln-edit-descricao">Descrição</label>
+              <div class="inputWrap">
+                <textarea class="input pln-textarea pln-textarea-descricao" id="pln-edit-descricao" rows="3"></textarea>
+              </div>
+            </div>
+
+            <div class="wrapper">
+              <label class="label" for="pln-edit-valor">Valor mensal</label>
+              <div class="inputWrap">
+                <input class="input" type="text" id="pln-edit-valor" inputmode="numeric" placeholder="R$ 0,00" />
+              </div>
+            </div>
+
+            <div class="wrapper">
+              <label class="label" for="pln-edit-valor-anual">Valor anual</label>
+              <div class="inputWrap">
+                <input class="input" type="text" id="pln-edit-valor-anual" inputmode="numeric" placeholder="R$ 0,00" />
+              </div>
+            </div>
+
+            <div class="wrapper pln-span-2" id="pln-edit-status-field" data-dropdown>
+              <label class="label" for="pln-edit-status">Status</label>
+              <button type="button" class="trigger" data-dropdown-trigger id="pln-edit-status">
+                <span data-dropdown-value>Ativo</span>
+                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="menu" data-dropdown-menu>
+                <div class="option selected" data-value="ativo">Ativo</div>
+                <div class="option" data-value="inativo">Inativo</div>
+              </div>
+            </div>
+
+            <div class="wrapper pln-span-2">
+              <label class="label" for="pln-edit-beneficios">Benefícios do plano</label>
+              <div class="inputWrap">
+                <textarea class="input pln-textarea pln-textarea-beneficios" id="pln-edit-beneficios" rows="6" placeholder="Um benefício por linha"></textarea>
+              </div>
+              <span class="pln-beneficios-hint text-10-regular">Um benefício por linha.</span>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <button type="button" class="btn secondaryGray sm" id="pln-edit-dialog-cancel">Cancelar</button>
+          <button type="submit" class="btn primary sm" id="pln-edit-dialog-save">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmação de alteração de preço -->
+  <div class="overlay" id="pln-price-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="pln-price-dialog-title">
+      <div class="header">
+        <h2 class="title" id="pln-price-dialog-title">Confirmar alteração de valor</h2>
+        <button type="button" class="closeBtn" id="pln-price-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <p class="text-body-s">A alteração de valor poderá impactar novas assinaturas e, dependendo da integração, também as recorrências existentes. Deseja continuar?</p>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray sm" id="pln-price-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="pln-price-dialog-confirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Ativar/Desativar plano -->
+  <div class="overlay" id="pln-toggle-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="pln-toggle-dialog-title">
+      <div class="header">
+        <h2 class="title" id="pln-toggle-dialog-title">Desativar plano</h2>
+        <button type="button" class="closeBtn" id="pln-toggle-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <p class="text-body-s" id="pln-toggle-dialog-message">Tem certeza que deseja desativar este plano?</p>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray sm" id="pln-toggle-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn destructive sm" id="pln-toggle-dialog-confirm">Desativar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/admin-shell.js"></script>
+  <script src="../shared/planos-data.js"></script>
+  <script src="../shared/planos.js"></script>
+</body>
+</html>

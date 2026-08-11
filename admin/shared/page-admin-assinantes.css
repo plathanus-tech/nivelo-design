@@ -1,0 +1,240 @@
+/*
+ * Assinantes (Backoffice > Assinantes > Assinantes). Mesma arquitetura de página das demais
+ * telas do admin (Usuários/Planos): `.card` transparente no mobile, sólido a partir de 768px;
+ * tabela real desktop + Cards mobile; toast de sucesso; Ações sticky à direita com rolagem
+ * horizontal (mesmo padrão de Planos/Categorias de receitas e despesas do cliente).
+ */
+
+.assn-page {
+  display: flex;
+  flex-direction: column;
+  /* 20px entre o subtítulo e a tabela — padrão de espaçamento definido no Admin (mesmo valor
+     de Planos, `.pln-page`). Único gap deste container: os 2 filhos diretos são `.assn-header`
+     e `.card.assn-list-card`, então não afeta mais nada. */
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.assn-title { color: var(--color-text-primary); margin: 0; }
+.assn-subtitle { color: var(--color-text-secondary); margin: 0; }
+
+.card.assn-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.assn-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+/* ---------- Busca + Filtros ---------- */
+.assn-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+.assn-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+.assn-filter { width: 100%; }
+@media (min-width: 768px) {
+  .assn-filter { width: auto; flex: 0 1 220px; min-width: 180px; }
+  .assn-filter-search { flex: 1 1 280px; min-width: 240px; }
+}
+.assn-filters .assn-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+#assn-filtros-trigger-root .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  justify-content: flex-start;
+  gap: var(--spacing-xs);
+}
+.assn-filtros-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-tertiary); }
+
+.assn-filter-popover:not([hidden]) {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: calc(100vh - var(--spacing-xl));
+  overflow-y: auto;
+}
+.assn-filter-popover .trigger { height: 36px; font-size: var(--font-size-sm); padding: var(--spacing-xs) var(--spacing-sm); }
+.assn-filter-popover .label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
+.assn-filter-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ---------- Tabela (desktop) ---------- */
+.assn-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  min-height: 40px;
+  white-space: normal;
+  line-height: 1.3;
+  vertical-align: middle;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.assn-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+.assn-table-card .td { padding: var(--spacing-xs) var(--spacing-sm); border-color: var(--color-gray-200); }
+.assn-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.assn-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+
+.assn-table-card .table { table-layout: fixed; width: 100%; min-width: 1480px; }
+.assn-table-card .th:nth-child(1)  { width: auto; }   /* Cliente — preenche o resto */
+.assn-table-card .th:nth-child(2)  { width: 160px; }  /* Plano atual */
+.assn-table-card .th:nth-child(3)  { width: 130px; }  /* Status da assinatura */
+.assn-table-card .th:nth-child(4)  { width: 120px; }  /* Situação do acesso */
+.assn-table-card .th:nth-child(5)  { width: 110px; }  /* Início */
+.assn-table-card .th:nth-child(6)  { width: 120px; }  /* Próximo vencimento */
+.assn-table-card .th:nth-child(7)  { width: 150px; }  /* Situação do teste */
+.assn-table-card .th:nth-child(8)  { width: 130px; }  /* Tokens de IA */
+.assn-table-card .th:nth-child(9)  { width: 150px; }  /* Último acesso */
+.assn-table-card .th:nth-child(10) { width: 140px; }  /* Ações — Visualizar/Bloquear/Mais ações */
+
+.assn-table-card .th:last-child,
+.assn-table-card .td:last-child { position: sticky; right: 0; z-index: 2; }
+.assn-table-card .td:last-child { box-shadow: -2px 0 4px rgba(3, 13, 32, 0.06); }
+
+.assn-cliente-nome { color: var(--color-text-primary); }
+.assn-cliente-email { color: var(--color-text-tertiary); display: block; }
+
+.assn-tokens {
+  color: var(--color-text-secondary);
+}
+
+.assn-table-card .tableWrap { overflow-x: auto; }
+
+/* ---------- Cards (Mobile) ---------- */
+/* `padding-top` igual ao espaçamento já existente entre a linha de Busca/Filtros e o divisor
+   (`--spacing-md`, o padding inferior de `.assn-filter-bar`) — mesmo valor entre o divisor e o
+   início do primeiro card, pedido explícito de manter esse padrão consistente. */
+.assn-cards { display: flex; flex-direction: column; gap: var(--spacing-sm); padding-top: var(--spacing-md); }
+@media (min-width: 768px) { .assn-cards { display: none; } }
+.assn-table-card .tableWrap { display: none; }
+@media (min-width: 768px) { .assn-table-card .tableWrap { display: block; } }
+
+.assn-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.assn-mobile-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-sm); }
+.assn-mobile-card-name { color: var(--color-text-primary); }
+.assn-mobile-card-email { color: var(--color-text-tertiary); }
+.assn-mobile-card-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); }
+.assn-mobile-card-fields dt, .assn-mobile-card-fields dd { margin: 0; text-align: left; }
+.assn-mobile-card-fields dt { color: var(--color-text-tertiary); }
+.assn-mobile-card-fields dd { color: var(--color-text-primary); }
+.assn-mobile-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* "Mais ações" (···) — mesmo padrão de menu já usado em "+ Novo Certificado"
+   (Dropdown.module.css's `.menu`/`.option` reaproveitado, ancorado num botão simples via JS
+   `position:fixed`, nunca um componente novo). */
+.assn-more-menu-root { position: relative; display: inline-flex; }
+
+.assn-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.assn-empty[hidden] { display: none; }
+
+/* ---------- Modais: Bloquear/Liberar, Alterar plano, Conceder dias, Gerar link ---------- */
+.assndet-form-grid { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.assndet-form-grid .label { text-align: left; }
+
+.assndet-upgrade-recap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-md);
+}
+.assndet-upgrade-recap-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-sm); }
+.assndet-upgrade-recap-row dt { color: var(--color-text-secondary); margin: 0; }
+.assndet-upgrade-recap-row dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; text-align: right; }
+.assndet-upgrade-note { color: var(--color-text-tertiary); }
+.assndet-upgrade-adjusted-note { color: var(--color-status-warning-fg); margin-top: var(--spacing-xs); }
+.assndet-upgrade-adjusted-note[hidden] { display: none; }
+
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+
+/* Motivo do bloqueio — campo opcional no modal de Bloquear cliente. */
+#assn-motivo-field[hidden] { display: none; }
+#assn-motivo-field { margin-top: var(--spacing-sm); }
+.assn-optional-tag { color: var(--color-text-tertiary); font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); }
+.assn-motivo-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 72px;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+/* Menu "Mais ações" — reaproveita `.menu`/`.option` de Dropdown.module.css, ancorado via JS
+   (`position:fixed`), mesmo padrão de "+ Novo Certificado". Visibilidade controlada pela
+   própria classe `.open` do componente (nenhum CSS extra necessário). */
+
+/* Guards obrigatórios (Dialog/Table/Feedback com `display` incondicional). */
+.overlay[hidden] { display: none; }
+
+/* Toast de sucesso — mesmo padrão exato já estabelecido em Usuários/Planos. */
+.assn-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.assn-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.assn-toast { box-shadow: var(--shadow-lg); animation: assn-toast-in 0.25s ease; }
+.assn-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.assn-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes assn-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

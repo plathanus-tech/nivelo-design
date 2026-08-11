@@ -1,0 +1,190 @@
+/*
+ * Novo Vídeo (Backoffice > Vídeos > Novo vídeo). Formulário + prévia do card lado a lado no
+ * desktop (a prévia reaproveita as classes `.videos-card`/etc. já definidas em
+ * `page-admin-videos.css`, carregado antes deste arquivo — mesmo card que o cliente vê, sem
+ * nenhuma informação exclusiva do admin dentro da prévia).
+ */
+
+.nv-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.nv-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.nv-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nv-back:hover { color: var(--color-text-primary); }
+.nv-title { color: var(--color-text-primary); margin: 0; }
+
+.nv-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.nv-empty[hidden] { display: none; }
+
+.nv-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+.nv-layout[hidden] { display: none; }
+@media (min-width: 900px) {
+  .nv-layout { flex-direction: row; align-items: flex-start; }
+  .nv-layout form { flex: 1 1 auto; min-width: 0; }
+  .nv-preview-col { flex: 0 0 300px; }
+}
+
+/* Espaçamento entre o card do formulário e a linha de botões (Cancelar/Publicar) — mesmo
+   `--spacing-lg` (24px) já usado em todo o resto da página entre blocos empilhados
+   (`.nv-page`/`.nv-layout`), nunca um valor à parte. O `<form>` é um bloco comum por padrão
+   (sem `display`/`gap` próprios), então o card e `.nv-actions` ficavam colados. */
+#nv-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.card.nv-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.nv-subsection {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.nv-subsection + .nv-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.nv-subsection-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.nv-optional { color: var(--color-text-tertiary); font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); }
+.nv-subsection-hint,
+.nv-status-hint { color: var(--color-text-tertiary); margin: 0; }
+
+.nv-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .nv-grid { grid-template-columns: 1fr 1fr; }
+  .nv-span-2 { grid-column: span 2; }
+}
+.nv-grid .label { text-align: left; }
+
+.nv-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 72px;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+/* ---------- Status de identificação do link (idle/loading/sucesso) ---------- */
+.nv-link-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  margin: 0;
+  color: var(--color-text-tertiary);
+}
+.nv-link-status[hidden] { display: none; }
+.nv-link-status.is-loading { color: var(--color-text-brand); }
+.nv-link-status.is-success { color: var(--color-status-success-fg); }
+.nv-link-status .nv-link-status-icon { display: inline-flex; }
+.nv-link-status.is-loading .nv-link-status-icon i { animation: nv-spin 1s linear infinite; }
+@keyframes nv-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.nv-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-md);
+}
+@media (min-width: 480px) {
+  .nv-actions { flex-direction: row; justify-content: flex-end; }
+}
+.nv-actions .btn { width: 100%; justify-content: center; }
+@media (min-width: 480px) { .nv-actions .btn { width: auto; } }
+
+/* ---------- Prévia do card ---------- */
+.nv-preview-card { padding: var(--spacing-md); display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.nv-preview-card .cardHeader { padding: 0; }
+.nv-preview-hint { color: var(--color-text-tertiary); margin: 0; }
+.nv-preview-slot .videos-card { cursor: default; }
+.nv-preview-slot .videos-card:hover { box-shadow: none; border-color: var(--color-border-subtle); }
+
+.nv-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-md);
+  border: var(--border-width-thin) dashed var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+/* Guard obrigatório: `Input.module.css`'s `.errorText` tem `display` incondicional. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+
+/* Bug real, mesma colisão já documentada em várias telas do sistema: `Feedback.module.css`'s
+   `.error` é uma classe crua (`background`/`border-color` de alerta), carregada globalmente
+   nesta tela por causa do toast — sem escopo a `.alert.error`, ela também bate em
+   `.wrapper.error`, pintando um fundo vermelho atrás do campo. O padrão de erro de input é só
+   a borda vermelha (já correta, vem de `Input.module.css`'s `.error .input`); aqui só
+   neutralizamos o vazamento de fundo/borda do `.wrapper` em si. */
+.wrapper.error { background: transparent; border-color: transparent; }
+
+/* Toast — mesmo padrão exato já estabelecido no resto do admin. */
+.nv-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.nv-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.nv-toast { box-shadow: var(--shadow-lg); animation: nv-toast-in 0.25s ease; }
+.nv-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.nv-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes nv-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

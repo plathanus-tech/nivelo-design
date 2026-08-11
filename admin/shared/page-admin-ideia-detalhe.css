@@ -1,0 +1,269 @@
+/* ══════════════════════════════════════════════════════════
+   IDEIA — DETALHE (ADMIN). Cópia de app/shared/page-ideia-detalhe.css, com
+   3 adições exclusivas do painel administrativo: `.ideia-detalhe-top-row`
+   (categoria + "Excluir ideia" no cabeçalho), `.ideia-comment-delete` (ícone
+   por comentário) e o guard de `.overlay[hidden]` do Dialog de confirmação
+   (componente novo nesta tela — o cliente não usa Dialog aqui).
+   ══════════════════════════════════════════════════════════ */
+
+.ideia-detalhe-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.ideia-detalhe-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  align-self: flex-start;
+}
+.ideia-detalhe-back:hover {
+  color: var(--color-action-primary);
+}
+
+/* ── Estado "não encontrada" ───────────────────────────────────────────── */
+.ideia-detalhe-not-found {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.ideia-detalhe-not-found:not([hidden]) { display: flex; }
+.ideia-detalhe-not-found p { margin: 0 0 var(--spacing-sm); }
+
+/* ── Corpo da ideia ────────────────────────────────────────────────────── */
+
+.ideia-detalhe-article {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+
+.ideia-detalhe-vote {
+  align-self: flex-start;
+}
+
+.ideia-detalhe-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+  flex: 1;
+}
+
+/* Linha superior do corpo: categoria (badge) à esquerda, "Excluir ideia"
+   (exclusivo do admin) à direita — mesmo padrão de `.idea-card-top-row` já
+   usado no feed (page-admin-canal-ideias.css). */
+.ideia-detalhe-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.ideia-detalhe-body .badge {
+  align-self: flex-start;
+}
+
+.ideia-detalhe-delete {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+.ideia-detalhe-delete:hover {
+  color: var(--color-status-error-fg);
+  background: var(--color-status-error-bg);
+}
+
+.ideia-detalhe-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.ideia-detalhe-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-tertiary);
+}
+
+.ideia-detalhe-author {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.ideia-detalhe-dot {
+  color: var(--color-border-default);
+}
+
+.ideia-detalhe-description {
+  color: var(--color-text-secondary);
+  margin: var(--spacing-xs) 0 0;
+  white-space: pre-wrap;
+}
+
+/* ── Comentários ───────────────────────────────────────────────────────── */
+
+.ideia-comentarios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.ideia-comentarios-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.ideia-comment-form {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.ideia-comment-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.ideia-comment-input-wrap .input {
+  resize: vertical;
+  min-height: 100px;
+  padding: calc(var(--spacing-sm) + 4px) 120px calc(var(--spacing-sm) + 4px) calc(var(--spacing-md) + 4px);
+  line-height: var(--line-height-normal);
+}
+
+.ideia-comment-submit {
+  position: absolute;
+  right: calc(var(--spacing-xs) + 8px);
+  bottom: calc(var(--spacing-xs) + 8px);
+}
+
+.ideia-comment-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ideia-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+.ideia-comment:first-child {
+  padding-top: 0;
+}
+.ideia-comment + .ideia-comment {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.ideia-comment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.ideia-comment-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.ideia-comment-author {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.ideia-comment-date {
+  color: var(--color-text-tertiary);
+}
+
+.ideia-comment-text {
+  color: var(--color-text-secondary);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* "Excluir comentário" (exclusivo do admin) — mesmo tratamento visual de
+   `.ideia-detalhe-delete`/`.idea-card-delete`, só menor (14px) pra caber ao
+   lado de cada comentário sem competir com o avatar/texto. */
+.ideia-comment-delete {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+.ideia-comment-delete:hover {
+  color: var(--color-status-error-fg);
+  background: var(--color-status-error-bg);
+}
+
+.ideia-comentarios-empty {
+  color: var(--color-text-tertiary);
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+.ideia-comentarios-empty p {
+  margin: 0;
+}
+
+/* ── Toast de sucesso (mesmo padrão de `.ideias-toast-region` já usado em
+   page-admin-canal-ideias.css) ───────────────────────────────────────────── */
+.ideias-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.ideias-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.ideias-toast {
+  box-shadow: var(--shadow-lg);
+  animation: ideias-toast-in 0.25s ease;
+}
+.ideias-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.ideias-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0;
+}
+.ideias-toast .message {
+  color: inherit;
+}
+
+@keyframes ideias-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Modais de confirmação "Excluir ideia"/"Excluir comentário" (exclusivo
+   do admin) — mesmo bug hidden+display incondicional já documentado
+   dezenas de vezes no resto do sistema: Dialog.module.css's
+   `.overlay{display:flex}` sem guard, primeiro uso do componente aqui. ──── */
+.overlay[hidden] { display: none; }

@@ -1,0 +1,15 @@
+/*
+ * Padrões compartilhados entre telas do admin que não pertencem ao shell (Header+Sidebar,
+ * ver `page-admin-shell.css`, cópia intocada do cliente) nem a uma página específica.
+ * Carregado por toda tela do admin que precise reaproveitar um desses padrões — nunca
+ * duplicado dentro do CSS de página.
+ */
+
+/* Título + subtítulo de página: espaçamento padrão de 8px entre os dois, único responsável
+   por esse gap em qualquer tela do admin (Usuários, Planos, etc.) — ajustar aqui vale pra
+   todas de uma vez, nunca sobrescrever este valor no CSS de uma página específica. */
+.app-page-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}

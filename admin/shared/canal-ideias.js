@@ -393,9 +393,17 @@
     });
   }
 
-  var novaIdeiaMessage = sessionStorage.getItem('nivelo.novaideia.success');
+  var novaIdeiaMessage = sessionStorage.getItem('nivelo.admin.novaideia.success');
   if (novaIdeiaMessage) {
-    sessionStorage.removeItem('nivelo.novaideia.success');
+    sessionStorage.removeItem('nivelo.admin.novaideia.success');
     showSuccessToast('Ideia publicada com sucesso', novaIdeiaMessage);
+  }
+
+  // ---------- Toast de sucesso vindo da exclusão de uma ideia a partir da
+  // tela de Detalhe (ver admin/shared/ideia-detalhe.js). ----------
+  var ideiaExcluidaMessage = sessionStorage.getItem('nivelo.admin.ideiaexcluida.success');
+  if (ideiaExcluidaMessage) {
+    sessionStorage.removeItem('nivelo.admin.ideiaexcluida.success');
+    showSuccessToast('Ideia excluída com sucesso', ideiaExcluidaMessage);
   }
 })();

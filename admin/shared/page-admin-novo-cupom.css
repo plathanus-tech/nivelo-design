@@ -1,0 +1,133 @@
+/*
+ * Novo Cupom (Backoffice > Cupons e afiliados > Novo cupom). 1 `.card` único com subseções
+ * separadas por `border-top` sutil, mesmo padrão já usado em Novo Produto/Novo Cadastro do
+ * cliente. Tipo de cupom (RadioButton) alterna quais subseções aparecem: Dados do afiliado +
+ * Dados de comissão (afiliado) OU Dados da campanha (promocional) — Configuração do cupom é
+ * comum aos dois.
+ */
+
+.ncup-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ncup-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.ncup-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.ncup-back:hover { color: var(--color-text-primary); }
+.ncup-title { color: var(--color-text-primary); margin: 0; }
+
+.card.ncup-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.ncup-subsection {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.ncup-subsection[hidden] { display: none; }
+.ncup-subsection + .ncup-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.ncup-subsection-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.ncup-optional { color: var(--color-text-tertiary); font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); }
+.ncup-subsection-hint { color: var(--color-text-tertiary); margin: 0; }
+
+.ncup-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .ncup-grid { grid-template-columns: 1fr 1fr; }
+  .ncup-span-2 { grid-column: span 2; }
+}
+.ncup-grid .label { text-align: left; }
+
+.ncup-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 72px;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+/* Tipo de cupom — cada `.option` do RadioButton ganha uma legenda secundária abaixo do rótulo. */
+#ncup-tipo-group { gap: var(--spacing-sm); }
+#ncup-tipo-group .option {
+  align-items: flex-start;
+  padding: var(--spacing-sm);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+#ncup-tipo-group .optionLabel { display: flex; flex-direction: column; gap: 2px; }
+.ncup-option-hint { color: var(--color-text-tertiary); font-weight: var(--font-weight-regular); }
+
+.ncup-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-md);
+}
+@media (min-width: 480px) {
+  .ncup-actions { flex-direction: row; justify-content: flex-end; }
+}
+.ncup-actions .btn { width: 100%; justify-content: center; }
+@media (min-width: 480px) { .ncup-actions .btn { width: auto; } }
+
+/* Guard obrigatório: `Feedback.module.css`'s `.error`/`RadioButton.module.css`'s `.input`
+   colidem com `.wrapper`/`.errorText`/campos de texto reais desta tela. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error { background: transparent; border-color: transparent; }
+.input:not([type="radio"]) { position: static; opacity: 1; width: 100%; height: auto; }
+
+/* Mesma guarda acima, agora pros campos de calendário (`dpRoot`, não `.wrapper`). */
+.dpRoot .errorText { display: none; }
+.dpRoot.error .errorText { display: flex; }
+
+/* Toast — mesmo padrão exato do resto do admin. */
+.ncup-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.ncup-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.ncup-toast { box-shadow: var(--shadow-lg); animation: ncup-toast-in 0.25s ease; }
+.ncup-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.ncup-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes ncup-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

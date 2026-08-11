@@ -1,0 +1,142 @@
+/*
+ * Detalhe do Cupom (Backoffice > Cupons e afiliados > Detalhe). Mesmo padrão "Ver detalhes" já
+ * usado em Assinantes/Histórico de Pagamentos: cabeçalho voltar/título/badges + ação
+ * contextual, estado "não encontrado", cards de seção (`.card`/`.cardHeader`/`.title`).
+ */
+
+.cupdet-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+#cupdet-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cupdet-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.cupdet-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.cupdet-back:hover { color: var(--color-text-primary); }
+
+.cupdet-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .cupdet-title-row { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+.cupdet-title-block { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-sm); }
+.cupdet-title { color: var(--color-text-primary); margin: 0; }
+
+.cupdet-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.cupdet-not-found:not([hidden]) { display: flex; }
+.cupdet-not-found p { margin: 0; }
+
+.cupdet-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.cupdet-section .cardHeader { padding: 0; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: var(--spacing-sm); }
+.cupdet-section .cardHeader .title { text-align: left; }
+#cupdet-comissao-section[hidden] { display: none; }
+#cupdet-afiliado-fields[hidden] { display: none; }
+
+.cupdet-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: 0;
+}
+@media (min-width: 768px) { .cupdet-fields { grid-template-columns: repeat(3, 1fr); } }
+.cupdet-fields dt { font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0 0 2px; }
+.cupdet-fields dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; }
+.cupdet-observacoes { color: var(--color-text-secondary); margin: 0; }
+.cupdet-observacoes[hidden] { display: none; }
+
+/* ---------- Métricas ---------- */
+.cupdet-metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 560px) { .cupdet-metrics { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .cupdet-metrics { grid-template-columns: repeat(3, 1fr); } }
+.cupdet-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-md);
+}
+.cupdet-metric-label { color: var(--color-text-tertiary); }
+.cupdet-metric-value { font-size: 24px; font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
+
+/* ---------- Gráfico (SVG puro, sem lib) ---------- */
+.cupdet-chart { width: 100%; overflow-x: auto; }
+.cupdet-chart svg { display: block; width: 100%; height: 200px; }
+.cupdet-chart-bar { fill: var(--color-action-primary); rx: 3; }
+.cupdet-chart-empty { color: var(--color-text-tertiary); text-align: center; padding: var(--spacing-lg) 0; }
+.cupdet-chart-label { font-size: 11px; fill: var(--color-text-tertiary); }
+.cupdet-chart-value { font-size: 11px; fill: var(--color-text-secondary); font-weight: var(--font-weight-medium); }
+
+/* ---------- Histórico de utilização ---------- */
+.cupdet-history-table .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.cupdet-history-table .tr:nth-child(odd) .td { background: var(--color-bg-surface); }
+.cupdet-history-table .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.cupdet-history-table .td, .cupdet-history-table .th { border-color: var(--color-gray-200); }
+.cupdet-history-empty { padding: var(--spacing-lg); color: var(--color-text-tertiary); text-align: center; }
+.cupdet-history-empty[hidden] { display: none; }
+
+/* Guard obrigatório: `.btn` (Button.module.css) tem `display` incondicional. */
+.cupdet-title-row .btn[hidden] { display: none; }
+
+/* Toast — mesmo padrão exato do resto do admin. */
+.cupdet-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.cupdet-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.cupdet-toast { box-shadow: var(--shadow-lg); animation: cupdet-toast-in 0.25s ease; }
+.cupdet-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.cupdet-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes cupdet-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

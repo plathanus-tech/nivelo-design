@@ -4,15 +4,21 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel Administrativo — Estrutura do menu — Nivelo</title>
+  <title>Detalhe do Pagamento — Painel Administrativo — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
   <link rel="stylesheet" href="../shared/page-admin-shell.css" />
+  <link rel="stylesheet" href="../shared/page-admin-common.css" />
+  <link rel="stylesheet" href="../shared/page-admin-pagamento-detalhe.css" />
 </head>
 <body>
+
+  <div class="hpdet-toast-region" id="toast-region" aria-live="polite"></div>
 
   <div class="app-shell" id="app-shell">
 
@@ -55,9 +61,8 @@
               <span class="app-nav-label">Usuários</span>
             </button>
 
-            <!-- Assinantes (expansível: Planos / Assinantes / Histórico) -->
-            <div class="app-nav-group" id="group-assinantes">
-              <button type="button" class="app-nav-item" data-group-toggle="group-assinantes" aria-expanded="false" data-tooltip="Assinantes · opções">
+            <div class="app-nav-group is-open" id="group-assinantes">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assinantes" aria-expanded="true" data-tooltip="Assinantes · opções">
                 <span class="app-nav-icon"><i data-lucide="credit-card" width="20" height="20"></i></span>
                 <span class="app-nav-label">Assinantes</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
@@ -71,7 +76,7 @@
                   <span class="app-nav-icon"><i data-lucide="user-check" width="16" height="16"></i></span>
                   <span class="app-nav-label">Assinantes</span>
                 </button>
-                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-historico">
+                <button type="button" class="app-nav-subitem is-active" data-nav="admin-assinantes-historico">
                   <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
                   <span class="app-nav-label">Histórico</span>
                 </button>
@@ -106,16 +111,73 @@
         </div>
       </aside>
 
-      <!-- ══════════════════ CONTEÚDO PRINCIPAL (placeholder) ══════════════════ -->
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — DETALHE DO PAGAMENTO ══════════════════ -->
       <main class="app-main">
-        <div class="app-main-placeholder">
-          <h1 class="app-main-placeholder-title">Área de conteúdo principal</h1>
-          <p class="app-main-placeholder-text">
-            Esta etapa cobre apenas a estrutura global de navegação do painel
-            administrativo (Header + Sidebar). Nenhum item começa selecionado
-            por padrão — o conteúdo de cada seção será construído em etapas
-            futuras.
-          </p>
+        <div class="hpdet-page">
+
+          <div class="hpdet-header">
+            <a class="hpdet-back" href="historico-pagamentos.html">
+              <i data-lucide="arrow-left" width="16" height="16"></i>
+              Histórico de Pagamentos
+            </a>
+            <div class="hpdet-title-row">
+              <div class="hpdet-title-block">
+                <h1 class="hpdet-title text-heading-6" id="hpdet-titulo">—</h1>
+                <span class="badge" id="hpdet-status-badge">—</span>
+              </div>
+              <button type="button" class="btn secondary" id="hpdet-perfil-btn">
+                <i data-lucide="user" width="16" height="16"></i>
+                Ver perfil do assinante
+              </button>
+            </div>
+          </div>
+
+          <div class="hpdet-not-found" id="hpdet-not-found" hidden>
+            <i data-lucide="search-x" width="32" height="32"></i>
+            <p class="text-subtitle-s">Pagamento não encontrado.</p>
+            <a class="btn secondary sm" href="historico-pagamentos.html">Voltar ao Histórico de Pagamentos</a>
+          </div>
+
+          <div id="hpdet-content" hidden>
+
+            <section class="card hpdet-section">
+              <div class="cardHeader"><h2 class="title">Dados do pagamento</h2></div>
+              <dl class="hpdet-fields">
+                <div><dt>Cliente</dt><dd id="hpdet-cliente">—</dd></div>
+                <div><dt>E-mail</dt><dd id="hpdet-email">—</dd></div>
+                <div><dt>Plano</dt><dd id="hpdet-plano">—</dd></div>
+                <div><dt>Tipo da cobrança</dt><dd id="hpdet-tipo">—</dd></div>
+                <div><dt>Data da cobrança</dt><dd id="hpdet-data">—</dd></div>
+                <div><dt>Data do pagamento</dt><dd id="hpdet-data-pagamento">—</dd></div>
+                <div><dt>Data de vencimento</dt><dd id="hpdet-vencimento">—</dd></div>
+                <div><dt>Forma de pagamento</dt><dd id="hpdet-forma">—</dd></div>
+                <div><dt>Identificador da transação</dt><dd id="hpdet-transacao">—</dd></div>
+              </dl>
+            </section>
+
+            <section class="card hpdet-section">
+              <div class="cardHeader"><h2 class="title">Valores</h2></div>
+              <dl class="hpdet-fields">
+                <div><dt>Valor original</dt><dd id="hpdet-valor-original">—</dd></div>
+                <div><dt>Cupom utilizado</dt><dd id="hpdet-cupom">—</dd></div>
+                <div><dt>Valor do desconto</dt><dd id="hpdet-desconto">—</dd></div>
+                <div><dt>Afiliado</dt><dd id="hpdet-afiliado">—</dd></div>
+                <div><dt>Valor final</dt><dd id="hpdet-valor-final">—</dd></div>
+                <div><dt>Status</dt><dd id="hpdet-status-inline">—</dd></div>
+              </dl>
+            </section>
+
+            <section class="card hpdet-section" id="hpdet-nf-section" hidden>
+              <div class="cardHeader"><h2 class="title">Nota fiscal</h2></div>
+              <p class="text-body-s hpdet-nf-text">Nota fiscal vinculada a este pagamento: <strong id="hpdet-nf-numero">—</strong></p>
+              <button type="button" class="btn secondary sm" id="hpdet-nf-btn">
+                <i data-lucide="file-text" width="16" height="16"></i>
+                Ver nota fiscal
+              </button>
+            </section>
+
+          </div>
+
         </div>
       </main>
 
@@ -127,5 +189,9 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/admin-shell.js"></script>
+  <script src="../shared/planos-data.js"></script>
+  <script src="../shared/assinantes-data.js"></script>
+  <script src="../shared/pagamentos-data.js"></script>
+  <script src="../shared/pagamento-detalhe.js"></script>
 </body>
 </html>

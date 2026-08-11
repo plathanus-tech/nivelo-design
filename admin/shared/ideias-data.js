@@ -112,6 +112,7 @@ window.NiveloIdeias = (function () {
   var COMMENTS_KEY = 'nivelo.admin.ideias.comentarios';
   var CREATED_KEY = 'nivelo.admin.ideias.criadas';
   var REMOVED_KEY = 'nivelo.admin.ideias.excluidas';
+  var REMOVED_COMMENTS_KEY = 'nivelo.admin.ideias.comentarios.excluidos';
 
   (function loadCreated() {
     try {
@@ -159,6 +160,22 @@ window.NiveloIdeias = (function () {
     } catch (e) {}
   })();
 
+  // Exclusivo do admin — remove os comentários excluídos em uma navegação
+  // anterior desta mesma sessão (mesmo raciocínio de `loadRemoved()` acima,
+  // aplicado depois dos seeds/extras já estarem todos carregados).
+  (function loadRemovedComments() {
+    try {
+      var raw = sessionStorage.getItem(REMOVED_COMMENTS_KEY);
+      if (!raw) return;
+      var removidos = JSON.parse(raw);
+      IDEIAS.forEach(function (idea) {
+        var ids = removidos[idea.codigo];
+        if (!ids || !ids.length) return;
+        idea.comentarios = idea.comentarios.filter(function (c) { return ids.indexOf(c.id) === -1; });
+      });
+    } catch (e) {}
+  })();
+
   function persistVotes(votadas) {
     try { sessionStorage.setItem(VOTES_KEY, JSON.stringify(votadas)); } catch (e) {}
   }
@@ -194,6 +211,16 @@ window.NiveloIdeias = (function () {
       var removidos = raw ? JSON.parse(raw) : [];
       if (removidos.indexOf(codigo) === -1) removidos.push(codigo);
       sessionStorage.setItem(REMOVED_KEY, JSON.stringify(removidos));
+    } catch (e) {}
+  }
+
+  function persistRemovedComment(codigo, comentarioId) {
+    try {
+      var raw = sessionStorage.getItem(REMOVED_COMMENTS_KEY);
+      var removidos = raw ? JSON.parse(raw) : {};
+      removidos[codigo] = removidos[codigo] || [];
+      if (removidos[codigo].indexOf(comentarioId) === -1) removidos[codigo].push(comentarioId);
+      sessionStorage.setItem(REMOVED_COMMENTS_KEY, JSON.stringify(removidos));
     } catch (e) {}
   }
 
@@ -287,6 +314,19 @@ window.NiveloIdeias = (function () {
     return true;
   }
 
+  // Exclusiva do admin — o cliente não tem esse botão em nenhuma tela.
+  // Remove de vez (mesmo raciocínio de `remove()` pra ideia: o pedido não
+  // menciona preservar histórico de comentário excluído).
+  function removeComentario(codigo, comentarioId) {
+    var idea = findByCodigo(codigo);
+    if (!idea) return false;
+    var index = idea.comentarios.findIndex(function (c) { return c.id === comentarioId; });
+    if (index === -1) return false;
+    idea.comentarios.splice(index, 1);
+    persistRemovedComment(codigo, comentarioId);
+    return true;
+  }
+
   return {
     categorias: categorias,
     categoriaLabel: categoriaLabel,
@@ -294,6 +334,7 @@ window.NiveloIdeias = (function () {
     findByCodigo: findByCodigo,
     toggleVoto: toggleVoto,
     addComentario: addComentario,
+    removeComentario: removeComentario,
     add: add,
     remove: remove
   };

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhe do Cupom — Painel Administrativo — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../shared/page-admin-shell.css" />
+  <link rel="stylesheet" href="../shared/page-admin-common.css" />
+  <link rel="stylesheet" href="../shared/page-admin-cupom-detalhe.css" />
+</head>
+<body>
+
+  <div class="cupdet-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Painel administrativo</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="admin-dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-usuarios" data-tooltip="Usuários">
+              <span class="app-nav-icon"><i data-lucide="users" width="20" height="20"></i></span>
+              <span class="app-nav-label">Usuários</span>
+            </button>
+
+            <div class="app-nav-group" id="group-assinantes">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assinantes" aria-expanded="false" data-tooltip="Assinantes · opções">
+                <span class="app-nav-icon"><i data-lucide="credit-card" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assinantes</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-planos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Planos</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-lista">
+                  <span class="app-nav-icon"><i data-lucide="user-check" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Assinantes</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-historico">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item is-active" data-nav="admin-cupons" data-tooltip="Cupons e afiliados">
+              <span class="app-nav-icon"><i data-lucide="ticket-percent" width="20" height="20"></i></span>
+              <span class="app-nav-label">Cupons e afiliados</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="admin-sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — DETALHE DO CUPOM ══════════════════ -->
+      <main class="app-main">
+        <div class="cupdet-page">
+
+          <div class="cupdet-header">
+            <a class="cupdet-back" href="cupons.html">
+              <i data-lucide="arrow-left" width="16" height="16"></i>
+              Cupons e Afiliados
+            </a>
+            <div class="cupdet-title-row">
+              <div class="cupdet-title-block">
+                <h1 class="cupdet-title text-heading-6" id="cupdet-titulo">—</h1>
+                <span class="badge" id="cupdet-tipo-badge">—</span>
+                <span class="badge" id="cupdet-status-badge">—</span>
+              </div>
+              <a class="btn secondary" id="cupdet-editar-btn" href="novo-cupom.html">
+                <i data-lucide="pencil" width="16" height="16"></i>
+                Editar
+              </a>
+            </div>
+          </div>
+
+          <div class="cupdet-not-found" id="cupdet-not-found" hidden>
+            <i data-lucide="ticket-x" width="32" height="32"></i>
+            <p class="text-subtitle-s">Cupom não encontrado.</p>
+            <a class="btn secondary sm" href="cupons.html">Voltar para Cupons e Afiliados</a>
+          </div>
+
+          <div id="cupdet-content" hidden>
+
+            <section class="card cupdet-section">
+              <div class="cardHeader"><h2 class="title">Informações principais</h2></div>
+              <dl class="cupdet-fields">
+                <div><dt>Código</dt><dd id="cupdet-codigo">—</dd></div>
+                <div><dt>Percentual de desconto</dt><dd id="cupdet-percentual">—</dd></div>
+                <div><dt>Data de criação</dt><dd id="cupdet-criacao">—</dd></div>
+                <div><dt>Validade</dt><dd id="cupdet-validade">—</dd></div>
+              </dl>
+              <dl class="cupdet-fields" id="cupdet-afiliado-fields" hidden>
+                <div><dt>E-mail do afiliado</dt><dd id="cupdet-afiliado-email">—</dd></div>
+                <div><dt>Telefone</dt><dd id="cupdet-afiliado-telefone">—</dd></div>
+                <div><dt>CPF/CNPJ</dt><dd id="cupdet-afiliado-documento">—</dd></div>
+              </dl>
+            </section>
+
+            <section class="card cupdet-section" id="cupdet-comissao-section" hidden>
+              <div class="cardHeader"><h2 class="title">Dados de comissão</h2></div>
+              <dl class="cupdet-fields">
+                <div><dt>Banco</dt><dd id="cupdet-com-banco">—</dd></div>
+                <div><dt>Agência</dt><dd id="cupdet-com-agencia">—</dd></div>
+                <div><dt>Conta</dt><dd id="cupdet-com-conta">—</dd></div>
+                <div><dt>Tipo de conta</dt><dd id="cupdet-com-tipoconta">—</dd></div>
+                <div><dt>Chave PIX</dt><dd id="cupdet-com-pix">—</dd></div>
+              </dl>
+              <p class="cupdet-observacoes text-body-s" id="cupdet-com-observacoes" hidden></p>
+            </section>
+
+            <section class="card cupdet-section">
+              <div class="cardHeader"><h2 class="title">Métricas</h2></div>
+              <div class="cupdet-metrics">
+                <div class="cupdet-metric">
+                  <span class="cupdet-metric-label text-body-xs">Total de utilizações</span>
+                  <span class="cupdet-metric-value" id="cupdet-metric-utilizacoes">0</span>
+                </div>
+                <div class="cupdet-metric">
+                  <span class="cupdet-metric-label text-body-xs">Valor total vendido</span>
+                  <span class="cupdet-metric-value" id="cupdet-metric-vendido">R$ 0,00</span>
+                </div>
+                <div class="cupdet-metric">
+                  <span class="cupdet-metric-label text-body-xs">Total de desconto concedido</span>
+                  <span class="cupdet-metric-value" id="cupdet-metric-desconto">R$ 0,00</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="card cupdet-section">
+              <div class="cardHeader">
+                <h2 class="title">Utilização do cupom por mês</h2>
+              </div>
+              <div class="cupdet-chart" id="cupdet-chart"></div>
+            </section>
+
+            <section class="card cupdet-section">
+              <div class="cardHeader">
+                <h2 class="title">Histórico de utilização</h2>
+                <button type="button" class="btn secondary sm hasLeft" id="cupdet-export-btn">
+                  <span class="icon"><i data-lucide="download" width="16" height="16"></i></span>
+                  Exportar CSV
+                </button>
+              </div>
+              <div class="cupdet-history-table">
+                <div class="tableWrap">
+                  <table class="table">
+                    <thead>
+                      <tr class="headerRow">
+                        <th class="th">Cliente</th>
+                        <th class="th">Data de utilização</th>
+                        <th class="th">Valor da compra</th>
+                        <th class="th">Percentual aplicado</th>
+                        <th class="th">Valor do desconto</th>
+                      </tr>
+                    </thead>
+                    <tbody id="cupdet-history-tbody"></tbody>
+                  </table>
+                </div>
+                <div class="cupdet-history-empty" id="cupdet-history-empty" hidden>
+                  <p class="text-body-s">Nenhuma utilização registrada ainda para este cupom.</p>
+                </div>
+              </div>
+            </section>
+
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/admin-shell.js"></script>
+  <script src="../shared/assinantes-data.js"></script>
+  <script src="../shared/planos-data.js"></script>
+  <script src="../shared/cupons-data.js"></script>
+  <script src="../shared/cupom-detalhe.js"></script>
+</body>
+</html>

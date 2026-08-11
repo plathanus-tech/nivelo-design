@@ -1,0 +1,264 @@
+/*
+ * Detalhe do Assinante (Backoffice > Assinantes > Assinantes > Detalhe). Estrutura visual
+ * copiada 1:1 do padrão "Ver detalhes" de Estoque do produto (`app/screens/detalhe-estoque.html`
+ * + `app/shared/page-detalhe-estoque.css`, disponível no prototype-nav do Cliente): cabeçalho
+ * voltar/título/badge + ação contextual, estado "não encontrado", cards de seção
+ * (`.card`/`.cardHeader`/`.title` + `dl`/`dt`/`dd`), histórico em timeline vertical. Mesmos
+ * tokens/breakpoints (640px no cabeçalho, 768px na grade de campos, gap `--spacing-lg` no
+ * container da página).
+ */
+
+.assndet-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+#assndet-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.assndet-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+
+.assndet-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.assndet-back:hover { color: var(--color-text-primary); }
+
+.assndet-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .assndet-title-row { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+
+.assndet-title-block { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-sm); }
+.assndet-title { color: var(--color-text-primary); margin: 0; }
+.assndet-badges { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; }
+
+.assndet-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); width: 100%; }
+@media (min-width: 640px) { .assndet-actions { width: auto; } }
+.assndet-actions .btn { width: 100%; justify-content: center; }
+@media (min-width: 480px) { .assndet-actions .btn { width: auto; } }
+
+/* ── Estado "não encontrado" ──────────────────────────────────────────── */
+.assndet-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.assndet-not-found:not([hidden]) { display: flex; }
+.assndet-not-found p { margin: 0; }
+
+/* ── Seções (mesmo `.card`/`.cardHeader`/`.title` já usado em Estoque) ──── */
+.assndet-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+/* Bug real: `Table.module.css`'s `.cardHeader` tem `flex-direction:column` — como este seletor
+   (2 classes) não redeclara essa propriedade, ela continua valendo por cascata (CSS é por
+   propriedade, não por regra), e o `align-items:center` daqui centralizava o título
+   horizontalmente em vez de alinhá-lo à esquerda. `flex-direction:row` explícito corrige na
+   raiz; `text-align:left` no título reforça, já que o `.title` sozinho não define alinhamento. */
+.assndet-section .cardHeader { padding: 0; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: var(--spacing-sm); }
+.assndet-section .cardHeader .title { text-align: left; }
+
+.assndet-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: 0;
+}
+@media (min-width: 768px) { .assndet-fields { grid-template-columns: repeat(3, 1fr); } }
+.assndet-fields dt { font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0 0 2px; }
+.assndet-fields dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; }
+
+.assndet-headline {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+}
+.assndet-headline-caption { color: var(--color-text-tertiary); margin-top: var(--spacing-xs); }
+
+#assndet-teste-section[hidden] { display: none; }
+
+/* ── Link de pagamento gerado (card "Assinatura") — mesmo padrão de nota
+   destacada já usado no card de trial/renovação do Dashboard (fundo Brand 50,
+   borda sutil), com o link + ícone de copiar (`.actionBtn`+`.tip`, mesmo
+   padrão de tooltip já usado nos ícones de ação das tabelas do admin). ──── */
+.assndet-link-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-brand);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+.assndet-link-box[hidden] { display: none; }
+
+.assndet-link-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-medium);
+}
+
+.assndet-link-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.assndet-link-url {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-secondary);
+}
+
+.assndet-link-expiracao {
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+#assndet-cupom-section[hidden] { display: none; }
+
+/* ---------- Pagamentos ---------- */
+.assndet-pagamentos-table { margin-top: var(--spacing-sm); }
+.assndet-pagamentos-table .table { width: 100%; table-layout: fixed; }
+.assndet-pagamentos-table .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.assndet-pagamentos-table .tr:nth-child(odd) .td { background: var(--color-bg-surface); }
+.assndet-pagamentos-table .tr:nth-child(even) .td { background: var(--color-gray-50); }
+
+/* ---------- Histórico (timeline vertical) ---------- */
+.assndet-timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.assndet-timeline-item { position: relative; display: flex; gap: var(--spacing-md); padding-bottom: var(--spacing-lg); }
+.assndet-timeline-item:last-child { padding-bottom: 0; }
+.assndet-timeline-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-action-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.assndet-timeline-item:not(:last-child) .assndet-timeline-icon::after {
+  content: '';
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--border-width-medium);
+  height: calc(100% - 32px + var(--spacing-lg));
+  background: var(--color-border-subtle);
+}
+.assndet-timeline-body { flex: 1; min-width: 0; padding-top: var(--spacing-xs); }
+.assndet-timeline-label { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.assndet-timeline-meta { color: var(--color-text-secondary); font-size: var(--font-size-sm); margin-top: 2px; }
+.assndet-timeline-responsavel { color: var(--color-text-tertiary); font-size: var(--font-size-sm); margin-top: 2px; }
+
+/* ---------- Modais: grid de formulário ---------- */
+.assndet-form-grid { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.assndet-form-grid .label { text-align: left; }
+
+.assndet-upgrade-recap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-md);
+}
+.assndet-upgrade-recap-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-sm); }
+.assndet-upgrade-recap-row dt { color: var(--color-text-secondary); margin: 0; }
+.assndet-upgrade-recap-row dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; text-align: right; }
+.assndet-upgrade-recap-row.assndet-upgrade-final dd { color: var(--color-action-primary); font-size: var(--font-size-lg); }
+.assndet-upgrade-note { color: var(--color-text-tertiary); }
+.assndet-upgrade-adjusted-note { color: var(--color-status-warning-fg); margin-top: var(--spacing-xs); }
+.assndet-upgrade-adjusted-note[hidden] { display: none; }
+
+/* "Gerenciar assinatura" — popover ancorado no botão (mesmo padrão de menu já usado em
+   "+ Novo Certificado"/"Mais ações" da listagem: `.menu`/`.option` de Dropdown.module.css,
+   `position:fixed` calculado via JS, nenhum componente novo). Bug real: `.wrapper` (Input/
+   Dropdown.module.css) tem `width:100%` genérico — sem reafirmar a largura aqui, esse wrapper
+   ocupava a linha inteira do `.assndet-actions` (flex row), empurrando "Gerenciar assinatura"
+   para a linha de baixo em vez de ficar ao lado de "Bloquear cliente". Mesma regra de largura
+   já usada nos botões vizinhos (100% até 480px, `auto` a partir daí). */
+.wrapper.assndet-manage-menu-root { position: relative; display: inline-flex; width: 100%; }
+@media (min-width: 480px) { .wrapper.assndet-manage-menu-root { width: auto; } }
+
+.overlay[hidden] { display: none; }
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+
+/* Motivo do bloqueio — campo opcional no modal de Bloquear cliente. */
+#assndet-motivo-field[hidden] { display: none; }
+#assndet-motivo-field { margin-top: var(--spacing-sm); }
+.assndet-motivo-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 72px;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+/* `.btn` (Button.module.css) tem `display:inline-flex` incondicional — sem guard, os botões
+   Bloquear/Liberar cliente (escondidos condicionalmente via JS conforme `acesso`) ficavam
+   visíveis os dois ao mesmo tempo, mesmo bug `hidden`+`display` já documentado dezenas de
+   vezes no projeto (ex. round 45/46/56 do CLAUDE.md do cliente). */
+.assndet-actions .btn[hidden] { display: none; }
+
+/* Toast — mesmo padrão exato de Usuários/Planos/Assinantes (listagem). */
+.assndet-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.assndet-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.assndet-toast { box-shadow: var(--shadow-lg); animation: assndet-toast-in 0.25s ease; }
+.assndet-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.assndet-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes assndet-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

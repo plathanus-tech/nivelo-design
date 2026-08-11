@@ -1,0 +1,256 @@
+/*
+ * Planos (Backoffice > Assinantes > Planos). Mesma arquitetura de página das demais telas do
+ * admin (busca em `.usr-*`/Categorias de receitas e despesas do cliente): `.card` transparente
+ * no mobile, sólido a partir de 768px; tabela real desktop + Cards mobile; toast de sucesso.
+ */
+
+.pln-page {
+  display: flex;
+  flex-direction: column;
+  /* 20px entre o subtítulo e a tabela — valor exato pedido, sem token correspondente na
+     escala (--spacing-md é 16px, --spacing-lg é 24px). Único gap deste container: os 2
+     filhos diretos são `.pln-header` e `.card.pln-list-card`, então não afeta mais nada. */
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* `margin:0` obrigatório — `<h1>`/`<p>` têm margem padrão do user-agent stylesheet, que
+   somava por cima do `gap:8px` do `.app-page-header-text` e inflava a distância visual real
+   entre título e subtítulo bem além dos 8px pretendidos (mesmo reset já aplicado em
+   `.usr-title`/`.usr-subtitle`, `page-admin-usuarios.css`). */
+.pln-title { color: var(--color-text-primary); margin: 0; }
+.pln-subtitle { color: var(--color-text-secondary); margin: 0; }
+
+.card.pln-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.pln-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+/* Cabeçalho: `.th` do componente tem `height:37px` fixo e nunca quebra linha por padrão —
+   com 8 colunas (Valor anual/Assinantes ativos/Última alteração incluídos) o texto vazava e
+   sobrepunha a coluna vizinha. `height:auto`+`white-space:normal` deixa cada cabeçalho quebrar
+   em até 2 linhas dentro da própria largura da coluna, sem sobreposição — combinado com a
+   rolagem horizontal abaixo (colunas em `px`, tabela mais larga que o card), mesmo padrão
+   exato já usado em Categorias de receitas e despesas (`page-categorias-financeiras.css`). */
+.pln-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  min-height: 40px;
+  white-space: normal;
+  line-height: 1.3;
+  vertical-align: middle;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.pln-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.pln-table-card .td {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.pln-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.pln-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+
+/* Colunas em `px` fixo (rótulo/dado curto); Nome fica sem largura própria (`width:auto` sob
+   `table-layout:fixed` = recebe todo o espaço restante). `min-width` no `.table` preserva a
+   rolagem horizontal (`.tableWrap` já tem `overflow-x:auto`, Table.module.css) — Ações (última
+   coluna) fica `position:sticky` presa à direita durante o scroll, mesmo padrão exato já usado
+   em Categorias de receitas e despesas/Contas a Pagar/Contas a Receber. */
+.pln-table-card .table { table-layout: fixed; width: 100%; min-width: 1220px; }
+.pln-table-card .th:nth-child(1) { width: auto; }   /* Nome — preenche o resto */
+.pln-table-card .th:nth-child(2) { width: 220px; }  /* Descrição */
+.pln-table-card .th:nth-child(3) { width: 110px; }  /* Valor mensal */
+.pln-table-card .th:nth-child(4) { width: 110px; }  /* Valor anual */
+.pln-table-card .th:nth-child(5) { width: 100px; }  /* Status */
+.pln-table-card .th:nth-child(6) { width: 130px; }  /* Assinantes ativos */
+.pln-table-card .th:nth-child(7) { width: 130px; }  /* Última alteração */
+.pln-table-card .th:nth-child(8) { width: 120px; }  /* Ações */
+
+.pln-table-card .th:last-child,
+.pln-table-card .td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+}
+.pln-table-card .td:last-child {
+  box-shadow: -2px 0 4px rgba(3, 13, 32, 0.06);
+}
+
+.pln-descricao-cell {
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pln-table-card .tableWrap { overflow-x: auto; }
+
+/* ---------- Cards (Mobile) ---------- */
+.pln-cards { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+@media (min-width: 768px) { .pln-cards { display: none; } }
+.pln-table-card .tableWrap { display: none; }
+@media (min-width: 768px) { .pln-table-card .tableWrap { display: block; } }
+
+/* Padding interno igual ao já usado nos Cards de Usuários (`.usr-mobile-card`) — `.card`
+   (Table.module.css) não tem padding próprio, então sem isso o conteúdo encosta nas bordas. */
+.pln-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.pln-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.pln-mobile-card-name { color: var(--color-text-primary); }
+.pln-mobile-card-desc { color: var(--color-text-secondary); }
+.pln-mobile-card-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+/* `<dd>` tem `margin-inline-start` de 40px no user-agent stylesheet — sem zerar, o valor
+   ficava deslocado à direita do próprio label (`<dt>`, sem margem), quebrando o alinhamento
+   à esquerda do par label+conteúdo. */
+.pln-mobile-card-fields dt,
+.pln-mobile-card-fields dd {
+  margin: 0;
+  text-align: left;
+}
+.pln-mobile-card-fields dt { color: var(--color-text-tertiary); }
+.pln-mobile-card-fields dd { color: var(--color-text-primary); }
+/* Ícones de ação alinhados à direita — mesmo padrão de Assinantes (`.assn-mobile-card-actions`).
+   Bug real: `justify-content:space-between` com um único filho (`.cellActions`, os ícones já
+   vêm agrupados dentro dele) empurra esse filho pro INÍCIO da linha, não pro fim — só teria
+   efeito de fato com 2+ filhos diretos. */
+.pln-mobile-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ---------- Modal: Editar plano ---------- */
+/* Bug real: o `<form>` que envolve `.body`+`.footer` (`Dialog.module.css`) é um elemento de
+   bloco comum — como ele não é `display:flex`, `.body{flex:1;overflow-y:auto}` nunca tem
+   efeito (flex só se aplica a um item DENTRO de um container flex; o form não repassa o
+   contexto flex do `.dialog` pros seus próprios filhos). Resultado: `.body` sempre cresce pro
+   tamanho natural do conteúdo, empurrando o rodapé (Cancelar/Salvar) pra fora da área visível
+   do modal, cortado pelo `overflow:hidden` do `.dialog`. Corrigido fazendo o `<form>` deste
+   modal repassar o contexto flex (`display:flex;flex-direction:column;flex:1;min-height:0`)
+   — só aqui, sem tocar em `Dialog.module.css` (usado por todo o sistema) nem nos outros 2
+   modais desta tela (que não têm `<form>` entre `.body` e `.footer`, logo não precisam disto). */
+#pln-edit-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+/* Modal em `md` (540px, ver planos.html) — grid de 2 colunas a partir de 768px pra aproveitar
+   a largura extra (Valor mensal/Status lado a lado), mesmo padrão exato já usado em Novo
+   Produto (`.novo-produto-grid`/`.novo-produto-span-2`). Nome/Descrição/Benefícios ocupam as
+   2 colunas (`.pln-span-2`) por serem campos de conteúdo mais longo. */
+.pln-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .pln-form-grid { grid-template-columns: 1fr 1fr; }
+  .pln-span-2 { grid-column: span 2; }
+}
+/* Labels e valores sempre alinhados à esquerda, mesmo padrão dos demais formulários do
+   sistema (nenhum bug conhecido aqui, reforçado defensivamente contra qualquer colisão
+   futura) — vale também no mobile, onde o grid vira 1 coluna só. */
+.pln-form-grid .label { text-align: left; }
+.pln-form-grid .trigger { text-align: left; }
+.pln-form-grid .input { text-align: left; }
+
+/* `.input` do componente tem `height:44px` fixo — sem isso o `rows` do `<textarea>` não tem
+   efeito nenhum. `height:auto`+`min-height`+`resize:vertical`, mesma técnica já usada em
+   Observações (`.novo-estoque-textarea`, `app/shared/page-novo-estoque.css`). Alturas mínimas
+   reduzidas (eram 96px/160px) pra o rodapé do modal (Cancelar/Salvar) ficar visível no
+   desktop sem rolagem excessiva — `resize:vertical` continua disponível pra quem quiser mais
+   espaço, e o `.body` do Dialog rola internamente quando o conteúdo não couber. */
+.pln-textarea {
+  width: 100%;
+  height: auto;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+.pln-textarea-descricao { min-height: 64px; }
+.pln-textarea-beneficios { min-height: 104px; }
+
+.pln-beneficios-hint {
+  color: var(--color-text-tertiary);
+}
+
+/* Guard obrigatório: `.overlay`/`.errorText` (Dialog/Input) têm `display` incondicional. */
+.overlay[hidden] { display: none; }
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+
+/* Feedback de sucesso — mesmo componente/estilo/posicionamento/comportamento/duração já
+   estabelecidos em Usuários (`.usr-toast*`, `page-admin-usuarios.css`), só renomeado pro
+   prefixo desta tela. Nunca um padrão novo/paralelo. */
+.pln-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.pln-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+.pln-toast {
+  box-shadow: var(--shadow-lg);
+  animation: pln-toast-in 0.25s ease;
+}
+.pln-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.pln-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+@keyframes pln-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pln-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.pln-empty[hidden] { display: none; }

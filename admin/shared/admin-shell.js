@@ -149,11 +149,19 @@
   });
 
   // ---------- Item ativo + navegação real ----------
-  // Só "Canal de ideias" tem tela construída até aqui — os demais itens
-  // (Usuários, Assinantes > Planos/Assinantes/Histórico, Cupons e
-  // afiliados, Vídeos) ainda são só estrutura de menu, sem destino real
-  // (mesmo padrão já usado no shell do cliente pra itens sem tela ainda).
-  var NAV_DESTINATIONS = { 'admin-canal-ideias': 'canal-ideias.html' };
+  // "Usuários", "Assinantes > Planos/Assinantes/Histórico", "Cupons e afiliados", "Vídeos" e
+  // "Canal de ideias" têm tela construída até aqui (mesmo padrão já usado no shell do cliente
+  // pra itens sem tela ainda, aplicado enquanto uma tela ainda não existe).
+  var NAV_DESTINATIONS = {
+    'admin-dashboard': 'dashboard.html',
+    'admin-usuarios': 'usuarios.html',
+    'admin-assinantes-planos': 'planos.html',
+    'admin-assinantes-lista': 'assinantes.html',
+    'admin-assinantes-historico': 'historico-pagamentos.html',
+    'admin-cupons': 'cupons.html',
+    'admin-videos': 'videos.html',
+    'admin-canal-ideias': 'canal-ideias.html'
+  };
 
   navItems.forEach(function (item) {
     if (item.dataset.nav === 'admin-sair' || NAV_DESTINATIONS[item.dataset.nav]) return;

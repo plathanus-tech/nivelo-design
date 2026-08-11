@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novo Cupom — Painel Administrativo — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css" />
+  <link rel="stylesheet" href="../shared/page-admin-shell.css" />
+  <link rel="stylesheet" href="../shared/page-admin-common.css" />
+  <link rel="stylesheet" href="../shared/page-admin-novo-cupom.css" />
+</head>
+<body>
+
+  <div class="ncup-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Painel administrativo</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="admin-dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-usuarios" data-tooltip="Usuários">
+              <span class="app-nav-icon"><i data-lucide="users" width="20" height="20"></i></span>
+              <span class="app-nav-label">Usuários</span>
+            </button>
+
+            <div class="app-nav-group" id="group-assinantes">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assinantes" aria-expanded="false" data-tooltip="Assinantes · opções">
+                <span class="app-nav-icon"><i data-lucide="credit-card" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assinantes</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-planos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Planos</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-lista">
+                  <span class="app-nav-icon"><i data-lucide="user-check" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Assinantes</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="admin-assinantes-historico">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item is-active" data-nav="admin-cupons" data-tooltip="Cupons e afiliados">
+              <span class="app-nav-icon"><i data-lucide="ticket-percent" width="20" height="20"></i></span>
+              <span class="app-nav-label">Cupons e afiliados</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="admin-canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="admin-sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVO CUPOM ══════════════════ -->
+      <main class="app-main">
+        <div class="ncup-page">
+
+          <div class="ncup-header">
+            <a class="ncup-back" href="cupons.html">
+              <i data-lucide="arrow-left" width="16" height="16"></i>
+              Cupons e Afiliados
+            </a>
+            <h1 class="ncup-title text-heading-6" id="ncup-titulo">Novo cupom</h1>
+          </div>
+
+          <form id="ncup-form" novalidate>
+            <div class="card ncup-card">
+
+              <!-- Tipo de cupom -->
+              <div class="ncup-subsection" id="ncup-tipo-subsection">
+                <h2 class="ncup-subsection-title">Tipo de cupom</h2>
+                <div class="wrapper" id="ncup-tipo-field">
+                  <div class="group vertical" role="radiogroup" aria-label="Tipo de cupom" id="ncup-tipo-group">
+                    <label class="option">
+                      <input type="radio" class="input" name="ncup-tipo" value="afiliado" checked />
+                      <span class="circle"><span class="dot"></span></span>
+                      <span class="optionLabel">
+                        Cupom de afiliado
+                        <span class="ncup-option-hint text-body-xs">Usado para rastrear clientes vindos através de uma pessoa específica.</span>
+                      </span>
+                    </label>
+                    <label class="option">
+                      <input type="radio" class="input" name="ncup-tipo" value="promocional" />
+                      <span class="circle"><span class="dot"></span></span>
+                      <span class="optionLabel">
+                        Cupom promocional
+                        <span class="ncup-option-hint text-body-xs">Usado para campanhas próprias (promoção de uma semana, data comemorativa, ação de marketing).</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dados do afiliado -->
+              <div class="ncup-subsection" id="ncup-afiliado-subsection">
+                <h2 class="ncup-subsection-title">Dados do afiliado</h2>
+                <div class="ncup-grid">
+                  <div class="wrapper ncup-span-2" id="ncup-afiliado-nome-field">
+                    <label class="label" for="ncup-afiliado-nome-input">Nome completo</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-afiliado-nome-input" placeholder="Ex.: Cláudia Menezes Ribeiro" /></div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe o nome completo do afiliado.</span>
+                  </div>
+                  <div class="wrapper" id="ncup-afiliado-email-field">
+                    <label class="label" for="ncup-afiliado-email-input">E-mail</label>
+                    <div class="inputWrap"><input class="input" type="email" id="ncup-afiliado-email-input" placeholder="nome@email.com.br" /></div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe um e-mail válido.</span>
+                  </div>
+                  <div class="wrapper" id="ncup-afiliado-telefone-field">
+                    <label class="label" for="ncup-afiliado-telefone-input">Telefone</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-afiliado-telefone-input" placeholder="+55 (00) 00000-0000" /></div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe um telefone.</span>
+                  </div>
+                  <div class="wrapper" id="ncup-afiliado-documento-field">
+                    <label class="label" for="ncup-afiliado-documento-input">CPF/CNPJ</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-afiliado-documento-input" placeholder="000.000.000-00" /></div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe um CPF ou CNPJ válido.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dados de comissão (opcional) -->
+              <div class="ncup-subsection" id="ncup-comissao-subsection">
+                <h2 class="ncup-subsection-title">Dados de comissão <span class="ncup-optional">(opcional)</span></h2>
+                <p class="ncup-subsection-hint text-body-xs">Campos reservados para pagamentos futuros de comissão ao afiliado.</p>
+                <div class="ncup-grid">
+                  <div class="wrapper" id="ncup-banco-field">
+                    <label class="label" for="ncup-banco-input">Banco</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-banco-input" placeholder="Ex.: Itaú Unibanco" /></div>
+                  </div>
+                  <div class="wrapper" id="ncup-agencia-field">
+                    <label class="label" for="ncup-agencia-input">Agência</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-agencia-input" placeholder="0000" /></div>
+                  </div>
+                  <div class="wrapper" id="ncup-conta-field">
+                    <label class="label" for="ncup-conta-input">Conta</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-conta-input" placeholder="00000-0" /></div>
+                  </div>
+                  <div class="wrapper" id="ncup-tipoconta-dropdown" data-dropdown>
+                    <label class="label">Tipo de conta</label>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span data-dropdown-value>Selecione</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu>
+                      <div class="option" data-value="corrente">Conta corrente</div>
+                      <div class="option" data-value="poupanca">Conta poupança</div>
+                    </div>
+                  </div>
+                  <div class="wrapper" id="ncup-pix-field">
+                    <label class="label" for="ncup-pix-input">Chave PIX</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-pix-input" placeholder="CPF, e-mail, telefone ou chave aleatória" /></div>
+                  </div>
+                  <div class="wrapper ncup-span-2" id="ncup-observacoes-field">
+                    <label class="label" for="ncup-observacoes-input">Observações</label>
+                    <div class="inputWrap"><textarea class="input ncup-textarea" id="ncup-observacoes-input" placeholder="Observações sobre o pagamento de comissão"></textarea></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dados da campanha (promocional) -->
+              <div class="ncup-subsection" id="ncup-campanha-subsection" hidden>
+                <h2 class="ncup-subsection-title">Dados da campanha</h2>
+                <div class="ncup-grid">
+                  <div class="wrapper ncup-span-2" id="ncup-campanha-nome-field">
+                    <label class="label" for="ncup-campanha-nome-input">Nome da campanha</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-campanha-nome-input" placeholder="Ex.: Campanha de Verão" /></div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe o nome da campanha.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Configuração do cupom -->
+              <div class="ncup-subsection" id="ncup-config-subsection">
+                <h2 class="ncup-subsection-title">Configuração do cupom</h2>
+                <p class="ncup-subsection-hint text-body-xs">O desconto é sempre percentual sobre o valor total da compra. Um mesmo cliente só pode utilizar este cupom uma única vez.</p>
+                <div class="ncup-grid">
+                  <div class="wrapper" id="ncup-codigo-field">
+                    <label class="label" for="ncup-codigo-input">Código do cupom</label>
+                    <div class="inputWrap"><input class="input" type="text" id="ncup-codigo-input" placeholder="Ex.: NIVELO20" /></div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe um código único, sem espaços.</span>
+                  </div>
+                  <div class="wrapper" id="ncup-percentual-field">
+                    <label class="label" for="ncup-percentual-input">Percentual de desconto</label>
+                    <div class="inputWrap"><input class="input" type="text" inputmode="numeric" id="ncup-percentual-input" placeholder="Ex.: 10" /></div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe um percentual entre 1 e 100.</span>
+                  </div>
+                  <div class="dpRoot" id="ncup-inicio-field">
+                    <label class="dpLabel" for="ncup-inicio-trigger">Data inicial de validade</label>
+                    <button type="button" class="dpTrigger" id="ncup-inicio-trigger">
+                      <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
+                      <span class="dpPlaceholder" id="ncup-inicio-value">Selecionar data</span>
+                    </button>
+                    <input type="hidden" id="ncup-inicio-input" />
+                    <div class="dpPopover" id="ncup-inicio-popover" hidden>
+                      <div class="dpCalendarHeader">
+                        <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior">
+                          <i data-lucide="chevron-left" width="16" height="16"></i>
+                        </button>
+                        <span class="dpCalendarLabel text-body-s" data-dp-label></span>
+                        <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês">
+                          <i data-lucide="chevron-right" width="16" height="16"></i>
+                        </button>
+                      </div>
+                      <div class="dpWeekdays">
+                        <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+                      </div>
+                      <div class="dpGrid" data-dp-grid></div>
+                    </div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe a data inicial de validade.</span>
+                  </div>
+                  <div class="dpRoot" id="ncup-fim-field">
+                    <label class="dpLabel" for="ncup-fim-trigger">Data final de validade</label>
+                    <button type="button" class="dpTrigger" id="ncup-fim-trigger">
+                      <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
+                      <span class="dpPlaceholder" id="ncup-fim-value">Selecionar data</span>
+                    </button>
+                    <input type="hidden" id="ncup-fim-input" />
+                    <div class="dpPopover" id="ncup-fim-popover" hidden>
+                      <div class="dpCalendarHeader">
+                        <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior">
+                          <i data-lucide="chevron-left" width="16" height="16"></i>
+                        </button>
+                        <span class="dpCalendarLabel text-body-s" data-dp-label></span>
+                        <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês">
+                          <i data-lucide="chevron-right" width="16" height="16"></i>
+                        </button>
+                      </div>
+                      <div class="dpWeekdays">
+                        <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+                      </div>
+                      <div class="dpGrid" data-dp-grid></div>
+                    </div>
+                    <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>A data final deve ser posterior à data inicial.</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="ncup-actions">
+              <a class="btn secondaryGray" href="cupons.html">Cancelar</a>
+              <button type="submit" class="btn primary" id="ncup-submit-btn">Salvar cupom</button>
+            </div>
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/admin-shell.js"></script>
+  <script src="../shared/assinantes-data.js"></script>
+  <script src="../shared/planos-data.js"></script>
+  <script src="../shared/cupons-data.js"></script>
+  <script src="../shared/date-picker.js"></script>
+  <script src="../shared/novo-cupom.js"></script>
+</body>
+</html>
