@@ -676,209 +676,83 @@ html { scroll-behavior: smooth; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   FUNCIONALIDADES — Split sticky com scroll travado (desktop)
-   .features-track dá a distância de rolagem; .features-pin gruda
-   (header + imagem + conteúdo) enquanto o usuário passa pelos 5
-   módulos, um de cada vez em cross-fade, liberando ao final.
-   Mobile: sem pin, lista empilhada normal (sem travar o scroll).
+   FUNCIONALIDADES — 5 cards lado a lado
+   Seção enxuta e visual: grid responsivo (1 col mobile, 2 cols
+   tablet, 5 cols desktop), ícone + nome + descrição curta, sem
+   listas de benefícios. CTA de conversão abaixo dos cards.
    ══════════════════════════════════════════════════════════ */
 
-.features-track { position: relative; }
-.features-pin { padding: var(--spacing-3xl) 0; }
-.features-layout {
+.features-section { padding: var(--spacing-3xl) 0; }
+
+.features-inner {
   max-width: 1120px;
   margin: 0 auto;
   padding: 0 var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xl);
 }
 
-/* Placeholder de imagem: mesma peça usada no painel sticky (desktop) e
-   acima de cada item (mobile). Formato retangular, com legenda indicando
-   se ali entra uma foto ilustrativa ou um mockup do produto. */
-.features-placeholder {
-  width: 100%;
-  aspect-ratio: 4 / 3;
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.feature-card {
+  padding: var(--spacing-lg);
+  border: var(--border-width-thin) solid var(--color-border-muted);
   border-radius: var(--radius-md);
-  border: var(--border-width-thin) dashed var(--color-border-default);
-  background-color: var(--color-bg-subtle);
-  color: var(--color-text-tertiary);
+  background-color: var(--color-bg-default);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+.feature-card:hover {
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.feature-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-brand);
+  color: var(--color-brand-500);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
 }
-.features-placeholder--wide { aspect-ratio: 16 / 10; }
-.features-placeholder i { width: 28px; height: 28px; }
-.features-placeholder-caption {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--letter-spacing-wide);
-  text-transform: uppercase;
-}
+.feature-card-icon--whatsapp { background-color: var(--color-whatsapp); }
+.feature-card-icon--whatsapp img { width: 24px; height: 24px; filter: brightness(0) invert(1); }
 
-/* Imagem real (Estoque, WhatsApp): mesma caixa (aspect-ratio/radius),
-   sem a borda tracejada nem a legenda de placeholder. */
-.features-placeholder--photo {
-  border: none;
-  background-color: transparent;
-  gap: 0;
-  overflow: hidden;
-  padding: 0;
-}
-.features-placeholder--photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.features-sticky { display: none; }
-.features-progress { display: none; }
-
-.features-item-visual { margin-bottom: var(--spacing-xs); }
-
-.features-list { display: flex; flex-direction: column; gap: var(--spacing-2xl); }
-
-.features-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  padding-bottom: var(--spacing-xl);
-  border-bottom: var(--border-width-thin) solid var(--color-border-muted);
-}
-.features-item:last-child { border-bottom: none; padding-bottom: 0; }
-
-.features-item-title {
+.feature-card-name {
   font-family: var(--font-heading);
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
-  margin: 0;
+  margin: 0 0 var(--spacing-2xs);
 }
-.features-item-desc {
-  font-size: var(--font-size-base);
+.feature-card-desc {
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-light);
   color: var(--color-text-secondary);
   line-height: var(--line-height-relaxed);
   margin: 0;
 }
-.features-item-bullets { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--spacing-2xs); }
-.features-item-bullets li { display: flex; align-items: flex-start; gap: var(--spacing-xs); font-size: var(--font-size-sm); color: var(--color-text-secondary); }
-.features-item-bullets li i { flex-shrink: 0; margin-top: 3px; color: var(--color-action-success); width: 14px; height: 14px; }
-.features-item-bullets li strong { font-weight: var(--font-weight-medium); color: var(--color-text-primary); }
 
-.features-item-subgroup { margin-top: var(--spacing-sm); display: flex; flex-direction: column; gap: var(--spacing-xs); }
-.features-item-subgroup-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-  color: var(--color-text-tertiary);
+.features-cta-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-2xl);
+}
+.features-cta-btn { width: 100%; }
+
+@media (min-width: 640px) {
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .features-cta-btn { width: auto; }
 }
 
-.features-item-note {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-light);
-  color: var(--color-text-tertiary);
-  line-height: var(--line-height-relaxed);
-  margin: var(--spacing-xs) 0 0;
-}
-
-@media (min-width: 900px) {
-  /* .features-track fornece a distância de rolagem; .features-pin gruda
-     logo abaixo do header fixo e libera naturalmente ao fim do track. */
-  .features-track { height: calc(5 * 90vh); } /* 5 módulos, ritmo confortável por módulo */
-  .features-pin { position: sticky; top: var(--nav-height); }
-
-  .features-layout { flex-direction: row; align-items: flex-start; gap: var(--spacing-3xl); }
-
-  .features-sticky {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-    flex: 0 0 360px;
-  }
-  .features-placeholder,
-  .features-sticky-label {
-    transition: opacity var(--transition-fast);
-  }
-  .features-sticky.is-swapping .features-placeholder,
-  .features-sticky.is-swapping .features-sticky-label {
-    opacity: 0.35;
-  }
-  .features-sticky-label {
-    font-family: var(--font-heading);
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-medium);
-    text-align: center;
-    color: var(--color-text-brand);
-  }
-
-  .features-item-visual { display: none; }
-
-  /* Trilha de progresso: substitui a linha estática. O trecho cinza
-     é o trilho inteiro; o preenchimento azul sobe conforme o usuário
-     avança dentro do módulo atual (e reinicia a cada novo módulo) —
-     assim fica claro que dá pra continuar rolando, não que acabou. */
-  .features-progress-fill {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 0%;
-    background-color: var(--color-action-primary);
-    border-radius: var(--radius-full);
-  }
-
-  /* Só um módulo visível por vez. Ao trocar, o que sai desliza e some
-     para baixo enquanto o próximo desliza e surge de baixo para cima:
-     a sensação é de troca contínua entre os dois, não de corte seco.
-     A troca de "transition" precisa ser IDÊNTICA em .is-active e na
-     regra base — se a lista de transition mudar junto com a classe,
-     o navegador aplica a mudança na hora em vez de animar a saída. */
-  .features-list { flex: 1; position: relative; min-height: 420px; }
-  .features-progress {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background-color: var(--color-border-subtle);
-    border-radius: var(--radius-full);
-    overflow: hidden;
-  }
-  .features-item {
-    position: absolute;
-    top: 0;
-    left: var(--spacing-xl);
-    width: calc(100% - var(--spacing-xl));
-    gap: var(--spacing-md);
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(16px);
-    transition:
-      opacity var(--transition-normal),
-      transform var(--transition-normal);
-  }
-  .features-item.is-active {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-  }
-  .features-item-title { font-size: var(--font-size-2xl); }
-  .features-item-desc { font-size: var(--font-size-lg); max-width: 480px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .features-item,
-  .features-placeholder,
-  .features-sticky-label {
-    transition: none;
-  }
+@media (min-width: 1120px) {
+  .features-grid { grid-template-columns: repeat(5, 1fr); gap: var(--spacing-sm); }
+  .feature-card { padding: var(--spacing-md); }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1070,7 +944,16 @@ html { scroll-behavior: smooth; }
   white-space: nowrap;
 }
 
-.pricing-price[hidden], .pricing-billing-note[hidden] { display: none; }
+.pricing-price[hidden], .pricing-billing-note[hidden], .pricing-card[hidden] { display: none; }
+
+/* Selo dos planos Fiscal / Fiscal + WhatsApp: só existem no anual. */
+.pricing-annual-only {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-brand);
+  margin: 0 0 var(--spacing-sm);
+}
 
 /* Card com lista de benefícios curta (Fiscal + WhatsApp): respiro extra
    ao redor do único item pra não parecer vazio ao lado dos outros cards. */
@@ -1109,6 +992,12 @@ html { scroll-behavior: smooth; }
 @media (min-width: 1100px) {
   .pricing-inner { padding: 0 var(--spacing-xl); }
   .pricing-grid { grid-template-columns: repeat(4, 1fr); }
+  /* Mensal só tem 2 planos (Fiscal e Fiscal + WhatsApp somem, ver JS):
+     em vez de esticar os 2 cards restantes pelas 4 colunas, mantém a
+     mesma largura de coluna (1fr) e desloca os dois pros trilhos
+     centrais, deixando o 1º e o 4º como respiro nas laterais. */
+  .pricing-grid.is-mensal .pricing-card:nth-child(3) { grid-column: 2; }
+  .pricing-grid.is-mensal .pricing-card:nth-child(4) { grid-column: 3; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1200,10 +1089,16 @@ html { scroll-behavior: smooth; }
 
 /* ══════════════════════════════════════════════════════════
    CONTATO — CTA final
-   Texto sobreposto à foto, que serve de plano de fundo da seção
-   inteira. Overlay em gradiente radial, mais escuro atrás do
-   conteúdo e suavizando nas bordas, pra não perder a foto de vista.
-   Sem cards, um único objetivo (WhatsApp).
+   Foto de fundo viva, conteúdo centralizado. Em vez de um tratamento
+   desenhado pra "resolver contraste" (vinheta/spotlight/mancha atrás
+   do texto), o enquadramento (object-position) foi reposicionado pra
+   aproveitar a faixa de plantação mais escura que já existe na própria
+   foto — a mesma lógica de uma escolha fotográfica, não um efeito
+   aplicado por cima. Complementado só por um degradê linear muito
+   sutil, de cima a baixo, distribuído pela foto INTEIRA (não localizado
+   atrás do conteúdo) — reforça a gradação natural da própria imagem
+   (céu claro em cima, plantação mais densa embaixo) em vez de brigar
+   com ela.
    ══════════════════════════════════════════════════════════ */
 
 .cta-section {
@@ -1211,7 +1106,7 @@ html { scroll-behavior: smooth; }
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  min-height: 420px;
   overflow: hidden;
 }
 
@@ -1224,29 +1119,36 @@ html { scroll-behavior: smooth; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 25%;
+  /* Desce o enquadramento pra dentro da faixa de plantação mais densa
+     (mais escura que o céu, que fica estourado/claro demais nesta
+     foto) — contraste que já vem da própria foto, não de um efeito
+     aplicado por cima. */
+  object-position: center 100%;
   display: block;
+  /* Imagem mais viva (saturação/exposição/contraste), na mesma energia
+     visual do vídeo do hero. */
+  filter: saturate(1.25) brightness(1.08) contrast(1.06);
 }
-/* Escurece a imagem inteira (contraste de texto em toda a seção) com
-   um gradiente puxando para o azul da marca, em vez de um preto neutro. */
+/* Um único degradê contínuo, de cima a baixo, cobrindo a foto inteira
+   (100% da largura, sem afunilar nas laterais — não é um formato).
+   Sem platô/plateau: a transição é uma única reta suave, na mesma
+   direção da gradação que a própria foto já tem (mais clara no início
+   da fileira de plantação, mais densa/escura ao fundo) — leitura de
+   tratamento fotográfico intencional, não um efeito por cima do texto. */
 .cta-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(160deg, rgba(3, 13, 32, 0.72) 0%, rgba(18, 68, 154, 0.55) 100%);
+  background: linear-gradient(180deg, rgba(3, 13, 32, 0.56) 0%, rgba(3, 13, 32, 0.8) 100%);
 }
 
 .cta-content {
   position: relative;
   z-index: 1;
-  max-width: 600px;
+  width: 100%;
+  max-width: 560px;
   margin: 0 auto;
-  padding: var(--spacing-2xl) var(--spacing-md);
+  padding: var(--spacing-3xl) var(--spacing-md) var(--spacing-2xl);
   text-align: center;
-  /* -32px do ajuste de composição anterior, mais -40px compensando a
-     recentralização vertical do flex (a seção ficou 80px mais baixa,
-     então o centro do flex desce 40px em relação à base da imagem) =
-     texto permanece na mesma posição relativa à imagem/base da seção. */
-  translate: 0 -72px;
 }
 .cta-headline {
   font-family: var(--font-heading);
@@ -1277,6 +1179,7 @@ html { scroll-behavior: smooth; }
 @media (min-width: 1280px) {
   .cta-section { min-height: 540px; }
   .cta-bg { height: 620px; }
+  .cta-content { padding-left: var(--spacing-2xl); padding-right: var(--spacing-2xl); }
 }
 
 /* ══════════════════════════════════════════════════════════

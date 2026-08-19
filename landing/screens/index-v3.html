@@ -147,18 +147,17 @@
     <div class="hero-overlay" aria-hidden="true"></div>
 
     <div class="hero-content">
-      <span class="hero-tag">Gestão Rural Simplificada</span>
+      <span class="hero-tag">Transformando Dados em Lucro</span>
 
       <h1 class="hero-headline">Sua fazenda organizada,<br>do jeito mais simples</h1>
 
       <p class="hero-sub">
-        Estoque, financeiro e relatórios rurais em um só lugar.<br class="hero-sub-br" />
-        Fácil de usar, rápido de aprender.
+        Tudo para a sua gestão em um só lugar.
       </p>
 
       <div class="hero-actions">
         <a href="../../app/screens/login.html" class="btn primary lg hero-btn-primary">
-          Acessar Área do Cliente
+          Começar grátis
         </a>
         <a href="#planos" class="hero-link">
           Ver planos
@@ -183,128 +182,56 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════
-       FUNCIONALIDADES — Split sticky com scroll travado (desktop)
-       A seção prende (header + imagem + conteúdo) enquanto o usuário
-       passa pelos 5 módulos em cross-fade, liberando ao final.
-       Mobile: lista empilhada normal, sem travar o scroll.
+       FUNCIONALIDADES — 5 cards lado a lado, responsivos
+       Visual e enxuto: nome + descrição curta, sem listas de
+       benefícios. CTA de conversão logo abaixo dos cards.
   ══════════════════════════════════════════════════════════ -->
   <section class="features-section" id="funcionalidades" aria-labelledby="features-headline">
-   <div class="features-track" id="features-track">
-    <div class="features-pin">
-    <header class="section-header">
-      <span class="section-tag">Plataforma</span>
-      <h2 class="section-headline" id="features-headline">Funcionalidades para uma gestão rural completa</h2>
-      <p class="section-sub">Do estoque ao financeiro, tudo pensado para ser simples de usar no dia a dia da fazenda.</p>
-    </header>
+    <div class="features-inner">
+      <header class="section-header" data-reveal>
+        <span class="section-tag">Plataforma</span>
+        <h2 class="section-headline" id="features-headline">Funcionalidades para uma gestão rural completa</h2>
+        <p class="section-sub">Tudo que sua fazenda precisa, em um só lugar.</p>
+      </header>
 
-    <div class="features-layout">
+      <div class="features-grid">
 
-      <div class="features-sticky" id="features-sticky">
-        <div class="features-placeholder features-placeholder--photo" id="features-sticky-placeholder">
-          <img src="../../estoque.png?v=2" alt="" />
-        </div>
-        <span class="features-sticky-label" id="features-sticky-label">Estoque</span>
-      </div>
-
-      <div class="features-list" id="features-list">
-
-        <div class="features-progress" aria-hidden="true">
-          <div class="features-progress-fill" id="features-progress-fill"></div>
-        </div>
-
-        <!-- 01 — Estoque -->
-        <article class="features-item is-active" data-panel="0">
-          <div class="features-item-visual">
-            <div class="features-placeholder features-placeholder--wide features-placeholder--photo">
-              <img src="../../estoque.png?v=2" alt="" />
-            </div>
-          </div>
-          <h3 class="features-item-title">Estoque</h3>
-          <p class="features-item-desc">Controle completo dos produtos da fazenda, acompanhando vendas, compras e estoque comprometido em um único lugar.</p>
-          <ul class="features-item-bullets">
-            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Estoque de vendas:</strong> produtos já comercializados.</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Estoque de uso:</strong> produtos adquiridos e insumos que serão utilizados.</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Estoque comprometido:</strong> produtos vendidos, mas que ainda precisam ser colhidos.</span></li>
-          </ul>
-          <p class="features-item-note">Quando a colheita acontece, você pode registrar o abatimento do estoque comprometido, controlando facilmente a quitação desse estoque.</p>
+        <article class="feature-card" data-reveal>
+          <div class="feature-card-icon"><i data-lucide="package" width="24" height="24"></i></div>
+          <h3 class="feature-card-name">Estoque</h3>
+          <p class="feature-card-desc">Controle vendas, insumos e colheita em um só lugar.</p>
         </article>
 
-        <!-- 02 — Financeiro -->
-        <article class="features-item" data-panel="1">
-          <div class="features-item-visual">
-            <div class="features-placeholder features-placeholder--wide features-placeholder--photo">
-              <img src="../../visao-completa-da-saude-financeira-da-propriedade.jpeg" alt="" />
-            </div>
-          </div>
-          <h3 class="features-item-title">Financeiro</h3>
-          <p class="features-item-desc">Tenha uma visão completa da saúde financeira da propriedade, controlando entradas, saídas e compromissos.</p>
-          <ul class="features-item-bullets">
-            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Contas a pagar:</strong> lançamentos, vencimentos e baixas.</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Contas a receber:</strong> lançamentos e recebimentos.</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span><strong>Caixa:</strong> controle de entradas, saídas e movimentações.</span></li>
-          </ul>
-          <div class="features-item-subgroup">
-            <span class="features-item-subgroup-label">Notas fiscais</span>
-            <ul class="features-item-bullets">
-              <li><i data-lucide="check" width="14" height="14"></i><span>Notas fiscais de saída</span></li>
-              <li><i data-lucide="check" width="14" height="14"></i><span>Notas fiscais de entrada</span></li>
-            </ul>
-          </div>
+        <article class="feature-card" data-reveal>
+          <div class="feature-card-icon"><i data-lucide="wallet" width="24" height="24"></i></div>
+          <h3 class="feature-card-name">Financeiro</h3>
+          <p class="feature-card-desc">Contas, caixa e notas fiscais sempre em dia.</p>
         </article>
 
-        <!-- 03 — Relatórios -->
-        <article class="features-item" data-panel="2">
-          <div class="features-item-visual">
-            <div class="features-placeholder features-placeholder--wide features-placeholder--photo">
-              <img src="../../dados-de-relatorio.png" alt="" />
-            </div>
-          </div>
-          <h3 class="features-item-title">Relatórios</h3>
-          <p class="features-item-desc">Transforme os dados da operação rural em informações estratégicas para melhores decisões.</p>
-          <ul class="features-item-bullets">
-            <li><i data-lucide="check" width="14" height="14"></i><span>LCDPR</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span>DRE</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span>Balancete</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span>Entradas e saídas.</span></li>
-          </ul>
+        <article class="feature-card" data-reveal>
+          <div class="feature-card-icon"><i data-lucide="bar-chart-3" width="24" height="24"></i></div>
+          <h3 class="feature-card-name">Relatórios</h3>
+          <p class="feature-card-desc">LCDPR, DRE e balancete prontos em segundos.</p>
         </article>
 
-        <!-- 04 — Cadastro Rural -->
-        <article class="features-item" data-panel="3">
-          <div class="features-item-visual">
-            <div class="features-placeholder features-placeholder--wide features-placeholder--photo">
-              <img src="../../caderno-de-campo.jpeg" alt="" />
-            </div>
-          </div>
-          <h3 class="features-item-title">Cadastro Rural</h3>
-          <p class="features-item-desc">Organize todas as informações da propriedade e acompanhe a operação rural com mais controle.</p>
-          <ul class="features-item-bullets">
-            <li><i data-lucide="check" width="14" height="14"></i><span>Cadastro de fazendas</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span>Cadastro de talhões</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span>Caderno de campo.</span></li>
-          </ul>
+        <article class="feature-card" data-reveal>
+          <div class="feature-card-icon"><i data-lucide="map" width="24" height="24"></i></div>
+          <h3 class="feature-card-name">Cadastro Rural</h3>
+          <p class="feature-card-desc">Fazendas, talhões e caderno de campo organizados.</p>
         </article>
 
-        <!-- 05 — WhatsApp -->
-        <article class="features-item" data-panel="4">
-          <div class="features-item-visual">
-            <div class="features-placeholder features-placeholder--wide features-placeholder--photo">
-              <img src="../../whatsapp-integracao.png" alt="" />
-            </div>
-          </div>
-          <h3 class="features-item-title">WhatsApp</h3>
-          <p class="features-item-desc">Simplifique tarefas do dia a dia permitindo interações rápidas através do WhatsApp.</p>
-          <ul class="features-item-bullets">
-            <li><i data-lucide="check" width="14" height="14"></i><span>Emissão de nota fiscal por mensagem</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span>Registro de informações no caderno de campo</span></li>
-            <li><i data-lucide="check" width="14" height="14"></i><span>Anotações da operação diretamente pelo WhatsApp.</span></li>
-          </ul>
+        <article class="feature-card" data-reveal>
+          <div class="feature-card-icon feature-card-icon--whatsapp"><img src="../shared/icons/whatsapp.svg" alt="" width="24" height="24" /></div>
+          <h3 class="feature-card-name">WhatsApp</h3>
+          <p class="feature-card-desc">Emita notas e registre dados direto pelo WhatsApp.</p>
         </article>
 
       </div>
+
+      <div class="features-cta-wrap" data-reveal>
+        <a href="../../app/screens/login.html" class="btn primary lg features-cta-btn">Começar grátis</a>
+      </div>
     </div>
-    </div>
-   </div>
   </section>
 
   <!-- ══════════════════════════════════════════════════════════
@@ -324,8 +251,8 @@
 
       <div class="pricing-toggle-wrap" data-reveal>
         <div class="pricing-toggle" role="group" aria-label="Forma de visualização de preços">
-          <button type="button" class="pricing-toggle-btn is-active" data-billing-btn="mensal" aria-pressed="true">Mensal</button>
-          <button type="button" class="pricing-toggle-btn pricing-toggle-btn--annual" data-billing-btn="anual" aria-pressed="false">
+          <button type="button" class="pricing-toggle-btn" data-billing-btn="mensal" aria-pressed="false">Mensal</button>
+          <button type="button" class="pricing-toggle-btn pricing-toggle-btn--annual is-active" data-billing-btn="anual" aria-pressed="true">
             <span class="pricing-toggle-best">Melhor custo-benefício</span>
             Anual <span class="pricing-toggle-save">Economize 20%</span>
           </button>
@@ -334,21 +261,22 @@
 
       <div class="pricing-grid">
 
-        <!-- Plano 1 — Fiscal -->
-        <article class="pricing-card" data-reveal>
+        <!-- Plano 1 — Fiscal (somente anual) -->
+        <article class="pricing-card" data-reveal data-billing-only="anual">
           <div class="pricing-icon"><i data-lucide="receipt" width="24" height="24"></i></div>
           <h3 class="pricing-name">Fiscal</h3>
+          <span class="pricing-annual-only">Disponível somente no plano anual</span>
           <p class="pricing-tagline">Ideal para quem precisa emitir notas fiscais e organizar sua operação fiscal.</p>
-          <div class="pricing-price" data-billing="mensal">
+          <div class="pricing-price" data-billing="mensal" hidden>
             <span class="pricing-price-value">R$ 29,90</span>
             <span class="pricing-price-period">/mês</span>
           </div>
-          <p class="pricing-billing-note" data-billing="mensal">Cobrança mensal. Cancele quando quiser.</p>
-          <div class="pricing-price" data-billing="anual" hidden>
+          <p class="pricing-billing-note" data-billing="mensal" hidden>Cobrança mensal. Cancele quando quiser.</p>
+          <div class="pricing-price" data-billing="anual">
             <span class="pricing-price-value">R$ 23,92</span>
             <span class="pricing-price-period">/mês</span>
           </div>
-          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual" hidden>
+          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual">
             <span class="pricing-anual-total">Cobrado anualmente R$ 287,04</span>
             <span class="pricing-savings-badge">Economize 20%</span>
           </div>
@@ -363,24 +291,25 @@
           <a href="../../app/screens/login.html" class="btn secondary md pricing-cta">Começar agora</a>
         </article>
 
-        <!-- Plano 2 — Fiscal + WhatsApp -->
-        <article class="pricing-card pricing-card--balanced" data-reveal>
+        <!-- Plano 2 — Fiscal + WhatsApp (somente anual) -->
+        <article class="pricing-card pricing-card--balanced" data-reveal data-billing-only="anual">
           <div class="pricing-icon pricing-icon--whatsapp">
             <i data-lucide="receipt" width="24" height="24"></i>
             <span class="pricing-icon-badge"><img src="../shared/icons/whatsapp.svg" alt="" width="12" height="12" /></span>
           </div>
           <h3 class="pricing-name">Fiscal + WhatsApp</h3>
+          <span class="pricing-annual-only">Disponível somente no plano anual</span>
           <p class="pricing-tagline">Emita notas fiscais em segundos, direto pelo WhatsApp.</p>
-          <div class="pricing-price" data-billing="mensal">
+          <div class="pricing-price" data-billing="mensal" hidden>
             <span class="pricing-price-value">R$ 99</span>
             <span class="pricing-price-period">/mês</span>
           </div>
-          <p class="pricing-billing-note" data-billing="mensal">Cobrança mensal. Cancele quando quiser.</p>
-          <div class="pricing-price" data-billing="anual" hidden>
+          <p class="pricing-billing-note" data-billing="mensal" hidden>Cobrança mensal. Cancele quando quiser.</p>
+          <div class="pricing-price" data-billing="anual">
             <span class="pricing-price-value">R$ 79,20</span>
             <span class="pricing-price-period">/mês</span>
           </div>
-          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual" hidden>
+          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual">
             <span class="pricing-anual-total">Cobrado anualmente R$ 950,40</span>
             <span class="pricing-savings-badge">Economize 20%</span>
           </div>
@@ -397,16 +326,16 @@
           <div class="pricing-icon"><i data-lucide="layout-grid" width="24" height="24"></i></div>
           <h3 class="pricing-name">Gestão Completa</h3>
           <p class="pricing-tagline">Estoque, financeiro e relatórios em um só lugar.</p>
-          <div class="pricing-price" data-billing="mensal">
+          <div class="pricing-price" data-billing="mensal" hidden>
             <span class="pricing-price-value">R$ 169</span>
             <span class="pricing-price-period">/mês</span>
           </div>
-          <p class="pricing-billing-note" data-billing="mensal">Cobrança mensal. Cancele quando quiser.</p>
-          <div class="pricing-price" data-billing="anual" hidden>
+          <p class="pricing-billing-note" data-billing="mensal" hidden>Cobrança mensal. Cancele quando quiser.</p>
+          <div class="pricing-price" data-billing="anual">
             <span class="pricing-price-value">R$ 135,20</span>
             <span class="pricing-price-period">/mês</span>
           </div>
-          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual" hidden>
+          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual">
             <span class="pricing-anual-total">Cobrado anualmente R$ 1.622,40</span>
             <span class="pricing-savings-badge">Economize 20%</span>
           </div>
@@ -431,16 +360,16 @@
           </div>
           <h3 class="pricing-name">Gestão Completa + WhatsApp</h3>
           <p class="pricing-tagline">Toda a gestão da fazenda, com o WhatsApp como atalho.</p>
-          <div class="pricing-price" data-billing="mensal">
+          <div class="pricing-price" data-billing="mensal" hidden>
             <span class="pricing-price-value">R$ 199</span>
             <span class="pricing-price-period">/mês</span>
           </div>
-          <p class="pricing-billing-note" data-billing="mensal">Cobrança mensal. Cancele quando quiser.</p>
-          <div class="pricing-price" data-billing="anual" hidden>
+          <p class="pricing-billing-note" data-billing="mensal" hidden>Cobrança mensal. Cancele quando quiser.</p>
+          <div class="pricing-price" data-billing="anual">
             <span class="pricing-price-value">R$ 159,20</span>
             <span class="pricing-price-period">/mês</span>
           </div>
-          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual" hidden>
+          <div class="pricing-billing-note pricing-billing-note--anual" data-billing="anual">
             <span class="pricing-anual-total">Cobrado anualmente R$ 1.910,40</span>
             <span class="pricing-savings-badge">Economize 20%</span>
           </div>
@@ -1012,136 +941,6 @@
       });
     })();
 
-    // ── Funcionalidades: seção travada (desktop) enquanto o usuário
-    // passa pelos 5 módulos; título/subtítulo ficam visíveis o tempo
-    // todo, só o conteúdo troca. No mobile não trava, lista empilhada
-    // normal (scroll comum, sem sensação de "scroll jacking").
-    (function () {
-      var track = document.getElementById('features-track');
-      var list = document.getElementById('features-list');
-      var sticky = document.getElementById('features-sticky');
-      var stickyBox = document.getElementById('features-sticky-placeholder');
-      var stickyLabel = document.getElementById('features-sticky-label');
-      var progressFill = document.getElementById('features-progress-fill');
-      var items = document.querySelectorAll('.features-item');
-      var mq = window.matchMedia('(min-width: 900px)');
-      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      var activeIndex = -1;
-      var swapTimer = null;
-      var ticking = false;
-      var SWAP_DIP_MS = 150; // acompanha --transition-fast, pro dip e a troca ficarem sincronizados
-
-      var modules = [
-        { label: 'Estoque',        kind: 'image', src: '../../estoque.png?v=2' },
-        { label: 'Financeiro',     kind: 'image', src: '../../visao-completa-da-saude-financeira-da-propriedade.jpeg' },
-        { label: 'Relatórios',     kind: 'image', src: '../../dados-de-relatorio.png' },
-        { label: 'Cadastro Rural', kind: 'image', src: '../../caderno-de-campo.jpeg' },
-        { label: 'WhatsApp',       kind: 'image', src: '../../whatsapp-integracao.png' }
-      ];
-
-      function setActiveModule(index) {
-        if (index === activeIndex) return;
-        var isFirstRun = activeIndex === -1;
-        activeIndex = index;
-        items.forEach(function (item) {
-          var active = item.dataset.panel === String(index);
-          item.classList.toggle('is-active', active);
-          if (mq.matches) {
-            item.setAttribute('aria-hidden', active ? 'false' : 'true');
-          } else {
-            item.removeAttribute('aria-hidden');
-          }
-        });
-        var mod = modules[index];
-
-        function applyStickyContent() {
-          stickyLabel.textContent = mod.label;
-          stickyBox.classList.toggle('features-placeholder--photo', mod.kind === 'image');
-          if (mod.kind === 'image') {
-            stickyBox.innerHTML = '<img src="' + mod.src + '" alt="" />';
-          } else {
-            stickyBox.innerHTML =
-              '<i data-lucide="' + mod.icon + '" width="28" height="28"></i>' +
-              '<span class="features-placeholder-caption">' + mod.type + '</span>';
-            lucide.createIcons();
-          }
-        }
-
-        window.clearTimeout(swapTimer);
-        // Na primeira aplicação (setup inicial da página) não há nada
-        // "trocando" ainda, então aplica direto, sem o dip.
-        if (reduceMotion.matches || isFirstRun) {
-          applyStickyContent();
-        } else {
-          sticky.classList.add('is-swapping');
-          swapTimer = window.setTimeout(function () {
-            applyStickyContent();
-            sticky.classList.remove('is-swapping');
-          }, SWAP_DIP_MS);
-        }
-      }
-
-      function measure() {
-        if (!mq.matches) {
-          list.style.minHeight = '';
-          return;
-        }
-        var maxH = 0;
-        items.forEach(function (item) {
-          if (item.scrollHeight > maxH) maxH = item.scrollHeight;
-        });
-        list.style.minHeight = maxH + 'px';
-      }
-
-      function updateScrollState() {
-        if (!mq.matches) return;
-        var pin = track.querySelector('.features-pin');
-        var trackRect = track.getBoundingClientRect();
-        var scrollable = track.offsetHeight - pin.offsetHeight;
-        var progress = scrollable > 0 ? (-trackRect.top) / scrollable : 0;
-        progress = Math.max(0, Math.min(1, progress));
-
-        // Progresso "dentro" do módulo atual (0 a 1, reinicia a cada
-        // módulo) — preenche a trilha gradualmente até a próxima troca,
-        // deixando claro que ainda dá pra continuar rolando.
-        var raw = progress * items.length;
-        var index = Math.min(items.length - 1, Math.floor(raw));
-        var withinModule = Math.max(0, Math.min(1, raw - index));
-
-        setActiveModule(index);
-        progressFill.style.height = (withinModule * 100) + '%';
-      }
-
-      function onScroll() {
-        if (ticking) return;
-        ticking = true;
-        window.requestAnimationFrame(function () {
-          updateScrollState();
-          ticking = false;
-        });
-      }
-
-      function onBreakpointChange() {
-        activeIndex = -1; // força reavaliação, inclusive do aria-hidden
-        measure();
-        updateScrollState();
-        if (!mq.matches) { setActiveModule(0); }
-      }
-
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', function () { measure(); onScroll(); });
-      if (mq.addEventListener) {
-        mq.addEventListener('change', onBreakpointChange);
-      }
-
-      measure();
-      setActiveModule(0);
-      updateScrollState();
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(measure);
-      }
-    })();
-
     // ── Por que a Nivelo: entrada suave (fade + rise) ao rolar até a seção ─
     (function () {
       var rows = document.querySelectorAll('[data-why-row]');
@@ -1196,6 +995,8 @@
     (function () {
       var buttons = document.querySelectorAll('[data-billing-btn]');
       var priceEls = document.querySelectorAll('[data-billing]');
+      var cards = document.querySelectorAll('.pricing-card');
+      var grid = document.querySelector('.pricing-grid');
       if (!buttons.length) return;
 
       function setBilling(mode) {
@@ -1207,6 +1008,14 @@
         priceEls.forEach(function (el) {
           el.hidden = el.dataset.billing !== mode;
         });
+        // Planos Fiscal e Fiscal + WhatsApp só existem no anual: no mensal,
+        // ficam ocultos e os 2 planos restantes centralizam na seção (sem
+        // esticar a largura, ver .pricing-grid.is-mensal no CSS).
+        cards.forEach(function (card) {
+          var only = card.dataset.billingOnly;
+          card.hidden = !!only && only !== mode;
+        });
+        if (grid) grid.classList.toggle('is-mensal', mode === 'mensal');
       }
 
       buttons.forEach(function (btn) {
@@ -1214,6 +1023,8 @@
           setBilling(btn.dataset.billingBtn);
         });
       });
+
+      setBilling('anual');
     })();
   </script>
 </body>
