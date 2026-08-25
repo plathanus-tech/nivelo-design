@@ -3,6 +3,46 @@
 
   if (window.lucide) lucide.createIcons();
 
+  // ---------- Tooltip padrão (mesma técnica já usada em Novo Cadastro/
+  // Estoque/Produtos: `position:fixed` calculado no hover/focus, nunca
+  // `position:absolute` puro) — usado no botão só-ícone de Transferência
+  // entre contas. ----------
+  function initFixedTooltip(trigger, placement) {
+    var tip = trigger.querySelector('.tip');
+    if (!tip) return;
+
+    function show() {
+      var rect = trigger.getBoundingClientRect();
+      var centerX = rect.left + rect.width / 2;
+      tip.style.position = 'fixed';
+      tip.style.left = centerX + 'px';
+      tip.style.transform = 'translateX(-50%)';
+      if (placement === 'bottom') {
+        tip.style.top = (rect.bottom + 8) + 'px';
+        tip.style.bottom = 'auto';
+      } else {
+        tip.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+        tip.style.top = 'auto';
+      }
+      tip.style.opacity = '1';
+
+      var margin = 8;
+      var tipRect = tip.getBoundingClientRect();
+      if (tipRect.left < margin) {
+        tip.style.left = (centerX + (margin - tipRect.left)) + 'px';
+      } else if (tipRect.right > window.innerWidth - margin) {
+        tip.style.left = (centerX - (tipRect.right - (window.innerWidth - margin))) + 'px';
+      }
+    }
+    function hide() { tip.style.opacity = '0'; }
+
+    trigger.addEventListener('mouseenter', show);
+    trigger.addEventListener('mouseleave', hide);
+    trigger.addEventListener('focus', show);
+    trigger.addEventListener('blur', hide);
+  }
+  initFixedTooltip(document.getElementById('transferencia-btn'), 'top');
+
   // ---------- Toast de sucesso (mesma composição já usada em Categorias/
   // Notas fiscais: Feedback reaproveitado como Toast). ----------
   var toastRegion = document.getElementById('toast-region');
@@ -39,6 +79,15 @@
     showSuccessToast(successMessage, 'O lançamento já está disponível no Caixa.');
   }
 
+  var transferenciaSuccessMessage = '';
+  try {
+    transferenciaSuccessMessage = sessionStorage.getItem('nivelo.transferenciacontas.success') || '';
+    if (transferenciaSuccessMessage) sessionStorage.removeItem('nivelo.transferenciacontas.success');
+  } catch (e) {}
+  if (transferenciaSuccessMessage) {
+    showSuccessToast(transferenciaSuccessMessage, 'Os lançamentos já estão disponíveis no Caixa.');
+  }
+
   // ---------- Rótulos ----------
   var TIPO_BADGE = {
     entrada: { status: 'success', label: 'Entrada' },
@@ -72,17 +121,19 @@
     var badge = TIPO_BADGE[lancamento.tipo];
     var categoriaText = categoriaDescricao(lancamento.categoriaCodigo);
     var pessoaText = lancamento.pessoaNome || '—';
+    var bancoText = lancamento.banco || '—';
     var isEntrada = lancamento.tipo === 'entrada';
     var sinal = isEntrada ? '+' : '-';
     var valorClass = isEntrada ? 'caixa-valor-entrada' : 'caixa-valor-saida';
     var valorText = sinal + formatMoeda(Math.abs(lancamento.valor));
     var searchText = normalize(lancamento.historico + ' ' + pessoaText + ' ' + categoriaText);
     return (
-      '<tr class="tr" id="caixa-row-' + lancamento.codigo + '" data-codigo="' + lancamento.codigo + '" data-data="' + lancamento.data + '" data-categoria="' + (lancamento.categoriaCodigo || '') + '" data-tipo="' + lancamento.tipo + '" data-valor="' + lancamento.valor + '" data-search="' + searchText + '">' +
+      '<tr class="tr" id="caixa-row-' + lancamento.codigo + '" data-codigo="' + lancamento.codigo + '" data-data="' + lancamento.data + '" data-categoria="' + (lancamento.categoriaCodigo || '') + '" data-banco="' + (lancamento.banco || '') + '" data-tipo="' + lancamento.tipo + '" data-valor="' + lancamento.valor + '" data-search="' + searchText + '">' +
         '<td class="td">' + formatDataPt(lancamento.data) + '</td>' +
         '<td class="td">' + lancamento.historico + '</td>' +
         '<td class="td">' + pessoaText + '</td>' +
         '<td class="td">' + categoriaText + '</td>' +
+        '<td class="td">' + bancoText + '</td>' +
         '<td class="td"><span class="badge" data-status="' + badge.status + '"><span class="badgeDot"></span>' + badge.label + '</span></td>' +
         '<td class="td"><span class="' + valorClass + '">' + valorText + '</span></td>' +
       '</tr>'
@@ -105,6 +156,7 @@
   var state = {
     search: '',
     categoria: '',
+    banco: '',
     periodStart: null,
     periodEnd: null,
     page: 1
@@ -112,6 +164,7 @@
 
   function rowMatches(row) {
     if (state.categoria && row.dataset.categoria !== state.categoria) return false;
+    if (state.banco && row.dataset.banco !== state.banco) return false;
     if (state.periodStart && row.dataset.data < state.periodStart) return false;
     if (state.periodEnd && row.dataset.data > state.periodEnd) return false;
     if (state.search) {
@@ -130,6 +183,8 @@
   var resumoEntradasEl = document.getElementById('caixa-resumo-entradas');
   var resumoSaidasEl = document.getElementById('caixa-resumo-saidas');
   var resumoSaldoEl = document.getElementById('caixa-resumo-saldo');
+  var bancoTagEl = document.getElementById('caixa-summary-banco-tag');
+  var bancoTagTextEl = document.getElementById('caixa-summary-banco-tag-text');
 
   function updateResumo(matching) {
     var totalEntradas = 0;
@@ -145,6 +200,9 @@
     resumoSaldoEl.textContent = (saldo < 0 ? '-' : '') + formatMoeda(Math.abs(saldo));
     resumoSaldoEl.classList.toggle('caixa-valor-saida', saldo < 0);
     resumoSaldoEl.classList.toggle('caixa-valor-entrada', saldo >= 0);
+
+    bancoTagEl.hidden = !state.banco;
+    if (state.banco) bancoTagTextEl.textContent = state.banco;
   }
 
   function applyFilters() {
@@ -221,8 +279,9 @@
     historico: { cellIndex: 1, type: 'text' },
     pessoa: { cellIndex: 2, type: 'text' },
     categoria: { cellIndex: 3, type: 'text' },
-    tipo: { cellIndex: 4, type: 'text' },
-    valor: { cellIndex: 5, type: 'number' }
+    banco: { cellIndex: 4, type: 'text' },
+    tipo: { cellIndex: 5, type: 'text' },
+    valor: { cellIndex: 6, type: 'number' }
   };
   var sortState = { key: null, dir: 'asc' };
   var headerRow = document.getElementById('caixa-header-row');
@@ -350,6 +409,26 @@
   });
   var categoriaDropdown = initDropdown(document.getElementById('dropdown-categoria'));
 
+  // Banco: populado com os valores REALMENTE presentes nos lançamentos
+  // (nunca o catálogo de Contas Bancárias) — o texto livre gravado em cada
+  // lançamento (`banco`) nem sempre bate com a descrição cadastrada ali,
+  // então a única forma de garantir que toda opção do filtro filtra de
+  // verdade é derivar as opções do próprio dataset.
+  var bancoMenu = document.getElementById('caixa-banco-menu');
+  var bancosUnicos = [];
+  window.NiveloCaixa.list().forEach(function (l) {
+    if (l.banco && bancosUnicos.indexOf(l.banco) === -1) bancosUnicos.push(l.banco);
+  });
+  bancosUnicos.sort();
+  bancosUnicos.forEach(function (banco) {
+    var optionEl = document.createElement('div');
+    optionEl.className = 'option';
+    optionEl.dataset.value = banco;
+    optionEl.textContent = banco;
+    bancoMenu.appendChild(optionEl);
+  });
+  var bancoDropdown = initDropdown(document.getElementById('dropdown-banco'));
+
   // ---------- Agrupamento de Filtros (FilterPopover) ----------
   var filtrosPopoverEl = document.getElementById('caixa-filtros-popover');
   var filtrosTriggerRoot = document.getElementById('caixa-filtros-trigger-root');
@@ -393,6 +472,7 @@
 
   document.getElementById('caixa-filtros-aplicar').addEventListener('click', function () {
     state.categoria = document.getElementById('dropdown-categoria').dataset.value || '';
+    state.banco = document.getElementById('dropdown-banco').dataset.value || '';
     state.page = 1;
     closeFiltrosPopover();
     applyFilters();
@@ -400,178 +480,38 @@
 
   document.getElementById('caixa-filtros-limpar').addEventListener('click', function () {
     categoriaDropdown.reset('', 'Todas as categorias');
+    bancoDropdown.reset('', 'Todos os bancos');
     state.categoria = '';
+    state.banco = '';
     resetPeriod();
     state.page = 1;
     applyFilters();
   });
 
-  // ---------- Período (intervalo de datas): Popover + calendário aninhado
-  // dentro do Agrupamento de Filtros — mesma composição já usada em Notas
-  // fiscais/Dashboard (dois cliques pra escolher início/fim). ----------
-  (function initPeriodPicker() {
-    var MONTH_NAMES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-      'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-
-    var trigger = document.getElementById('caixa-period-trigger');
-    var valueEl = document.getElementById('caixa-period-value');
-    var popover = document.getElementById('caixa-period-popover');
-    var startInput = document.getElementById('caixa-period-start-input');
-    var endInput = document.getElementById('caixa-period-end-input');
-    var calLabel = popover.querySelector('[data-period-label]');
-    var calGrid = popover.querySelector('[data-period-grid]');
-
-    var draft = { start: null, end: null, viewYear: 0, viewMonth: 0 };
-    var applied = null;
-
-    function pad2(n) { return n < 10 ? '0' + n : String(n); }
-    function toInputValue(date) { return date ? date.getFullYear() + '-' + pad2(date.getMonth() + 1) + '-' + pad2(date.getDate()) : ''; }
-    function parseInputValue(value) {
-      if (!value) return null;
-      var parts = value.split('-');
-      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  // ---------- Período: seletor de modo (Sem filtro/Últimos 30 dias/Dia/
+  // Mês/Intervalo), aninhado dentro do Agrupamento de Filtros — ver
+  // period-filter.js (mesmo componente usado em toda tabela do sistema). ----------
+  var periodFilter = window.NiveloPeriodFilter.init({
+    mount: document.getElementById('caixa-period-mount'),
+    onApply: function (result) {
+      state.periodStart = result.mode === 'none' ? null : result.start;
+      state.periodEnd = result.mode === 'none' ? null : result.end;
     }
-    function formatDatePt(date) { return pad2(date.getDate()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear(); }
-    function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
-    function capitalize(text) { return text.charAt(0).toUpperCase() + text.slice(1); }
+  });
 
-    function renderCalendar() {
-      calLabel.textContent = capitalize(MONTH_NAMES[draft.viewMonth]) + ' de ' + draft.viewYear;
-      var firstWeekday = new Date(draft.viewYear, draft.viewMonth, 1).getDay();
-      var daysInMonth = new Date(draft.viewYear, draft.viewMonth + 1, 0).getDate();
-      var html = '';
-      for (var e = 0; e < firstWeekday; e++) html += '<span class="caixa-period-day-empty"></span>';
-      for (var day = 1; day <= daysInMonth; day++) {
-        var date = new Date(draft.viewYear, draft.viewMonth, day);
-        var classes = ['caixa-period-day', 'text-12-regular'];
-        if (draft.start && sameDay(date, draft.start)) classes.push('is-start');
-        if (draft.end && sameDay(date, draft.end)) classes.push('is-end');
-        if (draft.start && draft.end && date > draft.start && date < draft.end) classes.push('is-in-range');
-        html += '<button type="button" class="' + classes.join(' ') + '" data-date="' + toInputValue(date) + '">' + day + '</button>';
-      }
-      calGrid.innerHTML = html;
-    }
-
-    function pickDate(date) {
-      if (!draft.start || (draft.start && draft.end)) {
-        draft.start = date;
-        draft.end = null;
-      } else if (date < draft.start) {
-        draft.end = draft.start;
-        draft.start = date;
-      } else {
-        draft.end = date;
-      }
-      startInput.value = toInputValue(draft.start);
-      endInput.value = toInputValue(draft.end);
-      renderCalendar();
-    }
-
-    calGrid.addEventListener('click', function (event) {
-      var btn = event.target.closest('.caixa-period-day');
-      if (!btn) return;
-      pickDate(parseInputValue(btn.dataset.date));
-    });
-
-    popover.querySelector('[data-period-prev]').addEventListener('click', function () {
-      draft.viewMonth--;
-      if (draft.viewMonth < 0) { draft.viewMonth = 11; draft.viewYear--; }
-      renderCalendar();
-    });
-    popover.querySelector('[data-period-next]').addEventListener('click', function () {
-      draft.viewMonth++;
-      if (draft.viewMonth > 11) { draft.viewMonth = 0; draft.viewYear++; }
-      renderCalendar();
-    });
-
-    startInput.addEventListener('change', function () {
-      var date = parseInputValue(startInput.value);
-      if (!date) return;
-      draft.start = date;
-      if (draft.end && draft.end < draft.start) draft.end = null;
-      draft.viewYear = date.getFullYear();
-      draft.viewMonth = date.getMonth();
-      renderCalendar();
-    });
-    endInput.addEventListener('change', function () {
-      var date = parseInputValue(endInput.value);
-      if (!date) return;
-      if (draft.start && date < draft.start) {
-        draft.end = draft.start;
-        draft.start = date;
-        startInput.value = toInputValue(draft.start);
-      } else {
-        draft.end = date;
-      }
-      renderCalendar();
-    });
-
-    function positionPeriodPopover() {
-      var margin = 16;
-      var width = Math.min(300, window.innerWidth - margin * 2);
-      var rect = trigger.getBoundingClientRect();
-      var left = rect.left;
-      if (left + width > window.innerWidth - margin) left = window.innerWidth - margin - width;
-      if (left < margin) left = margin;
-      popover.style.position = 'fixed';
-      popover.style.left = left + 'px';
-      popover.style.width = width + 'px';
-      popover.style.top = (rect.bottom + 4) + 'px';
-    }
-
-    function openPeriodPopover() {
-      var base = draft.start || new Date();
-      draft.viewYear = base.getFullYear();
-      draft.viewMonth = base.getMonth();
-      renderCalendar();
-      popover.hidden = false;
-      positionPeriodPopover();
-    }
-    function closePeriodPopoverInternal() { popover.hidden = true; }
-
-    trigger.addEventListener('click', function (event) {
-      event.stopPropagation();
-      if (popover.hidden) openPeriodPopover(); else closePeriodPopoverInternal();
-    });
-
-    document.getElementById('caixa-period-cancel').addEventListener('click', function () {
-      draft.start = applied ? applied.start : null;
-      draft.end = applied ? applied.end : null;
-      startInput.value = toInputValue(draft.start);
-      endInput.value = toInputValue(draft.end);
-      closePeriodPopoverInternal();
-    });
-
-    document.getElementById('caixa-period-apply').addEventListener('click', function () {
-      if (draft.start && draft.end) {
-        applied = { start: draft.start, end: draft.end };
-        valueEl.textContent = formatDatePt(draft.start) + ' até ' + formatDatePt(draft.end);
-        valueEl.classList.remove('caixa-period-placeholder');
-        state.periodStart = toInputValue(draft.start);
-        state.periodEnd = toInputValue(draft.end);
-      }
-      closePeriodPopoverInternal();
-    });
-
-    window.resetPeriodPicker = function () {
-      draft = { start: null, end: null, viewYear: 0, viewMonth: 0 };
-      applied = null;
-      startInput.value = '';
-      endInput.value = '';
-      valueEl.textContent = 'Todo o período';
-      valueEl.classList.add('caixa-period-placeholder');
-      state.periodStart = null;
-      state.periodEnd = null;
-    };
-    window.closePeriodPopoverPublic = closePeriodPopoverInternal;
-  })();
-
-  function closePeriodPopover() { if (window.closePeriodPopoverPublic) window.closePeriodPopoverPublic(); }
-  function resetPeriod() { if (window.resetPeriodPicker) window.resetPeriodPicker(); }
+  function closePeriodPopover() {}
+  function resetPeriod() {
+    periodFilter.reset();
+    state.periodStart = null;
+    state.periodEnd = null;
+  }
 
   // ---------- Navegação ----------
   document.getElementById('new-lancamento-btn').addEventListener('click', function () {
     window.location.href = 'novo-lancamento-caixa.html';
+  });
+  document.getElementById('transferencia-btn').addEventListener('click', function () {
+    window.location.href = 'transferencia-entre-contas.html';
   });
   var emptyGlobalBtn = document.getElementById('caixa-empty-global-btn');
   if (emptyGlobalBtn) {
@@ -595,8 +535,9 @@
         '<dl class="caixa-mobile-card-fields">' +
           '<div><dt class="text-10-regular">Cliente ou Fornecedor</dt><dd class="text-12-regular">' + cellText(row.children[2]) + '</dd></div>' +
           '<div><dt class="text-10-regular">Categoria</dt><dd class="text-12-regular">' + cellText(row.children[3]) + '</dd></div>' +
-          '<div><dt class="text-10-regular">Tipo</dt><dd class="text-12-regular">' + row.children[4].innerHTML + '</dd></div>' +
-          '<div><dt class="text-10-regular">Valor</dt><dd class="text-12-regular">' + row.children[5].innerHTML + '</dd></div>' +
+          '<div><dt class="text-10-regular">Banco</dt><dd class="text-12-regular">' + cellText(row.children[4]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Tipo</dt><dd class="text-12-regular">' + row.children[5].innerHTML + '</dd></div>' +
+          '<div><dt class="text-10-regular">Valor</dt><dd class="text-12-regular">' + row.children[6].innerHTML + '</dd></div>' +
         '</dl>' +
       '</div>'
     );
@@ -612,12 +553,12 @@
   // respeita busca/filtros aplicados, não a paginação nem o dataset inteiro). ----------
   function exportToExcel() {
     var rows = Array.prototype.slice.call(tbody.querySelectorAll('.tr')).filter(function (row) { return !row.classList.contains('is-filtered-out'); });
-    var headers = ['Data', 'Histórico', 'Cliente ou Fornecedor', 'Categoria', 'Tipo', 'Valor'];
+    var headers = ['Data', 'Histórico', 'Cliente ou Fornecedor', 'Categoria', 'Banco', 'Tipo', 'Valor'];
     var lines = [headers.join(';')];
     rows.forEach(function (row) {
-      var values = [0, 1, 2, 3].map(function (i) { return cellText(row.children[i]); });
-      values.push(cellText(row.children[4]));
+      var values = [0, 1, 2, 3, 4].map(function (i) { return cellText(row.children[i]); });
       values.push(cellText(row.children[5]));
+      values.push(cellText(row.children[6]));
       lines.push(values.join(';'));
     });
 

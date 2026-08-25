@@ -101,10 +101,6 @@
     window.location.href = 'fazenda-detalhe.html#id=' + card.dataset.fazendaId;
   });
 
-  document.getElementById('nova-anotacao-btn').addEventListener('click', function () {
-    window.location.href = 'nova-anotacao.html';
-  });
-
   document.getElementById('caderno-empty-global-btn').addEventListener('click', function () {
     window.location.href = 'nova-fazenda.html';
   });

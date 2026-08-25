@@ -1,0 +1,80 @@
+/* ══════════════════════════════════════════════════════════
+   TRANSFERÊNCIA ENTRE CONTAS — formulário de criação, acessado pelo botão
+   secundário da tela de Caixa. Mobile first. Estrutura/tokens copiados
+   deliberadamente de page-nova-conta-pagar.css (mesmo "card único +
+   subseção" já aprovado no restante do sistema) — classes próprias
+   (`tec-*`), não um arquivo compartilhado.
+   ══════════════════════════════════════════════════════════ */
+
+.tec-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.tec-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.tec-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.tec-back:hover { color: var(--color-text-primary); }
+.tec-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Seção (1 único `.card` do Table pro formulário) ──────────────────── */
+
+#tec-form { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+.tec-subsection { padding: var(--spacing-lg); }
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.tec-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .tec-grid { grid-template-columns: 1fr 1fr; }
+  .tec-span-2 { grid-column: span 2; }
+}
+
+.tec-dropdown { position: relative; }
+
+.tec-grid input.input { width: 100%; height: 44px; }
+.menu .option { display: block; }
+
+/* Mensagem de erro: mesmo padrão do resto do sistema — `.errorText` só
+   aparece quando `.wrapper`/campo ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+.dpRoot.error .dpTrigger { border-color: var(--color-action-error); }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.tec-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .tec-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .tec-actions .btn { min-width: 160px; }
+}

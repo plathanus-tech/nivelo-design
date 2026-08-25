@@ -416,170 +416,23 @@
     applyFilters();
   });
 
-  // ---------- Período (intervalo de datas): Popover + calendário aninhado
-  // dentro do Agrupamento de Filtros — mesma composição de "Período
-  // personalizado" do Dashboard (dois cliques pra escolher início/fim),
-  // reaproveitada aqui com prefixo próprio (`nf-`). ----------
-  (function initPeriodPicker() {
-    var MONTH_NAMES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-      'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-
-    var fieldRoot = document.getElementById('nf-period-field');
-    var trigger = document.getElementById('nf-period-trigger');
-    var valueEl = document.getElementById('nf-period-value');
-    var popover = document.getElementById('nf-period-popover');
-    var startInput = document.getElementById('nf-period-start-input');
-    var endInput = document.getElementById('nf-period-end-input');
-    var calLabel = popover.querySelector('[data-period-label]');
-    var calGrid = popover.querySelector('[data-period-grid]');
-
-    var draft = { start: null, end: null, viewYear: 0, viewMonth: 0 };
-    var applied = null;
-
-    function pad2(n) { return n < 10 ? '0' + n : String(n); }
-    function toInputValue(date) { return date ? date.getFullYear() + '-' + pad2(date.getMonth() + 1) + '-' + pad2(date.getDate()) : ''; }
-    function parseInputValue(value) {
-      if (!value) return null;
-      var parts = value.split('-');
-      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  // ---------- Período: seletor de modo (Sem filtro/Últimos 30 dias/Dia/
+  // Mês/Intervalo), aninhado dentro do Agrupamento de Filtros — ver
+  // period-filter.js (mesmo componente usado em toda tabela do sistema). ----------
+  var periodFilter = window.NiveloPeriodFilter.init({
+    mount: document.getElementById('nf-period-mount'),
+    onApply: function (result) {
+      state.periodStart = result.mode === 'none' ? null : result.start;
+      state.periodEnd = result.mode === 'none' ? null : result.end;
     }
-    function formatDatePt(date) { return pad2(date.getDate()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear(); }
-    function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
-    function capitalize(text) { return text.charAt(0).toUpperCase() + text.slice(1); }
+  });
 
-    function renderCalendar() {
-      calLabel.textContent = capitalize(MONTH_NAMES[draft.viewMonth]) + ' de ' + draft.viewYear;
-      var firstWeekday = new Date(draft.viewYear, draft.viewMonth, 1).getDay();
-      var daysInMonth = new Date(draft.viewYear, draft.viewMonth + 1, 0).getDate();
-      var html = '';
-      for (var e = 0; e < firstWeekday; e++) html += '<span class="nf-period-day-empty"></span>';
-      for (var day = 1; day <= daysInMonth; day++) {
-        var date = new Date(draft.viewYear, draft.viewMonth, day);
-        var classes = ['nf-period-day', 'text-12-regular'];
-        if (draft.start && sameDay(date, draft.start)) classes.push('is-start');
-        if (draft.end && sameDay(date, draft.end)) classes.push('is-end');
-        if (draft.start && draft.end && date > draft.start && date < draft.end) classes.push('is-in-range');
-        html += '<button type="button" class="' + classes.join(' ') + '" data-date="' + toInputValue(date) + '">' + day + '</button>';
-      }
-      calGrid.innerHTML = html;
-    }
-
-    function pickDate(date) {
-      if (!draft.start || (draft.start && draft.end)) {
-        draft.start = date;
-        draft.end = null;
-      } else if (date < draft.start) {
-        draft.end = draft.start;
-        draft.start = date;
-      } else {
-        draft.end = date;
-      }
-      startInput.value = toInputValue(draft.start);
-      endInput.value = toInputValue(draft.end);
-      renderCalendar();
-    }
-
-    calGrid.addEventListener('click', function (event) {
-      var btn = event.target.closest('.nf-period-day');
-      if (!btn) return;
-      pickDate(parseInputValue(btn.dataset.date));
-    });
-
-    popover.querySelector('[data-period-prev]').addEventListener('click', function () {
-      draft.viewMonth--;
-      if (draft.viewMonth < 0) { draft.viewMonth = 11; draft.viewYear--; }
-      renderCalendar();
-    });
-    popover.querySelector('[data-period-next]').addEventListener('click', function () {
-      draft.viewMonth++;
-      if (draft.viewMonth > 11) { draft.viewMonth = 0; draft.viewYear++; }
-      renderCalendar();
-    });
-
-    startInput.addEventListener('change', function () {
-      var date = parseInputValue(startInput.value);
-      if (!date) return;
-      draft.start = date;
-      if (draft.end && draft.end < draft.start) draft.end = null;
-      draft.viewYear = date.getFullYear();
-      draft.viewMonth = date.getMonth();
-      renderCalendar();
-    });
-    endInput.addEventListener('change', function () {
-      var date = parseInputValue(endInput.value);
-      if (!date) return;
-      if (draft.start && date < draft.start) {
-        draft.end = draft.start;
-        draft.start = date;
-        startInput.value = toInputValue(draft.start);
-      } else {
-        draft.end = date;
-      }
-      renderCalendar();
-    });
-
-    function positionPeriodPopover() {
-      var margin = 16;
-      var width = Math.min(300, window.innerWidth - margin * 2);
-      var rect = trigger.getBoundingClientRect();
-      var left = rect.left;
-      if (left + width > window.innerWidth - margin) left = window.innerWidth - margin - width;
-      if (left < margin) left = margin;
-      popover.style.position = 'fixed';
-      popover.style.left = left + 'px';
-      popover.style.width = width + 'px';
-      popover.style.top = (rect.bottom + 4) + 'px';
-    }
-
-    function openPeriodPopover() {
-      var base = draft.start || new Date();
-      draft.viewYear = base.getFullYear();
-      draft.viewMonth = base.getMonth();
-      renderCalendar();
-      popover.hidden = false;
-      positionPeriodPopover();
-    }
-    function closePeriodPopoverInternal() { popover.hidden = true; }
-
-    trigger.addEventListener('click', function (event) {
-      event.stopPropagation();
-      if (popover.hidden) openPeriodPopover(); else closePeriodPopoverInternal();
-    });
-
-    document.getElementById('nf-period-cancel').addEventListener('click', function () {
-      draft.start = applied ? applied.start : null;
-      draft.end = applied ? applied.end : null;
-      startInput.value = toInputValue(draft.start);
-      endInput.value = toInputValue(draft.end);
-      closePeriodPopoverInternal();
-    });
-
-    document.getElementById('nf-period-apply').addEventListener('click', function () {
-      if (draft.start && draft.end) {
-        applied = { start: draft.start, end: draft.end };
-        valueEl.textContent = formatDatePt(draft.start) + ' até ' + formatDatePt(draft.end);
-        valueEl.classList.remove('nf-period-placeholder');
-        state.periodStart = toInputValue(draft.start);
-        state.periodEnd = toInputValue(draft.end);
-      }
-      closePeriodPopoverInternal();
-    });
-
-    window.resetPeriodPicker = function () {
-      draft = { start: null, end: null, viewYear: 0, viewMonth: 0 };
-      applied = null;
-      startInput.value = '';
-      endInput.value = '';
-      valueEl.textContent = 'Todo o período';
-      valueEl.classList.add('nf-period-placeholder');
-      state.periodStart = null;
-      state.periodEnd = null;
-    };
-    window.closePeriodPopoverPublic = closePeriodPopoverInternal;
-  })();
-
-  function closePeriodPopover() { if (window.closePeriodPopoverPublic) window.closePeriodPopoverPublic(); }
-  function resetPeriod() { if (window.resetPeriodPicker) window.resetPeriodPicker(); }
+  function closePeriodPopover() {}
+  function resetPeriod() {
+    periodFilter.reset();
+    state.periodStart = null;
+    state.periodEnd = null;
+  }
 
   // ---------- Ações da tabela ----------
   function openViewScreen(numero) {

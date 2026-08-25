@@ -34,12 +34,6 @@
         </div>
       </div>
 
-      <div class="app-header-right">
-        <button type="button" class="btn secondary" id="notebook-btn">
-          <i data-lucide="book-open" width="16" height="16"></i>
-          <span class="app-header-notebook-label">Caderno de campo</span>
-        </button>
-      </div>
     </header>
 
     <div class="app-body">
@@ -62,6 +56,29 @@
               <span class="app-nav-label">Dashboard</span>
             </button>
 
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
             <div class="app-nav-group" id="group-cadastro">
               <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
                 <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
@@ -71,11 +88,11 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Pessoas e empresas</span>
+                  <span class="app-nav-label">Cliente e fornecedor</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos e serviços</span>
+                  <span class="app-nav-label">Produtos</span>
                 </button>
               </div>
             </div>
@@ -85,7 +102,7 @@
               <span class="app-nav-label">Estoque</span>
             </button>
 
-                                    <div class="app-nav-group is-open" id="group-financeiro">
+            <div class="app-nav-group is-open" id="group-financeiro">
               <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="true" data-tooltip="Financeiro · opções">
                 <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
                 <span class="app-nav-label">Financeiro</span>
@@ -112,9 +129,9 @@
             </div>
 
             <div class="app-nav-group" id="group-vendas">
-              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Fiscal · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Vendas · opções">
                 <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
-                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-label">Vendas</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -129,23 +146,10 @@
               </div>
             </div>
 
-            <div class="app-nav-group" id="group-assistente-ia">
-              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
-                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
-                <span class="app-nav-label">Assistente IA</span>
-                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="app-nav-submenu">
-                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
-                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
-                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Histórico</span>
-                </button>
-              </div>
-            </div>
+            
+
+            
+
           </div>
 
           <div class="app-nav-section">
@@ -208,10 +212,6 @@
               <span class="app-nav-label">Canal de ideias</span>
             </button>
 
-            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
-              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
-              <span class="app-nav-label">Vídeos</span>
-            </button>
           </div>
 
           <div class="app-nav-section">
@@ -224,6 +224,11 @@
                 </svg>
               </span>
               <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
             </button>
 
             <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">

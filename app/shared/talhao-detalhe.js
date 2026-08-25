@@ -12,7 +12,8 @@
   var TIPO_ANOTACAO = {
     despesa: { icon: 'arrow-up-circle', label: 'Despesa' },
     venda: { icon: 'arrow-down-circle', label: 'Venda' },
-    colheita: { icon: 'wheat', label: 'Colheita' }
+    colheita: { icon: 'wheat', label: 'Colheita' },
+    anotacao: { icon: 'file-text', label: 'Anotação' }
   };
 
   var currentFazenda = null;
@@ -142,14 +143,16 @@
   // (própria, só quando existir). Linha 3: data/hora.
   function buildAnotacaoRowHTML(a) {
     var tipo = TIPO_ANOTACAO[a.tipo];
-    var valorText = a.tipo === 'colheita' ? a.quantidade + ' ' + formatUnidade(a.quantidade, a.unidade) : formatBRL(a.valor);
+    var valorText = a.tipo === 'colheita' ? a.quantidade + ' ' + formatUnidade(a.quantidade, a.unidade)
+      : a.tipo === 'anotacao' ? ''
+      : formatBRL(a.valor);
     return (
       '<div class="anotacao-row">' +
         '<span class="anotacao-row-icon" data-tipo="' + a.tipo + '"><i data-lucide="' + tipo.icon + '" width="18" height="18"></i></span>' +
         '<div class="anotacao-row-body">' +
           '<div class="anotacao-row-top">' +
             '<strong class="anotacao-row-tipo text-body-s">' + tipo.label + '</strong>' +
-            '<span class="anotacao-row-value text-body-s">' + valorText + '</span>' +
+            (valorText ? '<span class="anotacao-row-value text-body-s">' + valorText + '</span>' : '') +
           '</div>' +
           (a.observacao ? '<div class="anotacao-row-observacao text-body-s">' + a.observacao + '</div>' : '') +
           '<div class="anotacao-row-meta text-body-xs">' + formatDataHora(a.dataHora) + '</div>' +

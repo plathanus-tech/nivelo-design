@@ -9,7 +9,6 @@
   var backdrop = document.getElementById('sidebar-backdrop');
   var hamburgerBtn = document.getElementById('hamburger-btn');
   var sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
-  var notebookBtn = document.getElementById('notebook-btn');
   // Exclui os botões de expandir/recolher grupo (Financeiro/Vendas/
   // Configuração/Fiscal) — eles também têm a classe `.app-nav-item`/
   // `.app-nav-subitem` (pro mesmo visual), mas clicar neles só abre/fecha
@@ -189,13 +188,13 @@
   });
 
   // ---------- Item ativo (demonstração visual, sem navegação real) ----------
-  // "Sair", "Dashboard", "Cadastro > Pessoas e empresas", "Cadastro >
-  // Produtos", "Estoque", "Configuração > Cadastro de fazenda",
-  // "Configuração > Categorias de receitas e despesas" e "Vendas > Notas
-  // fiscais" navegam de verdade (telas reais já existem, ver
+  // "Sair", "Dashboard", "Caderno de campo", "Cadastro > Cliente e
+  // fornecedor", "Cadastro > Produtos", "Estoque", "Configuração > Cadastro
+  // de fazenda", "Configuração > Categorias de receitas e despesas" e
+  // "Vendas > Notas fiscais" navegam de verdade (telas reais já existem, ver
   // NAV_DESTINATIONS abaixo); os demais itens só alternam o destaque
   // visual, sem destino ainda (nenhuma tela construída pra eles).
-  var NAV_DESTINATIONS = { dashboard: 'dashboard.html', 'cadastro-pessoas': 'cadastros.html', 'cadastro-produtos': 'produtos.html', estoque: 'estoque.html', 'config-fazenda': 'fazendas.html', 'config-conta-bancaria': 'contas-bancarias.html', 'config-conta-financeira': 'contas-financeiras.html', 'config-categorias': 'categorias-financeiras.html', 'fiscal-natureza': 'naturezas-operacao.html', 'fiscal-certificado': 'certificado-digital.html', 'fiscal-nota-entrada': 'fiscal.html','vendas-nota-fiscal': 'notas-fiscais.html', 'financeiro-caixa': 'caixa.html', 'financeiro-pagar': 'contas-a-pagar.html', 'financeiro-receber': 'contas-a-receber.html', 'financeiro-relatorios': 'relatorios.html', 'canal-ideias': 'canal-ideias.html', 'assistente-numeros': 'meus-numeros-whatsapp.html', 'assistente-nova-conversa': 'nova-conversa.html', 'fiscal-manifesto': 'manifestos.html', videos: 'videos.html', 'config-minha-conta': 'minha-conta.html' };
+  var NAV_DESTINATIONS = { dashboard: 'dashboard.html', 'caderno-campo': 'caderno-de-campo.html', 'cadastro-pessoas': 'cadastros.html', 'cadastro-produtos': 'produtos.html', estoque: 'estoque.html', 'config-fazenda': 'fazendas.html', 'config-conta-bancaria': 'contas-bancarias.html', 'config-conta-financeira': 'contas-financeiras.html', 'config-categorias': 'categorias-financeiras.html', 'fiscal-natureza': 'naturezas-operacao.html', 'fiscal-certificado': 'certificado-digital.html', 'fiscal-nota-entrada': 'fiscal.html','vendas-nota-fiscal': 'notas-fiscais.html', 'financeiro-caixa': 'caixa.html', 'financeiro-pagar': 'contas-a-pagar.html', 'financeiro-receber': 'contas-a-receber.html', 'financeiro-relatorios': 'relatorios.html', 'canal-ideias': 'canal-ideias.html', 'assistente-numeros': 'meus-numeros-whatsapp.html', 'assistente-nova-conversa': 'nova-conversa.html', 'fiscal-manifesto': 'manifestos.html', videos: 'videos.html', 'config-minha-conta': 'minha-conta.html' };
 
   navItems.forEach(function (item) {
     if (item.dataset.nav === 'sair' || NAV_DESTINATIONS[item.dataset.nav]) return;
@@ -207,13 +206,9 @@
     });
   });
 
-  // "Caderno de campo" navega de verdade pra `caderno-de-campo.html` a
-  // partir de QUALQUER tela (este script é compartilhado por todas) —
-  // ver app/CLAUDE.md, Jornada · Caderno de Campo.
-  notebookBtn.addEventListener('click', function () {
-    window.location.href = 'caderno-de-campo.html';
-  });
-
+  // "Caderno de campo" agora é um item de topo real da Sidebar (antes vivia
+  // só no Header) — navega de verdade via NAV_DESTINATIONS abaixo, junto com
+  // os demais itens com tela real.
   document.querySelector('[data-nav="sair"]').addEventListener('click', function () {
     window.location.href = 'login.html';
   });

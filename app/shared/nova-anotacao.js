@@ -258,7 +258,8 @@
     closeNovaSafraDialog();
   });
 
-  // ---------- Tipo de anotação: cards selecionáveis (Despesa/Venda/Colheita) ----------
+  // ---------- Tipo de anotação: cards selecionáveis (Despesa/Venda/Colheita/
+  // Anotação) ----------
   var tipoInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="tipo-anotacao"]'));
   var valorField = document.getElementById('valor-field');
   var quantidadeField = document.getElementById('quantidade-field');
@@ -266,6 +267,15 @@
   var unidadeDropdown = initDropdown(unidadeField, function () {
     unidadeField.classList.remove('error');
   });
+
+  // "Anotação" é um tipo independente e mais simples que os demais: sem
+  // Cultura/Safra (não é um registro de produção) e sem Valor/Quantidade/
+  // Unidade (não é uma movimentação financeira/de colheita) — só a
+  // Observação, que passa a ser o campo obrigatório desse tipo.
+  var culturaSafraSubsection = document.getElementById('cultura-safra-subsection');
+  var observacaoField = document.getElementById('observacao-field');
+  var observacaoInput = document.getElementById('na-observacao');
+  var observacaoOptionalTag = document.getElementById('observacao-optional-tag');
 
   function currentTipo() {
     var checked = tipoInputs.filter(function (i) { return i.checked; })[0];
@@ -278,9 +288,20 @@
       input.closest('.nova-anotacao-tipo-card').classList.toggle('is-selected', input.checked);
     });
     var isColheita = tipo === 'colheita';
-    valorField.hidden = isColheita;
+    var isAnotacao = tipo === 'anotacao';
+
+    culturaSafraSubsection.hidden = isAnotacao;
+    if (isAnotacao) culturaSafraSubsection.classList.remove('error');
+
+    valorField.hidden = isColheita || isAnotacao;
     quantidadeField.hidden = !isColheita;
     unidadeField.hidden = !isColheita;
+
+    observacaoOptionalTag.hidden = isAnotacao;
+    observacaoInput.placeholder = isAnotacao
+      ? 'Escreva sua anotação aqui...'
+      : 'Ex.: Compra de adubo para o Talhão 1';
+    if (!isAnotacao) observacaoField.classList.remove('error');
   }
 
   tipoInputs.forEach(function (input) {
@@ -306,6 +327,10 @@
   var quantidadeInput = document.getElementById('na-quantidade');
   quantidadeInput.addEventListener('input', function () {
     if (Number(quantidadeInput.value) > 0) quantidadeField.classList.remove('error');
+  });
+
+  observacaoInput.addEventListener('input', function () {
+    if (observacaoInput.value.trim()) observacaoField.classList.remove('error');
   });
 
   // ---------- Pré-seleção via query string (?fazenda=&talhao=) — vindo do
@@ -366,15 +391,30 @@
     talhaoField.classList.toggle('error', talhaoInvalid);
     if (talhaoInvalid) isValid = false;
 
-    var culturaInvalid = !culturaField.dataset.value;
-    culturaField.classList.toggle('error', culturaInvalid);
-    if (culturaInvalid) isValid = false;
+    var isAnotacao = tipo === 'anotacao';
 
-    var safraInvalid = !safraField.dataset.value;
-    safraField.classList.toggle('error', safraInvalid);
-    if (safraInvalid) isValid = false;
+    if (isAnotacao) {
+      culturaField.classList.remove('error');
+      safraField.classList.remove('error');
+    } else {
+      var culturaInvalid = !culturaField.dataset.value;
+      culturaField.classList.toggle('error', culturaInvalid);
+      if (culturaInvalid) isValid = false;
 
-    if (tipo === 'colheita') {
+      var safraInvalid = !safraField.dataset.value;
+      safraField.classList.toggle('error', safraInvalid);
+      if (safraInvalid) isValid = false;
+    }
+
+    if (isAnotacao) {
+      var observacaoInvalid = !observacaoInput.value.trim();
+      observacaoField.classList.toggle('error', observacaoInvalid);
+      if (observacaoInvalid) isValid = false;
+
+      valorField.classList.remove('error');
+      quantidadeField.classList.remove('error');
+      unidadeField.classList.remove('error');
+    } else if (tipo === 'colheita') {
       var quantidadeInvalid = !(Number(quantidadeInput.value) > 0);
       quantidadeField.classList.toggle('error', quantidadeInvalid);
       if (quantidadeInvalid) isValid = false;
@@ -384,6 +424,7 @@
       if (unidadeInvalid) isValid = false;
 
       valorField.classList.remove('error');
+      observacaoField.classList.remove('error');
     } else {
       var valorInvalid = !(valorCentavos > 0);
       valorField.classList.toggle('error', valorInvalid);
@@ -391,6 +432,7 @@
 
       quantidadeField.classList.remove('error');
       unidadeField.classList.remove('error');
+      observacaoField.classList.remove('error');
     }
 
     if (!isValid) return;
@@ -399,16 +441,19 @@
       fazendaId: fazendaField.dataset.value,
       talhaoId: talhaoField.dataset.value,
       tipo: tipo,
-      observacao: document.getElementById('na-observacao').value.trim(),
-      cultura: culturaField.dataset.value,
-      safra: safraField.dataset.value,
+      observacao: observacaoInput.value.trim(),
       dataHora: dataHoraISO
     };
+
+    if (!isAnotacao) {
+      anotacao.cultura = culturaField.dataset.value;
+      anotacao.safra = safraField.dataset.value;
+    }
 
     if (tipo === 'colheita') {
       anotacao.quantidade = Number(quantidadeInput.value);
       anotacao.unidade = unidadeField.dataset.value;
-    } else {
+    } else if (!isAnotacao) {
       anotacao.valor = valorCentavos / 100;
     }
 

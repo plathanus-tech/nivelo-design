@@ -12,8 +12,6 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-dashboard.css" />
@@ -37,12 +35,6 @@
         </div>
       </div>
 
-      <div class="app-header-right">
-        <button type="button" class="btn secondary" id="notebook-btn">
-          <i data-lucide="book-open" width="16" height="16"></i>
-          <span class="app-header-notebook-label">Caderno de campo</span>
-        </button>
-      </div>
     </header>
 
     <div class="app-body">
@@ -65,7 +57,29 @@
               <span class="app-nav-label">Dashboard</span>
             </button>
 
-            <!-- Cadastros (expansível: Pessoas e empresas / Produtos) -->
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
             <div class="app-nav-group" id="group-cadastro">
               <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
                 <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
@@ -75,11 +89,11 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Pessoas e empresas</span>
+                  <span class="app-nav-label">Cliente e fornecedor</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos e serviços</span>
+                  <span class="app-nav-label">Produtos</span>
                 </button>
               </div>
             </div>
@@ -89,8 +103,7 @@
               <span class="app-nav-label">Estoque</span>
             </button>
 
-            <!-- Financeiro (expansível, independente de Vendas) -->
-                                    <div class="app-nav-group" id="group-financeiro">
+            <div class="app-nav-group" id="group-financeiro">
               <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
                 <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
                 <span class="app-nav-label">Financeiro</span>
@@ -116,11 +129,10 @@
               </div>
             </div>
 
-            <!-- Vendas (expansível, independente de Financeiro) -->
             <div class="app-nav-group" id="group-vendas">
-              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Fiscal · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Vendas · opções">
                 <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
-                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-label">Vendas</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -135,24 +147,6 @@
               </div>
             </div>
 
-            <!-- Assistente IA (expansível, independente dos demais grupos) -->
-            <div class="app-nav-group" id="group-assistente-ia">
-              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
-                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
-                <span class="app-nav-label">Assistente IA</span>
-                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="app-nav-submenu">
-                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
-                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
-                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Histórico</span>
-                </button>
-              </div>
-            </div>
           </div>
 
           <div class="app-nav-section">
@@ -217,10 +211,6 @@
               <span class="app-nav-label">Canal de ideias</span>
             </button>
 
-            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
-              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
-              <span class="app-nav-label">Vídeos</span>
-            </button>
           </div>
 
           <div class="app-nav-section">
@@ -236,6 +226,11 @@
                 </svg>
               </span>
               <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
             </button>
 
             <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
@@ -271,75 +266,6 @@
                 <i data-lucide="loader-2" width="16" height="16"></i>
               </span>
             </div>
-
-            <div class="dashboard-filters" id="dashboard-filters">
-              <!-- Filtro de Fazenda: só aparece quando o usuário tem mais de uma fazenda
-                   cadastrada (ver FARMS em dashboard.js) — escondido por padrão aqui. -->
-              <div class="dash-filter" id="filter-fazenda" hidden>
-                <div class="wrapper dash-dropdown" id="dropdown-fazenda" data-dropdown>
-                  <span class="label">Fazenda</span>
-                  <button type="button" class="trigger" data-dropdown-trigger>
-                    <span class="placeholder" data-dropdown-value>Selecione a fazenda</span>
-                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                  </button>
-                  <div class="menu" data-dropdown-menu></div>
-                </div>
-              </div>
-
-              <div class="dash-filter" id="filter-periodo">
-                <div class="wrapper dash-dropdown" id="dropdown-periodo" data-dropdown data-value="6m">
-                  <span class="label">Período</span>
-                  <button type="button" class="trigger" data-dropdown-trigger>
-                    <span data-dropdown-value>Últimos 6 meses</span>
-                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                  </button>
-                  <div class="menu" data-dropdown-menu>
-                    <div class="option" data-value="3m">Últimos 3 meses</div>
-                    <div class="option selected" data-value="6m">Últimos 6 meses</div>
-                    <div class="option" data-value="12m">Últimos 12 meses</div>
-                    <div class="option" data-value="safra">Safra atual</div>
-                    <div class="option" data-value="custom">Período personalizado</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Popover do período personalizado: fica FORA do fluxo normal
-                   (position:fixed via JS), pra nunca empurrar o cabeçalho/
-                   layout do Dashboard, só sobrepor. Ver dashboard.js. -->
-              <div class="dash-period-popover" id="period-popover" hidden>
-                <div class="dash-period-popover-fields">
-                  <div class="wrapper">
-                    <span class="label">Data inicial</span>
-                    <div class="inputWrap"><input type="date" class="input" id="period-start-input" /></div>
-                  </div>
-                  <div class="wrapper">
-                    <span class="label">Data final</span>
-                    <div class="inputWrap"><input type="date" class="input" id="period-end-input" /></div>
-                  </div>
-                </div>
-
-                <div class="dash-calendar">
-                  <div class="dash-calendar-header">
-                    <button type="button" class="actionBtn" data-cal-prev aria-label="Mês anterior">
-                      <i data-lucide="chevron-left" width="16" height="16"></i>
-                    </button>
-                    <span class="dash-calendar-label" data-cal-label></span>
-                    <button type="button" class="actionBtn" data-cal-next aria-label="Próximo mês">
-                      <i data-lucide="chevron-right" width="16" height="16"></i>
-                    </button>
-                  </div>
-                  <div class="dash-calendar-weekdays">
-                    <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
-                  </div>
-                  <div class="dash-calendar-grid" data-cal-grid></div>
-                </div>
-
-                <div class="dash-period-popover-actions">
-                  <button type="button" class="btn secondary sm" data-period-cancel>Cancelar</button>
-                  <button type="button" class="btn primary sm" data-period-apply>Aplicar</button>
-                </div>
-              </div>
-            </div>
           </div>
 
           <!-- Aviso de renovação próxima (licença anual, até 30 dias do vencimento) —
@@ -359,7 +285,7 @@
               <div class="cardHeader">
                 <div class="dash-card-title-row">
                   <span class="dash-card-icon"><i data-lucide="sprout" width="18" height="18"></i></span>
-                  <h2 class="title" id="card-safra-title">Safra 2025/2026</h2>
+                  <h2 class="title" id="card-safra-title">Safras</h2>
                 </div>
               </div>
               <div class="dash-card-body">
@@ -370,7 +296,7 @@
                 <div class="dash-stat-list" data-content>
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Soja</span>
+                      <span class="dash-stat-label text-16-regular">Soja 2026</span>
                       <span class="dash-stat-sub text-12-regular">média 62 sc/ha</span>
                     </div>
                     <div class="dash-stat-value">
@@ -379,7 +305,7 @@
                   </div>
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Milho</span>
+                      <span class="dash-stat-label text-16-regular">Milho 2025/2026</span>
                       <span class="dash-stat-sub text-12-regular">média 140 sc/ha</span>
                     </div>
                     <div class="dash-stat-value">
@@ -388,7 +314,7 @@
                   </div>
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Trigo</span>
+                      <span class="dash-stat-label text-16-regular">Trigo 2026</span>
                       <span class="dash-stat-sub text-12-regular">média 55 sc/ha</span>
                     </div>
                     <div class="dash-stat-value">
@@ -527,48 +453,41 @@
                   <h2 class="title" id="card-pagar-title">Contas a pagar</h2>
                 </div>
                 <p class="subtitle dash-card-meta">
-                  <span class="dash-card-meta-value out" id="pagar-meta-value">R$ 99.500,00</span> · <span data-period-text>Últimos 6 meses</span>
+                  <span class="dash-card-meta-value out" id="pagar-meta-value">R$ 99.500,00</span>
                 </p>
               </div>
-              <div class="dash-table-body" data-content>
-                <div class="tableWrap">
-                  <table class="table">
-                    <thead>
-                      <tr class="headerRow">
-                        <th class="th">Vencto.</th>
-                        <th class="th">Descrição</th>
-                        <th class="th th-right">Valor</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="tr">
-                        <td class="td">Abr/25</td>
-                        <td class="td">Financiamento Sicredi</td>
-                        <td class="td td-right">R$ 28.400,00</td>
-                      </tr>
-                      <tr class="tr">
-                        <td class="td">Mai/25</td>
-                        <td class="td">Insumos, Soja</td>
-                        <td class="td td-right">R$ 14.200,00</td>
-                      </tr>
-                      <tr class="tr">
-                        <td class="td">Jun/25</td>
-                        <td class="td">Arrendamento 40 ha</td>
-                        <td class="td td-right">R$ 22.000,00</td>
-                      </tr>
-                      <tr class="tr">
-                        <td class="td">Jul/25</td>
-                        <td class="td">Financiamento BB</td>
-                        <td class="td td-right">R$ 18.600,00</td>
-                      </tr>
-                    </tbody>
-                  </table>
+              <div class="dash-card-body" data-content>
+                <div class="dash-stat-list">
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Em atraso</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 22.000,00</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Este mês</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 35.400,00</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Próximo mês</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 42.100,00</span>
+                    </div>
+                  </div>
                 </div>
                 <a href="#" class="dash-card-footer-link">Ver todas as contas<i data-lucide="arrow-right" width="14" height="14"></i></a>
               </div>
               <div class="dash-empty" data-empty hidden>
                 <i data-lucide="arrow-up-circle" width="28" height="28"></i>
-                <p class="text-14-regular">Nenhuma conta a pagar nos últimos 6 meses.</p>
+                <p class="text-14-regular">Nenhuma conta a pagar no momento.</p>
               </div>
             </section>
 
@@ -579,48 +498,41 @@
                   <h2 class="title" id="card-receber-title">Contas a receber</h2>
                 </div>
                 <p class="subtitle dash-card-meta">
-                  <span class="dash-card-meta-value in" id="receber-meta-value">R$ 274.350,00</span> · <span data-period-text>Últimos 6 meses</span>
+                  <span class="dash-card-meta-value in" id="receber-meta-value">R$ 274.350,00</span>
                 </p>
               </div>
-              <div class="dash-table-body" data-content>
-                <div class="tableWrap">
-                  <table class="table">
-                    <thead>
-                      <tr class="headerRow">
-                        <th class="th">Vencto.</th>
-                        <th class="th">Descrição</th>
-                        <th class="th th-right">Valor</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="tr">
-                        <td class="td">Abr/25</td>
-                        <td class="td">Venda de Soja, Lote 1</td>
-                        <td class="td td-right">R$ 82.000,00</td>
-                      </tr>
-                      <tr class="tr">
-                        <td class="td">Mai/25</td>
-                        <td class="td">Venda de Soja, Lote 2</td>
-                        <td class="td td-right">R$ 64.000,00</td>
-                      </tr>
-                      <tr class="tr">
-                        <td class="td">Jun/25</td>
-                        <td class="td">Venda de Milho, Lote 1</td>
-                        <td class="td td-right">R$ 31.200,00</td>
-                      </tr>
-                      <tr class="tr">
-                        <td class="td">Jul/25</td>
-                        <td class="td">Venda de Trigo, Lote 1</td>
-                        <td class="td td-right">R$ 22.050,00</td>
-                      </tr>
-                    </tbody>
-                  </table>
+              <div class="dash-card-body" data-content>
+                <div class="dash-stat-list">
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Em atraso</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 64.000,00</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Este mês</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 92.050,00</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular">Próximo mês</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 118.300,00</span>
+                    </div>
+                  </div>
                 </div>
                 <a href="#" class="dash-card-footer-link">Ver todas as contas<i data-lucide="arrow-right" width="14" height="14"></i></a>
               </div>
               <div class="dash-empty" data-empty hidden>
                 <i data-lucide="arrow-down-circle" width="28" height="28"></i>
-                <p class="text-14-regular">Nenhuma conta a receber nos últimos 6 meses.</p>
+                <p class="text-14-regular">Nenhuma conta a receber no momento.</p>
               </div>
             </section>
 

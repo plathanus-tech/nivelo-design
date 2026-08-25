@@ -5,10 +5,7 @@
    ainda): `.card`/`.cardHeader`/`.title`/`.subtitle` vêm de
    `Table.module.css`, aqui só recebem um leve reforço visual
    (`.dash-card`, sombra sutil) via seletor composto — mesmo padrão de
-   correção já usado pra colisões Input×Checkbox (ver rules.md). Filtros
-   (Fazenda/Período) reaproveitam `Dropdown`/`Input.module.css` da mesma
-   forma — conferido que `.wrapper`/`.label`/`.errorText`/`.msgIcon` têm
-   regras idênticas nos dois arquivos, sem colisão real.
+   correção já usado pra colisões Input×Checkbox (ver rules.md).
    ══════════════════════════════════════════════════════════ */
 
 /* ── Aviso de renovação próxima (licença anual, ≤30 dias) ─────────────── */
@@ -102,18 +99,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-}
-
-/* Desktop: título alinhado à esquerda, filtros no lado oposto da MESMA
-   linha (não colados ao título) — `justify-content:space-between` com só
-   esses 2 filhos (`h1` + `.dashboard-filters`) empurra cada um pra uma
-   ponta, deixando o espaço disponível entre eles. */
-@media (min-width: 1024px) {
-  .dashboard-topbar {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
 }
 
 .dashboard-heading {
@@ -256,191 +241,6 @@
   #plan-expired-overlay .footer .btn {
     width: 100%;
   }
-}
-
-/* ── Filtros (Fazenda / Período) ──────────────────────────────────────── */
-
-.dashboard-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--spacing-md);
-}
-
-/* Com Fazenda + Período visíveis juntos (usuário com mais de uma fazenda,
-   ver `dashboard.js`), os dois ficam lado a lado numa grid de 2 colunas
-   iguais em qualquer largura — sem isso, `.dash-filter{width:100%}`
-   (mobile-first, abaixo) empilharia os dois verticalmente até 1024px. Cada
-   `.dash-filter` já é `width:100%`; dentro da grid isso só preenche a
-   própria coluna, então nenhuma regra de largura precisa mudar. Abaixo de
-   380px (telas muito estreitas) volta a empilhar, pra não espremer demais
-   os dois triggers de Dropdown lado a lado. */
-.dashboard-filters.has-farm {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (max-width: 320px) {
-  .dashboard-filters.has-farm {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Mobile: cada filtro ocupa 100% da largura do conteúdo (mesmo padding
-   lateral do resto do Dashboard, herdado de `.app-main`/`.dashboard-grid`).
-   Desktop: volta a ter uma largura compacta, lado a lado. */
-.dash-filter {
-  width: 100%;
-}
-
-@media (min-width: 1024px) {
-  .dash-filter {
-    width: auto;
-    flex: 0 1 220px;
-    min-width: 180px;
-  }
-}
-
-/* Dropdown reaproveitado como filtro: mais compacto que o tamanho padrão
-   do componente (pensado pra formulários largos), sem alterar sua lógica. */
-.dash-dropdown .trigger {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: var(--font-size-sm);
-}
-.dash-dropdown .label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-.dash-dropdown .option {
-  font-size: var(--font-size-sm);
-}
-
-/* ── Popover de período personalizado ─────────────────────────────────── */
-/* Mesma linguagem visual do Popover da Sidebar retraída (superfície +
-   borda sutil + radius-md + shadow-lg) — não é um componente dedicado no
-   Storybook ainda, mas já é o padrão de "card flutuante" estabelecido
-   neste sistema, reaproveitado aqui em vez de inventar um novo. Posição
-   (`top`/`left`/`width`) é sempre inline, calculada via JS
-   (`getBoundingClientRect()` do filtro) — nunca no fluxo normal do
-   documento, por isso não afeta a altura/posição do cabeçalho. */
-.dash-period-popover:not([hidden]) {
-  position: fixed;
-  z-index: 60;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: var(--color-bg-surface);
-  border: var(--border-width-thin) solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-}
-
-.dash-period-popover-fields {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.dash-period-popover-fields .wrapper {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.dash-period-popover-fields .label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-.dash-period-popover-fields .input {
-  height: 36px;
-  font-size: var(--font-size-sm);
-  padding: var(--spacing-xs) var(--spacing-sm);
-}
-
-.dash-period-popover-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-sm);
-  padding-top: var(--spacing-sm);
-  border-top: var(--border-width-thin) solid var(--color-border-subtle);
-}
-
-/* ── Calendário (composição própria a partir de tokens — sem componente
-   dedicado no Storybook ainda, ver rules.md) ─────────────────────────── */
-
-.dash-calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dash-calendar-label {
-  flex: 1;
-  text-align: center;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-}
-
-.dash-calendar-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-  padding-bottom: var(--spacing-xs);
-}
-
-.dash-calendar-weekdays span {
-  text-align: center;
-  color: var(--color-text-tertiary);
-  text-transform: uppercase;
-}
-
-.dash-calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-
-.dash-calendar-day,
-.dash-calendar-day-empty {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dash-calendar-day {
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-full);
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-.dash-calendar-day:hover {
-  background: var(--color-bg-subtle);
-}
-
-.dash-calendar-day.is-in-range {
-  background: var(--color-bg-brand);
-  border-radius: var(--radius-xs);
-}
-
-.dash-calendar-day.is-in-range:hover {
-  filter: brightness(0.97);
-}
-
-.dash-calendar-day.is-start,
-.dash-calendar-day.is-end {
-  background: var(--color-action-primary);
-  color: var(--color-text-inverse);
-  font-weight: var(--font-weight-medium);
-}
-
-.dash-calendar-day.is-start:hover,
-.dash-calendar-day.is-end:hover {
-  background: var(--color-action-primary-hover);
 }
 
 .dashboard-row {
@@ -633,36 +433,6 @@
 
 .dash-card-meta-value.out { color: var(--color-text-error); }
 .dash-card-meta-value.in  { color: var(--color-text-success); }
-
-/* ── Tabelas (Contas a pagar / a receber) ─────────────────────────────── */
-
-.th-right,
-.td-right {
-  text-align: right;
-}
-
-/* O início da tabela precisa ficar alinhado com o título/ícone do card
-   (mesmo padding horizontal de `.cardHeader`) — sem isso a tabela parece
-   deslocada pra esquerda em relação ao resto do card. */
-.dash-table-body {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 0 var(--spacing-lg) var(--spacing-lg);
-}
-
-/* Zebra striping específico do Dashboard: alterna entre o fundo do próprio
-   card (`bg-surface`, "invisível") e `gray-100` (mais perceptível que
-   `gray-50`, testado a pedido do usuário) — override sobre o zebra padrão
-   do Table (`bg-subtle`/`bg-default`), via seletor composto (mesmo padrão
-   de correção já documentado em rules.md pra colisões/ajustes de
-   componente). Cabeçalho (`.th`) recebe o mesmo `gray-100`, unificando o
-   tom em vez de deixá-lo só nas linhas ímpares. Table.module.css em si não
-   muda — outros consumidores do componente mantêm o zebra padrão. */
-.dash-table-body .th { background: var(--color-gray-100); }
-.dash-table-body .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
-.dash-table-body .tr:nth-child(even) .td { background: var(--color-gray-100); }
-.dash-table-body .tr:hover .td { filter: brightness(0.97); }
 
 /* ── Clima ─────────────────────────────────────────────────────────────── */
 

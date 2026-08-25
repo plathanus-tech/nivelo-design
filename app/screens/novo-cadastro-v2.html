@@ -4,7 +4,7 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Novo produto — Nivelo</title>
+  <title>Novo cadastro (V2) — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
@@ -13,10 +13,10 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
-  <link rel="stylesheet" href="../shared/page-novo-produto.css" />
+  <link rel="stylesheet" href="../shared/page-novo-cadastro.css" />
+  <link rel="stylesheet" href="../shared/page-novo-cadastro-v2.css" />
 </head>
 <body>
 
@@ -87,11 +87,11 @@
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
-                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                <button type="button" class="app-nav-subitem is-active" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
                   <span class="app-nav-label">Cliente e fornecedor</span>
                 </button>
-                <button type="button" class="app-nav-subitem is-active" data-nav="cadastro-produtos">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
                   <span class="app-nav-label">Produtos</span>
                 </button>
@@ -243,294 +243,289 @@
         </div>
       </aside>
 
-      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVO PRODUTO ══════════════════ -->
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVO CADASTRO ══════════════════ -->
       <main class="app-main">
-        <div class="novo-produto-page">
+        <div class="novo-cadastro-page">
 
-          <div class="novo-produto-header">
-            <a href="produtos.html" class="novo-produto-back" id="novo-produto-back-top">
+          <div class="novo-cadastro-header">
+            <a href="cadastros.html" class="novo-cadastro-back" id="novo-cadastro-back-top">
               <i data-lucide="arrow-left" width="18" height="18"></i>
               Voltar
             </a>
-            <h1 class="novo-produto-title text-heading-6" id="novo-produto-page-title">Novo produto</h1>
+            <div class="novo-cadastro-title-row">
+              <h1 class="novo-cadastro-title text-heading-6" id="novo-cadastro-title">Novo cadastro</h1>
+              <!-- Variante V2 em validação com o cliente — só um selo visual pra
+                   deixar claro que esta não é a tela oficial ainda; a versão
+                   atual (novo-cadastro.html) continua intocada e acessível. -->
+              <span class="badge" data-status="info"><span class="badgeDot"></span>V2 · em validação</span>
+            </div>
           </div>
 
-          <form id="novo-produto-form" novalidate>
+          <form id="novo-cadastro-form" novalidate>
 
-            <section class="card novo-produto-card">
+            <section class="card novo-cadastro-card">
 
-              <!-- ══════════════ 1. INFORMAÇÕES PRINCIPAIS ══════════════ -->
-              <div class="novo-produto-subsection">
-                <h2 class="novo-produto-subsection-title">Informações principais</h2>
-                <div class="novo-produto-grid">
+            <!-- ══════════════ 1. DADOS DO CADASTRO ══════════════ -->
+            <div class="novo-cadastro-subsection">
+              <h2 class="novo-cadastro-subsection-title">Dados do cadastro</h2>
+                <div class="novo-cadastro-grid">
 
-                  <div class="wrapper novo-produto-span-2" id="nome-field">
-                    <label class="label" for="np-nome">Nome</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="np-nome" placeholder="Ex.: Soja" aria-describedby="nome-error" />
-                    </div>
-                    <span class="errorText" id="nome-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Informe o nome do produto.
-                    </span>
-                  </div>
-
-                  <div class="wrapper" id="codigo-referencia-field">
-                    <label class="label" for="np-codigo-referencia">Código Referência (SKU)</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="np-codigo-referencia" placeholder="Ex.: REF-SOJA-01" aria-describedby="codigo-referencia-error" />
-                    </div>
-                    <span class="errorText" id="codigo-referencia-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Informe o código de referência (SKU).
-                    </span>
-                  </div>
-
-                  <div class="wrapper novo-produto-dropdown" id="categoria-field">
-                    <span class="label">Categoria do Produto</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span class="placeholder" data-dropdown-value>Selecione a categoria</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="categoria-menu"></div>
-                    <span class="errorText" id="categoria-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione a categoria do produto.
-                    </span>
-                  </div>
-
-                  <div class="wrapper" id="codigo-field">
-                    <label class="label" for="np-codigo">Código</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="np-codigo" disabled readonly />
-                    </div>
-                    <span class="helperText">Gerado automaticamente.</span>
-                  </div>
-
-                  <div class="wrapper novo-produto-dropdown" id="origem-icms-field">
-                    <span class="label">Origem conforme ICMS</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span class="placeholder" data-dropdown-value>Selecione a origem</span>
+                  <!-- V2: Tipo + Código sobem pra primeira linha, acima do Nome —
+                       o Tipo é quem decide se o restante do formulário aparece
+                       completo ou simplificado (Transportadora Própria), então
+                       ele precisa ser a primeira decisão do usuário na tela. -->
+                  <!-- Tipo: multi-seleção (uma pessoa/empresa pode ser Cliente E
+                       Fornecedor, por exemplo) — mesma estrutura wrapper/trigger/
+                       menu/option do Dropdown de seleção única, só com `multiple`
+                       pra sinalizar o comportamento diferente pro JS: cada seleção
+                       vira uma tag removível dentro do próprio trigger, e o menu
+                       fica aberto entre cliques pra permitir marcar mais de uma
+                       opção seguida. -->
+                  <div class="wrapper novo-cadastro-dropdown novo-cadastro-dropdown-multi" id="tipo-field">
+                    <span class="label">Tipo</span>
+                    <button type="button" class="trigger multiTrigger" data-dropdown-trigger>
+                      <span class="novo-cadastro-tags" data-dropdown-value data-placeholder="Selecione um ou mais tipos"></span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
                     <div class="menu" data-dropdown-menu>
-                      <div class="option" data-value="0">0 · Nacional, exceto as indicadas nos códigos 3, 4, 5 e 8</div>
-                      <div class="option" data-value="1">1 · Estrangeira, importação direta, exceto a indicada no código 6</div>
-                      <div class="option" data-value="2">2 · Estrangeira, adquirida no mercado interno, exceto a indicada no código 7</div>
-                      <div class="option" data-value="3">3 · Nacional, conteúdo de importação superior a 40% e igual ou inferior a 70%</div>
-                      <div class="option" data-value="4">4 · Nacional, produção em conformidade com processos produtivos básicos</div>
-                      <div class="option" data-value="5">5 · Nacional, conteúdo de importação inferior ou igual a 40%</div>
-                      <div class="option" data-value="6">6 · Estrangeira, importação direta, sem similar nacional</div>
-                      <div class="option" data-value="7">7 · Estrangeira, adquirida no mercado interno, sem similar nacional</div>
-                      <div class="option" data-value="8">8 · Nacional, conteúdo de importação superior a 70%</div>
+                      <div class="option optionCheckbox" data-value="cliente"><span class="optionCheck"><i data-lucide="check" width="12" height="12"></i></span>Cliente</div>
+                      <div class="option optionCheckbox" data-value="fornecedor"><span class="optionCheck"><i data-lucide="check" width="12" height="12"></i></span>Fornecedor</div>
+                      <div class="option optionCheckbox" data-value="transportadora"><span class="optionCheck"><i data-lucide="check" width="12" height="12"></i></span>Transportadora</div>
                     </div>
-                    <span class="errorText" id="origem-icms-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione a origem conforme ICMS.
+                  </div>
+
+                  <div class="wrapper" id="code-field">
+                    <label class="label" for="nc-code">Código</label>
+                    <!-- Dois triggers de tooltip INDEPENDENTES pro mesmo campo:
+                         hover no campo inteiro (`#code-input-tip-trigger`) mostra só o
+                         balão dele, centralizado acima do campo; hover no ícone
+                         (`#code-icon-tip-trigger`) mostra só o balão dele, centralizado
+                         no ícone. Posição em `position:fixed` calculada via JS
+                         (novo-cadastro.js, `initFixedTooltip()`) — não mais CSS puro
+                         `:hover`/`.wrapper`: o `.tip` de CADA trigger é um descendente
+                         do `.wrapper` do CAMPO inteiro (`#code-field`, do próprio
+                         Input), então a regra genérica `.wrapper:hover .tip` do
+                         Tooltip.module.css mostrava os DOIS balões juntos sempre que o
+                         mouse estava em QUALQUER lugar do campo (ver `#code-field .tip`
+                         em page-novo-cadastro.css, que neutraliza essa regra). -->
+                    <div class="novo-cadastro-code-input-tooltip" id="code-input-tip-trigger" tabindex="0">
+                      <div class="inputWrap">
+                        <input class="input" type="text" id="nc-code" name="code" disabled readonly />
+                      </div>
+                      <span class="tip text-body-xs top">
+                        <span class="arrow"></span>
+                        Este código é gerado automaticamente pelo sistema.
+                      </span>
+                    </div>
+                    <span class="helperText novo-cadastro-code-help">
+                      Sequencial
+                      <span class="novo-cadastro-tooltip-info" id="code-icon-tip-trigger" tabindex="0">
+                        <i data-lucide="info" width="14" height="14"></i>
+                        <span class="tip text-body-xs top">
+                          <span class="arrow"></span>
+                          Este código é gerado automaticamente pelo sistema.
+                        </span>
+                      </span>
                     </span>
                   </div>
 
-                  <div class="wrapper" id="cest-field">
-                    <label class="label" for="np-cest">CEST <span class="novo-produto-optional-tag">(opcional)</span></label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="np-cest" placeholder="Ex.: 20.038.00" />
-                    </div>
-                  </div>
-
-                  <div class="wrapper" id="ncm-field">
-                    <label class="label" for="np-ncm">NCM</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="np-ncm" placeholder="Ex.: 1201.90.00" />
-                    </div>
-                    <span class="helperText">Obrigatório quando o produto for utilizado em vendas ou emissão de nota fiscal.</span>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- ══════════════ 2. CONVERSÃO E ARMAZENAMENTO ══════════════ -->
-              <div class="novo-produto-subsection">
-                <h2 class="novo-produto-subsection-title">Conversão e armazenamento</h2>
-                <div class="novo-produto-grid">
-
-                  <div class="wrapper novo-produto-dropdown" id="unidade-volume-field">
-                    <span class="label">Unidade de Volume</span>
+                  <!-- Só aparece quando Transportadora é o ÚNICO tipo marcado —
+                       ver ncv2.js: `refreshTransportadoraField()`. Decide se o
+                       restante do formulário fica completo (Terceira) ou
+                       simplificado (Própria). -->
+                  <div class="wrapper novo-cadastro-dropdown" id="tipo-transportadora-field" hidden>
+                    <span class="label">Tipo de transportadora</span>
                     <button type="button" class="trigger" data-dropdown-trigger>
                       <span class="placeholder" data-dropdown-value>Selecione</span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
                     <div class="menu" data-dropdown-menu>
-                      <div class="option" data-value="CX">CX · Caixa</div>
-                      <div class="option" data-value="UN">UN · Unidade</div>
-                      <div class="option" data-value="KG">KG · Quilograma</div>
-                      <div class="option" data-value="LT">LT · Litro</div>
-                      <div class="option" data-value="PT">PT · Pacote</div>
-                      <div class="option" data-value="FR">FR · Fardo</div>
-                      <div class="option" data-value="SC">SC · Saco</div>
+                      <div class="option" data-value="propria">Própria</div>
+                      <div class="option" data-value="terceira">Terceira</div>
                     </div>
-                    <span class="helperText">Unidade base usada pelo sistema para conversão e controle quantitativo.</span>
-                    <span class="errorText" id="unidade-volume-error">
+                  </div>
+
+                  <div class="wrapper" id="name-field">
+                    <label class="label" for="nc-name">Nome</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="nc-name" name="name" placeholder="Nome completo ou razão social" aria-describedby="name-error" />
+                    </div>
+                    <span class="errorText" id="name-error">
                       <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione a unidade de volume.
+                      Informe o nome.
                     </span>
                   </div>
 
-                  <div class="wrapper novo-produto-dropdown" id="unidade-medida-field">
-                    <span class="label">Unidade de Medida</span>
+                  <div class="wrapper" id="fantasy-field">
+                    <label class="label" for="nc-fantasy">Nome fantasia</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="nc-fantasy" name="fantasyName" placeholder="Nome fantasia (opcional)" />
+                    </div>
+                  </div>
+
+                  <div class="wrapper novo-cadastro-dropdown" id="pessoa-tipo-field">
+                    <span class="label">Tipo de pessoa</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span data-dropdown-value>Pessoa física</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu>
+                      <div class="option selected" data-value="fisica">Pessoa física</div>
+                      <div class="option" data-value="juridica">Pessoa jurídica</div>
+                    </div>
+                  </div>
+
+                  <!-- CPF/CNPJ: um único campo que troca label/placeholder/máscara
+                       conforme o Tipo de pessoa (ver novo-cadastro.js), em vez de dois
+                       campos separados alternando `hidden` — evita um valor de CPF
+                       "órfão" sobrando no DOM ao trocar pra Jurídica (e vice-versa). -->
+                  <div class="wrapper" id="document-field">
+                    <label class="label" for="nc-document" id="nc-document-label">CPF</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" inputmode="numeric" id="nc-document" name="document" placeholder="000.000.000-00" maxlength="14" />
+                    </div>
+                  </div>
+
+                </div>
+            </div>
+
+            <!-- ══════════════ 2. INFORMAÇÕES FISCAIS E CONTATO ══════════════ -->
+            <!-- V2: quando Transportadora Própria estiver selecionada, o título
+                 vira só "Informações fiscais" e Telefone/E-mail (Contato) somem
+                 — ver `ncv2.js`: `applyPropriaSimplification()`. -->
+            <div class="novo-cadastro-subsection">
+              <h2 class="novo-cadastro-subsection-title" id="fiscal-section-title">Informações fiscais e contato</h2>
+                <div class="novo-cadastro-grid">
+
+                  <div class="wrapper" id="ie-field">
+                    <label class="label" for="nc-ie">Inscrição estadual</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="nc-ie" name="stateRegistration" placeholder="Número da inscrição estadual" />
+                    </div>
+                  </div>
+
+                  <div class="wrapper novo-cadastro-dropdown" id="contribuinte-field">
+                    <span class="label">Contribuinte</span>
                     <button type="button" class="trigger" data-dropdown-trigger>
                       <span class="placeholder" data-dropdown-value>Selecione</span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
                     <div class="menu" data-dropdown-menu>
-                      <div class="option" data-value="CX">CX · Caixa</div>
-                      <div class="option" data-value="UN">UN · Unidade</div>
-                      <div class="option" data-value="KG">KG · Quilograma</div>
-                      <div class="option" data-value="LT">LT · Litro</div>
-                      <div class="option" data-value="PT">PT · Pacote</div>
-                      <div class="option" data-value="FR">FR · Fardo</div>
-                      <div class="option" data-value="SC">SC · Saco</div>
+                      <div class="option" data-value="icms">Contribuinte ICMS</div>
+                      <div class="option" data-value="isento">Contribuinte isento</div>
+                      <div class="option" data-value="nao-contribuinte">Não contribuinte</div>
                     </div>
-                    <span class="helperText">Unidade usada no dia a dia para comercializar ou movimentar o produto.</span>
-                    <span class="errorText" id="unidade-medida-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione a unidade de medida.
-                    </span>
                   </div>
 
-                  <div class="wrapper" id="fator-conversao-field">
-                    <label class="label" for="np-fator-conversao">Fator de Conversão</label>
+                  <div class="wrapper" id="phone-field">
+                    <label class="label" for="nc-phone">Telefone</label>
                     <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="np-fator-conversao" placeholder="Ex.: 60" aria-describedby="fator-conversao-error" />
+                      <input class="input" type="tel" inputmode="tel" id="nc-phone" name="phone" placeholder="(00) 00000-0000" maxlength="15" />
                     </div>
-                    <span class="helperText">Quantas unidades de Unidade de Volume equivalem a 1 Unidade de Medida.</span>
-                    <span class="errorText" id="fator-conversao-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Informe o fator de conversão.
-                    </span>
+                  </div>
+
+                  <div class="wrapper" id="email-field">
+                    <label class="label" for="nc-email">E-mail <span class="cadastro-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="email" id="nc-email" name="email" placeholder="email@propriedade.com.br" />
+                    </div>
                   </div>
 
                 </div>
-              </div>
+            </div>
 
-              <!-- ══════════════ 3. DIMENSÕES E PESO ══════════════ -->
-              <div class="novo-produto-subsection">
-                <h2 class="novo-produto-subsection-title">Dimensões e peso</h2>
-                <div class="novo-produto-grid">
+            <!-- ══════════════ 3. ENDEREÇO ══════════════ -->
+            <!-- V2: seção inteira escondida quando Transportadora Própria — ver
+                 `ncv2.js`: `applyPropriaSimplification()`. -->
+            <div class="novo-cadastro-subsection" id="address-section">
+              <h2 class="novo-cadastro-subsection-title">Endereço</h2>
+                <div class="novo-cadastro-grid">
 
-                  <div class="wrapper" id="altura-field">
-                    <label class="label" for="np-altura">Altura <span class="novo-produto-optional-tag">(opcional)</span></label>
+                  <div class="wrapper novo-cadastro-span-2" id="cep-field">
+                    <label class="label" for="nc-cep">CEP</label>
                     <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="np-altura" placeholder="0,00" />
+                      <input class="input" type="text" inputmode="numeric" autocomplete="postal-code" id="nc-cep" name="cep" placeholder="00000-000" maxlength="9" />
                     </div>
-                    <span class="helperText">Em centímetros (cm).</span>
                   </div>
 
-                  <div class="wrapper" id="largura-field">
-                    <label class="label" for="np-largura">Largura <span class="novo-produto-optional-tag">(opcional)</span></label>
+                  <div class="wrapper novo-cadastro-span-2" id="street-field">
+                    <label class="label" for="nc-street">Rua</label>
                     <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="np-largura" placeholder="0,00" />
+                      <input class="input" type="text" autocomplete="address-line1" id="nc-street" name="street" placeholder="Nome da rua" />
                     </div>
-                    <span class="helperText">Em centímetros (cm).</span>
                   </div>
 
-                  <div class="wrapper" id="comprimento-field">
-                    <label class="label" for="np-comprimento">Comprimento <span class="novo-produto-optional-tag">(opcional)</span></label>
+                  <div class="wrapper" id="number-field">
+                    <label class="label" for="nc-number">Número</label>
                     <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="np-comprimento" placeholder="0,00" />
+                      <input class="input" type="text" inputmode="numeric" autocomplete="address-line2" id="nc-number" name="number" placeholder="Nº" />
                     </div>
-                    <span class="helperText">Em centímetros (cm).</span>
                   </div>
 
-                  <div class="wrapper" id="peso-liquido-field">
-                    <label class="label" for="np-peso-liquido">Peso Líquido <span class="novo-produto-optional-tag">(opcional)</span></label>
+                  <div class="wrapper" id="complement-field">
+                    <label class="label" for="nc-complement">Complemento <span class="cadastro-optional-tag">(opcional)</span></label>
                     <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="np-peso-liquido" placeholder="0,00" />
+                      <input class="input" type="text" id="nc-complement" name="complement" placeholder="Apto, bloco, referência (opcional)" />
                     </div>
-                    <span class="helperText">Em quilogramas (kg).</span>
                   </div>
 
-                  <div class="wrapper" id="peso-bruto-field">
-                    <label class="label" for="np-peso-bruto">Peso Bruto <span class="novo-produto-optional-tag">(opcional)</span></label>
+                  <!-- Bairro → Cidade + Estado: mesma ordem/hierarquia do Step 2
+                       (Endereço) do fluxo de Criar Conta (cadastro-endereco.html):
+                       Bairro sozinho em largura cheia, depois Cidade+Estado lado a
+                       lado (Cidade primeiro). Aqui Cidade depende de Estado ter sido
+                       selecionado (dropdowns, não texto livre como lá) — a ordem
+                       visual só muda a posição no grid, a lógica de dependência
+                       continua em novo-cadastro.js por id, não por posição no DOM. -->
+                  <div class="wrapper novo-cadastro-span-2" id="district-field">
+                    <label class="label" for="nc-district">Bairro</label>
                     <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="np-peso-bruto" placeholder="0,00" />
-                    </div>
-                    <span class="helperText">Em quilogramas (kg).</span>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- ══════════════ 4. CONTROLE DE ESTOQUE ══════════════ -->
-              <div class="novo-produto-subsection">
-                <h2 class="novo-produto-subsection-title">Controle de estoque</h2>
-                <div class="novo-produto-grid">
-
-                  <div class="wrapper novo-produto-span-2" id="controla-estoque-field">
-                    <span class="label">Controla Estoque</span>
-                    <div class="group horizontal" role="radiogroup" aria-label="Controla Estoque">
-                      <label class="option">
-                        <input type="radio" class="input" name="controla-estoque" value="sim" checked />
-                        <span class="circle"><span class="dot"></span></span>
-                        <span class="optionLabel">Sim</span>
-                      </label>
-                      <label class="option">
-                        <input type="radio" class="input" name="controla-estoque" value="nao" />
-                        <span class="circle"><span class="dot"></span></span>
-                        <span class="optionLabel">Não</span>
-                      </label>
+                      <input class="input" type="text" autocomplete="address-level3" id="nc-district" name="district" placeholder="Bairro" />
                     </div>
                   </div>
 
-                  <div class="wrapper" id="qtd-minima-field">
-                    <label class="label" for="np-qtd-minima">Quantidade mínima em estoque</label>
-                    <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="1" id="np-qtd-minima" placeholder="0" aria-describedby="qtd-minima-error" />
-                    </div>
-                    <span class="errorText" id="qtd-minima-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Informe a quantidade mínima.
-                    </span>
-                  </div>
-
-                  <div class="wrapper" id="qtd-maxima-field">
-                    <label class="label" for="np-qtd-maxima">Quantidade máxima em estoque</label>
-                    <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="1" id="np-qtd-maxima" placeholder="0" aria-describedby="qtd-maxima-error" />
-                    </div>
-                    <span class="errorText" id="qtd-maxima-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      A quantidade máxima deve ser maior ou igual à mínima.
-                    </span>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- ══════════════ 5. STATUS ══════════════ -->
-              <div class="novo-produto-subsection">
-                <h2 class="novo-produto-subsection-title">Status</h2>
-                <div class="novo-produto-grid">
-
-                  <div class="wrapper novo-produto-dropdown" id="status-field" data-value="ativo">
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span data-dropdown-value>Ativo</span>
+                  <div class="wrapper novo-cadastro-dropdown" id="cidade-field">
+                    <span class="label">Cidade</span>
+                    <button type="button" class="trigger" data-dropdown-trigger disabled>
+                      <span class="placeholder" data-dropdown-value>Selecione o estado primeiro</span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
-                    <div class="menu" data-dropdown-menu>
-                      <div class="option selected" data-value="ativo">Ativo</div>
-                      <div class="option" data-value="cancelado">Cancelado</div>
-                      <div class="option" data-value="bloqueado">Bloqueado</div>
-                    </div>
+                    <div class="menu" data-dropdown-menu></div>
+                  </div>
+
+                  <div class="wrapper novo-cadastro-dropdown" id="estado-field">
+                    <span class="label">Estado</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione o estado</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu></div>
                   </div>
 
                 </div>
-              </div>
+            </div>
+
+            <!-- ══════════════ 4. CADASTRO DE VEÍCULOS (só Transportadora) ══════════════ -->
+            <div class="novo-cadastro-subsection" id="vehicles-section" hidden>
+              <h2 class="novo-cadastro-subsection-title">Cadastro de veículos</h2>
+
+                <div class="novo-cadastro-vehicles-empty" id="vehicles-empty">
+                  <i data-lucide="truck" width="28" height="28"></i>
+                  <p class="text-body-s">Nenhum veículo cadastrado.</p>
+                </div>
+
+                <div class="novo-cadastro-vehicles-list" id="vehicles-list"></div>
+
+                <button type="button" class="btn secondary hasLeft" id="add-vehicle-btn">
+                  <span class="icon"><i data-lucide="plus" width="16" height="16"></i></span>
+                  Adicionar veículo
+                </button>
+            </div>
 
             </section>
 
-            <div class="novo-produto-actions">
-              <a href="produtos.html" class="btn secondary" id="novo-produto-cancel">Cancelar</a>
-              <button type="submit" class="btn primary" id="novo-produto-submit">Salvar produto</button>
+            <div class="novo-cadastro-actions">
+              <a href="cadastros.html" class="btn secondary" id="novo-cadastro-cancel">Cancelar</a>
+              <button type="submit" class="btn primary" id="novo-cadastro-submit">Salvar cadastro</button>
             </div>
 
           </form>
@@ -542,42 +537,11 @@
 
   </div>
 
-  <!-- Tooltip compartilhado da Sidebar retraída -->
   <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
-
-  <!-- Modal "Adicionar nova categoria" — mesmo padrão de "Adicionar novo
-       local" (novo-estoque.html/js): categoria criada aqui vai pro catálogo
-       compartilhado (window.NiveloCategorias, persistido em localStorage) e
-       passa a aparecer em qualquer cadastro futuro. -->
-  <div class="overlay" id="nova-categoria-overlay" hidden>
-    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="nova-categoria-title">
-      <div class="header">
-        <h2 class="title" id="nova-categoria-title">Adicionar nova categoria</h2>
-        <button class="closeBtn" id="nova-categoria-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
-      </div>
-      <div class="body">
-        <div class="wrapper" id="nova-categoria-nome-field">
-          <label class="label" for="nova-categoria-nome">Nome da categoria</label>
-          <div class="inputWrap">
-            <input class="input" type="text" id="nova-categoria-nome" placeholder="Ex.: Sementes" />
-          </div>
-          <span class="errorText" id="nova-categoria-error">
-            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-            Informe o nome da categoria.
-          </span>
-        </div>
-      </div>
-      <div class="footer">
-        <button type="button" class="btn secondary sm" id="nova-categoria-cancel">Cancelar</button>
-        <button type="button" class="btn primary sm" id="nova-categoria-add">Adicionar</button>
-      </div>
-    </div>
-  </div>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
-  <script src="../shared/produtos-data.js"></script>
-  <script src="../shared/categorias-data.js"></script>
-  <script src="../shared/novo-produto.js"></script>
+  <script src="../shared/cadastros-data.js"></script>
+  <script src="../shared/novo-cadastro-v2.js"></script>
 </body>
 </html>

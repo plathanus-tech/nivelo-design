@@ -6,11 +6,14 @@
 // referenciam os ids de `window.NiveloFazendas` (mesmo array `talhoes` das
 // duas telas de Detalhe da fazenda) — sem duplicar dado entre os módulos.
 //
-// `tipo`: 'despesa' | 'venda' | 'colheita'.
+// `tipo`: 'despesa' | 'venda' | 'colheita' | 'anotacao'.
 // `valor` (reais, número) existe só em despesa/venda. `quantidade`/`unidade`
 // existem só em colheita (`unidade` é 'Saca'/'Kg'/'Litro', mesmo vocabulário
 // já usado no campo `unidade` de produtos-data.js) — nunca os dois pares
 // juntos, pra não ambiguar valor monetário com quantidade produzida.
+// `anotacao` é um registro livre, independente dos demais: só `observacao`
+// (obrigatória nesse tipo), sem `valor`/`quantidade`/`unidade`/`cultura`/
+// `safra`.
 //
 // `cultura` (round 42, campo do Storybook = `window.NiveloProdutos`,
 // categoria 'Grãos') e `safra` (`window.NiveloSafras`) registram QUAL
@@ -18,7 +21,8 @@
 // cultura do talhão naquele momento, não algo fixo por talhão. Uma nova
 // anotação pré-seleciona a cultura da ÚLTIMA anotação daquele talhão (ver
 // `findUltimaCultura`), caindo pra `talhao.cultura` (fazendas-data.js) se
-// ainda não houver nenhuma anotação.
+// ainda não houver nenhuma anotação. Não existem em anotações do tipo
+// `anotacao` (ver acima).
 window.NiveloCaderno = (function () {
   'use strict';
 

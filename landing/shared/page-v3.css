@@ -676,10 +676,11 @@ html { scroll-behavior: smooth; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   FUNCIONALIDADES — 5 cards lado a lado
+   FUNCIONALIDADES — 8 cards, 2 linhas de 4 no desktop
    Seção enxuta e visual: grid responsivo (1 col mobile, 2 cols
-   tablet, 5 cols desktop), ícone + nome + descrição curta, sem
-   listas de benefícios. CTA de conversão abaixo dos cards.
+   tablet, 4 cols desktop = 8 cards em 2 linhas de 4), ícone + nome
+   + descrição curta, sem listas de benefícios. CTA de conversão
+   abaixo dos cards.
    ══════════════════════════════════════════════════════════ */
 
 .features-section { padding: var(--spacing-3xl) 0; }
@@ -720,9 +721,6 @@ html { scroll-behavior: smooth; }
   justify-content: center;
   margin-bottom: var(--spacing-md);
 }
-.feature-card-icon--whatsapp { background-color: var(--color-whatsapp); }
-.feature-card-icon--whatsapp img { width: 24px; height: 24px; filter: brightness(0) invert(1); }
-
 .feature-card-name {
   font-family: var(--font-heading);
   font-size: var(--font-size-lg);
@@ -751,7 +749,7 @@ html { scroll-behavior: smooth; }
 }
 
 @media (min-width: 1120px) {
-  .features-grid { grid-template-columns: repeat(5, 1fr); gap: var(--spacing-sm); }
+  .features-grid { grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); }
   .feature-card { padding: var(--spacing-md); }
 }
 

@@ -1,0 +1,258 @@
+/* ══════════════════════════════════════════════════════════
+   NiveloPeriodFilter — visual do trigger + popover do filtro de Período,
+   compartilhado por toda tabela/relatório do sistema (ver period-filter.js).
+   O trigger reaproveita `.wrapper`/`.label`/`.trigger`/`.chevron` reais de
+   Input/Dropdown (já carregados em toda tela que usa este filtro) — só o
+   POPOVER (lista de modos + calendários + rodapé) é CSS novo, mesma
+   linguagem visual já estabelecida em todo popover deste sistema
+   (superfície + borda sutil + radius-md + shadow-lg, `position:fixed`
+   calculado via JS — ver Popover da Sidebar/Dashboard/Notas Fiscais). Zero
+   valor hardcoded, só tokens.
+   ══════════════════════════════════════════════════════════ */
+
+.pf-field .trigger { text-align: left; }
+
+.pf-popover {
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.pf-popover[hidden] { display: none; }
+
+/* ── Lista de modos (Sem filtro / Últimos 30 dias / Dia / Mês / Intervalo) ── */
+
+.pf-mode-list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xs);
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.pf-mode-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-sm);
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pf-mode-option:hover { background: var(--color-bg-subtle); }
+
+.pf-mode-option.is-selected {
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Área de detalhe (campos condicionais por modo) ── */
+
+.pf-mode-detail {
+  padding: var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.pf-mode-detail[hidden] { display: none; }
+
+/* ── Campo-gatilho de data (usado pelos modos "Dia" e "Intervalo") — mesma
+   composição visual do `dpTrigger`/`dpTriggerIcon`/`dpPlaceholder` reais do
+   DatePicker (Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css,
+   o mesmo componente usado em "Data inicial"/"Data final" do Balancete/DRE/
+   LCDPR/Entradas e Saídas): altura 44px, ícone de calendário à esquerda, cor/
+   padding/borda idênticos — reconstruído aqui em vez de importar o `.module.css`
+   do componente porque nem toda tela que usa este filtro carrega esse arquivo.
+   O calendário abaixo só aparece depois de clicar no campo, nunca os dois
+   (campo(s) + calendário) fixos na tela ao mesmo tempo. ── */
+
+.pf-date-fields {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.pf-date-field { flex: 1 1 0; min-width: 0; margin-bottom: var(--spacing-md); }
+.pf-date-fields .pf-date-field { margin-bottom: 0; }
+.pf-date-field .label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--color-text-secondary);
+}
+.pf-date-field .trigger {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-sm);
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+}
+.pf-date-field .trigger:hover { border-color: var(--color-border-default); }
+.pf-date-field .trigger.is-open { border-color: var(--color-border-default); }
+.pf-date-field-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+/* Nome de classe próprio (não `.placeholder`, que Dropdown.module.css deixa
+   sempre gray-300 independente do estado) — preenchido usa a cor normal de
+   texto do trigger; só `.is-placeholder` (campo ainda vazio) fica na cor
+   muted, mesmo contraste do `dpPlaceholder` real do DatePicker. */
+.pf-date-field-value { color: var(--color-text-primary); }
+.pf-date-field-value.is-placeholder { color: var(--color-text-disabled); }
+
+/* ── Calendário de dia — dropdown CLÁSSICO, flutuante, `position:fixed`
+   anexado a `document.body` (ver `openDateCalendar`/`dateCalendarPopover` em
+   period-filter.js) — sempre expande FORA do card do filtro, nunca inline
+   dentro do `.pf-mode-detail`. Mesma superfície/borda/raio/sombra do
+   `dpPopover` real do DatePicker, `z-index` maior que o `.pf-popover` (70)
+   já que flutua por cima dele. ── */
+
+.pf-date-calendar-popover {
+  z-index: 75;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.pf-date-calendar-popover[hidden] { display: none; }
+
+/* ── Calendário de dia/intervalo (mesma composição já usada em todo o
+   sistema — ver `.dash-calendar-*`/`.nf-period-*`, agora unificados aqui) ── */
+
+.pf-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pf-calendar-label {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.pf-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding-bottom: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.pf-calendar-weekdays span {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+}
+
+.pf-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.pf-calendar-day,
+.pf-calendar-day-empty {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+}
+
+.pf-calendar-day {
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.pf-calendar-day:hover { background: var(--color-bg-subtle); }
+
+.pf-calendar-day.is-in-range {
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-xs);
+}
+.pf-calendar-day.is-in-range:hover { filter: brightness(0.97); }
+
+.pf-calendar-day.is-selected,
+.pf-calendar-day.is-start,
+.pf-calendar-day.is-end {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+.pf-calendar-day.is-selected:hover,
+.pf-calendar-day.is-start:hover,
+.pf-calendar-day.is-end:hover { background: var(--color-action-primary-hover); }
+
+/* ── Grade de meses (modo "Mês") — mesma métrica do `dpMonthGrid` do
+   DatePicker real, reconstruída aqui pra não depender de carregar o
+   `.module.css` do componente em telas que não o usam por outro motivo. ── */
+
+.pf-month-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.pf-month-cell {
+  padding: var(--spacing-sm) 0;
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.pf-month-cell:hover { border-color: var(--color-action-primary); }
+
+.pf-month-cell.is-selected {
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Rodapé (Cancelar/Aplicar) ── */
+
+.pf-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+}

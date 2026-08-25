@@ -4,7 +4,7 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DRE — Nivelo</title>
+  <title>Transferência entre Contas — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
@@ -13,15 +13,15 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
-  <link rel="stylesheet" href="../shared/page-dre.css" />
+  <link rel="stylesheet" href="../shared/page-caixa.css" />
+  <link rel="stylesheet" href="../shared/page-transferencia-entre-contas.css" />
 </head>
 <body>
 
-  <div class="dre-toast-region" id="toast-region" aria-live="polite"></div>
+  <div class="caixa-toast-region" id="toast-region" aria-live="polite"></div>
 
   <div class="app-shell" id="app-shell">
 
@@ -113,7 +113,7 @@
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
-                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                <button type="button" class="app-nav-subitem is-active" data-nav="financeiro-caixa">
                   <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
                   <span class="app-nav-label">Caixa</span>
                 </button>
@@ -125,7 +125,7 @@
                   <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
                   <span class="app-nav-label">Contas a receber</span>
                 </button>
-                <button type="button" class="app-nav-subitem is-active" data-nav="financeiro-relatorios">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
                   <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
                   <span class="app-nav-label">Relatórios</span>
                 </button>
@@ -149,10 +149,6 @@
                 </button>
               </div>
             </div>
-
-            
-
-            
 
           </div>
 
@@ -248,78 +244,29 @@
         </div>
       </aside>
 
-      <!-- ══════════════════ CONTEÚDO PRINCIPAL — DRE ══════════════════ -->
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — TRANSFERÊNCIA ENTRE CONTAS ══════════════════ -->
       <main class="app-main">
-        <div class="dre-page">
+        <div class="tec-page">
 
-          <div class="dre-page-header">
-            <a href="relatorios.html" class="dre-back">
-              <i data-lucide="arrow-left" width="18" height="18"></i>
-              Voltar
-            </a>
-            <h1 class="dre-title text-heading-6">Demonstração do Resultado do Exercício (DRE)</h1>
-            <p class="dre-sub text-body-s">Analise o desempenho financeiro do período por meio das receitas, despesas e resultado obtido.</p>
+          <div class="tec-header">
+            <a href="caixa.html" class="tec-back"><i data-lucide="arrow-left" width="16" height="16"></i>Caixa</a>
+            <h1 class="tec-title text-heading-6">Transferência entre Contas</h1>
           </div>
 
-          <!-- ══════════════ FILTROS (accordion: recolhe sozinho após gerar) ══════════════ -->
-          <div class="card dre-filtros-card" id="dre-filtros-card">
-            <div class="cardHeader dre-filtros-header" id="dre-filtros-header">
-              <h2 class="title">Filtros</h2>
-              <button type="button" class="dre-filtros-toggle" id="dre-filtros-toggle" aria-expanded="true" aria-controls="dre-filtros-content" aria-label="Recolher filtros">
-                <i data-lucide="chevron-down" width="18" height="18"></i>
-              </button>
-            </div>
+          <form id="tec-form" novalidate>
+            <section class="card tec-card">
 
-            <div class="dre-filtros-content" id="dre-filtros-content">
-            <div class="dre-filtros-body">
-              <div class="dre-filtros-grid">
+              <div class="tec-subsection">
+                <div class="tec-grid">
 
-                <div class="dre-span-2" id="tipo-periodo-field">
-                  <span class="label">Período</span>
-                  <div class="group horizontal" role="radiogroup" aria-label="Tipo de período">
-                    <label class="option">
-                      <input type="radio" class="input" name="tipo-periodo" value="mes" checked />
-                      <span class="circle"><span class="dot"></span></span>
-                      <span class="optionLabel">Mês</span>
-                    </label>
-                    <label class="option">
-                      <input type="radio" class="input" name="tipo-periodo" value="intervalo" />
-                      <span class="circle"><span class="dot"></span></span>
-                      <span class="optionLabel">Intervalo personalizado</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="dpRoot" id="mes-ano-field">
-                  <label class="dpLabel" for="dre-mes-ano-trigger">Mês/Ano</label>
-                  <button type="button" class="dpTrigger" id="dre-mes-ano-trigger">
-                    <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
-                    <span class="dpPlaceholder" id="dre-mes-ano-value">Selecionar competência</span>
-                  </button>
-                  <input type="hidden" id="dre-mes-ano" />
-                  <div class="dpPopover" id="dre-mes-ano-popover" hidden>
-                    <div class="dpCalendarHeader">
-                      <button type="button" class="dpNavBtn" data-competencia-prev-year aria-label="Ano anterior">
-                        <i data-lucide="chevron-left" width="16" height="16"></i>
-                      </button>
-                      <span class="dpCalendarLabel text-body-s" data-competencia-year-label></span>
-                      <button type="button" class="dpNavBtn" data-competencia-next-year aria-label="Próximo ano">
-                        <i data-lucide="chevron-right" width="16" height="16"></i>
-                      </button>
-                    </div>
-                    <div class="dpMonthGrid" data-competencia-grid></div>
-                  </div>
-                </div>
-
-                <div class="dre-span-2 dre-intervalo-fields" id="intervalo-fields" hidden>
-                  <div class="dpRoot" id="data-inicial-field">
-                    <label class="dpLabel" for="dre-data-inicial-trigger">Data inicial</label>
-                    <button type="button" class="dpTrigger" id="dre-data-inicial-trigger">
+                  <div class="dpRoot" id="data-field">
+                    <label class="dpLabel" for="data-trigger">Data</label>
+                    <button type="button" class="dpTrigger" id="data-trigger" aria-describedby="data-error">
                       <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
-                      <span class="dpPlaceholder" id="dre-data-inicial-value">Selecionar data</span>
+                      <span class="dpPlaceholder" id="data-value">Selecionar data</span>
                     </button>
-                    <input type="hidden" id="dre-data-inicial" />
-                    <div class="dpPopover" id="dre-data-inicial-popover" hidden>
+                    <input type="hidden" id="tec-data" />
+                    <div class="dpPopover" id="data-popover" hidden>
                       <div class="dpCalendarHeader">
                         <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior">
                           <i data-lucide="chevron-left" width="16" height="16"></i>
@@ -334,172 +281,66 @@
                       </div>
                       <div class="dpGrid" data-dp-grid></div>
                     </div>
+                    <span class="errorText" id="data-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe a data da transferência.
+                    </span>
                   </div>
-                  <div class="dpRoot" id="data-final-field">
-                    <label class="dpLabel" for="dre-data-final-trigger">Data final</label>
-                    <button type="button" class="dpTrigger" id="dre-data-final-trigger">
-                      <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
-                      <span class="dpPlaceholder" id="dre-data-final-value">Selecionar data</span>
+
+                  <div class="wrapper" id="valor-field">
+                    <label class="label" for="tec-valor">Valor</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" inputmode="numeric" id="tec-valor" placeholder="R$ 0,00" aria-describedby="valor-error" />
+                    </div>
+                    <span class="errorText" id="valor-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe um valor maior que zero.
+                    </span>
+                  </div>
+
+                  <div class="wrapper tec-dropdown" id="origem-field">
+                    <span class="label">Conta de origem</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione a conta de origem</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
-                    <input type="hidden" id="dre-data-final" />
-                    <div class="dpPopover" id="dre-data-final-popover" hidden>
-                      <div class="dpCalendarHeader">
-                        <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior">
-                          <i data-lucide="chevron-left" width="16" height="16"></i>
-                        </button>
-                        <span class="dpCalendarLabel text-body-s" data-dp-label></span>
-                        <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês">
-                          <i data-lucide="chevron-right" width="16" height="16"></i>
-                        </button>
-                      </div>
-                      <div class="dpWeekdays">
-                        <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
-                      </div>
-                      <div class="dpGrid" data-dp-grid></div>
+                    <div class="menu" data-dropdown-menu id="origem-menu"></div>
+                    <span class="errorText" id="origem-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione a conta de origem.
+                    </span>
+                  </div>
+
+                  <div class="wrapper tec-dropdown" id="destino-field">
+                    <span class="label">Conta de destino</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione a conta de destino</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="destino-menu"></div>
+                    <span class="errorText" id="destino-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione a conta de destino, diferente da conta de origem.
+                    </span>
+                  </div>
+
+                  <div class="wrapper tec-span-2" id="historico-field">
+                    <label class="label" for="tec-historico">Histórico</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="tec-historico" placeholder="Ex.: Transferência para cobrir despesas do mês" />
                     </div>
                   </div>
-                </div>
 
-                <div class="wrapper dre-combobox" id="categoria-field">
-                  <span class="label" id="categoria-label">Categoria</span>
-                  <div class="inputWrap hasRight">
-                    <input type="text" class="input" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list" aria-controls="categoria-combobox-menu" aria-labelledby="categoria-label" data-combobox-input placeholder="Todas as categorias" autocomplete="off" />
-                    <span class="iconRight dre-combobox-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                  </div>
-                  <div class="menu dre-combobox-menu" id="categoria-combobox-menu" role="listbox" data-combobox-menu hidden></div>
                 </div>
+              </div>
 
-                <div class="wrapper dre-dropdown" id="agrupamento-field">
-                  <span class="label">Agrupamento</span>
-                  <button type="button" class="trigger" data-dropdown-trigger>
-                    <span data-dropdown-value>Automático</span>
-                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                  </button>
-                  <div class="menu" data-dropdown-menu>
-                    <div class="option selected" data-value="automatico">Automático</div>
-                    <div class="option" data-value="dia">Diário</div>
-                    <div class="option" data-value="semana">Semanal</div>
-                    <div class="option" data-value="mes">Mensal</div>
-                  </div>
-                </div>
+              <div class="tec-actions">
+                <a href="caixa.html" class="btn secondary" id="tec-cancel">Cancelar</a>
+                <button type="submit" class="btn primary" id="tec-submit">Salvar transferência</button>
+              </div>
 
-              </div>
-            </div>
-
-            <div class="dre-filtros-actions">
-              <button type="button" class="btn primary" id="dre-gerar-btn">Gerar relatório</button>
-            </div>
-            </div>
-          </div>
-
-          <!-- ══════════════ RESULTADO ══════════════ -->
-          <div id="dre-resultado" hidden>
-
-            <div class="dre-resultado-header">
-              <div class="dre-resultado-title-block">
-                <h2 class="dre-resultado-title text-subtitle-m">Demonstração do Resultado do Exercício (DRE)</h2>
-                <p class="dre-resultado-resumo text-body-s" id="dre-resumo-filtros">—</p>
-              </div>
-              <div class="dre-resultado-actions">
-                <button type="button" class="actionBtn" data-export="pdf" aria-label="Exportar PDF">
-                  <i data-lucide="file-down" width="18" height="18"></i>
-                  <span class="tip text-body-xs top"><span class="arrow"></span>Exportar PDF</span>
-                </button>
-                <button type="button" class="actionBtn" data-export="excel" aria-label="Exportar Excel">
-                  <i data-lucide="sheet" width="18" height="18"></i>
-                  <span class="tip text-body-xs top"><span class="arrow"></span>Exportar Excel</span>
-                </button>
-                <button type="button" class="actionBtn" data-export="imprimir" aria-label="Imprimir">
-                  <i data-lucide="printer" width="18" height="18"></i>
-                  <span class="tip text-body-xs top"><span class="arrow"></span>Imprimir</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="dre-summary-row">
-              <div class="card dre-summary-card">
-                <div class="cardHeader">
-                  <div class="dre-summary-title-row">
-                    <span class="dre-summary-icon dre-summary-icon-receita"><i data-lucide="arrow-down-circle" width="18" height="18"></i></span>
-                    <h3 class="title text-14-bold">Receita Bruta</h3>
-                  </div>
-                </div>
-                <div class="dre-summary-body">
-                  <span class="dre-summary-value dre-value-positive" id="dre-kpi-receita">R$ 0,00</span>
-                </div>
-              </div>
-              <div class="card dre-summary-card">
-                <div class="cardHeader">
-                  <div class="dre-summary-title-row">
-                    <span class="dre-summary-icon dre-summary-icon-despesa"><i data-lucide="arrow-up-circle" width="18" height="18"></i></span>
-                    <h3 class="title text-14-bold">Total de Despesas</h3>
-                  </div>
-                </div>
-                <div class="dre-summary-body">
-                  <span class="dre-summary-value dre-value-negative" id="dre-kpi-despesas">R$ 0,00</span>
-                </div>
-              </div>
-              <div class="card dre-summary-card">
-                <div class="cardHeader">
-                  <div class="dre-summary-title-row">
-                    <span class="dre-summary-icon"><i data-lucide="scale" width="18" height="18"></i></span>
-                    <h3 class="title text-14-bold">Resultado do Período</h3>
-                  </div>
-                </div>
-                <div class="dre-summary-body">
-                  <span class="dre-summary-value" id="dre-kpi-resultado">R$ 0,00</span>
-                </div>
-              </div>
-              <div class="card dre-summary-card">
-                <div class="cardHeader">
-                  <div class="dre-summary-title-row">
-                    <span class="dre-summary-icon"><i data-lucide="percent" width="18" height="18"></i></span>
-                    <h3 class="title text-14-bold">Margem (%)</h3>
-                  </div>
-                </div>
-                <div class="dre-summary-body">
-                  <span class="dre-summary-value" id="dre-kpi-margem">—</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="card dre-chart-card">
-              <div class="cardHeader dre-chart-header" id="dre-chart-header">
-                <h3 class="title">Evolução do resultado</h3>
-                <button type="button" class="dre-chart-toggle" id="dre-chart-toggle" aria-expanded="true" aria-controls="dre-chart-body" aria-label="Recolher gráfico">
-                  <i data-lucide="chevron-down" width="18" height="18"></i>
-                </button>
-              </div>
-              <div class="dre-chart-body" id="dre-chart-body">
-                <div class="dre-chart-wrap">
-                  <svg id="dre-chart-svg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
-                </div>
-                <div class="dre-chart-axis" id="dre-chart-axis"></div>
-              </div>
-            </div>
-
-            <div class="card dre-table-card">
-              <div class="cardHeader">
-                <h3 class="title">Demonstração do Resultado do Exercício</h3>
-                <p class="dre-table-caption text-body-xs">Valores em R$, sem centavos.</p>
-              </div>
-              <div class="dre-table-scroll-shell">
-                <div class="dre-table-scroll-top" id="dre-table-scroll-top">
-                  <div class="dre-table-scroll-top-spacer" id="dre-table-scroll-top-spacer"></div>
-                </div>
-                <div class="tableWrap dre-tablewrap" id="dre-tablewrap">
-                  <table class="table dre-table">
-                    <thead>
-                      <tr class="headerRow" id="dre-header-row"></tr>
-                    </thead>
-                    <tbody id="dre-tbody"></tbody>
-                  </table>
-                </div>
-                <div class="dre-table-scroll-fade" aria-hidden="true"></div>
-              </div>
-            </div>
-
-          </div>
+            </section>
+          </form>
 
         </div>
       </main>
@@ -513,9 +354,12 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/date-picker.js"></script>
+  <script src="../shared/bancos-catalogo-data.js"></script>
+  <script src="../shared/contas-financeiras-data.js"></script>
+  <script src="../shared/contas-bancarias-data.js"></script>
   <script src="../shared/categorias-financeiras-data.js"></script>
   <script src="../shared/caixa-data.js"></script>
-  <script src="../shared/date-picker.js"></script>
-  <script src="../shared/dre.js"></script>
+  <script src="../shared/transferencia-entre-contas.js"></script>
 </body>
 </html>

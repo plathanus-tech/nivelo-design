@@ -133,7 +133,6 @@ window.PROTO_NAV_CONFIG = {
           desktop: '../app/screens/dashboard.html',
           variants: [
             { id: 'dashboard-empty', label: 'Fazenda recém-cadastrada (sem dados)', desktop: '../app/screens/dashboard.html#state=empty' },
-            { id: 'dashboard-multifarm', label: 'Usuário com várias fazendas (filtro visível)', desktop: '../app/screens/dashboard.html#state=multifarm' },
             { id: 'dashboard-trialwarning', label: 'Teste: menos de 3 dias restantes (tag amarela)', desktop: '../app/screens/dashboard.html#state=trialwarning' },
             { id: 'dashboard-trialexpired', label: 'Teste: período expirado (modal de bloqueio + blur)', desktop: '../app/screens/dashboard.html#state=trialexpired' },
             { id: 'dashboard-renewalwarning', label: 'Licença anual vencendo em breve (aviso)', desktop: '../app/screens/dashboard.html#state=renewalwarning' },
@@ -183,6 +182,21 @@ window.PROTO_NAV_CONFIG = {
             { id: 'novo-cadastro-required', label: 'Campos obrigatórios', desktop: '../app/screens/novo-cadastro.html#state=required' },
             { id: 'novo-cadastro-vehiclesinvalid', label: 'Veículo com placa/UF inválida', desktop: '../app/screens/novo-cadastro.html#state=vehiclesinvalid' },
             { id: 'novo-cadastro-edit', label: 'Editar cadastro (exemplo)', desktop: '../app/screens/novo-cadastro.html#state=edit' }
+          ]
+        },
+        // V2 (variante em validação com o cliente) — tela separada, não
+        // substitui `novo-cadastro` acima. Simplifica o formulário quando
+        // Tipo = só Transportadora + Tipo de transportadora = Própria.
+        {
+          id: 'novo-cadastro-v2',
+          label: 'Novo cadastro (V2)',
+          desktop: '../app/screens/novo-cadastro-v2.html',
+          variants: [
+            { id: 'novo-cadastro-v2-transportadora', label: 'Somente Transportadora (escolher Própria/Terceira)', desktop: '../app/screens/novo-cadastro-v2.html#state=transportadora' },
+            { id: 'novo-cadastro-v2-transportadoraoutro', label: 'Transportadora + outro tipo (cadastro normal)', desktop: '../app/screens/novo-cadastro-v2.html#state=transportadoraoutro' },
+            { id: 'novo-cadastro-v2-propria', label: 'Transportadora Própria (formulário simplificado)', desktop: '../app/screens/novo-cadastro-v2.html#state=propria' },
+            { id: 'novo-cadastro-v2-terceira', label: 'Transportadora Terceira (formulário completo)', desktop: '../app/screens/novo-cadastro-v2.html#state=terceira' },
+            { id: 'novo-cadastro-v2-required', label: 'Campos obrigatórios', desktop: '../app/screens/novo-cadastro-v2.html#state=required' }
           ]
         },
         {
@@ -548,6 +562,11 @@ window.PROTO_NAV_CONFIG = {
               id: 'novo-lancamento-caixa',
               label: 'Incluir lançamento',
               desktop: '../app/screens/novo-lancamento-caixa.html'
+            },
+            {
+              id: 'transferencia-entre-contas',
+              label: 'Transferência entre contas',
+              desktop: '../app/screens/transferencia-entre-contas.html'
             }
           ]
         },

@@ -15,7 +15,9 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/FilterPopover/FilterPopover.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/period-filter.css" />
   <link rel="stylesheet" href="../shared/page-caixa.css" />
 </head>
 <body>
@@ -37,12 +39,6 @@
         </div>
       </div>
 
-      <div class="app-header-right">
-        <button type="button" class="btn secondary" id="notebook-btn">
-          <i data-lucide="book-open" width="16" height="16"></i>
-          <span class="app-header-notebook-label">Caderno de campo</span>
-        </button>
-      </div>
     </header>
 
     <div class="app-body">
@@ -65,6 +61,29 @@
               <span class="app-nav-label">Dashboard</span>
             </button>
 
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
             <div class="app-nav-group" id="group-cadastro">
               <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
                 <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
@@ -74,11 +93,11 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Pessoas e empresas</span>
+                  <span class="app-nav-label">Cliente e fornecedor</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos e serviços</span>
+                  <span class="app-nav-label">Produtos</span>
                 </button>
               </div>
             </div>
@@ -88,8 +107,7 @@
               <span class="app-nav-label">Estoque</span>
             </button>
 
-            <!-- Financeiro já nasce aberto nesta tela, com "Caixa" ativo. -->
-                                    <div class="app-nav-group is-open" id="group-financeiro">
+            <div class="app-nav-group is-open" id="group-financeiro">
               <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="true" data-tooltip="Financeiro · opções">
                 <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
                 <span class="app-nav-label">Financeiro</span>
@@ -116,9 +134,9 @@
             </div>
 
             <div class="app-nav-group" id="group-vendas">
-              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Fiscal · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Vendas · opções">
                 <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
-                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-label">Vendas</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -133,23 +151,12 @@
               </div>
             </div>
 
-            <div class="app-nav-group" id="group-assistente-ia">
-              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
-                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
-                <span class="app-nav-label">Assistente IA</span>
-                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="app-nav-submenu">
-                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
-                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
-                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Histórico</span>
-                </button>
-              </div>
-            </div>
+            
+
+            <!-- Financeiro já nasce aberto nesta tela, com "Caixa" ativo. -->
+
+            
+
           </div>
 
           <div class="app-nav-section">
@@ -212,10 +219,6 @@
               <span class="app-nav-label">Canal de ideias</span>
             </button>
 
-            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
-              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
-              <span class="app-nav-label">Vídeos</span>
-            </button>
           </div>
 
           <div class="app-nav-section">
@@ -228,6 +231,11 @@
                 </svg>
               </span>
               <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
             </button>
 
             <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
@@ -252,10 +260,23 @@
               <h1 class="caixa-title text-heading-6">Caixa</h1>
               <p class="caixa-subtitle text-body-s">Acompanhe as entradas, saídas e saldos financeiros da sua fazenda.</p>
             </div>
-            <button type="button" class="btn primary hasLeft" id="new-lancamento-btn">
-              <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
-              Incluir lançamento
-            </button>
+            <div class="caixa-header-actions">
+              <button type="button" class="btn secondary iconOnly" id="transferencia-btn" aria-label="Transferência entre contas">
+                <span class="icon"><i data-lucide="arrow-left-right" width="18" height="18"></i></span>
+                <span class="tip text-body-xs top"><span class="arrow"></span>Transferência entre contas</span>
+              </button>
+              <button type="button" class="btn primary hasLeft" id="new-lancamento-btn">
+                <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
+                Incluir lançamento
+              </button>
+            </div>
+          </div>
+
+          <!-- Tag de banco filtrado: só aparece quando o filtro de Banco está
+               aplicado, deixando claro que o resumo abaixo reflete só aquele
+               banco (pedido explícito do usuário). -->
+          <div class="caixa-summary-filter-tag" id="caixa-summary-banco-tag" hidden>
+            <span class="badge" data-status="info"><span class="badgeDot"></span>Banco: <span id="caixa-summary-banco-tag-text"></span></span>
           </div>
 
           <!-- Resumo: mesma aparência exata dos cards de resumo de Estoque
@@ -336,8 +357,9 @@
                     <tr class="headerRow" id="caixa-header-row">
                       <th class="th sortable" data-sort-key="data" aria-sort="none"><span class="thInner">Data<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="historico" aria-sort="none"><span class="thInner">Histórico<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th sortable" data-sort-key="pessoa" aria-sort="none"><span class="thInner">Cliente ou Fornecedor<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="pessoa" aria-sort="none"><span class="thInner">Cliente / Fornecedor<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="categoria" aria-sort="none"><span class="thInner">Categoria<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="banco" aria-sort="none"><span class="thInner">Banco<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="tipo" aria-sort="none"><span class="thInner">Tipo<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="valor" aria-sort="none"><span class="thInner">Valor<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                     </tr>
@@ -380,44 +402,10 @@
             </section>
           </div>
 
-          <!-- Popover "Filtros": Período (intervalo de datas, mesma composição
-               já usada em Notas fiscais/Dashboard) + Categoria. -->
+          <!-- Popover "Filtros": Período (seletor de modo, ver
+               period-filter.js) + Categoria. -->
           <div class="caixa-filter-popover" id="caixa-filtros-popover" hidden>
-            <div class="wrapper caixa-period-field" id="caixa-period-field">
-              <span class="label">Período</span>
-              <button type="button" class="trigger" id="caixa-period-trigger">
-                <span id="caixa-period-value" class="caixa-period-placeholder">Todo o período</span>
-                <span class="chevron"><i data-lucide="calendar" width="16" height="16"></i></span>
-              </button>
-
-              <div class="caixa-period-popover" id="caixa-period-popover" hidden>
-                <div class="caixa-period-inputs">
-                  <div class="wrapper" id="caixa-period-start-field">
-                    <label class="label" for="caixa-period-start-input">De</label>
-                    <div class="inputWrap"><input type="date" class="input" id="caixa-period-start-input" /></div>
-                  </div>
-                  <div class="wrapper" id="caixa-period-end-field">
-                    <label class="label" for="caixa-period-end-input">Até</label>
-                    <div class="inputWrap"><input type="date" class="input" id="caixa-period-end-input" /></div>
-                  </div>
-                </div>
-                <div class="caixa-period-calendar">
-                  <div class="caixa-period-calendar-header">
-                    <button type="button" class="actionBtn" data-period-prev aria-label="Mês anterior"><i data-lucide="chevron-left" width="16" height="16"></i></button>
-                    <span class="text-body-s" data-period-label></span>
-                    <button type="button" class="actionBtn" data-period-next aria-label="Próximo mês"><i data-lucide="chevron-right" width="16" height="16"></i></button>
-                  </div>
-                  <div class="caixa-period-weekdays">
-                    <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
-                  </div>
-                  <div class="caixa-period-grid" data-period-grid></div>
-                </div>
-                <div class="caixa-period-actions">
-                  <button type="button" class="btn secondary sm" id="caixa-period-cancel">Cancelar</button>
-                  <button type="button" class="btn primary sm" id="caixa-period-apply">Aplicar</button>
-                </div>
-              </div>
-            </div>
+            <div id="caixa-period-mount"></div>
 
             <div class="wrapper caixa-dropdown" id="dropdown-categoria">
               <span class="label">Categoria</span>
@@ -427,6 +415,17 @@
               </button>
               <div class="menu" data-dropdown-menu id="caixa-categoria-menu">
                 <div class="option selected" data-value="">Todas as categorias</div>
+              </div>
+            </div>
+
+            <div class="wrapper caixa-dropdown" id="dropdown-banco">
+              <span class="label">Banco</span>
+              <button type="button" class="trigger" data-dropdown-trigger>
+                <span data-dropdown-value>Todos os bancos</span>
+                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="menu" data-dropdown-menu id="caixa-banco-menu">
+                <div class="option selected" data-value="">Todos os bancos</div>
               </div>
             </div>
 
@@ -448,6 +447,7 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/period-filter.js"></script>
   <script src="../shared/categorias-financeiras-data.js"></script>
   <script src="../shared/caixa-data.js"></script>
   <script src="../shared/caixa.js"></script>

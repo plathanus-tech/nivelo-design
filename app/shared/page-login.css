@@ -128,12 +128,14 @@ img { max-width: 100%; display: block; }
 @media (min-width: 1024px) {
   .login-shell { flex-direction: row; }
 
-  /* Painel institucional: imagem "gestão com nivelo.png" funcionando como
-     hero (ocupa quase toda a largura e altura), com overlay azul
+  /* Painel institucional: imagem "gestão com nivelo melhora.png" funcionando
+     como hero (ocupa quase toda a largura e altura), com overlay azul
      institucional (mesmo azul do CTA da landing: brand-950 → brand-600,
      só que em opacidade muito mais baixa aqui, pra preservar as cores
      naturais da lavoura) + fade suave na borda direita, dissolvendo a
-     imagem na área clara do formulário em vez de um corte reto. */
+     imagem na área clara do formulário em vez de um corte reto. Sem
+     nenhum card de texto sobre a foto: a fotografia é o elemento visual
+     principal do painel. */
   .login-panel {
     display: block;
     position: relative;
@@ -187,52 +189,17 @@ img { max-width: 100%; display: block; }
     -webkit-mask-image: linear-gradient(90deg, black 0%, black 70%, transparent 100%);
   }
 
-  /* Bloco institucional sobre a imagem: reforço de marca discreto, longe da
-     área onde o card se sobrepõe (fica na base esquerda). Fundo translúcido
-     com blur (glassmorphism sutil) pra garantir contraste sem competir com
-     o formulário. */
-  .login-panel-copy {
-    position: absolute;
-    left: var(--spacing-2xl);
-    bottom: var(--spacing-3xl);
-    max-width: 380px;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: color-mix(in srgb, var(--color-brand-950) 28%, transparent);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: var(--border-width-thin) solid color-mix(in srgb, var(--color-gray-white) 14%, transparent);
-    border-radius: var(--radius-md);
-  }
-  /* Logo branco (NIVELO branco header): único lugar onde a marca aparece no
-     desktop, ao lado da mensagem institucional em vez de dentro do card. */
-  .login-panel-logo {
-    height: 34px;
-    width: auto;
-    margin: 0 0 var(--spacing-md);
-  }
-  .login-panel-heading {
-    font-family: var(--font-heading);
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-gray-white);
-    line-height: var(--line-height-snug);
-    margin: 0 0 var(--spacing-xs);
-  }
-  .login-panel-text {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-light);
-    color: color-mix(in srgb, var(--color-gray-white) 82%, transparent);
-    line-height: var(--line-height-normal);
-    margin: 0;
-  }
-
   .login-page {
     flex: 1;
-    /* Volta pra row: no mobile é column pra empilhar logo+card, mas aqui só o
-       card fica visível (logo mora no painel) e o truque de sobreposição
-       (padding-left + margin-left negativo) pressupõe eixo horizontal. */
-    flex-direction: row;
-    justify-content: flex-start;
+    /* Sem o card institucional dentro do painel, a marca (logo) volta a
+       aparecer aqui, empilhada acima do card do formulário — por isso o
+       eixo continua vertical (column, como no mobile), só o alinhamento
+       horizontal muda pra `flex-start` (em vez de `center`), preservando o
+       posicionamento determinístico de sempre via padding-left +
+       margin-left negativo no card (não depende da largura variável da
+       coluna, que um `center` teria). */
+    flex-direction: column;
+    align-items: flex-start;
     padding-left: var(--spacing-3xl);
   }
 
@@ -257,9 +224,10 @@ img { max-width: 100%; display: block; }
   margin-bottom: var(--spacing-lg);
 }
 
-/* Logo solto, fora do card (só mobile/tablet — ver 1024px+ onde ele some e
-   a marca passa a viver no painel institucional, versão branca). Sem
-   competir com o título: fica separado do card, não dentro do cabeçalho. */
+/* Logo solto, fora do card, em qualquer largura de tela (empilhado acima do
+   card no mobile/tablet centralizado; no desktop, acima do card e alinhado
+   à esquerda junto dele, ver 1024px+). Sem competir com o título: fica
+   separado do card, não dentro do cabeçalho. */
 .login-logo {
   display: block;
   height: 40px;
@@ -267,12 +235,13 @@ img { max-width: 100%; display: block; }
   margin: 0 auto calc(var(--spacing-2xl) - 12px);
 }
 
-/* Some no desktop (o logo passa a viver no painel institucional, versão
-   branca) — regra precisa vir DEPOIS da base acima na ordem do arquivo,
-   senão a base (mesma especificidade) venceria o cascade mesmo dentro de
-   uma media query que bate. */
+/* Continua visível no desktop (antes era escondido aqui porque a marca
+   vivia no card institucional removido do painel) — só o alinhamento muda:
+   `margin:0 auto` centrava dentro de `.login-page`, mas o painel agora
+   alinha os filhos à esquerda (`align-items:flex-start`), então o logo
+   perde a centralização horizontal pra ficar rente ao card abaixo dele. */
 @media (min-width: 1024px) {
-  .login-logo { display: none; }
+  .login-logo { margin-left: 0; margin-right: 0; }
 }
 
 /* Heading/6 no mobile, Heading/5 no desktop (escala tipográfica oficial da

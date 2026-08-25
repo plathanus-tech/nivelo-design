@@ -132,76 +132,7 @@
   border-top: var(--border-width-thin) solid var(--color-border-subtle);
 }
 
-/* ── Período (intervalo de datas) — trigger dentro do Agrupamento de
-   Filtros, popover+calendário aninhado (mesma composição do Período
-   personalizado do Dashboard, z-index maior pra ficar sobre o próprio
-   Agrupamento de Filtros). ──────────────────────────────────────────────── */
-.nf-period-field { position: relative; }
-.nf-period-placeholder { color: var(--color-text-tertiary); }
-
-.nf-period-popover:not([hidden]) {
-  position: fixed;
-  z-index: 70;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: var(--color-bg-surface);
-  border: var(--border-width-thin) solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-}
-
-.nf-period-inputs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-sm);
-}
-.nf-period-inputs .input { height: 36px; font-size: var(--font-size-sm); }
-
-.nf-period-calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.nf-period-weekdays,
-.nf-period-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-.nf-period-weekdays { text-align: center; color: var(--color-text-tertiary); margin-bottom: var(--spacing-2xs); }
-
-.nf-period-day,
-.nf-period-day-empty {
-  width: 100%;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-sm);
-  color: var(--color-text-primary);
-  cursor: pointer;
-}
-.nf-period-day:hover { background: var(--color-bg-subtle); }
-.nf-period-day.is-in-range { background: var(--color-bg-brand); border-radius: 0; }
-.nf-period-day.is-start,
-.nf-period-day.is-end {
-  background: var(--color-action-primary);
-  color: var(--color-text-inverse);
-  font-weight: var(--font-weight-medium);
-}
-
-.nf-period-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-sm);
-  padding-top: var(--spacing-sm);
-  border-top: var(--border-width-thin) solid var(--color-border-subtle);
-}
+/* ── Período: ver period-filter.css (componente compartilhado) ── */
 
 /* ── Tabela (desktop) / Cards (mobile), uma por aba ──────────────────────── */
 

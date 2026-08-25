@@ -1,0 +1,15 @@
+/* ══════════════════════════════════════════════════════════
+   NOVO CADASTRO V2 — variante da tela "Novo cadastro" de Pessoas e
+   Empresas, pra validação com o cliente. A versão atual
+   (page-novo-cadastro.css) não foi tocada; este arquivo só ADICIONA o
+   necessário pro selo "V2 · em validação" no cabeçalho — todo o resto do
+   layout (grid, subseções, dropdowns, veículos) reaproveita
+   page-novo-cadastro.css sem alteração.
+   ══════════════════════════════════════════════════════════ */
+
+.novo-cadastro-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}

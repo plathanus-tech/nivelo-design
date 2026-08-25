@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/FilterPopover/FilterPopover.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/period-filter.css" />
   <link rel="stylesheet" href="../shared/page-notas-fiscais.css" />
 </head>
 <body>
@@ -39,12 +40,6 @@
         </div>
       </div>
 
-      <div class="app-header-right">
-        <button type="button" class="btn secondary" id="notebook-btn">
-          <i data-lucide="book-open" width="16" height="16"></i>
-          <span class="app-header-notebook-label">Caderno de campo</span>
-        </button>
-      </div>
     </header>
 
     <div class="app-body">
@@ -67,6 +62,29 @@
               <span class="app-nav-label">Dashboard</span>
             </button>
 
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
             <div class="app-nav-group" id="group-cadastro">
               <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
                 <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
@@ -76,11 +94,11 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Pessoas e empresas</span>
+                  <span class="app-nav-label">Cliente e fornecedor</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Produtos e serviços</span>
+                  <span class="app-nav-label">Produtos</span>
                 </button>
               </div>
             </div>
@@ -90,7 +108,7 @@
               <span class="app-nav-label">Estoque</span>
             </button>
 
-                                    <div class="app-nav-group" id="group-financeiro">
+            <div class="app-nav-group" id="group-financeiro">
               <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
                 <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
                 <span class="app-nav-label">Financeiro</span>
@@ -116,11 +134,10 @@
               </div>
             </div>
 
-            <!-- Vendas já nasce aberto nesta tela, com "Notas fiscais" ativo. -->
             <div class="app-nav-group is-open" id="group-vendas">
-              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="true" data-tooltip="Fiscal · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="true" data-tooltip="Vendas · opções">
                 <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
-                <span class="app-nav-label">Fiscal</span>
+                <span class="app-nav-label">Vendas</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -135,23 +152,11 @@
               </div>
             </div>
 
-            <div class="app-nav-group" id="group-assistente-ia">
-              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
-                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
-                <span class="app-nav-label">Assistente IA</span>
-                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="app-nav-submenu">
-                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
-                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
-                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Histórico</span>
-                </button>
-              </div>
-            </div>
+            
+
+            <!-- Vendas já nasce aberto nesta tela, com "Notas fiscais" ativo. -->
+
+            
           </div>
 
           <div class="app-nav-section">
@@ -214,10 +219,6 @@
               <span class="app-nav-label">Canal de ideias</span>
             </button>
 
-            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
-              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
-              <span class="app-nav-label">Vídeos</span>
-            </button>
           </div>
 
           <div class="app-nav-section">
@@ -230,6 +231,11 @@
                 </svg>
               </span>
               <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
             </button>
 
             <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
@@ -359,45 +365,11 @@
 
           </div>
 
-          <!-- Popover "Filtros": Período (intervalo de datas, mesma composição
-               de Popover+calendário já usada no Período personalizado do
-               Dashboard) + Status. Compartilhado pelas 2 abas. -->
+          <!-- Popover "Filtros": Período (seletor de modo — Sem filtro/Últimos
+               30 dias/Dia/Mês/Intervalo, ver period-filter.js) + Status.
+               Compartilhado pelas 2 abas. -->
           <div class="nf-filter-popover" id="nf-filtros-popover" hidden>
-            <div class="wrapper nf-period-field" id="nf-period-field">
-              <span class="label">Período</span>
-              <button type="button" class="trigger" id="nf-period-trigger">
-                <span id="nf-period-value" class="nf-period-placeholder">Todo o período</span>
-                <span class="chevron"><i data-lucide="calendar" width="16" height="16"></i></span>
-              </button>
-
-              <div class="nf-period-popover" id="nf-period-popover" hidden>
-                <div class="nf-period-inputs">
-                  <div class="wrapper" id="nf-period-start-field">
-                    <label class="label" for="nf-period-start-input">De</label>
-                    <div class="inputWrap"><input type="date" class="input" id="nf-period-start-input" /></div>
-                  </div>
-                  <div class="wrapper" id="nf-period-end-field">
-                    <label class="label" for="nf-period-end-input">Até</label>
-                    <div class="inputWrap"><input type="date" class="input" id="nf-period-end-input" /></div>
-                  </div>
-                </div>
-                <div class="nf-period-calendar">
-                  <div class="nf-period-calendar-header">
-                    <button type="button" class="actionBtn" data-period-prev aria-label="Mês anterior"><i data-lucide="chevron-left" width="16" height="16"></i></button>
-                    <span class="text-body-s" data-period-label></span>
-                    <button type="button" class="actionBtn" data-period-next aria-label="Próximo mês"><i data-lucide="chevron-right" width="16" height="16"></i></button>
-                  </div>
-                  <div class="nf-period-weekdays">
-                    <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
-                  </div>
-                  <div class="nf-period-grid" data-period-grid></div>
-                </div>
-                <div class="nf-period-actions">
-                  <button type="button" class="btn secondary sm" id="nf-period-cancel">Cancelar</button>
-                  <button type="button" class="btn primary sm" id="nf-period-apply">Aplicar</button>
-                </div>
-              </div>
-            </div>
+            <div id="nf-period-mount"></div>
 
             <div class="wrapper nf-dropdown" id="dropdown-status">
               <span class="label">Status</span>
@@ -432,6 +404,7 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/period-filter.js"></script>
   <script src="../shared/notas-fiscais-data.js"></script>
   <script src="../shared/notas-fiscais.js"></script>
 </body>

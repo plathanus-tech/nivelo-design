@@ -138,8 +138,20 @@
    controlada por classe (`.is-selected`) via JS, não `:checked` puro em CSS. */
 .nova-anotacao-tipo-group {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--spacing-md);
+}
+
+@media (min-width: 480px) {
+  .nova-anotacao-tipo-group {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .nova-anotacao-tipo-group {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .nova-anotacao-tipo-card {
@@ -184,12 +196,6 @@
 .nova-anotacao-tipo-label {
   color: var(--color-text-primary);
   font-weight: var(--font-weight-medium);
-}
-
-@media (max-width: 479px) {
-  .nova-anotacao-tipo-group {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ── Ações do rodapé ───────────────────────────────────────────────────── */
