@@ -85,7 +85,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Cliente e fornecedor</span>
+                  <span class="app-nav-label">Clientes e fornecedores</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -132,13 +132,17 @@
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
                 <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
                   <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
                   <span class="app-nav-label">Notas fiscais</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
                   <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Manifesto</span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
                 </button>
               </div>
             </div>
@@ -180,6 +184,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
                   <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
                 </button>
 
                 <div class="app-nav-subgroup" id="group-fiscal">
@@ -246,6 +254,10 @@
       <!-- ══════════════════ CONTEÚDO PRINCIPAL — RELATÓRIOS ══════════════════ -->
       <main class="app-main">
         <div class="rel-page">
+
+          <div class="rel-version-banner-v1">
+            <a href="relatorios-v2.html" class="rel-version-switch-v1">Ver nova versão (V2)<i data-lucide="arrow-right" width="14" height="14"></i></a>
+          </div>
 
           <div class="rel-header">
             <h1 class="rel-title text-heading-6">Relatórios</h1>

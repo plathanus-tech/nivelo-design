@@ -1,0 +1,224 @@
+/* ══════════════════════════════════════════════════════════
+   UNIDADE DE MEDIDA — Configuração > Unidade de medida. Mobile first.
+   Mesmos padrões já usados em Categorias de receitas e despesas/Produtos:
+   `Table` como Card genérico, `Dialog` pro modal de Ativar/Desativar,
+   `Feedback` reaproveitado como Toast. Classes próprias (`unidmed-*`), sem
+   compartilhar arquivo com as demais telas de Configuração (mesma convenção
+   já estabelecida entre elas).
+
+   Sem busca/filtros/paginação nesta tela — dataset pequeno por natureza
+   (unidades de medida de um produtor pequeno/médio não costumam passar de
+   uma dezena), mesmo raciocínio já aplicado a Fazendas/Estoque. */
+
+.unidmed-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.unidmed-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .unidmed-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.unidmed-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+
+.unidmed-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.unidmed-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0;
+  max-width: 560px;
+}
+
+#new-unidade-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  #new-unidade-btn {
+    width: auto;
+  }
+}
+
+/* ── Tabela (desktop) / Cards (mobile) ──────────────────────────────────── */
+
+.card.unidmed-table-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.unidmed-table-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.unidmed-table-card .tableWrap {
+  display: none;
+}
+
+.unidmed-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .unidmed-table-card .tableWrap {
+    display: block;
+  }
+  .unidmed-cards {
+    display: none;
+  }
+}
+
+.unidmed-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.unidmed-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+.unidmed-table-card .sortIcon { color: var(--color-gray-500); }
+
+.unidmed-table-card .td {
+  border-color: var(--color-gray-200);
+}
+.unidmed-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.unidmed-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.unidmed-table-card .tr:hover .td { filter: brightness(0.97); }
+
+.unidmed-table-card .table {
+  table-layout: fixed;
+  width: 100%;
+}
+.unidmed-table-card .th:nth-child(1) { width: 12%; }  /* Unidade */
+.unidmed-table-card .th:nth-child(2) { width: auto; } /* Descrição — preenche o resto */
+.unidmed-table-card .th:nth-child(3) { width: 16%; }  /* Corresponde a */
+.unidmed-table-card .th:nth-child(4) { width: 20%; }  /* Unidade base */
+.unidmed-table-card .th:nth-child(5) { width: 12%; }  /* Status */
+.unidmed-table-card .th:nth-child(6) { width: 160px; } /* Ações */
+
+/* "Padrão do sistema" (KG/LT/UN): texto discreto no lugar dos botões de
+   ação — essas unidades não podem ser editadas, ativadas/desativadas nem
+   excluídas (ver unidades-medida-data.js). */
+.unidmed-sistema-tag {
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.unidmed-mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.unidmed-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.unidmed-mobile-card-name { color: var(--color-text-primary); }
+.unidmed-mobile-card-sigla {
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.unidmed-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.unidmed-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.unidmed-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+.unidmed-mobile-card-fields dd .badge { font-size: var(--font-size-sm); }
+
+.unidmed-mobile-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.unidmed-mobile-card-actions .unidmed-sistema-tag {
+  margin-left: auto;
+}
+
+/* ── Toast de sucesso ─────────────────────────────────────────────────────
+   Mesma composição já usada em Categorias/Produtos/Cadastro (Feedback
+   reaproveitado como Toast), incluindo o fix de colisão Feedback×Dialog. */
+.unidmed-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+
+.unidmed-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.unidmed-toast {
+  box-shadow: var(--shadow-lg);
+  animation: unidmed-toast-in 0.25s ease;
+}
+
+.unidmed-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.unidmed-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+
+@keyframes unidmed-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard (o componente
+   React resolve com `if (!open) return null`) — mesmo bug já documentado
+   em page-produtos.css/page-cadastros.css/page-categorias-financeiras.css. */
+.overlay[hidden] { display: none; }

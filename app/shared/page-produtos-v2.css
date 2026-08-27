@@ -1,0 +1,387 @@
+/* ══════════════════════════════════════════════════════════
+   PRODUTOS V2 — cadastro central de produtos (listagem), reescrito com 2
+   abas (Produtos de venda / Produtos de uso, colunas diferentes por tipo —
+   mesmo raciocínio multi-tab-multi-tabela já usado em page-estoque.css) e
+   Ativar/Desativar como ação real de linha. Mobile first. Classes próprias
+   (`produtos-*`), cópia deliberada de page-produtos.css (V1), que continua
+   intacta e é servida só pelo navegador de protótipo. Ver app/CLAUDE.md.
+   ══════════════════════════════════════════════════════════ */
+
+.produtos-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   recorrente documentado em CLAUDE.md (o componente React resolve com
+   `if (!open) return null`, HTML estático precisa do guard). */
+.overlay[hidden] { display: none; }
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.produtos-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .produtos-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.produtos-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+#new-produto-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  #new-produto-btn {
+    width: auto;
+  }
+}
+
+/* ── Abas ──────────────────────────────────────────────────────────────── */
+.produtos-tabs {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ── Busca/Filtros fundidos com a tabela ──────────────────────────────── */
+.card.produtos-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.produtos-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.produtos-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.produtos-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.prod-filter {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .prod-filter {
+    width: auto;
+    flex: 0 1 220px;
+    min-width: 180px;
+  }
+  .prod-filter-search {
+    flex: 1 1 280px;
+    min-width: 240px;
+  }
+}
+
+.produtos-filters .prod-filter.prod-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+.prod-dropdown .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+.prod-dropdown .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+.prod-dropdown .option {
+  font-size: var(--font-size-sm);
+}
+
+.prod-date-filter {
+  width: 100%;
+}
+.prod-date-filter .dpTrigger {
+  height: 28px;
+  padding: 0 var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.prod-trigger-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.prod-trigger-row .dpTrigger {
+  flex: 1;
+  min-width: 0;
+}
+.prod-filter-clear {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.prod-filter-clear[hidden] { display: none; }
+
+/* ── Agrupamento de Filtros (FilterPopover) ───────────────────────────── */
+#produtos-filtros-trigger-root .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  justify-content: flex-start;
+  gap: var(--spacing-xs);
+}
+.prod-filtros-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+.produtos-filter-popover:not([hidden]) {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.produtos-filter-popover .trigger {
+  height: 36px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.produtos-filter-popover .label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.produtos-filter-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Tabela (desktop) / Cards (mobile) ─────────────────────────────────── */
+
+.produtos-table-card .tableWrap {
+  display: none;
+  padding-top: 0;
+}
+
+.produtos-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .produtos-table-card .tableWrap {
+    display: block;
+  }
+  .produtos-cards {
+    display: none;
+  }
+}
+
+.produtos-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  white-space: normal;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.produtos-table-card .th.sortable .thInner { gap: var(--spacing-sm); }
+.produtos-table-card .sortIcon { color: var(--color-gray-500); }
+.produtos-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.produtos-table-card .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.produtos-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.produtos-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.produtos-table-card .tr:hover .td { filter: brightness(0.97); }
+
+.produtos-table-card .table {
+  table-layout: fixed;
+}
+/* Aba "Produtos de venda" — 9 colunas (inclui NCM/GTIN/Status). */
+#panel-venda .th:nth-child(1) { width: 10%; }  /* SKU */
+#panel-venda .th:nth-child(2) { width: 17%; }  /* Produto */
+#panel-venda .th:nth-child(3) { width: 16%; }  /* Unidade de medida */
+#panel-venda .th:nth-child(4) { width: 11%; }  /* NCM */
+#panel-venda .th:nth-child(5) { width: 11%; }  /* GTIN/EAN */
+#panel-venda .th:nth-child(6) { width: 9%; }  /* Estoque mínimo */
+#panel-venda .th:nth-child(7) { width: 9%; }  /* Estoque máximo */
+#panel-venda .th:nth-child(8) { width: 10%; }  /* Status */
+#panel-venda .th:nth-child(9) { width: 120px; } /* Ações */
+
+/* Aba "Produtos de uso" — 7 colunas (sem NCM/GTIN, com Status). */
+#panel-uso .th:nth-child(1) { width: 13%; }  /* SKU */
+#panel-uso .th:nth-child(2) { width: 25%; }  /* Produto */
+#panel-uso .th:nth-child(3) { width: 20%; }  /* Unidade de medida */
+#panel-uso .th:nth-child(4) { width: 11%; }  /* Estoque mínimo */
+#panel-uso .th:nth-child(5) { width: 11%; }  /* Estoque máximo */
+#panel-uso .th:nth-child(6) { width: 12%; }  /* Status */
+#panel-uso .th:nth-child(7) { width: 120px; } /* Ações */
+
+.produtos-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.produtos-empty:not([hidden]) { display: flex; }
+.produtos-empty p { margin: 0; }
+
+.produtos-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.produtos-empty-global:not([hidden]) { display: flex; }
+.produtos-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.produtos-empty-global-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.produtos-empty-global-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--spacing-sm);
+  max-width: 360px;
+}
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.produtos-mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.produtos-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.produtos-mobile-card-name {
+  color: var(--color-text-primary);
+}
+
+.produtos-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+
+.produtos-mobile-card-fields dt {
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+
+.produtos-mobile-card-fields dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.produtos-mobile-card-actions {
+  justify-content: flex-end;
+  padding: var(--spacing-sm) 0 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* ── Toast de sucesso ──────────────────────────────────────────────────── */
+.produtos-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+
+.produtos-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.produtos-toast {
+  box-shadow: var(--shadow-lg);
+  animation: produtos-toast-in 0.25s ease;
+}
+
+.produtos-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.produtos-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+
+@keyframes produtos-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

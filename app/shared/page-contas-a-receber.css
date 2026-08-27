@@ -434,3 +434,18 @@
 .overlay .wrapper.error .errorText { display: flex; }
 .overlay .wrapper.error .input,
 .overlay .wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* ── Link pra V2 (adicionado quando a V2 foi criada) — mantém a V1
+   intacta visualmente, só um link discreto no topo pra facilitar a
+   comparação entre as duas versões. ── */
+.ctr-version-banner-v1 { display: flex; justify-content: flex-end; margin-bottom: var(--spacing-sm); }
+.ctr-version-switch-v1 {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-brand);
+  text-decoration: none;
+}
+.ctr-version-switch-v1:hover { text-decoration: underline; }

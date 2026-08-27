@@ -160,7 +160,7 @@
   var paginationNextBtn = paginationEl.querySelector('[data-page-next]');
 
   var state = {
-    tab: 'todos',
+    tab: 'cliente',
     situacao: 'ativos',
     situacaoSince: null,
     search: '',
@@ -184,9 +184,9 @@
   // ---------- Filtros ----------
   function rowMatches(row) {
     var tipos = (row.dataset.tipo || '').split(' ');
-    if (state.tab !== 'todos' && tipos.indexOf(state.tab) === -1) return false;
+    if (tipos.indexOf(state.tab) === -1) return false;
 
-    var situacaoMap = { ativos: 'ativo', inativos: 'inativo', excluidos: 'excluido' };
+    var situacaoMap = { ativos: 'ativo', inativos: 'inativo' };
     if (row.dataset.status !== situacaoMap[state.situacao]) return false;
 
     if (state.situacao !== 'ativos' && state.situacaoSince) {
@@ -288,13 +288,13 @@
   // fora por não agregarem valor como critério de ordenação. "Data de
   // cadastro" não é coluna visível da tabela (só existe como dado de filtro),
   // então também não entra aqui.
-  var STATUS_RANK = { ativo: 0, inativo: 1, excluido: 2 };
+  var STATUS_RANK = { ativo: 0, inativo: 1 };
   var SORTABLE_COLUMNS = {
-    nome: { cellIndex: 0, type: 'text-firstline' },
-    codigo: { cellIndex: 1, type: 'text' },
-    tipo: { cellIndex: 2, type: 'text' },
-    status: { cellIndex: 3, type: 'status' },
-    cidade: { cellIndex: 5, type: 'text' }
+    codigo: { cellIndex: 0, type: 'text' },
+    nome: { cellIndex: 1, type: 'text-firstline' },
+    tipo: { cellIndex: 4, type: 'text' },
+    cidade: { cellIndex: 5, type: 'text' },
+    status: { cellIndex: 6, type: 'status' }
   };
 
   var headerRow = document.getElementById('cadastros-header-row');
@@ -361,7 +361,7 @@
     applyFilters();
   });
 
-  // ---------- Abas (Todos / Cliente / Fornecedor / Transportadora) ----------
+  // ---------- Abas (Cliente / Fornecedor / Transportadora) ----------
   tablist.addEventListener('click', function (event) {
     var tabBtn = event.target.closest('.tab');
     if (!tabBtn) return;
@@ -448,8 +448,8 @@
     return { selectOption: selectOption };
   }
 
-  // ---------- Filtro de Situação + campo contextual "Inativo/Excluído desde" ----------
-  var SITUACAO_DATE_LABELS = { inativos: 'Inativo desde', excluidos: 'Excluído desde' };
+  // ---------- Filtro de Situação + campo contextual "Inativo desde" ----------
+  var SITUACAO_DATE_LABELS = { inativos: 'Inativo desde' };
   var situacaoDropdownEl = document.getElementById('dropdown-situacao');
   var situacaoDateField = document.getElementById('situacao-date-field');
   var situacaoDateLabel = document.getElementById('situacao-date-label');
@@ -457,7 +457,7 @@
 
   function applySituacao(value) {
     state.situacao = value;
-    var showDateField = value === 'inativos' || value === 'excluidos';
+    var showDateField = value === 'inativos';
     situacaoDateField.hidden = !showDateField;
     if (showDateField) {
       situacaoDateLabel.textContent = SITUACAO_DATE_LABELS[value];
@@ -477,54 +477,82 @@
     applyFilters();
   });
 
-  // ---------- Ações da tabela (Nota fiscal / Editar / Excluir) ----------
-  // "Nota fiscal" navega pra Nova Nota Fiscal com o participante pré-preenchido
-  // (ver `openNovaNotaFiscal()` abaixo); "Editar" reaproveita o formulário de
-  // Novo Cadastro; "Excluir" é soft delete de verdade, a regra de negócio
-  // central desta tela.
+  // ---------- Ações da tabela (Editar / Ativar-Desativar) ----------
+  // "Editar" reaproveita o formulário de Novo Cadastro; "Ativar/Desativar"
+  // substitui o antigo conceito de exclusão — o cadastro nunca é removido de
+  // verdade, só troca de situação, sempre mediante confirmação.
   var STATUS_BADGE = {
     ativo: { status: 'success', label: 'Ativo' },
-    inativo: { status: 'warning', label: 'Inativo' },
-    excluido: { status: 'error', label: 'Excluído' }
+    inativo: { status: 'warning', label: 'Inativo' }
   };
 
+  function buildRowActionsHTML(status) {
+    if (status === 'ativo') {
+      return '<div class="cellActions">' +
+        '<button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>' +
+        '<button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button>' +
+        '</div>';
+    }
+    return '<div class="cellActions">' +
+      '<button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>' +
+      '<button type="button" class="actionBtn" data-action="ativar" aria-label="Ativar"><i data-lucide="check-circle" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ativar</span></button>' +
+      '</div>';
+  }
+
   // Modal de confirmação (Dialog do Storybook) — mesmo padrão já usado no
-  // Modal de Termos de cadastro-planos.html. Centralizado, não é
-  // drawer/popover, e o botão de confirmar usa o padrão visual destrutivo
-  // (`.btn.destructive`) pra deixar clara a natureza da ação.
-  var deleteDialogOverlay = document.getElementById('delete-dialog-overlay');
-  var pendingDeleteRow = null;
+  // toggle de Talhões (fazenda-detalhe-cadastro.js). Centralizado, não é
+  // drawer/popover; o botão de confirmar usa o padrão visual destrutivo
+  // (`.btn.destructive`) só quando a ação é Desativar.
+  var toggleDialogOverlay = document.getElementById('toggle-dialog-overlay');
+  var toggleDialogTitle = document.getElementById('toggle-dialog-title');
+  var toggleDialogMessage = document.getElementById('toggle-dialog-message');
+  var toggleDialogConfirm = document.getElementById('toggle-dialog-confirm');
+  var pendingToggleRow = null;
 
-  function openDeleteDialog(row) {
-    pendingDeleteRow = row;
-    deleteDialogOverlay.hidden = false;
+  function openToggleDialog(row) {
+    pendingToggleRow = row;
+    var isAtivo = row.dataset.status === 'ativo';
+    toggleDialogTitle.textContent = isAtivo ? 'Desativar cadastro' : 'Ativar cadastro';
+    toggleDialogMessage.textContent = isAtivo
+      ? 'Tem certeza que deseja desativar este cadastro? O cadastro continuará armazenado e poderá ser reativado a qualquer momento.'
+      : 'Tem certeza que deseja ativar este cadastro?';
+    toggleDialogConfirm.textContent = isAtivo ? 'Desativar' : 'Ativar';
+    toggleDialogConfirm.classList.toggle('destructive', isAtivo);
+    toggleDialogConfirm.classList.toggle('primary', !isAtivo);
+    toggleDialogOverlay.hidden = false;
   }
 
-  function closeDeleteDialog() {
-    deleteDialogOverlay.hidden = true;
-    pendingDeleteRow = null;
+  function closeToggleDialog() {
+    toggleDialogOverlay.hidden = true;
+    pendingToggleRow = null;
   }
 
-  document.getElementById('delete-dialog-close').addEventListener('click', closeDeleteDialog);
-  document.getElementById('delete-dialog-cancel').addEventListener('click', closeDeleteDialog);
+  document.getElementById('toggle-dialog-close').addEventListener('click', closeToggleDialog);
+  document.getElementById('toggle-dialog-cancel').addEventListener('click', closeToggleDialog);
 
-  deleteDialogOverlay.addEventListener('click', function (event) {
-    if (event.target === deleteDialogOverlay) closeDeleteDialog();
+  toggleDialogOverlay.addEventListener('click', function (event) {
+    if (event.target === toggleDialogOverlay) closeToggleDialog();
   });
 
   document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' && !deleteDialogOverlay.hidden) closeDeleteDialog();
+    if (event.key === 'Escape' && !toggleDialogOverlay.hidden) closeToggleDialog();
   });
 
-  document.getElementById('delete-dialog-confirm').addEventListener('click', function () {
-    if (!pendingDeleteRow) return;
-    var row = pendingDeleteRow;
-    row.dataset.status = 'excluido';
-    row.dataset.situacaoSince = toInputValue(new Date());
-    var statusCell = row.children[3];
-    var badge = STATUS_BADGE.excluido;
-    statusCell.innerHTML = '<span class="badge" data-status="' + badge.status + '"><span class="badgeDot"></span>' + badge.label + '</span>';
-    closeDeleteDialog();
+  toggleDialogConfirm.addEventListener('click', function () {
+    if (!pendingToggleRow) return;
+    var row = pendingToggleRow;
+    var newStatus = row.dataset.status === 'ativo' ? 'inativo' : 'ativo';
+    row.dataset.status = newStatus;
+    if (newStatus === 'inativo') {
+      row.dataset.situacaoSince = toInputValue(new Date());
+    } else {
+      delete row.dataset.situacaoSince;
+    }
+    var badge = STATUS_BADGE[newStatus];
+    row.children[6].innerHTML = '<span class="badge" data-status="' + badge.status + '"><span class="badgeDot"></span>' + badge.label + '</span>';
+    row.children[7].innerHTML = buildRowActionsHTML(newStatus);
+    if (window.lucide) lucide.createIcons();
+    closeToggleDialog();
     applyFilters();
   });
 
@@ -548,13 +576,13 @@
     // um único valor "representativo".
     var tipos = (row.dataset.tipo || '').split(' ').filter(Boolean);
 
-    var nomeCell = row.children[0];
+    var nomeCell = row.children[1];
     var firstNode = nomeCell.childNodes[0];
     var nome = (firstNode && firstNode.nodeType === Node.TEXT_NODE) ? firstNode.nodeValue.trim() : nomeCell.textContent.trim();
     var fantasiaEl = nomeCell.querySelector('.cadastros-fantasia');
     var fantasia = fantasiaEl ? fantasiaEl.textContent.trim() : '';
 
-    var documento = cellText(row.children[4]);
+    var documento = cellText(row.children[2]);
     var pessoaTipo = documento.indexOf('/') !== -1 ? 'juridica' : 'fisica';
 
     var cidadeParts = cellText(row.children[5]).split('/');
@@ -562,7 +590,7 @@
     var estadoFromCell = cidadeParts[1] || '';
 
     var payload = {
-      codigo: cellText(row.children[1]),
+      codigo: cellText(row.children[0]),
       nome: nome,
       fantasia: fantasia,
       tipo: tipos,
@@ -586,36 +614,16 @@
     window.location.href = 'novo-cadastro.html#state=edit';
   }
 
-  // ---------- Cadastrar Nota Fiscal: navega pra Nova Nota Fiscal com o
-  // participante de origem pré-preenchido. Handoff via `sessionStorage` (mesmo
-  // mecanismo já usado por `openEditScreen()` acima, e pelo rascunho de "+
-  // Cadastrar novo fornecedor" de Nova Conta a Pagar) — só o código do cadastro
-  // atravessa, a resolução completa (nome/documento/UF/tipo) acontece do lado
-  // de lá, lendo o mesmo `NiveloCadastros` que já é a fonte real do dropdown
-  // Destinatário. Consumido e removido no primeiro load de `nova-nota-
-  // fiscal.js`, nunca sobrevive a uma 2ª navegação. ----------
-  function openNovaNotaFiscal(row) {
-    var codigo = cellText(row.children[1]);
-    try { sessionStorage.setItem('nivelo.novanotafiscal.prefill', JSON.stringify({ codigo: codigo })); } catch (e) {}
-    window.location.href = 'nova-nota-fiscal.html';
-  }
-
   function handleRowAction(btn, row) {
     var action = btn.dataset.action;
 
-    if (action === 'excluir') {
-      if (row.dataset.status === 'excluido') return;
-      openDeleteDialog(row);
+    if (action === 'ativar' || action === 'desativar') {
+      openToggleDialog(row);
       return;
     }
 
     if (action === 'editar') {
       openEditScreen(row);
-      return;
-    }
-
-    if (action === 'nota-fiscal') {
-      openNovaNotaFiscal(row);
       return;
     }
 
@@ -644,13 +652,13 @@
   function cellText(cell) { return cell.textContent.trim(); }
 
   function buildCardHTML(row) {
-    var nomeCell = row.children[0];
+    var nomeCell = row.children[1];
     var firstNode = nomeCell.childNodes[0];
     var nome = (firstNode && firstNode.nodeType === Node.TEXT_NODE) ? firstNode.nodeValue.trim() : nomeCell.textContent.trim();
     var fantasiaEl = nomeCell.querySelector('.cadastros-fantasia');
     var fantasiaHTML = fantasiaEl ? fantasiaEl.outerHTML : '';
-    var statusHTML = row.children[3].innerHTML;
-    var actionsHTML = row.children[6].querySelector('.cellActions').innerHTML;
+    var statusHTML = row.children[6].innerHTML;
+    var actionsHTML = row.children[7].querySelector('.cellActions').innerHTML;
 
     return (
       '<div class="card cadastros-mobile-card" data-row-id="' + row.id + '">' +
@@ -659,9 +667,10 @@
           statusHTML +
         '</div>' +
         '<dl class="cadastros-mobile-card-fields">' +
-          '<div><dt class="text-10-regular">Código</dt><dd class="text-12-regular">' + cellText(row.children[1]) + '</dd></div>' +
-          '<div><dt class="text-10-regular">Tipo</dt><dd class="text-12-regular">' + cellText(row.children[2]) + '</dd></div>' +
-          '<div><dt class="text-10-regular">CPF/CNPJ</dt><dd class="text-12-regular">' + cellText(row.children[4]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Código</dt><dd class="text-12-regular">' + cellText(row.children[0]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">CPF/CNPJ</dt><dd class="text-12-regular">' + cellText(row.children[2]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Telefone</dt><dd class="text-12-regular">' + cellText(row.children[3]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Tipo</dt><dd class="text-12-regular">' + cellText(row.children[4]) + '</dd></div>' +
           '<div><dt class="text-10-regular">Cidade</dt><dd class="text-12-regular">' + cellText(row.children[5]) + '</dd></div>' +
         '</dl>' +
         '<div class="cellActions cadastros-mobile-card-actions">' + actionsHTML + '</div>' +
@@ -689,7 +698,7 @@
   // couber). Conteúdo é estático por linha, então só precisa rodar uma vez
   // no carregamento, não a cada `applyFilters()`.
   Array.prototype.slice.call(tbody.querySelectorAll('.tr')).forEach(function (row) {
-    var docCell = row.children[4];
+    var docCell = row.children[2];
     if (docCell) docCell.title = docCell.textContent.trim();
   });
 

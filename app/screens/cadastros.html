@@ -4,7 +4,7 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cadastro de Cliente e Fornecedor — Nivelo</title>
+  <title>Clientes e fornecedores — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
@@ -93,7 +93,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem is-active" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Cliente e fornecedor</span>
+                  <span class="app-nav-label">Clientes e fornecedores</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -140,13 +140,17 @@
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
                 <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
                   <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
                   <span class="app-nav-label">Notas fiscais</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
                   <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Manifesto</span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
                 </button>
               </div>
             </div>
@@ -183,6 +187,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
                   <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
                 </button>
 
                 <!-- Fiscal (subgrupo dentro de Configuração) -->
@@ -255,7 +263,7 @@
         <div class="cadastros-page">
 
           <div class="cadastros-header">
-            <h1 class="cadastros-title text-heading-6">Cadastro de Cliente e Fornecedor</h1>
+            <h1 class="cadastros-title text-heading-6">Clientes e fornecedores</h1>
             <button type="button" class="btn primary hasLeft" id="add-cadastro-btn">
               <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
               Novo cadastro
@@ -264,8 +272,7 @@
 
           <div class="wrapper cadastros-tabs">
             <div class="list" role="tablist" id="cadastros-tablist">
-              <button type="button" role="tab" aria-selected="true" class="tab active" data-tab="todos">Todos</button>
-              <button type="button" role="tab" aria-selected="false" class="tab" data-tab="cliente">Cliente</button>
+              <button type="button" role="tab" aria-selected="true" class="tab active" data-tab="cliente">Cliente</button>
               <button type="button" role="tab" aria-selected="false" class="tab" data-tab="fornecedor">Fornecedor</button>
               <button type="button" role="tab" aria-selected="false" class="tab" data-tab="transportadora">Transportadora</button>
             </div>
@@ -300,7 +307,6 @@
                     <div class="menu" data-dropdown-menu>
                       <div class="option selected" data-value="ativos">Ativos</div>
                       <div class="option" data-value="inativos">Inativos</div>
-                      <div class="option" data-value="excluidos">Excluídos</div>
                     </div>
                   </div>
                 </div>
@@ -319,206 +325,171 @@
               <table class="table">
                 <thead>
                   <tr class="headerRow" id="cadastros-header-row">
-                    <th class="th sortable" data-sort-key="nome" aria-sort="none"><span class="thInner">Nome<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                     <th class="th sortable" data-sort-key="codigo" aria-sort="none"><span class="thInner">Código<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                    <th class="th sortable" data-sort-key="tipo" aria-sort="none"><span class="thInner">Tipo<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                    <th class="th sortable" data-sort-key="status" aria-sort="none"><span class="thInner">Status<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                    <th class="th sortable" data-sort-key="nome" aria-sort="none"><span class="thInner">Nome/Razão social<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                     <th class="th">CPF/CNPJ</th>
+                    <th class="th">Telefone</th>
+                    <th class="th sortable" data-sort-key="tipo" aria-sort="none"><span class="thInner">Tipo<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                     <th class="th sortable" data-sort-key="cidade" aria-sort="none"><span class="thInner">Cidade<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                    <th class="th sortable" data-sort-key="status" aria-sort="none"><span class="thInner">Status<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                     <th class="th">Ações</th>
                   </tr>
                 </thead>
                 <tbody id="cadastros-tbody">
 
                   <tr class="tr" id="cad-row-c-1001" data-tipo="cliente" data-status="ativo" data-cadastro-date="2025-08-12" data-search="maria aparecida souza c-1001 12345678900" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14015-000","rua":"Rua Voluntarios da Patria","numero":"482","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 99876-5432"}'>
-                    <td class="td">Maria Aparecida Souza</td>
                     <td class="td">C-1001</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Maria Aparecida Souza</td>
                     <td class="td">123.456.789-00</td>
+                    <td class="td">(16) 99876-5432</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Ribeirão Preto/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2001" data-tipo="fornecedor" data-status="ativo" data-cadastro-date="2024-11-03" data-search="insumos agricolas vale ltda vale agro f-2001 12345678000190" data-record='{"ie":"111.222.333.444","contribuinte":"icms","cep":"14160-000","rua":"Avenida Conde Francisco Matarazzo","numero":"1200","complemento":"","bairro":"Vila Rica","estadoUf":"SP","vehicles":[],"telefone":"(16) 3512-4400"}'>
-                    <td class="td">Insumos Agrícolas Vale Ltda<span class="cadastros-fantasia text-12-regular">Vale Agro</span></td>
                     <td class="td">F-2001</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Insumos Agrícolas Vale Ltda<span class="cadastros-fantasia text-12-regular">Vale Agro</span></td>
                     <td class="td">12.345.678/0001-90</td>
+                    <td class="td">(16) 3512-4400</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Sertãozinho/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-cf-3001" data-tipo="cliente fornecedor" data-status="ativo" data-cadastro-date="2023-05-20" data-search="cerealista bom grao s.a. bom grao cf-3001 98765432000110" data-record='{"ie":"222.333.444.555","contribuinte":"icms","cep":"14780-000","rua":"Rodovia Anhanguera km 380","numero":"s/n","complemento":"","bairro":"Distrito Industrial","estadoUf":"SP","vehicles":[],"telefone":"(17) 3322-4455"}'>
-                    <td class="td">Cerealista Bom Grão S.A.<span class="cadastros-fantasia text-12-regular">Bom Grão</span></td>
                     <td class="td">CF-3001</td>
-                    <td class="td">Cliente, Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Cerealista Bom Grão S.A.<span class="cadastros-fantasia text-12-regular">Bom Grão</span></td>
                     <td class="td">98.765.432/0001-10</td>
+                    <td class="td">(17) 3322-4455</td>
+                    <td class="td">Cliente, Fornecedor</td>
                     <td class="td">Barretos/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-t-4001" data-tipo="transportadora" data-status="ativo" data-cadastro-date="2025-01-15" data-search="transrural logistica ltda transrural t-4001 11222333000144" data-record='{"ie":"333.444.555.666","contribuinte":"icms","cep":"14400-000","rua":"Avenida Rio Branco","numero":"2100","complemento":"","bairro":"Jardim America","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"FRA4B12","uf":"SP"}]}],"telefone":"(16) 3701-2233"}'>
-                    <td class="td">TransRural Logística Ltda<span class="cadastros-fantasia text-12-regular">TransRural</span></td>
                     <td class="td">T-4001</td>
-                    <td class="td">Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">TransRural Logística Ltda<span class="cadastros-fantasia text-12-regular">TransRural</span></td>
                     <td class="td">11.222.333/0001-44</td>
+                    <td class="td">(16) 3701-2233</td>
+                    <td class="td">Transportadora</td>
                     <td class="td">Franca/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1002" data-tipo="cliente" data-status="inativo" data-situacao-since="2026-03-15" data-cadastro-date="2022-09-08" data-search="joao batista oliveira c-1002 23456789011" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14620-000","rua":"Rua Sete de Setembro","numero":"350","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 98765-1122"}'>
-                    <td class="td">João Batista Oliveira</td>
                     <td class="td">C-1002</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
+                    <td class="td">João Batista Oliveira</td>
                     <td class="td">234.567.890-11</td>
+                    <td class="td">(16) 98765-1122</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Orlândia/SP</td>
+                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn" data-action="ativar" aria-label="Ativar"><i data-lucide="check-circle" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ativar</span></button></div>
                     </td>
                   </tr>
 
-                  <tr class="tr" id="cad-row-f-2002" data-tipo="fornecedor" data-status="excluido" data-situacao-since="2026-02-02" data-cadastro-date="2021-06-30" data-search="defensivos e cia comercio ltda defensivos e cia f-2002 22333444000155" data-record='{"ie":"444.555.666.777","contribuinte":"icms","cep":"14169-000","rua":"Rua XV de Novembro","numero":"800","complemento":"","bairro":"Vila Recreio","estadoUf":"SP","vehicles":[],"telefone":"(16) 3512-7890"}'>
-                    <td class="td">Defensivos &amp; Cia Comércio Ltda<span class="cadastros-fantasia text-12-regular">Defensivos &amp; Cia</span></td>
+                  <tr class="tr" id="cad-row-f-2002" data-tipo="fornecedor" data-status="inativo" data-situacao-since="2026-02-02" data-cadastro-date="2021-06-30" data-search="defensivos e cia comercio ltda defensivos e cia f-2002 22333444000155" data-record='{"ie":"444.555.666.777","contribuinte":"icms","cep":"14169-000","rua":"Rua XV de Novembro","numero":"800","complemento":"","bairro":"Vila Recreio","estadoUf":"SP","vehicles":[],"telefone":"(16) 3512-7890"}'>
                     <td class="td">F-2002</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="error"><span class="badgeDot"></span>Excluído</span></td>
+                    <td class="td">Defensivos &amp; Cia Comércio Ltda<span class="cadastros-fantasia text-12-regular">Defensivos &amp; Cia</span></td>
                     <td class="td">22.333.444/0001-55</td>
+                    <td class="td">(16) 3512-7890</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Sertãozinho/SP</td>
+                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn" data-action="ativar" aria-label="Ativar"><i data-lucide="check-circle" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-ct-5001" data-tipo="cliente transportadora" data-status="ativo" data-cadastro-date="2024-04-18" data-search="graos express transportes ltda graos express ct-5001 33444555000166" data-record='{"ie":"555.666.777.888","contribuinte":"icms","cep":"14701-000","rua":"Avenida Jeronimo Goncalves","numero":"1500","complemento":"","bairro":"Jardim Paulista","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"BEB5C34","uf":"SP"}]}],"telefone":"(17) 99988-7766"}'>
-                    <td class="td">Grãos Express Transportes Ltda<span class="cadastros-fantasia text-12-regular">Grãos Express</span></td>
                     <td class="td">CT-5001</td>
-                    <td class="td">Cliente, Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Grãos Express Transportes Ltda<span class="cadastros-fantasia text-12-regular">Grãos Express</span></td>
                     <td class="td">33.444.555/0001-66</td>
+                    <td class="td">(17) 99988-7766</td>
+                    <td class="td">Cliente, Transportadora</td>
                     <td class="td">Bebedouro/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-ft-6001" data-tipo="fornecedor transportadora" data-status="ativo" data-cadastro-date="2023-10-02" data-search="log fertil distribuicao ltda log fertil ft-6001 44555666000177" data-record='{"ie":"666.777.888.999","contribuinte":"icms","cep":"14830-000","rua":"Rua Barao do Rio Branco","numero":"210","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"PRA6D45","uf":"SP"}]}],"telefone":"(17) 3411-5566"}'>
-                    <td class="td">Log Fértil Distribuição Ltda<span class="cadastros-fantasia text-12-regular">Log Fértil</span></td>
                     <td class="td">FT-6001</td>
-                    <td class="td">Fornecedor, Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Log Fértil Distribuição Ltda<span class="cadastros-fantasia text-12-regular">Log Fértil</span></td>
                     <td class="td">44.555.666/0001-77</td>
+                    <td class="td">(17) 3411-5566</td>
+                    <td class="td">Fornecedor, Transportadora</td>
                     <td class="td">Pradópolis/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-cft-7001" data-tipo="cliente fornecedor transportadora" data-status="ativo" data-cadastro-date="2020-03-11" data-search="agropecuaria central ltda agro central cft-7001 55666777000188" data-record='{"ie":"777.888.999.000","contribuinte":"icms","cep":"14010-000","rua":"Avenida Presidente Vargas","numero":"3200","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"RIB7E56","uf":"SP"},{"value":"RIB8F67","uf":"SP"}]}],"telefone":"(16) 3232-1010"}'>
-                    <td class="td">Agropecuária Central Ltda<span class="cadastros-fantasia text-12-regular">Agro Central</span></td>
                     <td class="td">CFT-7001</td>
-                    <td class="td">Cliente, Fornecedor, Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Agropecuária Central Ltda<span class="cadastros-fantasia text-12-regular">Agro Central</span></td>
                     <td class="td">55.666.777/0001-88</td>
+                    <td class="td">(16) 3232-1010</td>
+                    <td class="td">Cliente, Fornecedor, Transportadora</td>
                     <td class="td">Ribeirão Preto/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2003" data-tipo="fornecedor" data-status="ativo" data-cadastro-date="2025-06-25" data-search="antonio carlos pereira f-2003 34567890122" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14840-000","rua":"Rua Dom Pedro II","numero":"120","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 99111-2233"}'>
-                    <td class="td">Antônio Carlos Pereira</td>
                     <td class="td">F-2003</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Antônio Carlos Pereira</td>
                     <td class="td">345.678.901-22</td>
+                    <td class="td">(16) 99111-2233</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Guariba/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
-                  <tr class="tr" id="cad-row-c-1003" data-tipo="cliente" data-status="excluido" data-situacao-since="2026-01-10" data-cadastro-date="2019-12-05" data-search="sebastiao ramos da silva c-1003 45678901233" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"15910-000","rua":"Rua Sao Joao","numero":"75","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 98877-6655"}'>
-                    <td class="td">Sebastião Ramos da Silva</td>
+                  <tr class="tr" id="cad-row-c-1003" data-tipo="cliente" data-status="inativo" data-situacao-since="2026-01-10" data-cadastro-date="2019-12-05" data-search="sebastiao ramos da silva c-1003 45678901233" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"15910-000","rua":"Rua Sao Joao","numero":"75","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 98877-6655"}'>
                     <td class="td">C-1003</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="error"><span class="badgeDot"></span>Excluído</span></td>
+                    <td class="td">Sebastião Ramos da Silva</td>
                     <td class="td">456.789.012-33</td>
+                    <td class="td">(16) 98877-6655</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Monte Alto/SP</td>
+                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn" data-action="ativar" aria-label="Ativar"><i data-lucide="check-circle" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-t-4002" data-tipo="transportadora" data-status="inativo" data-situacao-since="2026-02-20" data-cadastro-date="2022-02-14" data-search="rota do campo transportes ltda rota do campo t-4002 66777888000199" data-record='{"ie":"888.999.000.111","contribuinte":"icms","cep":"15900-000","rua":"Avenida Brasil","numero":"640","complemento":"","bairro":"Vila Melhado","estadoUf":"SP","vehicles":[{"situacao":"inativo","plates":[{"value":"TAQ9G78","uf":"SP"}]}],"telefone":"(16) 3252-4040"}'>
-                    <td class="td">Rota do Campo Transportes Ltda<span class="cadastros-fantasia text-12-regular">Rota do Campo</span></td>
                     <td class="td">T-4002</td>
-                    <td class="td">Transportadora</td>
-                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
+                    <td class="td">Rota do Campo Transportes Ltda<span class="cadastros-fantasia text-12-regular">Rota do Campo</span></td>
                     <td class="td">66.777.888/0001-99</td>
+                    <td class="td">(16) 3252-4040</td>
+                    <td class="td">Transportadora</td>
                     <td class="td">Taquaritinga/SP</td>
+                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn" data-action="ativar" aria-label="Ativar"><i data-lucide="check-circle" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ativar</span></button></div>
                     </td>
                   </tr>
 
@@ -531,402 +502,327 @@
                        4003). Maioria `data-status="ativo"` de propósito. -->
 
                   <tr class="tr" id="cad-row-c-1010" data-tipo="cliente" data-status="ativo" data-cadastro-date="2020-03-14" data-search="antônio carlos ribeiro c-1010 23456789102" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14870-100","rua":"Rua Comendador Vicente Marchi","numero":"210","complemento":"","bairro":"Vila Xavier","estadoUf":"SP","vehicles":[],"telefone":"(16) 99123-4567"}'>
-                    <td class="td">Antônio Carlos Ribeiro</td>
                     <td class="td">C-1010</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Antônio Carlos Ribeiro</td>
                     <td class="td">234.567.891-02</td>
+                    <td class="td">(16) 99123-4567</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Jaboticabal/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1011" data-tipo="cliente" data-status="ativo" data-cadastro-date="2020-07-22" data-search="sebastião donizete martins c-1011 34567891203" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14300-020","rua":"Rua Coronel Joaquim Alves","numero":"88","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 98234-5678"}'>
-                    <td class="td">Sebastião Donizete Martins</td>
                     <td class="td">C-1011</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Sebastião Donizete Martins</td>
                     <td class="td">345.678.912-03</td>
+                    <td class="td">(16) 98234-5678</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Batatais/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2010" data-tipo="fornecedor" data-status="ativo" data-cadastro-date="2020-11-05" data-search="agropecuária santa fé ltda santa fé agro f-2010 12345679000101" data-record='{"ie":"111.222.333.101","contribuinte":"icms","cep":"14140-000","rua":"Avenida Rui Barbosa","numero":"1450","complemento":"","bairro":"Jardim Alvorada","estadoUf":"SP","vehicles":[],"telefone":"(16) 3720-1234"}'>
-                    <td class="td">Agropecuária Santa Fé Ltda<span class="cadastros-fantasia text-12-regular">Santa Fé Agro</span></td>
                     <td class="td">F-2010</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Agropecuária Santa Fé Ltda<span class="cadastros-fantasia text-12-regular">Santa Fé Agro</span></td>
                     <td class="td">12.345.679/0001-01</td>
+                    <td class="td">(16) 3720-1234</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Cravinhos/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2011" data-tipo="fornecedor" data-status="ativo" data-cadastro-date="2021-01-18" data-search="insumos cravinhos comercial ltda insumocrav f-2011 23456780000112" data-record='{"ie":"111.222.333.112","contribuinte":"icms","cep":"14600-030","rua":"Rua Sete de Setembro","numero":"320","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 3812-5566"}'>
-                    <td class="td">Insumos Cravinhos Comercial Ltda<span class="cadastros-fantasia text-12-regular">InsumoCrav</span></td>
                     <td class="td">F-2011</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Insumos Cravinhos Comercial Ltda<span class="cadastros-fantasia text-12-regular">InsumoCrav</span></td>
                     <td class="td">23.456.780/0001-12</td>
+                    <td class="td">(16) 3812-5566</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">São Joaquim da Barra/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-t-4010" data-tipo="transportadora" data-status="ativo" data-cadastro-date="2021-04-30" data-search="transportes rápido cerrado ltda rápido cerrado t-4010 34567891000123" data-record='{"ie":"111.222.333.123","contribuinte":"icms","cep":"14960-000","rua":"Rodovia Colômbia-Barretos km 8","numero":"s/n","complemento":"","bairro":"Zona Rural","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"RCT4E12","uf":"SP"}]}],"telefone":"(17) 3345-6789"}'>
-                    <td class="td">Transportes Rápido Cerrado Ltda<span class="cadastros-fantasia text-12-regular">Rápido Cerrado</span></td>
                     <td class="td">T-4010</td>
-                    <td class="td">Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Transportes Rápido Cerrado Ltda<span class="cadastros-fantasia text-12-regular">Rápido Cerrado</span></td>
                     <td class="td">34.567.891/0001-23</td>
+                    <td class="td">(17) 3345-6789</td>
+                    <td class="td">Transportadora</td>
                     <td class="td">Colômbia/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-cf-3010" data-tipo="cliente fornecedor" data-status="ativo" data-cadastro-date="2021-08-09" data-search="cerealista pontal ltda cerealista pontal cf-3010 45678912000134" data-record='{"ie":"111.222.333.134","contribuinte":"icms","cep":"14770-000","rua":"Rua Barão do Rio Branco","numero":"655","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 3958-2233"}'>
-                    <td class="td">Cerealista Pontal Ltda<span class="cadastros-fantasia text-12-regular">Cerealista Pontal</span></td>
                     <td class="td">CF-3010</td>
-                    <td class="td">Cliente, Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Cerealista Pontal Ltda<span class="cadastros-fantasia text-12-regular">Cerealista Pontal</span></td>
                     <td class="td">45.678.912/0001-34</td>
+                    <td class="td">(16) 3958-2233</td>
+                    <td class="td">Cliente, Fornecedor</td>
                     <td class="td">Pontal/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-ct-5010" data-tipo="cliente transportadora" data-status="ativo" data-cadastro-date="2021-12-02" data-search="fazenda transportes pitangueiras ltda faztrans ct-5010 56789123000145" data-record='{"ie":"111.222.333.145","contribuinte":"icms","cep":"14750-000","rua":"Avenida Brasil","numero":"990","complemento":"","bairro":"Jardim Paulista","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"PTG7F34","uf":"SP"}]}],"telefone":"(16) 99456-7890"}'>
-                    <td class="td">Fazenda Transportes Pitangueiras Ltda<span class="cadastros-fantasia text-12-regular">FazTrans</span></td>
                     <td class="td">CT-5010</td>
-                    <td class="td">Cliente, Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Fazenda Transportes Pitangueiras Ltda<span class="cadastros-fantasia text-12-regular">FazTrans</span></td>
                     <td class="td">56.789.123/0001-45</td>
+                    <td class="td">(16) 99456-7890</td>
+                    <td class="td">Cliente, Transportadora</td>
                     <td class="td">Pitangueiras/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-ft-6010" data-tipo="fornecedor transportadora" data-status="ativo" data-cadastro-date="2022-02-14" data-search="distribuidora viradouro ltda viradist ft-6010 67891234000156" data-record='{"ie":"111.222.333.156","contribuinte":"icms","cep":"14840-000","rua":"Rua Quinze de Novembro","numero":"402","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"VRD2G56","uf":"SP"}]}],"telefone":"(17) 3324-1122"}'>
-                    <td class="td">Distribuidora Viradouro Ltda<span class="cadastros-fantasia text-12-regular">ViraDist</span></td>
                     <td class="td">FT-6010</td>
-                    <td class="td">Fornecedor, Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Distribuidora Viradouro Ltda<span class="cadastros-fantasia text-12-regular">ViraDist</span></td>
                     <td class="td">67.891.234/0001-56</td>
+                    <td class="td">(17) 3324-1122</td>
+                    <td class="td">Fornecedor, Transportadora</td>
                     <td class="td">Viradouro/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-cft-7010" data-tipo="cliente fornecedor transportadora" data-status="ativo" data-cadastro-date="2022-06-27" data-search="grupo nuporanga agro ltda grupo nuporanga cft-7010 78912345000167" data-record='{"ie":"111.222.333.167","contribuinte":"icms","cep":"14730-000","rua":"Rua São Sebastião","numero":"275","complemento":"","bairro":"Vila Nova","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"NPG9H78","uf":"SP"}]}],"telefone":"(17) 99567-8901"}'>
-                    <td class="td">Grupo Nuporanga Agro Ltda<span class="cadastros-fantasia text-12-regular">Grupo Nuporanga</span></td>
                     <td class="td">CFT-7010</td>
-                    <td class="td">Cliente, Fornecedor, Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Grupo Nuporanga Agro Ltda<span class="cadastros-fantasia text-12-regular">Grupo Nuporanga</span></td>
                     <td class="td">78.912.345/0001-67</td>
+                    <td class="td">(17) 99567-8901</td>
+                    <td class="td">Cliente, Fornecedor, Transportadora</td>
                     <td class="td">Nuporanga/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1012" data-tipo="cliente" data-status="ativo" data-cadastro-date="2022-09-19" data-search="joaquina pereira lima c-1012 45678912304" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14680-000","rua":"Rua Padre Anchieta","numero":"133","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 98678-9012"}'>
-                    <td class="td">Joaquina Pereira Lima</td>
                     <td class="td">C-1012</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Joaquina Pereira Lima</td>
                     <td class="td">456.789.123-04</td>
+                    <td class="td">(16) 98678-9012</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Jardinópolis/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1013" data-tipo="cliente" data-status="ativo" data-cadastro-date="2022-11-30" data-search="roberto aparecido silveira c-1013 56789123405" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14150-000","rua":"Rua Antônio Diederichsen","numero":"560","complemento":"","bairro":"Jardim Serrana","estadoUf":"SP","vehicles":[],"telefone":"(16) 99845-6677"}'>
-                    <td class="td">Roberto Aparecido Silveira</td>
                     <td class="td">C-1013</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Roberto Aparecido Silveira</td>
                     <td class="td">567.891.234-05</td>
+                    <td class="td">(16) 99845-6677</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Serrana/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2012" data-tipo="fornecedor" data-status="ativo" data-cadastro-date="2023-01-25" data-search="sementes dumont ltda semdumont f-2012 89123456000178" data-record='{"ie":"111.222.333.178","contribuinte":"icms","cep":"14260-000","rua":"Rua Major Marcondes","numero":"77","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 3789-0123"}'>
-                    <td class="td">Sementes Dumont Ltda<span class="cadastros-fantasia text-12-regular">SemDumont</span></td>
                     <td class="td">F-2012</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Sementes Dumont Ltda<span class="cadastros-fantasia text-12-regular">SemDumont</span></td>
                     <td class="td">89.123.456/0001-78</td>
+                    <td class="td">(16) 3789-0123</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Dumont/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2013" data-tipo="fornecedor" data-status="ativo" data-cadastro-date="2023-04-11" data-search="adubos cajuru s.a. aducajuru f-2013 91234567000189" data-record='{"ie":"111.222.333.189","contribuinte":"isento","cep":"14330-000","rua":"Rua Cel. Fernando Prestes","numero":"210","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 3341-5588"}'>
-                    <td class="td">Adubos Cajuru S.A.<span class="cadastros-fantasia text-12-regular">AduCajuru</span></td>
                     <td class="td">F-2013</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Adubos Cajuru S.A.<span class="cadastros-fantasia text-12-regular">AduCajuru</span></td>
                     <td class="td">91.234.567/0001-89</td>
+                    <td class="td">(16) 3341-5588</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Cajuru/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-t-4011" data-tipo="transportadora" data-status="ativo" data-cadastro-date="2023-07-06" data-search="transportadora altinópolis ltda transalti t-4011 10234568000190" data-record='{"ie":"111.222.333.190","contribuinte":"icms","cep":"14350-000","rua":"Rua Dr. Gabriel Junqueira","numero":"340","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"ALT3J90","uf":"SP"}]}],"telefone":"(16) 99890-1234"}'>
-                    <td class="td">Transportadora Altinópolis Ltda<span class="cadastros-fantasia text-12-regular">TransAlti</span></td>
                     <td class="td">T-4011</td>
-                    <td class="td">Transportadora</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Transportadora Altinópolis Ltda<span class="cadastros-fantasia text-12-regular">TransAlti</span></td>
                     <td class="td">10.234.568/0001-90</td>
+                    <td class="td">(16) 99890-1234</td>
+                    <td class="td">Transportadora</td>
                     <td class="td">Altinópolis/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1014" data-tipo="cliente" data-status="ativo" data-cadastro-date="2023-10-15" data-search="marcos vinícius andrade c-1014 67891234506" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14240-000","rua":"Rua Cândido Portinari","numero":"158","complemento":"","bairro":"Vila Rica","estadoUf":"SP","vehicles":[],"telefone":"(16) 98901-2345"}'>
-                    <td class="td">Marcos Vinícius Andrade</td>
                     <td class="td">C-1014</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Marcos Vinícius Andrade</td>
                     <td class="td">678.912.345-06</td>
+                    <td class="td">(16) 98901-2345</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Brodowski/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1015" data-tipo="cliente" data-status="ativo" data-cadastro-date="2023-12-20" data-search="fazenda boa esperança agropecuária ltda boa esperança c-1015 21345679000101" data-record='{"ie":"111.222.333.201","contribuinte":"icms","cep":"14860-000","rua":"Rodovia Guariba-Jaboticabal km 4","numero":"s/n","complemento":"","bairro":"Zona Rural","estadoUf":"SP","vehicles":[],"telefone":"(16) 3251-9900"}'>
-                    <td class="td">Fazenda Boa Esperança Agropecuária Ltda<span class="cadastros-fantasia text-12-regular">Boa Esperança</span></td>
                     <td class="td">C-1015</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Fazenda Boa Esperança Agropecuária Ltda<span class="cadastros-fantasia text-12-regular">Boa Esperança</span></td>
                     <td class="td">21.345.679/0001-01</td>
+                    <td class="td">(16) 3251-9900</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Guariba/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2014" data-tipo="fornecedor" data-status="ativo" data-cadastro-date="2024-02-08" data-search="josé carlos fontoura f-2014 78912345607" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"15910-000","rua":"Rua Marechal Deodoro","numero":"45","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(17) 99012-3456"}'>
-                    <td class="td">José Carlos Fontoura</td>
                     <td class="td">F-2014</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">José Carlos Fontoura</td>
                     <td class="td">789.123.456-07</td>
+                    <td class="td">(17) 99012-3456</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Monte Alto/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-cf-3011" data-tipo="cliente fornecedor" data-status="ativo" data-cadastro-date="2024-05-17" data-search="comercial taquaritinga de grãos ltda grãostaqua cf-3011 32456780000112" data-record='{"ie":"111.222.333.212","contribuinte":"icms","cep":"15900-000","rua":"Rua Cel. Domiciano Ferreira Leite","numero":"512","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 3253-4477"}'>
-                    <td class="td">Comercial Taquaritinga de Grãos Ltda<span class="cadastros-fantasia text-12-regular">GrãosTaqua</span></td>
                     <td class="td">CF-3011</td>
-                    <td class="td">Cliente, Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Comercial Taquaritinga de Grãos Ltda<span class="cadastros-fantasia text-12-regular">GrãosTaqua</span></td>
                     <td class="td">32.456.780/0001-12</td>
+                    <td class="td">(16) 3253-4477</td>
+                    <td class="td">Cliente, Fornecedor</td>
                     <td class="td">Taquaritinga/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1016" data-tipo="cliente" data-status="inativo" data-situacao-since="2025-09-10" data-cadastro-date="2024-06-01" data-search="antônia ferreira campos c-1016 89012345608" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14700-000","rua":"Rua São Paulo","numero":"640","complemento":"","bairro":"Jardim América","estadoUf":"SP","vehicles":[],"telefone":"(17) 98123-4567"}'>
-                    <td class="td">Antônia Ferreira Campos</td>
                     <td class="td">C-1016</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
+                    <td class="td">Antônia Ferreira Campos</td>
                     <td class="td">890.123.456-08</td>
+                    <td class="td">(17) 98123-4567</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Bebedouro/SP</td>
+                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn" data-action="ativar" aria-label="Ativar"><i data-lucide="check-circle" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2015" data-tipo="fornecedor" data-status="inativo" data-situacao-since="2025-11-02" data-cadastro-date="2024-08-23" data-search="máquinas orlândia ltda maqorlândia f-2015 43567891000123" data-record='{"ie":"111.222.333.223","contribuinte":"icms","cep":"14620-000","rua":"Rua Duque de Caxias","numero":"288","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 3336-8899"}'>
-                    <td class="td">Máquinas Orlândia Ltda<span class="cadastros-fantasia text-12-regular">MaqOrlândia</span></td>
                     <td class="td">F-2015</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
+                    <td class="td">Máquinas Orlândia Ltda<span class="cadastros-fantasia text-12-regular">MaqOrlândia</span></td>
                     <td class="td">43.567.891/0001-23</td>
+                    <td class="td">(16) 3336-8899</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Orlândia/SP</td>
+                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn" data-action="ativar" aria-label="Ativar"><i data-lucide="check-circle" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1017" data-tipo="cliente" data-status="ativo" data-cadastro-date="2024-10-10" data-search="wellington souza prado c-1017 90123456709" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14400-000","rua":"Rua Monsenhor Rosa","numero":"900","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(16) 99234-5678"}'>
-                    <td class="td">Wellington Souza Prado</td>
                     <td class="td">C-1017</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Wellington Souza Prado</td>
                     <td class="td">901.234.567-09</td>
+                    <td class="td">(16) 99234-5678</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Franca/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1018" data-tipo="cliente" data-status="ativo" data-cadastro-date="2025-01-05" data-search="laticínios pradópolis ltda latiprado c-1018 54678912000134" data-record='{"ie":"111.222.333.234","contribuinte":"isento","cep":"14850-000","rua":"Rua José Bonifácio","numero":"165","complemento":"","bairro":"Vila Nova","estadoUf":"SP","vehicles":[],"telefone":"(17) 3345-2211"}'>
-                    <td class="td">Laticínios Pradópolis Ltda<span class="cadastros-fantasia text-12-regular">LatiPrado</span></td>
                     <td class="td">C-1018</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Laticínios Pradópolis Ltda<span class="cadastros-fantasia text-12-regular">LatiPrado</span></td>
                     <td class="td">54.678.912/0001-34</td>
+                    <td class="td">(17) 3345-2211</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Pradópolis/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
-                  <tr class="tr" id="cad-row-t-4012" data-tipo="transportadora" data-status="excluido" data-situacao-since="2026-01-15" data-cadastro-date="2025-03-12" data-search="transportes sertãozinho ltda transsertão t-4012 65789123000145" data-record='{"ie":"111.222.333.245","contribuinte":"icms","cep":"14160-000","rua":"Avenida Antônio Diederichsen","numero":"2200","complemento":"","bairro":"Distrito Industrial","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"SRT5K12","uf":"SP"}]}],"telefone":"(16) 3456-7890"}'>
-                    <td class="td">Transportes Sertãozinho Ltda<span class="cadastros-fantasia text-12-regular">TransSertão</span></td>
+                  <tr class="tr" id="cad-row-t-4012" data-tipo="transportadora" data-status="inativo" data-situacao-since="2026-01-15" data-cadastro-date="2025-03-12" data-search="transportes sertãozinho ltda transsertão t-4012 65789123000145" data-record='{"ie":"111.222.333.245","contribuinte":"icms","cep":"14160-000","rua":"Avenida Antônio Diederichsen","numero":"2200","complemento":"","bairro":"Distrito Industrial","estadoUf":"SP","vehicles":[{"situacao":"ativo","plates":[{"value":"SRT5K12","uf":"SP"}]}],"telefone":"(16) 3456-7890"}'>
                     <td class="td">T-4012</td>
-                    <td class="td">Transportadora</td>
-                    <td class="td"><span class="badge" data-status="error"><span class="badgeDot"></span>Excluído</span></td>
+                    <td class="td">Transportes Sertãozinho Ltda<span class="cadastros-fantasia text-12-regular">TransSertão</span></td>
                     <td class="td">65.789.123/0001-45</td>
+                    <td class="td">(16) 3456-7890</td>
+                    <td class="td">Transportadora</td>
                     <td class="td">Sertãozinho/SP</td>
+                    <td class="td"><span class="badge" data-status="warning"><span class="badgeDot"></span>Inativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn" data-action="ativar" aria-label="Ativar"><i data-lucide="check-circle" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-c-1019" data-tipo="cliente" data-status="ativo" data-cadastro-date="2025-06-28" data-search="cristiane aparecida nunes c-1019 11223344510" data-record='{"ie":"","contribuinte":"nao-contribuinte","cep":"14780-000","rua":"Rua 21","numero":"310","complemento":"","bairro":"Centro","estadoUf":"SP","vehicles":[],"telefone":"(17) 99123-8899"}'>
-                    <td class="td">Cristiane Aparecida Nunes</td>
                     <td class="td">C-1019</td>
-                    <td class="td">Cliente</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Cristiane Aparecida Nunes</td>
                     <td class="td">112.233.445-10</td>
+                    <td class="td">(17) 99123-8899</td>
+                    <td class="td">Cliente</td>
                     <td class="td">Barretos/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
                   <tr class="tr" id="cad-row-f-2016" data-tipo="fornecedor" data-status="ativo" data-cadastro-date="2026-02-02" data-search="rações ribeirão ltda raçõesrib f-2016 76891234000156" data-record='{"ie":"111.222.333.256","contribuinte":"icms","cep":"14020-000","rua":"Rua Amador Bueno","numero":"1500","complemento":"","bairro":"Jardim Botânico","estadoUf":"SP","vehicles":[],"telefone":"(17) 99345-6789"}'>
-                    <td class="td">Rações Ribeirão Ltda<span class="cadastros-fantasia text-12-regular">RaçõesRib</span></td>
                     <td class="td">F-2016</td>
-                    <td class="td">Fornecedor</td>
-                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
+                    <td class="td">Rações Ribeirão Ltda<span class="cadastros-fantasia text-12-regular">RaçõesRib</span></td>
                     <td class="td">76.891.234/0001-56</td>
+                    <td class="td">(17) 99345-6789</td>
+                    <td class="td">Fornecedor</td>
                     <td class="td">Ribeirão Preto/SP</td>
+                    <td class="td"><span class="badge" data-status="success"><span class="badgeDot"></span>Ativo</span></td>
                     <td class="td tdActions">
-                      <div class="cellActions">
-                        <button type="button" class="actionBtn" data-action="nota-fiscal" aria-label="Cadastrar nota fiscal"><i data-lucide="receipt" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Cadastrar nota fiscal</span></button>
-                        <button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button>
-                        <button type="button" class="actionBtn actionDanger" data-action="excluir" aria-label="Excluir"><i data-lucide="trash-2" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Excluir</span></button>
-                      </div>
+                      <div class="cellActions"><button type="button" class="actionBtn" data-action="editar" aria-label="Editar"><i data-lucide="pencil" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Editar</span></button><button type="button" class="actionBtn actionDanger" data-action="desativar" aria-label="Desativar"><i data-lucide="ban" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Desativar</span></button></div>
                     </td>
                   </tr>
 
@@ -989,21 +885,25 @@
   <!-- Tooltip compartilhado da Sidebar retraída -->
   <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
 
-  <!-- Modal de confirmação de exclusão (Dialog do Storybook) — markup/classes
-       exatamente como Dialog.tsx monta (overlay > dialog > header/body/footer),
-       mesmo padrão já usado no Modal de Termos em cadastro-planos.html. -->
-  <div class="overlay" id="delete-dialog-overlay" hidden>
-    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+  <!-- Modal de confirmação de Ativar/Desativar (Dialog do Storybook) — markup/
+       classes exatamente como Dialog.tsx monta (overlay > dialog > header/body/
+       footer), mesmo padrão já usado no toggle de Talhões
+       (fazenda-detalhe-cadastro.js). Título/mensagem/classe do botão de
+       confirmação trocam via JS conforme a situação atual do cadastro
+       (Desativar = `.btn.destructive`, Ativar = `.btn.primary`), Cancelar
+       sempre `.btn.secondaryGray`. -->
+  <div class="overlay" id="toggle-dialog-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="toggle-dialog-title">
       <div class="header">
-        <h2 class="title" id="delete-dialog-title">Excluir cadastro</h2>
-        <button class="closeBtn" id="delete-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+        <h2 class="title" id="toggle-dialog-title">Desativar cadastro</h2>
+        <button class="closeBtn" id="toggle-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
       </div>
       <div class="body">
-        <p class="text-body-s">Este cadastro será marcado como excluído, mas continuará disponível para consulta através do filtro de situação.</p>
+        <p class="text-body-s" id="toggle-dialog-message">Tem certeza que deseja desativar este cadastro? O cadastro continuará armazenado e poderá ser reativado a qualquer momento.</p>
       </div>
       <div class="footer">
-        <button type="button" class="btn secondary sm" id="delete-dialog-cancel">Cancelar</button>
-        <button type="button" class="btn destructive sm" id="delete-dialog-confirm">Excluir</button>
+        <button type="button" class="btn secondaryGray sm" id="toggle-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn destructive sm" id="toggle-dialog-confirm">Desativar</button>
       </div>
     </div>
   </div>

@@ -26,11 +26,17 @@
   // página de detalhes ter conteúdo de verdade pra mostrar. `fornecedor`/
   // `valorUnitario`/`deposito`: opcionais, `null` quando não informados
   // (nunca um traço "—" direto no dado, isso é só apresentação).
-  var COMPRAS = [
-    { codigo: 'CMP-001', produto: 'Adubo', sku: 'PRD-006', unidade: 'Saca', quantidadeInicial: 200, quantidade: 200, tipoEntrada: 'manual', fornecedor: 'Agropecuária Bom Plantio', valorUnitario: 85, deposito: 'Depósito Central', dataEntrada: '2026-06-05', historico: [{ tipo: 'entrada', quantidade: 200, data: '2026-06-05', observacao: null }] },
-    { codigo: 'CMP-002', produto: 'Semente', sku: 'PRD-007', unidade: 'Kg', quantidadeInicial: 500, quantidade: 500, tipoEntrada: 'xml', fornecedor: 'Sementes Vale Verde', valorUnitario: 12.5, deposito: 'Depósito Norte', dataEntrada: '2026-06-20', historico: [{ tipo: 'entrada', quantidade: 500, data: '2026-06-20', observacao: null }] },
-    { codigo: 'CMP-003', produto: 'Defensivo', sku: 'PRD-008', unidade: 'Litro', quantidadeInicial: 100, quantidade: 100, tipoEntrada: 'manual', fornecedor: null, valorUnitario: null, deposito: null, dataEntrada: '2026-07-08', historico: [{ tipo: 'entrada', quantidade: 100, data: '2026-07-08', observacao: null }] }
-  ];
+  //
+  // O array em si (seed + mutações de quantidade/histórico) vive agora em
+  // `estoque-compras-data.js` (`window.NiveloEstoqueCompras`), carregado
+  // antes deste script — extraído pra lá pra virar a fonte única compartilhada
+  // com o Relatório de Compras (`relatorio-compras.html`), que precisa ler os
+  // mesmos dados sem depender de nenhum elemento de DOM desta tela. Os
+  // objetos retornados por `.list()` são os MESMOS objetos do módulo (só o
+  // array é copiado, não os registros), então toda mutação feita aqui em
+  // `record.quantidade`/`record.historico` (Registrar consumo etc.) já reflete
+  // de volta em `window.NiveloEstoqueCompras.list()` normalmente.
+  var COMPRAS = window.NiveloEstoqueCompras.list();
 
   // `abatida` nunca é editada diretamente pelo usuário (ver rules.md,
   // "Estoque Comprometido") — é sempre o resultado acumulado de movimentações

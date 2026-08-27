@@ -106,6 +106,18 @@
 
 .novo-produto-dropdown { position: relative; }
 
+/* Resultado ao vivo da conversão ("1 SC = 60 KG"), reflexo do que já está
+   cadastrado em Configuração > Unidade de medida pra unidade escolhida —
+   nunca pede o fator de conversão de novo aqui (ver novo-produto.js). */
+.novo-produto-unidade-resultado {
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+  align-self: end;
+  padding-bottom: var(--spacing-xs);
+}
+.novo-produto-unidade-resultado[hidden] { display: none; }
+
 /* ⚠️ Colisão de classes .input/.option com RadioButton.module.css (mesmo
    padrão já documentado em page-novo-estoque.css/CLAUDE.md) — a seção
    "Controle de estoque" usa RadioButton (Sim/Não), e como os `.module.css`

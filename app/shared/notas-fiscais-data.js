@@ -23,8 +23,11 @@
      transportadoraNome, // opcional
      observacao,         // opcional
      tipoOperacao,       // código de natureza-operacao-data.js
-     cfop                // derivado do tipoOperacao no momento da emissão
-   }
+     cfop,               // derivado do tipoOperacao no momento da emissão
+     origem              // só quando tipo='saida' — 'venda' | 'remessa'. De onde a nota
+                          // foi originada (Pedido de Venda ou Remessa), consumido pelo
+                          // filtro "Origem" da Central de Notas Fiscais (V2). Default
+                          // 'venda' quando não informado (ex.: emissão manual).
 
    Notas de entrada: este protótipo não tem um fluxo manual de criação pra
    elas (decisão explícita do pedido — a entrada real virá de uma
@@ -35,23 +38,23 @@
   'use strict';
 
   var NOTAS = [
-    { numero: 'NF-1001', tipo: 'saida', dataEmissao: '2026-07-10', clienteNome: 'Cerealista Bom Grão S.A.', clienteDocumento: '98.765.432/0001-10', uf: 'SP', valor: 74400, status: 'emitida', motivoRejeicao: null,
+    { numero: 'NF-1001', tipo: 'saida', dataEmissao: '2026-07-10', clienteNome: 'Cerealista Bom Grão S.A.', clienteDocumento: '98.765.432/0001-10', uf: 'SP', valor: 74400, status: 'emitida', motivoRejeicao: null, origem: 'venda',
       itens: [{ produtoNome: 'Soja', sku: 'PRD-001', unidade: 'Saca', quantidade: 1240, preco: 60 }],
       meioPagamento: 'boleto', categoriaCodigo: 'CAT-001', transportadoraNome: 'TransRural Logística Ltda', observacao: '', tipoOperacao: 'venda-dentro-estado', cfop: '5102' },
-    { numero: 'NF-1002', tipo: 'saida', dataEmissao: '2026-07-15', clienteNome: 'Maria Aparecida Souza', clienteDocumento: '123.456.789-00', uf: 'SP', valor: 12600, status: 'emitida', motivoRejeicao: null,
+    { numero: 'NF-1002', tipo: 'saida', dataEmissao: '2026-07-15', clienteNome: 'Maria Aparecida Souza', clienteDocumento: '123.456.789-00', uf: 'SP', valor: 12600, status: 'emitida', motivoRejeicao: null, origem: 'venda',
       itens: [{ produtoNome: 'Milho', sku: 'PRD-002', unidade: 'Saca', quantidade: 420, preco: 30 }],
       meioPagamento: 'pix', categoriaCodigo: 'CAT-002', transportadoraNome: null, observacao: '', tipoOperacao: 'venda-dentro-estado', cfop: '5102' },
-    { numero: 'NF-1003', tipo: 'saida', dataEmissao: '2026-07-22', clienteNome: 'Agropecuária Central Ltda', clienteDocumento: '55.666.777/0001-88', uf: 'MG', valor: 5400, status: 'pendente', motivoRejeicao: null,
+    { numero: 'NF-1003', tipo: 'saida', dataEmissao: '2026-07-22', clienteNome: 'Agropecuária Central Ltda', clienteDocumento: '55.666.777/0001-88', uf: 'MG', valor: 5400, status: 'pendente', motivoRejeicao: null, origem: 'venda',
       itens: [{ produtoNome: 'Trigo', sku: 'PRD-003', unidade: 'Saca', quantidade: 90, preco: 60 }],
       meioPagamento: 'transferencia', categoriaCodigo: 'CAT-001', transportadoraNome: 'Grãos Express Transportes Ltda', observacao: 'Aguardando confirmação da SEFAZ.', tipoOperacao: 'venda-fora-estado', cfop: '6102' },
-    { numero: 'NF-1004', tipo: 'saida', dataEmissao: '2026-07-24', clienteNome: 'Fazenda Boa Esperança Agropecuária Ltda', clienteDocumento: '21.345.679/0001-01', uf: 'SP', valor: 8900, status: 'rejeitada',
+    { numero: 'NF-1004', tipo: 'saida', dataEmissao: '2026-07-24', clienteNome: 'Fazenda Boa Esperança Agropecuária Ltda', clienteDocumento: '21.345.679/0001-01', uf: 'SP', valor: 8900, status: 'rejeitada', origem: 'venda',
       motivoRejeicao: 'CNPJ do destinatário divergente do cadastrado na Receita Federal.',
       itens: [{ produtoNome: 'Adubo', sku: 'PRD-006', unidade: 'Saca', quantidade: 178, preco: 50 }],
       meioPagamento: 'boleto', categoriaCodigo: 'CAT-002', transportadoraNome: null, observacao: '', tipoOperacao: 'venda-dentro-estado', cfop: '5102' },
-    { numero: 'NF-1005', tipo: 'saida', dataEmissao: '2026-06-28', clienteNome: 'Wellington Souza Prado', clienteDocumento: '901.234.567-09', uf: 'SP', valor: 3200, status: 'cancelada', motivoRejeicao: null,
+    { numero: 'NF-1005', tipo: 'saida', dataEmissao: '2026-06-28', clienteNome: 'Wellington Souza Prado', clienteDocumento: '901.234.567-09', uf: 'SP', valor: 3200, status: 'cancelada', motivoRejeicao: null, origem: 'venda',
       itens: [{ produtoNome: 'Defensivo', sku: 'PRD-008', unidade: 'Litro', quantidade: 40, preco: 80 }],
       meioPagamento: 'cartao-credito', categoriaCodigo: 'CAT-001', transportadoraNome: null, observacao: 'Cancelada a pedido do cliente.', tipoOperacao: 'venda-dentro-estado', cfop: '5102' },
-    { numero: 'NF-1006', tipo: 'saida', dataEmissao: '2026-07-27', clienteNome: 'Joaquina Pereira Lima', clienteDocumento: '456.789.123-04', uf: 'SP', valor: 6600, status: 'rejeitada',
+    { numero: 'NF-1006', tipo: 'saida', dataEmissao: '2026-07-27', clienteNome: 'Joaquina Pereira Lima', clienteDocumento: '456.789.123-04', uf: 'SP', valor: 6600, status: 'rejeitada', origem: 'remessa',
       motivoRejeicao: 'Falha de comunicação com a SEFAZ no momento da transmissão. Tente emitir novamente.',
       itens: [{ produtoNome: 'Sorgo', sku: 'PRD-004', unidade: 'Saca', quantidade: 110, preco: 60 }],
       meioPagamento: 'dinheiro', categoriaCodigo: 'CAT-002', transportadoraNome: 'Transportadora Altinópolis Ltda', observacao: '', tipoOperacao: 'remessa', cfop: '5905' }
@@ -111,9 +114,21 @@
       transportadoraNome: payload.transportadoraNome || null,
       observacao: payload.observacao || '',
       tipoOperacao: payload.tipoOperacao,
-      cfop: payload.cfop
+      cfop: payload.cfop,
+      origem: payload.origem || 'venda'
     };
     NOTAS.push(nota);
+    return nota;
+  }
+
+  // Cancela uma NF-e já emitida (regra de estado: só nota de saída 'emitida'
+  // pode ser cancelada — ver podeCancelar() em notas-fiscais-v2.js). Ação
+  // permanente, mesmo espírito de cancelar()/registrarPagamento() em
+  // contas-pagar-data.js/manifestos-data.js.
+  function cancelar(numero) {
+    var nota = findByNumero(numero);
+    if (!nota || nota.tipo !== 'saida' || nota.status !== 'emitida') return null;
+    nota.status = 'cancelada';
     return nota;
   }
 
@@ -172,6 +187,7 @@
     nextNumero: nextNumero,
     add: add,
     addEntrada: addEntrada,
+    cancelar: cancelar,
     updateAfterCorrecao: updateAfterCorrecao
   };
 })();

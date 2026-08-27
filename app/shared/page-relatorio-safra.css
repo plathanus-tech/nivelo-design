@@ -1,0 +1,191 @@
+/* ══════════════════════════════════════════════════════════
+   RELATÓRIO DE SAFRA (Financeiro > Relatórios > Relatório de Safra).
+   Filtro de Safra (Dropdown) + resumo (Total plantado/Total colhido) + UMA
+   tabela (Produto/Plantado/Colhido) para a safra selecionada. Tudo reage ao
+   filtro na hora, sem passo de "Gerar relatório" (ver relatorio-safra.js).
+   Fontes read-only: `fazendas-data.js` (Plantado) e `caderno-data.js`
+   (Colhido), nunca escreve em nenhum dos dois. Mobile first.
+   ══════════════════════════════════════════════════════════ */
+
+.relsafra-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.relsafra-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+.relsafra-title { color: var(--color-text-primary); margin: 0; }
+.relsafra-description { color: var(--color-text-tertiary); margin: 0; }
+
+.relsafra-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.relsafra-back:hover {
+  color: var(--color-text-primary);
+}
+
+/* ── Filtro de Safra ──────────────────────────────────────────────────── */
+
+.relsafra-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.relsafra-dropdown {
+  width: 100%;
+  max-width: 260px;
+}
+
+/* ── Resumo (Total plantado / Total colhido) ──────────────────────────────
+   Mesma cópia estrutural do padrão de KPI já usado em Estoque/Caixa/Contas
+   a Pagar/Receber: título+valor no mesmo tamanho compacto (12px/24px) em
+   qualquer largura de tela, 1 coluna no mobile, 2 iguais a partir de
+   1024px (só 2 cards aqui, diferente dos 3-4 de outras telas). */
+.relsafra-summary-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+@media (min-width: 1024px) {
+  .relsafra-summary-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+.card.relsafra-summary-card {
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.relsafra-summary-card .cardHeader {
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+}
+.relsafra-summary-card .title {
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+.relsafra-summary-icon svg { width: 14px; height: 14px; }
+.relsafra-summary-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.relsafra-summary-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+.relsafra-summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+.relsafra-summary-value {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+.relsafra-summary-caption {
+  color: var(--color-text-tertiary);
+  font-size: 10px;
+  font-weight: var(--font-weight-regular);
+}
+@media (min-width: 1024px) {
+  .relsafra-summary-caption { font-size: 12px; font-weight: var(--font-weight-regular); }
+}
+
+/* ── Tabela (Produto/Plantado/Colhido) ─────────────────────────────────── */
+
+.card.relsafra-table-card {
+  padding: 0;
+}
+.relsafra-table-header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+/* "Exportar Excel" — mesmo tratamento visual/posicionamento do botão já
+   usado em Caixa (page-caixa.css's #caixa-export-btn), pra manter o mesmo
+   padrão em toda tabela do sistema com exportação. */
+#relsafra-export-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border-muted);
+  color: var(--color-text-secondary);
+  gap: var(--spacing-xs);
+}
+#relsafra-export-btn:hover:not(:disabled) {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-300);
+  color: var(--color-text-primary);
+}
+#relsafra-export-btn:active:not(:disabled) {
+  background: var(--color-gray-100);
+}
+@media (min-width: 768px) {
+  #relsafra-export-btn { width: auto; }
+}
+
+.relsafra-table-card .td:nth-child(2),
+.relsafra-table-card .td:nth-child(3) {
+  text-align: right;
+}
+.relsafra-table-card .th:nth-child(2),
+.relsafra-table-card .th:nth-child(3) {
+  text-align: right;
+}
+
+/* Zebra striping (branco/gray-50) escopado ao TBODY (`#relsafra-tbody`, id — nunca a
+   uma classe genérica da tabela), mesmo padrão/mesma lição já documentada em LCDPR/
+   DRE/Balancete V2: sobrescreve o zebra padrão (bg-subtle/bg-default) de
+   Table.module.css pelo par branco/gray-50 usado nos demais relatórios da V2. */
+#relsafra-tbody .tr:nth-child(odd) .td { background: var(--color-bg-surface); }
+#relsafra-tbody .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.relsafra-table-card .tr:hover .td { filter: brightness(0.97); }
+
+/* Mensagem "nenhum dado" pra safra inteira (nem plantado, nem colhido) —
+   some a tabela por completo, mostra só a mensagem central. Guard
+   `hidden`+`display` incondicional: `.relsafra-empty` abaixo é
+   `display:flex` sem guarda, então precisa reforçar `[hidden]{display:none}`
+   (mesmo padrão documentado dezenas de vezes em app/CLAUDE.md). */
+.relsafra-empty[hidden] { display: none; }
+.relsafra-empty:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-tertiary);
+  padding: var(--spacing-lg);
+}
+.relsafra-empty svg { flex-shrink: 0; }

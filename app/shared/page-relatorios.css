@@ -85,3 +85,17 @@
   font-weight: var(--font-weight-medium);
 }
 .card.rel-card:hover .rel-card-cta { color: var(--color-action-primary-hover); }
+
+/* ── Faixa de troca de versão (V1 → V2), aditivo — mesmo padrão já usado
+   em Contas a Receber V1/V2. ── */
+.rel-version-banner-v1 { display: flex; justify-content: flex-end; margin-bottom: var(--spacing-sm); }
+.rel-version-switch-v1 {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.rel-version-switch-v1:hover { color: var(--color-text-brand); }

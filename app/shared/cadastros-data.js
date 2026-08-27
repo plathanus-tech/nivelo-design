@@ -7,19 +7,24 @@
 // (um cadastro pode ser Cliente + Fornecedor, por exemplo). Registros com
 // `status: "excluido"` (soft delete) ficam fora de `list()`/`findByTipo()`
 // — um cadastro excluído não deve aparecer como opção pra um registro novo.
+// `inscricaoEstadual`/`telefone`/`endereco` (aditivos, round Pedidos de
+// Venda): nenhum consumidor existente lia esses campos, então só alguns
+// registros seed foram preenchidos (os prováveis de aparecer numa
+// demonstração) — os demais ficam `undefined`, e quem consome trata isso
+// como "—", nunca quebra.
 window.NiveloCadastros = (function () {
   'use strict';
 
   var CADASTROS = [
-    { nome: "Maria Aparecida Souza", codigo: "C-1001", tipo: ["cliente"], status: "ativo", documento: "123.456.789-00", cidade: "Ribeirão Preto/SP" },
+    { nome: "Maria Aparecida Souza", codigo: "C-1001", tipo: ["cliente"], status: "ativo", documento: "123.456.789-00", cidade: "Ribeirão Preto/SP", inscricaoEstadual: "Isento", telefone: "(16) 99811-2233", endereco: "Rua das Palmeiras, 245 - Ribeirão Preto/SP" },
     { nome: "Insumos Agrícolas Vale Ltda", codigo: "F-2001", tipo: ["fornecedor"], status: "ativo", documento: "12.345.678/0001-90", cidade: "Sertãozinho/SP" },
-    { nome: "Cerealista Bom Grão S.A.", codigo: "CF-3001", tipo: ["cliente","fornecedor"], status: "ativo", documento: "98.765.432/0001-10", cidade: "Barretos/SP" },
+    { nome: "Cerealista Bom Grão S.A.", codigo: "CF-3001", tipo: ["cliente","fornecedor"], status: "ativo", documento: "98.765.432/0001-10", cidade: "Barretos/SP", inscricaoEstadual: "123.456.789.110", telefone: "(17) 3322-4455", endereco: "Av. dos Cereais, 800 - Barretos/SP" },
     { nome: "TransRural Logística Ltda", codigo: "T-4001", tipo: ["transportadora"], status: "ativo", documento: "11.222.333/0001-44", cidade: "Franca/SP" },
     { nome: "João Batista Oliveira", codigo: "C-1002", tipo: ["cliente"], status: "inativo", documento: "234.567.890-11", cidade: "Orlândia/SP" },
     { nome: "Defensivos & Cia Comércio Ltda", codigo: "F-2002", tipo: ["fornecedor"], status: "excluido", documento: "22.333.444/0001-55", cidade: "Sertãozinho/SP" },
     { nome: "Grãos Express Transportes Ltda", codigo: "CT-5001", tipo: ["cliente","transportadora"], status: "ativo", documento: "33.444.555/0001-66", cidade: "Bebedouro/SP" },
     { nome: "Log Fértil Distribuição Ltda", codigo: "FT-6001", tipo: ["fornecedor","transportadora"], status: "ativo", documento: "44.555.666/0001-77", cidade: "Pradópolis/SP" },
-    { nome: "Agropecuária Central Ltda", codigo: "CFT-7001", tipo: ["cliente","fornecedor","transportadora"], status: "ativo", documento: "55.666.777/0001-88", cidade: "Ribeirão Preto/SP" },
+    { nome: "Agropecuária Central Ltda", codigo: "CFT-7001", tipo: ["cliente","fornecedor","transportadora"], status: "ativo", documento: "55.666.777/0001-88", cidade: "Ribeirão Preto/SP", inscricaoEstadual: "223.445.667.100", telefone: "(16) 3255-1188", endereco: "Av. Central, 1200 - Ribeirão Preto/SP" },
     { nome: "Antônio Carlos Pereira", codigo: "F-2003", tipo: ["fornecedor"], status: "ativo", documento: "345.678.901-22", cidade: "Guariba/SP" },
     { nome: "Sebastião Ramos da Silva", codigo: "C-1003", tipo: ["cliente"], status: "excluido", documento: "456.789.012-33", cidade: "Monte Alto/SP" },
     { nome: "Rota do Campo Transportes Ltda", codigo: "T-4002", tipo: ["transportadora"], status: "inativo", documento: "66.777.888/0001-99", cidade: "Taquaritinga/SP" },

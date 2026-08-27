@@ -182,6 +182,11 @@
   transition: background-color var(--transition-fast);
 }
 .dpMonth:hover { background: var(--color-bg-subtle); }
+.dpMonth:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+.dpMonth:disabled:hover { background: transparent; }
 .dpMonthSelected {
   background: var(--color-action-primary);
   color: var(--color-text-inverse);

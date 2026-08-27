@@ -165,7 +165,7 @@ window.PROTO_NAV_CONFIG = {
       screens: [
         {
           id: 'cadastros-listagem',
-          label: 'Cadastro de pessoas e empresas',
+          label: 'Clientes e fornecedores',
           desktop: '../app/screens/cadastros.html',
           variants: [
             { id: 'cadastros-listagem-created', label: 'Cadastro realizado com sucesso', desktop: '../app/screens/cadastros.html#state=created' },
@@ -213,6 +213,29 @@ window.PROTO_NAV_CONFIG = {
           desktop: '../app/screens/novo-produto.html',
           variants: [
             { id: 'novo-produto-edit', label: 'Editar produto (exemplo)', desktop: '../app/screens/novo-produto.html?sku=PRD-001' }
+          ]
+        },
+        // V2 — reconstrução da jornada de Produtos: listagem com 2 abas
+        // (Produtos de venda/Produtos de uso, colunas próprias por tipo,
+        // Ativar/Desativar real) + formulário condicional por Tipo de
+        // produto (Dados Fiscais × Entrada Inicial no Estoque). É o destino
+        // real da Sidebar (`NAV_DESTINATIONS['cadastro-produtos']`) — V1
+        // acima continua só pro navegador de protótipo.
+        {
+          id: 'produtos-v2',
+          label: 'Produtos (V2)',
+          desktop: '../app/screens/produtos-v2.html',
+          variants: [
+            { id: 'produtos-v2-empty', label: 'Nenhum produto', desktop: '../app/screens/produtos-v2.html#state=empty' }
+          ]
+        },
+        {
+          id: 'novo-produto-v2',
+          label: 'Novo produto (V2)',
+          desktop: '../app/screens/novo-produto-v2.html',
+          variants: [
+            { id: 'novo-produto-v2-edit-venda', label: 'Editar Produto de venda (exemplo)', desktop: '../app/screens/novo-produto-v2.html?sku=PRD-001' },
+            { id: 'novo-produto-v2-edit-uso', label: 'Editar Produto de uso (exemplo)', desktop: '../app/screens/novo-produto-v2.html?sku=PRD-006' }
           ]
         }
       ]
@@ -334,6 +357,29 @@ window.PROTO_NAV_CONFIG = {
           desktop: '../app/screens/nova-categoria-financeira.html',
           variants: [
             { id: 'nova-categoria-financeira-editar', label: 'Editar categoria (exemplo)', desktop: '../app/screens/nova-categoria-financeira.html?codigo=CAT-001' }
+          ]
+        },
+        // Épico "Unidade de Medida" (`type:'flow'`) — Configuração > Unidade
+        // de medida: listagem (KG/LT/UN padrão do sistema + unidades
+        // customizadas) + cadastro/edição.
+        {
+          id: 'unidades-medida-epico',
+          label: 'Unidade de Medida',
+          type: 'flow',
+          screens: [
+            {
+              id: 'unidades-medida',
+              label: 'Unidade de medida',
+              desktop: '../app/screens/unidades-medida.html'
+            },
+            {
+              id: 'nova-unidade-medida',
+              label: 'Nova unidade de medida',
+              desktop: '../app/screens/nova-unidade-medida.html',
+              variants: [
+                { id: 'nova-unidade-medida-editar', label: 'Editar unidade (exemplo)', desktop: '../app/screens/nova-unidade-medida.html?sigla=SC' }
+              ]
+            }
           ]
         },
         // Épico "Natureza da Operação" (`type:'flow'`) — Fiscal > Natureza
@@ -599,19 +645,54 @@ window.PROTO_NAV_CONFIG = {
             }
           ]
         },
+        // Contas a Receber V2 (padrão): geração automática a partir de Nota
+        // Fiscal/Pedido, recebimentos parciais/múltiplos em bancos
+        // diferentes com desconto, filtro/coluna de Banco na listagem. A V1
+        // (épico seguinte) permanece intacta e disponível pra comparação —
+        // pedido explícito do usuário de manter as duas versões visíveis.
+        {
+          id: 'contas-a-receber-v2-epico',
+          label: 'Contas a receber (V2)',
+          type: 'flow',
+          screens: [
+            {
+              id: 'contas-a-receber-v2',
+              label: 'Contas a receber (V2)',
+              desktop: '../app/screens/contas-a-receber-v2.html'
+            },
+            {
+              id: 'nova-conta-receber-v2',
+              label: 'Nova Conta a Receber (V2)',
+              desktop: '../app/screens/nova-conta-receber-v2.html',
+              variants: [
+                { id: 'nova-conta-receber-v2-editar', label: 'Editar (CTR-0003)', desktop: '../app/screens/nova-conta-receber-v2.html?codigo=CTR-0003&modo=editar' }
+              ]
+            },
+            {
+              id: 'detalhe-conta-receber-v2',
+              label: 'Ver detalhes (Contas a receber V2)',
+              desktop: '../app/screens/detalhe-conta-receber-v2.html?codigo=CTR-0009',
+              variants: [
+                { id: 'detalhe-conta-receber-v2-parcial', label: 'Recebimentos parciais/múltiplos bancos (CTR-0003)', desktop: '../app/screens/detalhe-conta-receber-v2.html?codigo=CTR-0003' },
+                { id: 'detalhe-conta-receber-v2-nao-encontrada', label: 'Conta não encontrada', desktop: '../app/screens/detalhe-conta-receber-v2.html?codigo=inexistente' }
+              ]
+            }
+          ]
+        },
+        // Contas a Receber V1 (versão anterior, mantida intacta pra comparação).
         {
           id: 'contas-a-receber-epico',
-          label: 'Contas a receber',
+          label: 'Contas a receber (V1)',
           type: 'flow',
           screens: [
             {
               id: 'contas-a-receber',
-              label: 'Contas a receber',
+              label: 'Contas a receber (V1)',
               desktop: '../app/screens/contas-a-receber.html'
             },
             {
               id: 'nova-conta-receber',
-              label: 'Nova Conta a Receber',
+              label: 'Nova Conta a Receber (V1)',
               desktop: '../app/screens/nova-conta-receber.html',
               variants: [
                 { id: 'nova-conta-receber-editar', label: 'Editar (CTR-0003)', desktop: '../app/screens/nova-conta-receber.html?codigo=CTR-0003&modo=editar' }
@@ -619,7 +700,7 @@ window.PROTO_NAV_CONFIG = {
             },
             {
               id: 'detalhe-conta-receber',
-              label: 'Ver detalhes (Contas a receber)',
+              label: 'Ver detalhes (Contas a receber V1)',
               desktop: '../app/screens/detalhe-conta-receber.html?codigo=CTR-0001',
               variants: [
                 { id: 'detalhe-conta-receber-parcelada', label: 'Conta recorrente (CTR-0003)', desktop: '../app/screens/detalhe-conta-receber.html?codigo=CTR-0003' },
@@ -628,30 +709,80 @@ window.PROTO_NAV_CONFIG = {
             }
           ]
         },
+        // Relatórios V2 (padrão): landing V2 + Balancete/LCDPR/DRE V2 (filtros revisados
+        // por relatório) + Relatório de Compras/Relatório de Safra (novos, só na V2). A
+        // V1 (épico seguinte) permanece intacta e disponível pra comparação — mesmo
+        // padrão já usado em Contas a Receber V1/V2.
         {
-          id: 'relatorios',
-          label: 'Relatórios',
-          desktop: '../app/screens/relatorios.html'
+          id: 'relatorios-v2-epico',
+          label: 'Relatórios (V2)',
+          type: 'flow',
+          screens: [
+            {
+              id: 'relatorios-v2',
+              label: 'Relatórios (V2)',
+              desktop: '../app/screens/relatorios-v2.html'
+            },
+            {
+              id: 'balancete-v2',
+              label: 'Balancete (V2)',
+              desktop: '../app/screens/balancete-v2.html'
+            },
+            {
+              id: 'lcdpr-v2',
+              label: 'LCDPR (V2)',
+              desktop: '../app/screens/lcdpr-v2.html'
+            },
+            {
+              id: 'dre-v2',
+              label: 'DRE (V2)',
+              desktop: '../app/screens/dre-v2.html'
+            },
+            {
+              id: 'relatorio-compras',
+              label: 'Histórico de custos dos insumos',
+              desktop: '../app/screens/relatorio-compras.html'
+            },
+            {
+              id: 'relatorio-safra',
+              label: 'Relatório de Safra',
+              desktop: '../app/screens/relatorio-safra.html'
+            }
+          ]
         },
+        // Relatórios V1 (versão anterior, mantida intacta pra comparação) — inclui
+        // Entradas e Saídas, removido da V2.
         {
-          id: 'balancete',
-          label: 'Balancete',
-          desktop: '../app/screens/balancete.html'
-        },
-        {
-          id: 'lcdpr',
-          label: 'LCDPR',
-          desktop: '../app/screens/lcdpr.html'
-        },
-        {
-          id: 'dre',
-          label: 'DRE',
-          desktop: '../app/screens/dre.html'
-        },
-        {
-          id: 'entradas-saidas',
-          label: 'Entradas e Saídas',
-          desktop: '../app/screens/entradas-saidas.html'
+          id: 'relatorios-epico',
+          label: 'Relatórios (V1)',
+          type: 'flow',
+          screens: [
+            {
+              id: 'relatorios',
+              label: 'Relatórios (V1)',
+              desktop: '../app/screens/relatorios.html'
+            },
+            {
+              id: 'balancete',
+              label: 'Balancete (V1)',
+              desktop: '../app/screens/balancete.html'
+            },
+            {
+              id: 'lcdpr',
+              label: 'LCDPR (V1)',
+              desktop: '../app/screens/lcdpr.html'
+            },
+            {
+              id: 'dre',
+              label: 'DRE (V1)',
+              desktop: '../app/screens/dre.html'
+            },
+            {
+              id: 'entradas-saidas',
+              label: 'Entradas e Saídas (V1)',
+              desktop: '../app/screens/entradas-saidas.html'
+            }
+          ]
         }
       ]
     },
@@ -660,9 +791,53 @@ window.PROTO_NAV_CONFIG = {
       label: 'Jornada · Fiscal',
       screens: [
         {
+          id: 'pedidos-venda-epico',
+          label: 'Pedidos de Venda',
+          type: 'flow',
+          screens: [
+            {
+              id: 'pedidos-de-venda',
+              label: 'Pedidos de Venda',
+              desktop: '../app/screens/pedidos-de-venda.html',
+              variants: [
+                { id: 'pedidos-de-venda-vazio', label: 'Nenhum pedido cadastrado', desktop: '../app/screens/pedidos-de-venda.html#state=empty' },
+                { id: 'pedidos-de-venda-emitirnfe-semcertificado', label: 'Emitir nota fiscal · Sem certificado', desktop: '../app/screens/pedidos-de-venda.html#state=emitirnfe-semcertificado' },
+                { id: 'pedidos-de-venda-emitirnfe-comcertificado', label: 'Emitir nota fiscal · Com certificado', desktop: '../app/screens/pedidos-de-venda.html#state=emitirnfe-comcertificado' }
+              ]
+            },
+            {
+              id: 'novo-pedido-venda',
+              label: 'Novo pedido de venda',
+              desktop: '../app/screens/novo-pedido-venda.html'
+            },
+            {
+              id: 'nova-remessa',
+              label: 'Nova remessa',
+              desktop: '../app/screens/nova-remessa.html'
+            },
+            {
+              id: 'pedido-venda-detalhe',
+              label: 'Detalhes do pedido de venda',
+              desktop: '../app/screens/pedido-venda-detalhe.html#numero=PV-0002',
+              variants: [
+                { id: 'pedido-venda-detalhe-nfe-emitida', label: 'NF-e já emitida', desktop: '../app/screens/pedido-venda-detalhe.html#numero=PV-0001' },
+                { id: 'pedido-venda-detalhe-nao-encontrado', label: 'Pedido não encontrado', desktop: '../app/screens/pedido-venda-detalhe.html#numero=PV-9999' }
+              ]
+            }
+          ]
+        },
+        {
           id: 'notas-fiscais',
-          label: 'Notas fiscais',
+          label: 'Notas fiscais (V1)',
           desktop: '../app/screens/notas-fiscais.html'
+        },
+        {
+          id: 'notas-fiscais-v2',
+          label: 'Notas fiscais (V2)',
+          desktop: '../app/screens/notas-fiscais-v2.html',
+          variants: [
+            { id: 'notas-fiscais-v2-origem-remessa', label: 'Notas de saída filtradas por Origem = Remessa', desktop: '../app/screens/notas-fiscais-v2.html#state=demoremessa' }
+          ]
         },
         {
           id: 'nova-nota-fiscal',
@@ -677,7 +852,7 @@ window.PROTO_NAV_CONFIG = {
         },
         {
           id: 'manifestos',
-          label: 'Manifesto eletrônico',
+          label: 'MDF-e (Manifesto)',
           desktop: '../app/screens/manifestos.html'
         },
         {

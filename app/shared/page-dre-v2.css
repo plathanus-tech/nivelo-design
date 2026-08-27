@@ -1,0 +1,37 @@
+/* ══════════════════════════════════════════════════════════
+   DRE (V2) — Financeiro > Relatórios > DRE, versão 2. Carregado JUNTO
+   com page-dre.css (a base visual/estrutural — KPIs, gráfico, cascata
+   contábil hierárquica, toast, scroll da tabela — é 100% a mesma da V1,
+   pedido explícito de preservar 1:1). Este arquivo tem só o DELTA da V2:
+   faixa de versão (V1 ⇄ V2) e o ajuste de grid dos filtros, que agora
+   tem só 2 campos (Ano + Baseado em) em vez de 4.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Faixa de versão (V1 ⇄ V2) — mesmo padrão de Contas a Receber V2
+   (`.ctr-version-banner`/`.ctr-version-switch`), classes próprias. ── */
+.dre-version-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.dre-version-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.dre-version-switch:hover { color: var(--color-text-brand); }
+
+/* ── Filtros: só 2 campos agora (Ano + Baseado em) — a grid de 4 colunas
+   de page-dre.css continua funcionando (os 2 campos simplesmente ocupam
+   as 2 primeiras colunas em telas largas), sem precisar de override. O
+   campo de Ano é um `.dpRoot` (mesmo componente DatePicker do resto do
+   sistema, modo `initYear`), então já respeita a largura/altura padrão
+   sem CSS extra. */
+#ano-field { width: 100%; }
+#ano-field .dpTrigger { width: 100%; }

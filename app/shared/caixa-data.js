@@ -70,7 +70,16 @@
     { codigo: 'LC-0023', data: '2026-07-28', historico: 'Tarifa de manutenção de conta', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-007', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 120, banco: 'Sicredi - Conta Corrente', competencia: '2026-07' },
     { codigo: 'LC-0024', data: '2026-07-29', historico: 'Combustível para colheitadeira', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-004', contaFinanceiraCodigo: 1, tipo: 'saida', valor: 4800, banco: 'Dinheiro em caixa', competencia: '2026-07' },
     { codigo: 'LC-0025', data: '2026-07-30', historico: 'Venda de soja - safra 2025/26 (2ª remessa)', pessoaNome: 'Cerealista Bom Grão S.A.', pessoaDocumento: '98.765.432/0001-10', categoriaCodigo: 'CAT-001', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 24000, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
-    { codigo: 'LC-0026', data: '2026-07-31', historico: 'Manutenção de maquinário agrícola', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-004', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 6500, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' }
+    { codigo: 'LC-0026', data: '2026-07-31', historico: 'Manutenção de maquinário agrícola', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-004', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 6500, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
+
+    // Lançamentos fictícios de exercícios anteriores (2024/2025) — adicionados só pra dar
+    // dado real a filtros de Ano-calendário que cobrem exercícios passados (ex.: LCDPR V2,
+    // round de independência V2/V1). Poucos lançamentos de propósito (histórico simplificado,
+    // não um dataset completo) — só ADICIONADOS, nenhuma linha existente foi removida/alterada.
+    { codigo: 'LC-0027', data: '2024-03-10', historico: 'Venda de soja - safra 2023/24', pessoaNome: 'Cerealista Bom Grão S.A.', pessoaDocumento: '98.765.432/0001-10', categoriaCodigo: 'CAT-001', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 32000, banco: 'Banco do Brasil - Conta Corrente', competencia: '2024-03' },
+    { codigo: 'LC-0028', data: '2024-06-18', historico: 'Compra de fertilizantes NPK', pessoaNome: 'Insumos Agrícolas Vale Ltda', pessoaDocumento: '12.345.678/0001-90', categoriaCodigo: 'CAT-003', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 12400, banco: 'Sicredi - Conta Corrente', competencia: '2024-06' },
+    { codigo: 'LC-0029', data: '2025-04-05', historico: 'Venda de milho - safra 2024/25', pessoaNome: 'Maria Aparecida Souza', pessoaDocumento: '123.456.789-00', categoriaCodigo: 'CAT-002', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 27500, banco: 'Banco do Brasil - Conta Corrente', competencia: '2025-04' },
+    { codigo: 'LC-0030', data: '2025-08-22', historico: 'Impostos sobre a produção agrícola', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-006', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 3100, banco: 'Sicredi - Conta Corrente', competencia: '2025-08' }
   ];
 
   function list() {

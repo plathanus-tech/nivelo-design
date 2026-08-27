@@ -1,0 +1,313 @@
+/* ══════════════════════════════════════════════════════════
+   RELATÓRIO DE COMPRAS — Financeiro > Relatórios > Relatório de Compras.
+   Tela V2: UMA tabela hierárquica só (Produto/Data da compra/Quantidade/
+   Preço unitário/Fornecedor/Depósito), mesmo padrão de accordion de linhas
+   (`.tr[data-parent-group]`/`.rc-group-toggle`) já usado em dre.js/
+   dre-v2.js — mas com o agrupamento EXCLUSIVAMENTE por produto (nunca por
+   categoria/classificação DRE): cada produto é uma linha expansível/
+   recolhível (nível 0), e ao expandir mostra o histórico cronológico de
+   compras daquele produto (linhas-folha, nível 1) + um indicador de
+   variação de preço entre a 1ª e a última compra registrada (2ª linha
+   compacta da célula de Produto). Sem agrupamento de nível superior tipo
+   "Custos" — como este relatório é de compras, toda compra já é um custo
+   por definição, então essa camada seria redundante (pedido explícito).
+   Mobile first.
+
+   Filtros: Período + Categoria, ANTES de qualquer resultado aparecer —
+   mesmo padrão visual/de interação de Balancete/DRE (card de Filtros em
+   accordion, recolhe sozinho após "Gerar relatório", RadioButton Mês/
+   Intervalo + DatePicker oficial do sistema). A Categoria só decide QUAIS
+   compras entram no relatório (todas, ou só as de uma categoria
+   específica) — nunca afeta a estrutura de agrupamento da tabela, que é
+   sempre por produto nos dois casos.
+   ══════════════════════════════════════════════════════════ */
+
+.rc-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.rc-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.rc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.rc-back:hover {
+  color: var(--color-text-primary);
+}
+
+.rc-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.rc-description {
+  color: var(--color-text-tertiary);
+  margin: 0;
+  max-width: 640px;
+}
+
+/* ── Filtros (accordion: recolhe sozinho após gerar) ──────────────────────
+   Cópia estrutural do padrão já usado em Balancete/DRE. ────────────────── */
+
+.rc-filtros-card { display: flex; flex-direction: column; }
+
+.rc-filtros-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+}
+.rc-filtros-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+}
+.rc-filtros-toggle svg { transition: transform var(--transition-fast); }
+.rc-filtros-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.rc-filtros-content:not([hidden]) { display: flex; flex-direction: column; }
+
+.rc-filtros-body { padding: 0 var(--spacing-lg) var(--spacing-lg); }
+
+.rc-filtros-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .rc-filtros-grid { grid-template-columns: 1fr 1fr; }
+  .rc-span-2 { grid-column: span 2; }
+}
+@media (min-width: 1024px) {
+  .rc-filtros-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.rc-intervalo-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 480px) {
+  .rc-intervalo-fields { grid-template-columns: 1fr 1fr; }
+}
+.rc-intervalo-fields[hidden] { display: none; }
+#mes-ano-field[hidden] { display: none; }
+
+/* Colisão RadioButton×Input/Dropdown: RadioButton.module.css esconde o radio
+   nativo via `.input{opacity:0;position:absolute;width:1px;height:1px}` —
+   como essa classe é carregada globalmente, vaza pros campos de texto/data/
+   mês reais desta tela (Mês/Ano, Data inicial, Data final). Mesmo padrão de
+   fix preventivo já aplicado desde a criação em Balancete/DRE/LCDPR/Natureza
+   da Operação. */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+  width: 100%;
+  height: 44px;
+}
+
+/* Mesma colisão, agora em `.label`: `RadioButton.module.css` declara
+   `.label{font-weight:bold}` (rótulo do próprio grupo de radio, "Período")
+   — vence os labels normais de campo (Categoria), deixando-os Bold em vez
+   do Medium correto do componente Input/Dropdown. Reafirma o peso certo com
+   um seletor mais específico; `.dpLabel` (Mês/Ano) já nasce Medium no
+   próprio componente (ver DatePicker.module.css), incluído aqui só por
+   robustez. */
+.rc-filtros-grid .label,
+.rc-filtros-grid .dpLabel {
+  font-weight: var(--font-weight-medium);
+}
+
+/* Dropdown (Categoria): opções empilhadas, uma por linha — mesmo fix de
+   colisão RadioButton×Dropdown já documentado em Balancete/DRE/LCDPR. */
+.rc-dropdown { position: relative; }
+.rc-dropdown .trigger { text-align: left; }
+.rc-dropdown .menu .option { display: block; width: 100%; }
+.rc-dropdown .menu {
+  position: fixed;
+  z-index: 60;
+  overflow-y: auto;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: top;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+.rc-dropdown.open .menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+.rc-dropdown .chevron svg {
+  transition: transform var(--transition-fast);
+  color: var(--color-text-tertiary);
+}
+.rc-dropdown.open .chevron svg { transform: rotate(180deg); }
+
+.rc-filtros-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.rc-filtros-actions .btn { width: 100%; }
+@media (min-width: 640px) {
+  .rc-filtros-actions .btn { width: auto; min-width: 200px; }
+}
+
+/* ── Resultado — mesmo espaçamento entre blocos já adotado em outras telas
+   de relatório (16px entre seções internas, não os 24px do topo da página).
+   Nunca aparece antes de "Gerar relatório" ser clicado. ────────────────── */
+#rc-resultado:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Estado vazio (nenhuma compra registrada) ─────────────────────────────
+   Guard obrigatório: qualquer elemento alternado via atributo `hidden` que
+   também recebe `display` próprio precisa reafirmar isso só sob
+   `:not([hidden])` — senão a regra de autor (mais específica que o UA
+   stylesheet) vence o `hidden` e o elemento fica visível o tempo todo. ─── */
+
+.rc-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+.rc-empty:not([hidden]) {
+  display: flex;
+}
+.rc-empty svg {
+  color: var(--color-text-disabled);
+}
+.rc-empty p {
+  margin: 0;
+}
+
+/* ── Tabela hierárquica única (Produto/Data/Quantidade/Preço/Fornecedor/
+   Depósito) — mesmo padrão de linha-de-grupo colapsável já usado em
+   dre.js/dre-v2.js, adaptado pra só 1 nível de accordion (bucket DRE, modo
+   "Todas"): linha de produto (nível 1) nunca é colapsável por si só, é um
+   sub-cabeçalho sempre visível enquanto o bucket pai está expandido; linhas
+   de compra (nível 2, folhas) só herdam visibilidade do bucket. Zebra e
+   fundo de cada nível escopados a `#rc-tbody` (ID, nunca uma classe
+   genérica) pra vencer de propósito o zebra padrão de `Table.module.css`
+   (`.tr:nth-child(odd/even) .td`) — mesma lição de especificidade já
+   documentada em LCDPR/DRE/Entradas e Saídas. ────────────────────────── */
+
+.card.rc-table-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nível 0 = linha de Produto (única com toggle, agrupamento exclusivo por
+   produto). Nível 1 = linha de compra individual (folha, zebra própria). */
+#rc-tbody .rc-row-level-0,
+#rc-tbody .rc-row-level-0 .td {
+  background: var(--color-gray-50);
+  font-weight: var(--font-weight-semibold);
+}
+#rc-tbody .rc-row-level-1,
+#rc-tbody .rc-row-level-1 .td {
+  background: var(--color-bg-surface);
+}
+#rc-tbody .rc-row-level-1.rc-row-zebra,
+#rc-tbody .rc-row-level-1.rc-row-zebra .td {
+  background: var(--color-gray-50);
+}
+
+.rc-row-collapsed {
+  display: none;
+}
+
+.rc-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.rc-row-indent-1 {
+  padding-left: var(--spacing-lg);
+}
+
+.rc-row-sublabel {
+  display: block;
+  margin-top: var(--spacing-2xs);
+  color: var(--color-text-tertiary);
+}
+
+.rc-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.rc-group-toggle svg {
+  transition: transform var(--transition-fast);
+}
+.rc-group-toggle.is-collapsed svg {
+  transform: rotate(-90deg);
+}
+
+/* ── Variação de preço inline (2ª linha da célula de Produto) ─────────── */
+
+.rc-trend-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+}
+.rc-trend-empty {
+  color: var(--color-text-tertiary);
+}
+/* Verde quando o preço caiu (bom pra quem compra), vermelho quando subiu —
+   mesma convenção de cor já usada em `caixa.js`'s `.caixa-valor-entrada`/
+   `.caixa-valor-saida` (entrada=verde/saída=vermelho), aqui reaproveitada
+   pro sentido "preço caiu = favorável / preço subiu = desfavorável". */
+.rc-trend-down {
+  color: var(--color-status-success-fg);
+}
+.rc-trend-up {
+  color: var(--color-status-error-fg);
+}

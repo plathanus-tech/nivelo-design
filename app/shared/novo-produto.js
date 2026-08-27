@@ -95,9 +95,7 @@
   var comprimentoInput = document.getElementById('np-comprimento');
   var pesoLiquidoInput = document.getElementById('np-peso-liquido');
   var pesoBrutoInput = document.getElementById('np-peso-bruto');
-  var unidadeVolumeField = document.getElementById('unidade-volume-field');
-  var fatorConversaoField = document.getElementById('fator-conversao-field');
-  var fatorConversaoInput = document.getElementById('np-fator-conversao');
+  var unidadeResultadoEl = document.getElementById('np-unidade-resultado');
   var controlaEstoqueField = document.getElementById('controla-estoque-field');
   var controlaEstoqueRadios = Array.prototype.slice.call(document.querySelectorAll('input[name="controla-estoque"]'));
   var qtdMinimaField = document.getElementById('qtd-minima-field');
@@ -107,9 +105,34 @@
   var statusField = document.getElementById('status-field');
 
   var origemIcmsDropdown = initDropdown(origemIcmsField);
-  var unidadeMedidaDropdown = initDropdown(unidadeMedidaField);
-  var unidadeVolumeDropdown = initDropdown(unidadeVolumeField);
   var statusDropdown = initDropdown(statusField);
+
+  // ---------- Unidade de Medida: opções vêm do catálogo central
+  // (Configuração > Unidade de medida, `window.NiveloUnidadesMedida`) em vez
+  // do vocabulário fixo que ficava hardcoded nesta tela — a unidade
+  // cadastrada lá já carrega sua própria conversão ("1 unidade corresponde
+  // a X <unidade base>"), então "Unidade de Volume"/"Fator de Conversão"
+  // deixaram de existir aqui como campos próprios (ver
+  // `updateUnidadeResultado()` abaixo, que só reflete o que já está
+  // cadastrado, nunca pede pro usuário informar de novo). ----------
+  var unidadeMedidaDropdown = initDropdown(unidadeMedidaField, function (sigla) {
+    updateUnidadeResultado(sigla);
+  });
+  unidadeMedidaField.querySelector('[data-dropdown-menu]').innerHTML =
+    window.NiveloUnidadesMedida.list().filter(function (u) { return u.ativo; }).map(function (u) {
+      return '<div class="option" data-value="' + u.sigla + '">' + u.sigla + ' · ' + u.nome + '</div>';
+    }).join('');
+
+  function updateUnidadeResultado(sigla) {
+    var unidade = window.NiveloUnidadesMedida.findBySigla(sigla);
+    if (!unidade) {
+      unidadeResultadoEl.hidden = true;
+      return;
+    }
+    var quantidadeText = unidade.correspondeA.toString().replace('.', ',');
+    unidadeResultadoEl.textContent = '1 ' + unidade.sigla + ' = ' + quantidadeText + ' ' + unidade.unidadeBaseSigla;
+    unidadeResultadoEl.hidden = false;
+  }
 
   // ---------- Categoria do Produto: opções vêm do catálogo compartilhado
   // (window.NiveloCategorias, persistido em localStorage) + item fixo "+
@@ -236,7 +259,6 @@
   }
   clearErrorOnInput(codigoReferenciaField, codigoReferenciaInput, function (v) { return v.trim() !== ''; });
   clearErrorOnInput(nomeField, nomeInput, function (v) { return v.trim() !== ''; });
-  clearErrorOnInput(fatorConversaoField, fatorConversaoInput, function (v) { return Number(v) > 0; });
   qtdMinimaInput.addEventListener('input', function () { qtdMinimaField.classList.remove('error'); });
   qtdMaximaInput.addEventListener('input', function () { qtdMaximaField.classList.remove('error'); });
 
@@ -251,7 +273,10 @@
     nomeInput.value = product.nome;
     if (product.categoria) selectCategoria(product.categoria);
     if (product.origemIcms) origemIcmsDropdown.selectValue(product.origemIcms);
-    if (product.unidadeMedida) unidadeMedidaDropdown.selectValue(product.unidadeMedida);
+    if (product.unidadeMedida) {
+      unidadeMedidaDropdown.selectValue(product.unidadeMedida);
+      updateUnidadeResultado(product.unidadeMedida);
+    }
     cestInput.value = product.cest || '';
     ncmInput.value = product.ncm || '';
     alturaInput.value = product.altura != null ? product.altura : '';
@@ -259,9 +284,6 @@
     comprimentoInput.value = product.comprimento != null ? product.comprimento : '';
     pesoLiquidoInput.value = product.pesoLiquido != null ? product.pesoLiquido : '';
     pesoBrutoInput.value = product.pesoBruto != null ? product.pesoBruto : '';
-    if (product.unidadeVolume) unidadeVolumeDropdown.selectValue(product.unidadeVolume);
-    fatorConversaoInput.value = product.fatorConversao != null ? product.fatorConversao : '';
-
     var controlaRadio = document.querySelector('input[name="controla-estoque"][value="' + (product.controlaEstoque ? 'sim' : 'nao') + '"]');
     if (controlaRadio) controlaRadio.checked = true;
     syncControlaEstoqueChecked();
@@ -287,14 +309,6 @@
   // ---------- Validação + envio ----------
   var form = document.getElementById('novo-produto-form');
 
-  // Mapa CX/UN/KG/LT/PT/FR/SC -> rótulo compatível com o vocabulário legado
-  // de `unidade` (Saca/Kg/Litro/Unidade, usado pelo combobox de Produto do
-  // Estoque) — só usado ao CRIAR um produto novo por aqui, pra não injetar
-  // um código cru (ex. "KG") onde os consumidores existentes esperam um
-  // rótulo por extenso (ex. "Kg"). Editar um produto existente nunca toca
-  // no `unidade` original dele (ver `payload.unidade` abaixo).
-  var UNIDADE_LEGADO_LABELS = { CX: 'Caixa', UN: 'Unidade', KG: 'Kg', LT: 'Litro', PT: 'Pacote', FR: 'Fardo', SC: 'Saco' };
-
   function runValidation() {
     var codigoReferenciaInvalid = !codigoReferenciaInput.value.trim();
     codigoReferenciaField.classList.toggle('error', codigoReferenciaInvalid);
@@ -311,12 +325,6 @@
     var unidadeMedidaInvalid = !unidadeMedidaField.dataset.value;
     unidadeMedidaField.classList.toggle('error', unidadeMedidaInvalid);
 
-    var unidadeVolumeInvalid = !unidadeVolumeField.dataset.value;
-    unidadeVolumeField.classList.toggle('error', unidadeVolumeInvalid);
-
-    var fatorConversaoInvalid = !(Number(fatorConversaoInput.value) > 0);
-    fatorConversaoField.classList.toggle('error', fatorConversaoInvalid);
-
     var controla = getControlaEstoque() === 'sim';
     var qtdMinimaInvalid = false;
     var qtdMaximaInvalid = false;
@@ -330,7 +338,7 @@
     }
 
     return !codigoReferenciaInvalid && !nomeInvalid && !categoriaInvalid && !origemIcmsInvalid && !unidadeMedidaInvalid &&
-      !unidadeVolumeInvalid && !fatorConversaoInvalid && !qtdMinimaInvalid && !qtdMaximaInvalid;
+      !qtdMinimaInvalid && !qtdMaximaInvalid;
   }
 
   form.addEventListener('submit', function (event) {
@@ -346,13 +354,19 @@
     }
 
     var controla = getControlaEstoque() === 'sim';
+    // A unidade escolhida já carrega sua própria conversão (cadastrada em
+    // Configuração > Unidade de medida) — `unidadeVolume`/`fatorConversao`
+    // continuam preenchidos no registro do produto (mesmos 2 campos que
+    // Nova Remessa/Novo Pedido de Venda já leem hoje), só que derivados
+    // automaticamente em vez de pedidos de novo pro usuário aqui.
+    var unidadeRegistro = window.NiveloUnidadesMedida.findBySigla(unidadeMedidaField.dataset.value);
     var payload = {
       nome: nomeInput.value.trim(),
       codigoReferencia: codigoReferenciaInput.value.trim(),
       categoria: categoriaField.dataset.value,
       origemIcms: origemIcmsField.dataset.value,
       unidadeMedida: unidadeMedidaField.dataset.value,
-      unidade: editingProduct ? editingProduct.unidade : (UNIDADE_LEGADO_LABELS[unidadeMedidaField.dataset.value] || unidadeMedidaField.dataset.value),
+      unidade: editingProduct ? editingProduct.unidade : (unidadeRegistro ? unidadeRegistro.nome : unidadeMedidaField.dataset.value),
       cest: cestInput.value.trim(),
       ncm: ncmInput.value.trim(),
       altura: alturaInput.value !== '' ? Number(alturaInput.value) : null,
@@ -360,8 +374,8 @@
       comprimento: comprimentoInput.value !== '' ? Number(comprimentoInput.value) : null,
       pesoLiquido: pesoLiquidoInput.value !== '' ? Number(pesoLiquidoInput.value) : null,
       pesoBruto: pesoBrutoInput.value !== '' ? Number(pesoBrutoInput.value) : null,
-      unidadeVolume: unidadeVolumeField.dataset.value,
-      fatorConversao: Number(fatorConversaoInput.value),
+      unidadeVolume: unidadeRegistro ? unidadeRegistro.unidadeBaseSigla : '',
+      fatorConversao: unidadeRegistro ? unidadeRegistro.correspondeA : 1,
       controlaEstoque: controla,
       qtdMinima: controla ? Number(qtdMinimaInput.value) : null,
       qtdMaxima: controla ? Number(qtdMaximaInput.value) : null,

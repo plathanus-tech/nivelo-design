@@ -267,5 +267,144 @@
     };
   }
 
-  window.NiveloDatePicker = { initDay: initDay, initMonth: initMonth };
+  // ---------- Modo "year" (Ano-calendário) ----------
+  function initYear(opts) {
+    var root = document.getElementById(opts.rootId);
+    var trigger = document.getElementById(opts.triggerId);
+    var valueEl = document.getElementById(opts.valueId);
+    var clearBtn = opts.clearId ? document.getElementById(opts.clearId) : null;
+    var popover = document.getElementById(opts.popoverId);
+    var decadeLabel = popover.querySelector('[data-competencia-year-label]');
+    var grid = popover.querySelector('[data-competencia-grid]');
+    var placeholder = opts.placeholder || 'Selecionar ano';
+
+    var value = null; // ano (number) ou null
+    var minYear = opts.minYear || null;
+    var maxYear = opts.maxYear || null;
+    // `allowedYears`: lista explícita e fechada de anos válidos (ex.: [2023, 2024, 2025]).
+    // Diferente de minYear/maxYear (que só desabilitavam os botões fora do intervalo, mas
+    // continuavam navegáveis via década), aqui os anos fora da lista NUNCA aparecem no
+    // grid — nem desabilitados, removidos por completo, conforme pedido explícito. A
+    // navegação por década (prev/next) e o rótulo de intervalo somem junto, já que não há
+    // nada pra paginar numa lista fechada e pequena.
+    var allowedYears = opts.allowedYears || null;
+    var prevBtn = popover.querySelector('[data-competencia-prev-year]');
+    var nextBtn = popover.querySelector('[data-competencia-next-year]');
+    if (allowedYears) {
+      if (prevBtn) prevBtn.hidden = true;
+      if (nextBtn) nextBtn.hidden = true;
+      if (decadeLabel) decadeLabel.hidden = true;
+    }
+    var defaultDecadeYear = maxYear || new Date().getFullYear();
+    var viewDecadeStart = Math.floor(defaultDecadeYear / 10) * 10;
+
+    function isYearAllowed(year) {
+      if (allowedYears) return allowedYears.indexOf(year) !== -1;
+      if (minYear !== null && year < minYear) return false;
+      if (maxYear !== null && year > maxYear) return false;
+      return true;
+    }
+
+    function renderGrid() {
+      var html = '';
+      if (allowedYears) {
+        allowedYears.forEach(function (year) {
+          var isSelected = value === year;
+          html += '<button type="button" class="dpMonth' + (isSelected ? ' dpMonthSelected' : '') + '" data-year="' + year + '">' + year + '</button>';
+        });
+        grid.innerHTML = html;
+        return;
+      }
+      decadeLabel.textContent = viewDecadeStart + ' - ' + (viewDecadeStart + 11);
+      for (var i = 0; i < 12; i++) {
+        var year = viewDecadeStart + i;
+        var isSelected = value === year;
+        var disabled = !isYearAllowed(year);
+        html += '<button type="button" class="dpMonth' + (isSelected ? ' dpMonthSelected' : '') + '"' + (disabled ? ' disabled' : '') + ' data-year="' + year + '">' + year + '</button>';
+      }
+      grid.innerHTML = html;
+    }
+
+    function close() {
+      popover.hidden = true;
+      document.removeEventListener('click', outsideClick);
+    }
+    function outsideClick(event) {
+      var path = event.composedPath ? event.composedPath() : [event.target];
+      if (path.indexOf(root) === -1) close();
+    }
+    function open() {
+      if (root.classList.contains('is-readonly')) return;
+      viewDecadeStart = Math.floor((value || defaultDecadeYear) / 10) * 10;
+      renderGrid();
+      popover.hidden = false;
+      positionPopover(trigger, popover);
+      window.setTimeout(function () { document.addEventListener('click', outsideClick); }, 0);
+    }
+
+    function applySelected(year) {
+      value = year;
+      valueEl.textContent = String(year);
+      valueEl.classList.remove('dpPlaceholder');
+      if (clearBtn) clearBtn.hidden = false;
+    }
+    function applyCleared() {
+      value = null;
+      valueEl.textContent = placeholder;
+      valueEl.classList.add('dpPlaceholder');
+      if (clearBtn) clearBtn.hidden = true;
+    }
+
+    trigger.addEventListener('click', function () {
+      if (popover.hidden) open(); else close();
+    });
+
+    grid.addEventListener('click', function (event) {
+      var btn = event.target.closest('.dpMonth');
+      if (!btn || btn.disabled) return;
+      applySelected(Number(btn.dataset.year));
+      close();
+      if (opts.onChange) opts.onChange(value);
+    });
+
+    if (prevBtn) prevBtn.addEventListener('click', function () {
+      if (allowedYears) return;
+      viewDecadeStart -= 12;
+      renderGrid();
+    });
+    if (nextBtn) nextBtn.addEventListener('click', function () {
+      if (allowedYears) return;
+      viewDecadeStart += 12;
+      renderGrid();
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        applyCleared();
+        if (opts.onChange) opts.onChange(null);
+      });
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && !popover.hidden) close();
+    });
+
+    if (opts.initialValue) applySelected(opts.initialValue);
+
+    return {
+      getValue: function () { return value; },
+      setValue: function (year) {
+        if (!year) { applyCleared(); return; }
+        applySelected(Number(year));
+      },
+      setReadonly: function (readonly) {
+        root.classList.toggle('is-readonly', readonly);
+        trigger.disabled = readonly;
+        if (clearBtn) clearBtn.disabled = readonly;
+      }
+    };
+  }
+
+  window.NiveloDatePicker = { initDay: initDay, initMonth: initMonth, initYear: initYear };
 })();

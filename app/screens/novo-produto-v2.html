@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novo produto — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-novo-produto-v2.css" />
+</head>
+<body>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
+            <div class="app-nav-group is-open" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="true" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Clientes e fornecedores</span>
+                </button>
+                <button type="button" class="app-nav-subitem is-active" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Vendas · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Vendas</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
+                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta Financeira</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
+                </button>
+
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVO PRODUTO V2 ══════════════════ -->
+      <main class="app-main">
+        <div class="novo-produto-page">
+
+          <div class="novo-produto-header">
+            <a href="produtos-v2.html" class="novo-produto-back" id="novo-produto-back-top">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <h1 class="novo-produto-title text-heading-6" id="novo-produto-page-title">Novo produto</h1>
+          </div>
+
+          <form id="novo-produto-form" novalidate>
+
+            <section class="card novo-produto-card">
+
+              <!-- ══════════════ 1. PRODUTO (sempre visível) ══════════════ -->
+              <div class="novo-produto-subsection">
+                <h2 class="novo-produto-subsection-title">Produto</h2>
+                <div class="novo-produto-grid">
+
+                  <div class="wrapper novo-produto-span-2" id="tipo-produto-field">
+                    <span class="label">Tipo de produto</span>
+                    <div class="group horizontal" role="radiogroup" aria-label="Tipo de produto">
+                      <label class="option checked">
+                        <input type="radio" class="input" name="tipo-produto" value="venda" checked />
+                        <span class="circle"><span class="dot"></span></span>
+                        <span class="optionLabel">Produto de venda</span>
+                      </label>
+                      <label class="option">
+                        <input type="radio" class="input" name="tipo-produto" value="uso" />
+                        <span class="circle"><span class="dot"></span></span>
+                        <span class="optionLabel">Produto de uso</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="wrapper novo-produto-span-2" id="nome-field">
+                    <label class="label" for="np-nome">Produto</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="np-nome" placeholder="Ex.: Soja" aria-describedby="nome-error" />
+                    </div>
+                    <span class="errorText" id="nome-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o nome do produto.
+                    </span>
+                  </div>
+
+                  <div class="wrapper novo-produto-dropdown" id="categoria-field">
+                    <span class="label">Categoria do Produto</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione a categoria</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="categoria-menu"></div>
+                    <span class="errorText" id="categoria-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione a categoria do produto.
+                    </span>
+                  </div>
+
+                  <div class="wrapper novo-produto-dropdown" id="unidade-medida-field">
+                    <span class="label">Unidade de Medida</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu></div>
+                    <span class="helperText">Unidade usada no dia a dia para comercializar ou movimentar o produto. Cadastrada em Configuração &gt; Unidade de medida.</span>
+                    <span class="errorText" id="unidade-medida-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione a unidade de medida.
+                    </span>
+                  </div>
+
+                  <p class="novo-produto-unidade-resultado text-body-s" id="np-unidade-resultado" hidden></p>
+
+                </div>
+              </div>
+
+              <!-- ══════════════ 2a. DADOS FISCAIS (só Produto de venda) ══════════════ -->
+              <div class="novo-produto-subsection" id="dados-fiscais-section">
+                <h2 class="novo-produto-subsection-title">Dados Fiscais</h2>
+                <div class="novo-produto-grid">
+
+                  <div class="wrapper" id="ncm-field">
+                    <label class="label" for="np-ncm">NCM</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="np-ncm" placeholder="Ex.: 1201.90.00" />
+                    </div>
+                    <span class="helperText">Obrigatório quando o produto for utilizado em vendas ou emissão de nota fiscal.</span>
+                  </div>
+
+                  <div class="wrapper novo-produto-dropdown" id="origem-icms-field">
+                    <span class="label">Origem conforme ICMS</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione a origem</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu>
+                      <div class="option" data-value="0">0 · Nacional, exceto as indicadas nos códigos 3, 4, 5 e 8</div>
+                      <div class="option" data-value="1">1 · Estrangeira, importação direta, exceto a indicada no código 6</div>
+                      <div class="option" data-value="2">2 · Estrangeira, adquirida no mercado interno, exceto a indicada no código 7</div>
+                      <div class="option" data-value="3">3 · Nacional, conteúdo de importação superior a 40% e igual ou inferior a 70%</div>
+                      <div class="option" data-value="4">4 · Nacional, produção em conformidade com processos produtivos básicos</div>
+                      <div class="option" data-value="5">5 · Nacional, conteúdo de importação inferior ou igual a 40%</div>
+                      <div class="option" data-value="6">6 · Estrangeira, importação direta, sem similar nacional</div>
+                      <div class="option" data-value="7">7 · Estrangeira, adquirida no mercado interno, sem similar nacional</div>
+                      <div class="option" data-value="8">8 · Nacional, conteúdo de importação superior a 70%</div>
+                    </div>
+                    <span class="errorText" id="origem-icms-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione a origem conforme ICMS.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="cest-field">
+                    <label class="label" for="np-cest">CEST <span class="novo-produto-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="np-cest" placeholder="Ex.: 20.038.00" />
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="gtin-field">
+                    <label class="label" for="np-gtin">GTIN/EAN <span class="novo-produto-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="np-gtin" placeholder="Ex.: 7891234567895" />
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- ══════════════ 2b. ENTRADA INICIAL NO ESTOQUE (só Produto de uso) ══════════════ -->
+              <div class="novo-produto-subsection" id="entrada-inicial-section" hidden>
+                <h2 class="novo-produto-subsection-title">Entrada Inicial no Estoque</h2>
+                <p class="novo-produto-section-hint text-body-s">Opcional. Preencha se já quiser registrar a quantidade inicial deste produto no seu estoque.</p>
+                <div class="novo-produto-grid">
+
+                  <div class="dpRoot" id="entrada-data-field">
+                    <span class="label">Data da entrada</span>
+                    <button type="button" class="dpTrigger" id="entrada-data-trigger">
+                      <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
+                      <span class="dpPlaceholder" id="entrada-data-value">Selecionar data</span>
+                    </button>
+                    <div class="dpPopover" id="entrada-data-popover" hidden>
+                      <div class="dpCalendarHeader">
+                        <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior"><i data-lucide="chevron-left" width="16" height="16"></i></button>
+                        <span class="dpCalendarLabel text-body-s" data-dp-label></span>
+                        <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês"><i data-lucide="chevron-right" width="16" height="16"></i></button>
+                      </div>
+                      <div class="dpWeekdays">
+                        <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+                      </div>
+                      <div class="dpGrid" data-dp-grid></div>
+                    </div>
+                    <input type="hidden" id="entrada-data-hidden" />
+                  </div>
+
+                  <div class="wrapper" id="entrada-quantidade-field">
+                    <label class="label" for="np-entrada-quantidade">Quantidade</label>
+                    <div class="inputWrap">
+                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="np-entrada-quantidade" placeholder="0" />
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="entrada-unidade-field">
+                    <label class="label" for="np-entrada-unidade">Unidade</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="np-entrada-unidade" disabled readonly placeholder="Definida pela Unidade de Medida" />
+                    </div>
+                    <span class="helperText">Sempre igual à Unidade de Medida do produto.</span>
+                  </div>
+
+                  <div class="wrapper novo-produto-dropdown" id="entrada-deposito-field">
+                    <span class="label">Depósito</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione o depósito</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="entrada-deposito-menu"></div>
+                  </div>
+
+                  <div class="wrapper novo-produto-dropdown" id="entrada-fornecedor-field">
+                    <span class="label">Fornecedor</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione o fornecedor</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="entrada-fornecedor-menu"></div>
+                  </div>
+
+                  <div class="wrapper" id="entrada-preco-field">
+                    <label class="label" for="np-entrada-preco">Preço unitário</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" inputmode="numeric" id="np-entrada-preco" placeholder="R$ 0,00" />
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="entrada-valor-total-field">
+                    <label class="label" for="np-entrada-valor-total">Valor total</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="np-entrada-valor-total" disabled readonly placeholder="R$ 0,00" />
+                    </div>
+                  </div>
+
+                  <div class="wrapper novo-produto-span-2" id="entrada-documento-field">
+                    <span class="label">Nota fiscal / Documento <span class="novo-produto-optional-tag">(opcional)</span></span>
+                    <div class="novo-produto-dropzone">
+                      <input type="file" accept=".xml,.pdf" id="entrada-documento-input" class="novo-produto-dropzone-input" />
+                      <label for="entrada-documento-input" class="novo-produto-dropzone-label">
+                        <i data-lucide="upload" width="20" height="20"></i>
+                        <span id="entrada-documento-name">Selecionar arquivo (XML ou PDF)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- ══════════════ 3. CONTROLE DE ESTOQUE (sempre visível) ══════════════ -->
+              <div class="novo-produto-subsection">
+                <h2 class="novo-produto-subsection-title">Controle de estoque</h2>
+                <p class="novo-produto-section-hint text-body-s">Os limites são opcionais. Quando configurados, a Nivelo poderá avisar quando o saldo atingir o mínimo ou o máximo.</p>
+                <div class="novo-produto-grid">
+
+                  <div class="wrapper" id="qtd-minima-field">
+                    <label class="label" for="np-qtd-minima">Estoque mínimo para alerta <span class="novo-produto-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="number" inputmode="decimal" min="0" step="1" id="np-qtd-minima" placeholder="0" aria-describedby="qtd-minima-error" />
+                    </div>
+                    <span class="errorText" id="qtd-minima-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      A quantidade mínima não pode ser negativa.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="qtd-maxima-field">
+                    <label class="label" for="np-qtd-maxima">Estoque máximo para alerta <span class="novo-produto-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="number" inputmode="decimal" min="0" step="1" id="np-qtd-maxima" placeholder="0" aria-describedby="qtd-maxima-error" />
+                    </div>
+                    <span class="errorText" id="qtd-maxima-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      O estoque máximo deve ser maior ou igual ao mínimo.
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+
+            </section>
+
+            <div class="novo-produto-actions">
+              <a href="produtos-v2.html" class="btn secondary" id="novo-produto-cancel">Cancelar</a>
+              <button type="submit" class="btn primary" id="novo-produto-submit">Salvar produto</button>
+            </div>
+
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <!-- Modal "Adicionar nova categoria" — mesmo padrão de V1. -->
+  <div class="overlay" id="nova-categoria-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="nova-categoria-title">
+      <div class="header">
+        <h2 class="title" id="nova-categoria-title">Adicionar nova categoria</h2>
+        <button class="closeBtn" id="nova-categoria-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="wrapper" id="nova-categoria-nome-field">
+          <label class="label" for="nova-categoria-nome">Nome da categoria</label>
+          <div class="inputWrap">
+            <input class="input" type="text" id="nova-categoria-nome" placeholder="Ex.: Sementes" />
+          </div>
+          <span class="errorText" id="nova-categoria-error">
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe o nome da categoria.
+          </span>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondary sm" id="nova-categoria-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="nova-categoria-add">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/produtos-data.js"></script>
+  <script src="../shared/categorias-data.js"></script>
+  <script src="../shared/unidades-medida-data.js"></script>
+  <script src="../shared/locais-data.js"></script>
+  <script src="../shared/cadastros-data.js"></script>
+  <script src="../shared/date-picker.js"></script>
+  <script src="../shared/novo-produto-v2.js"></script>
+</body>
+</html>

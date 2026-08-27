@@ -1,0 +1,168 @@
+/* ══════════════════════════════════════════════════════════
+   DETALHES DO PEDIDO DE VENDA — página "Ver detalhes" da listagem de
+   Pedidos de Venda. Read-only, exceto as ações contextuais (Emitir nota
+   fiscal / Cancelar pedido, mesmo modal de cancelamento da listagem — ver
+   page-pedidos-de-venda.css, cujas classes `.pv-toast*`/`.overlay` também
+   são carregadas aqui). Estrutura de seções (`.card`+`.cardHeader`/
+   `.title`, cabeçalho com voltar/título/badge/ação contextual) copiada
+   1:1 do mesmo padrão de "Ver detalhes" já usado em Estoque/Contas a
+   Pagar/Manifesto/Certificado Digital (classes próprias `pvd-*` aqui,
+   nunca reaproveitando o nome de outra tela). ══════════════════════ */
+
+.pvd-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Mesmo guard `:not([hidden])` documentado dezenas de vezes neste
+   projeto: `#detalhe-content` some via atributo `hidden` no estado "não
+   encontrado" — sem o guard, `display:flex` (id, especificidade maior
+   que `[hidden]`) reapareceria por cima do estado de erro. */
+#detalhe-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.pvd-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.pvd-back:hover { color: var(--color-text-primary); }
+
+.pvd-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.pvd-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .pvd-title-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.pvd-title-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.pvd-title { color: var(--color-text-primary); margin: 0; }
+
+.pvd-header-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .pvd-header-actions { flex-direction: row; width: auto; }
+}
+#acao-emitir-nfe-btn,
+#acao-cancelar-btn { width: 100%; justify-content: center; }
+@media (min-width: 640px) {
+  #acao-emitir-nfe-btn,
+  #acao-cancelar-btn { width: auto; }
+}
+
+/* `.btn` (Button.module.css) tem `display:flex` incondicional — sem este
+   guard, o atributo `hidden` (usado enquanto o boot() ainda não resolveu
+   o pedido, e quando a NF-e já está concluída) não escondia o botão de
+   verdade. Mesmo bug já documentado dezenas de vezes neste projeto. */
+.btn[hidden] { display: none; }
+/* `.overlay[hidden]{display:none}` já vem de page-pedidos-de-venda.css,
+   carregado nesta tela — não duplicado aqui. */
+
+/* ── Estado "não encontrado" ───────────────────────────────────────────── */
+.pvd-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.pvd-not-found:not([hidden]) { display: flex; }
+.pvd-not-found p { margin: 0; }
+
+/* ── Seções ────────────────────────────────────────────────────────────── */
+.pvd-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.pvd-section .cardHeader { padding: 0; }
+/* Bug real, mesmo padrão `hidden`+`display` incondicional documentado
+   dezenas de vezes neste projeto: sem esta guarda, `#di-transporte-section`/
+   `#di-observacao-section` (escondidas via `hidden` quando o pedido não tem
+   esse dado) reapareciam sempre — `.pvd-section{display:flex}` (classe,
+   mesma especificidade do atributo `[hidden]`) vencia por ordem no arquivo. */
+.pvd-section[hidden] { display: none; }
+
+.pvd-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: 0;
+}
+/* Mesmo bug/fix acima: sem isto, `#di-pagamento-avista-fields` e
+   `#di-pagamento-prazo-fields` apareciam os DOIS ao mesmo tempo,
+   independente da condição de pagamento escolhida no cadastro. */
+.pvd-fields[hidden] { display: none; }
+@media (min-width: 768px) {
+  .pvd-fields { grid-template-columns: repeat(3, 1fr); }
+}
+.pvd-fields dt {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+.pvd-fields dd {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+.pvd-integracoes-fields dd { font-weight: var(--font-weight-regular); }
+
+.pvd-observacao {
+  color: var(--color-text-primary);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* ── Tabela de parcelas ────────────────────────────────────────────────── */
+.pvd-parcelas-wrap { overflow-x: auto; }
+.pvd-parcelas-table { width: 100%; }
+.pvd-parcelas-table .th,
+.pvd-parcelas-table .td { padding: var(--spacing-xs) var(--spacing-sm); }
+.pvd-parcelas-table .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+#di-parcelas-tbody .tr:nth-child(odd) .td { background: var(--color-bg-surface); }
+#di-parcelas-tbody .tr:nth-child(even) .td { background: var(--color-gray-50); }

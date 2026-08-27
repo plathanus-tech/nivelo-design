@@ -1,0 +1,134 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA UNIDADE DE MEDIDA — formulário de cadastro/edição, dentro de
+   Configuração > Unidade de medida. Mobile first. Estrutura/tokens copiados
+   deliberadamente de page-nova-categoria-financeira.css (mesmo "card único
+   com subseções + divisor" já aprovado no restante do sistema) — classes
+   próprias (`unidmed-form-*`), não um arquivo compartilhado com a listagem
+   (mesmo princípio já documentado entre as demais telas de Configuração).
+   ══════════════════════════════════════════════════════════ */
+
+.unidmed-form-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.unidmed-form-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.unidmed-form-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.unidmed-form-back:hover { color: var(--color-text-primary); }
+
+.unidmed-form-title { color: var(--color-text-primary); margin: 0; }
+.unidmed-form-subtitle { color: var(--color-text-tertiary); margin: 0; }
+
+/* ── Informação de apoio (Feedback "info" reaproveitado) — reforça o
+   conceito "1 unidade corresponde a X unidade base" com um exemplo
+   concreto, sem usar o termo técnico "fator de conversão" em nenhum
+   lugar da interface. ────────────────────────────────────────────────── */
+.unidmed-form-info .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.unidmed-form-info .message { margin: 0; }
+
+/* ── Seções (1 único `.card` do Table pra todo o formulário) ─────────────── */
+
+#unidmed-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.unidmed-form-subsection {
+  padding: var(--spacing-lg);
+}
+.unidmed-form-subsection + .unidmed-form-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.unidmed-form-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.unidmed-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .unidmed-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .unidmed-form-span-2 {
+    grid-column: span 2;
+  }
+}
+
+.unidmed-form-dropdown { position: relative; }
+
+.unidmed-form-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* Mensagem de erro: `.errorText` só aparece quando `.wrapper` ganha
+   `.error` via JS — mesmo padrão de Novo produto/Nova categoria. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* Resultado ao vivo ("1 CX = 50 UN") — texto de apoio calculado conforme o
+   usuário preenche Nome/Sigla/Corresponde a/Unidade base (ver
+   nova-unidade-medida.js), reforçando o conceito sem jargão técnico. */
+.unidmed-form-resultado {
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+.unidmed-form-resultado[hidden] { display: none; }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.unidmed-form-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+
+@media (min-width: 768px) {
+  .unidmed-form-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .unidmed-form-actions .btn { min-width: 200px; }
+}

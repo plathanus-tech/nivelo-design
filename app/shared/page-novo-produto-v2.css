@@ -1,0 +1,196 @@
+/* ══════════════════════════════════════════════════════════
+   NOVO PRODUTO V2 — formulário condicional por Tipo de produto (Produto de
+   venda × Produto de uso). Mobile first. Cópia deliberada de
+   page-novo-produto.css (V1), que continua intacta e é servida só pelo
+   navegador de protótipo. Ver app/CLAUDE.md.
+   ══════════════════════════════════════════════════════════ */
+
+.novo-produto-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   recorrente documentado em CLAUDE.md. */
+.overlay[hidden] { display: none; }
+
+.novo-produto-categoria-option-create {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.novo-produto-categoria-option-create:hover {
+  background: var(--color-bg-brand);
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.novo-produto-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.novo-produto-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.novo-produto-back:hover { color: var(--color-text-primary); }
+
+.novo-produto-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Seções ────────────────────────────────────────────────────────────── */
+
+#novo-produto-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.novo-produto-subsection {
+  padding: var(--spacing-lg);
+}
+.novo-produto-subsection + .novo-produto-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+/* Seções condicionais (Dados Fiscais / Entrada Inicial no Estoque) usam
+   `hidden` puro alternado via JS — sem guard aqui elas ficariam sempre
+   visíveis, já que `.novo-produto-subsection` não declara `display` (herda
+   o padrão do bloco), então nenhum guard extra é necessário nesse caso
+   específico; mantido como nota de verificação. */
+
+.novo-produto-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+.novo-produto-section-hint {
+  margin: calc(var(--spacing-md) * -1) 0 var(--spacing-md);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.novo-produto-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .novo-produto-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .novo-produto-span-2 {
+    grid-column: span 2;
+  }
+}
+
+.novo-produto-dropdown { position: relative; }
+
+.novo-produto-unidade-resultado {
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+  align-self: end;
+  padding-bottom: var(--spacing-xs);
+}
+.novo-produto-unidade-resultado[hidden] { display: none; }
+
+/* ⚠️ Colisão de classes .input/.option com RadioButton.module.css — a
+   seção "Produto" usa RadioButton (Tipo de produto), e como os
+   `.module.css` do Storybook são carregados aqui como stylesheets globais,
+   as regras genéricas de RadioButton vazam pros campos de texto/número
+   reais e pros itens `.option` dos Dropdowns desta mesma tela. Mesmo fix
+   padrão já documentado em CLAUDE.md, aplicado preventivamente. */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+}
+.novo-produto-grid input.input:not([type="radio"]),
+.dialog input.input:not([type="radio"]) {
+  width: 100%;
+  height: 44px;
+}
+.menu .option {
+  display: block;
+}
+
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+.novo-produto-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Tipo de produto (RadioButton) ─────────────────────────────────────── */
+#tipo-produto-field .group { gap: var(--spacing-lg); }
+
+/* ── Entrada Inicial no Estoque: dropzone (mesmo padrão de Novo registo de
+   estoque > Compras/XML) ──────────────────────────────────────────────── */
+.novo-produto-dropzone {
+  position: relative;
+}
+.novo-produto-dropzone-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.novo-produto-dropzone-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) dashed var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.novo-produto-dropzone-label:hover {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+}
+
+/* DatePicker (Data da entrada): mesmo tratamento de campo dentro do grid. */
+#entrada-data-field .dpTrigger { width: 100%; }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.novo-produto-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+
+@media (min-width: 768px) {
+  .novo-produto-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .novo-produto-actions .btn { min-width: 160px; }
+}

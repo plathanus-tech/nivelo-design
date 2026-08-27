@@ -1,0 +1,507 @@
+/* ══════════════════════════════════════════════════════════
+   BALANCETE (V2) — Financeiro > Relatórios > Balancete, versão 2. Mobile
+   first. Fork de `page-balancete.css` (V1 intocada) — esta é uma folha de
+   estilo COMPLETA e independente (não um delta), copiada e adaptada.
+   Único delta funcional real da V2: o card de Filtros só tem o campo de
+   período (Conta/Categoria/Agrupamento foram removidos, tanto do HTML
+   quanto de qualquer CSS que só existia pra eles) + a faixa de versão
+   (V1 ⇄ V2) no topo da página. Classes próprias `bal-*`, mesmo vocabulário
+   da V1 (CSS escopado à própria página, sem colisão possível).
+   ══════════════════════════════════════════════════════════ */
+
+.bal-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+.bal-page-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.bal-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.bal-back:hover { color: var(--color-text-primary); }
+.bal-title { color: var(--color-text-primary); margin: 0; }
+
+/* ── Faixa de versão (V1 ⇄ V2) — mesmo padrão visual já usado em outras
+   telas com fork de versão (ver `.ctr-version-banner` em
+   page-contas-a-receber-v2.css), adaptado com prefixo `bal-`. Deixa claro
+   que esta é a V2 e permite voltar pra V1 pra comparação, sem precisar do
+   navegador de protótipo. ────────────────────────────────────────────── */
+.bal-version-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.bal-version-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.bal-version-switch:hover { color: var(--color-text-brand); }
+
+/* ── Filtros (accordion: recolhe sozinho após gerar) ──────────────────────
+   Cabeçalho inteiro é clicável (não só o botão de chevron) pra expandir/
+   recolher; `.bal-filtros-content` (corpo+ações) alterna via `hidden`.
+   Nesta versão o grid só precisa acomodar o campo de período (Mês/Ano ou
+   Intervalo) — sem Conta/Categoria/Agrupamento, o grid de 4 colunas do
+   desktop nunca chega a ser preenchido por completo, e está tudo bem. ── */
+.bal-filtros-card { display: flex; flex-direction: column; }
+
+.bal-filtros-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+}
+.bal-filtros-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+}
+.bal-filtros-toggle svg { transition: transform var(--transition-fast); }
+.bal-filtros-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.bal-filtros-content:not([hidden]) { display: flex; flex-direction: column; }
+
+.bal-filtros-body { padding: 0 var(--spacing-lg) var(--spacing-lg); }
+
+.bal-filtros-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .bal-filtros-grid { grid-template-columns: 1fr 1fr; }
+  .bal-span-2 { grid-column: span 2; }
+}
+@media (min-width: 1024px) {
+  .bal-filtros-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.bal-intervalo-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 480px) {
+  .bal-intervalo-fields { grid-template-columns: 1fr 1fr; }
+}
+.bal-intervalo-fields[hidden] { display: none; }
+#mes-ano-field[hidden] { display: none; }
+
+/* Colisão RadioButton×Input: RadioButton.module.css esconde o radio nativo via
+   `.input{opacity:0;position:absolute;width:1px;height:1px}` — como essa classe é
+   carregada globalmente, vaza pros campos de texto/data/mês reais desta tela (Mês/Ano,
+   Data inicial, Data final). Mesmo padrão de fix já usado em várias outras telas do
+   sistema (fixando `height:44px` explicitamente, o valor real do componente Input). */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+  width: 100%;
+  height: 44px;
+}
+
+/* Mesma colisão, agora em `.label`: `RadioButton.module.css` declara `.label{font-weight:
+   bold}` (rótulo do grupo de radio, "Período") — vence os labels normais de campo (nesta
+   versão, só o "Mês/Ano" do DatePicker), deixando-os Bold em vez do Medium correto do
+   componente Input. Reafirma o peso certo com um seletor mais específico; `.dpLabel`
+   (Mês/Ano) já nasce Medium no próprio componente (ver DatePicker.module.css), incluído
+   aqui só por robustez. */
+.bal-filtros-grid .label,
+.bal-filtros-grid .dpLabel {
+  font-weight: var(--font-weight-medium);
+}
+
+.bal-filtros-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.bal-filtros-actions .btn { width: 100%; }
+@media (min-width: 640px) {
+  .bal-filtros-actions .btn { width: auto; min-width: 200px; }
+}
+
+/* ── Botão "Gerar relatório" desabilitado enquanto sem período válido ──── */
+.btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Resultado: espaçamento entre cards igual ao padrão já adotado nas
+   telas de detalhe do sistema — 16px entre os blocos (cabeçalho/KPIs/
+   gráfico/tabela), não os 24px usados entre as seções de topo da página. */
+#bal-resultado:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Cabeçalho do resultado ───────────────────────────────────────────── */
+.bal-resultado-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .bal-resultado-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+.bal-resultado-title { color: var(--color-text-primary); margin: 0 0 var(--spacing-2xs); }
+.bal-resultado-resumo { color: var(--color-text-tertiary); margin: 0; }
+.bal-resultado-actions { display: flex; gap: var(--spacing-2xs); flex-shrink: 0; }
+
+/* ── Cards de resumo — mesma cópia estrutural exata já usada em
+   Estoque/Caixa/Contas a Pagar/Receber (tamanho fixo 12px/24px em
+   qualquer largura). ─────────────────────────────────────────────────── */
+.bal-summary-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+@media (min-width: 640px) {
+  .bal-summary-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .bal-summary-row { gap: var(--spacing-lg); }
+}
+
+.card.bal-summary-card { box-shadow: var(--shadow-sm); display: flex; flex-direction: column; height: 100%; }
+.bal-summary-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) calc(var(--spacing-md) - 4px); }
+.bal-summary-card .title { color: var(--color-text-primary); }
+/* Colisão .title (Table.module.css, carregado depois de typography.css no <head>) vs
+   .text-14-bold: mesma especificidade de 1 classe, Table.module.css vence por ordem de
+   carregamento. Reafirma os valores do token com um seletor de 3 classes. */
+.bal-summary-card .title.text-14-bold { font-size: 14px; font-weight: var(--font-weight-bold); }
+.bal-summary-icon svg { width: 14px; height: 14px; }
+.bal-summary-title-row { display: flex; align-items: center; gap: var(--spacing-xs); }
+.bal-summary-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-brand); }
+.bal-summary-icon-entrada { color: var(--color-status-success-fg); }
+.bal-summary-icon-saida { color: var(--color-status-error-fg); }
+.bal-summary-body { display: flex; flex-direction: column; gap: 2px; flex: 1; padding: 0 var(--spacing-lg) var(--spacing-lg); }
+.bal-summary-value {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+.bal-value-positive { color: var(--color-status-success-fg); }
+.bal-value-negative { color: var(--color-status-error-fg); }
+
+/* ── Gráfico (SVG puro, sem lib) ───────────────────────────────────────── */
+.bal-chart-card { display: flex; flex-direction: column; }
+.bal-chart-wrap {
+  padding: 0 var(--spacing-lg) var(--spacing-sm);
+  height: 220px;
+}
+@media (max-width: 767px) {
+  /* Reduzir altura do gráfico no mobile, ocupando menos espaço vertical. */
+  .bal-chart-wrap { height: 140px; }
+}
+#bal-chart-svg { width: 100%; height: 100%; display: block; }
+.bal-chart-hit { cursor: default; }
+
+/* Tooltip do gráfico — visual "moderno" (fundo escuro, sombra suave,
+   cantos arredondados), criado uma vez via JS e reposicionado perto do
+   cursor a cada hover. `position:fixed`, mesma técnica já usada em todo
+   tooltip/popover deste sistema. */
+.bal-chart-tooltip {
+  position: fixed;
+  z-index: 90;
+  min-width: 180px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-gray-900);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-sm);
+  pointer-events: none;
+}
+.bal-chart-tooltip[hidden] { display: none; }
+.bal-chart-tooltip-header {
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: var(--border-width-thin) solid rgba(255, 255, 255, 0.12);
+}
+.bal-chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: 2px 0;
+}
+.bal-chart-tooltip-label { flex: 1; color: rgba(255, 255, 255, 0.72); }
+.bal-chart-tooltip-value { font-weight: var(--font-weight-medium); color: var(--color-text-inverse); }
+.bal-chart-tooltip-saldo {
+  margin-top: var(--spacing-2xs);
+  padding-top: var(--spacing-xs);
+  border-top: var(--border-width-thin) solid rgba(255, 255, 255, 0.12);
+}
+.bal-chart-tooltip-saldo .bal-chart-tooltip-label { color: rgba(255, 255, 255, 0.72); }
+/* --color-status-success/error-fg (green-700/red-700) são pensados pra texto sobre fundo
+   CLARO — contra o fundo escuro deste tooltip (--color-gray-900) o contraste calculado é
+   ~3.6:1 (verde) e ~2.8:1 (vermelho), abaixo do mínimo WCAG AA (4.5:1). Usando os tokens
+   green-400/red-400 (mesmos valores do tema dark do catálogo, pensados pra fundo escuro):
+   ~10.3:1 e ~6.5:1, ambos aprovados. */
+.bal-chart-tooltip .bal-value-positive { color: var(--color-green-400); }
+.bal-chart-tooltip .bal-value-negative { color: var(--color-red-400); }
+
+/* Legenda de dias/períodos abaixo do gráfico — HTML real (não `<text>`
+   dentro do SVG). Cada `<span>` tem a mesma largura fracionária
+   (`flex:1 1 0`) do grupo de barras correspondente no SVG, garantindo
+   alinhamento exato mesmo quando nem toda coluna mostra texto (amostragem
+   em períodos longos). */
+.bal-chart-axis {
+  display: flex;
+  padding: 0 var(--spacing-lg);
+  margin-top: 2px;
+}
+.bal-chart-axis-label {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  /* `overflow:visible` de propósito: a coluna é mais estreita que o texto do rótulo, que
+     precisa vazar pras colunas vizinhas VAZIAS. */
+  overflow: visible;
+}
+/* Mês (" Jul") só cabe em telas largas — abaixo de 768px sobra só o número do dia. */
+@media (max-width: 767px) {
+  .bal-chart-axis-label-month { display: none; }
+}
+
+/* Linha de zero — única referência horizontal do gráfico. Cinza suave. */
+.bal-chart-zero-line { stroke: var(--color-gray-200); }
+
+/* Hover: expansão pura da própria barra (mesma cor, sem stroke/contorno).
+   `transform-box:fill-box` + origem ancorada embaixo (todas as barras daqui nascem
+   do baseline pra cima, nunca invertidas). */
+.bal-chart-bar {
+  transition: transform 160ms ease;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.bal-chart-bar.is-active { transform: scale(1.05, 1.08); }
+
+.bal-chart-legend {
+  display: flex;
+  gap: var(--spacing-lg);
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+}
+.bal-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  color: var(--color-text-secondary);
+}
+.bal-chart-legend-dot { width: 10px; height: 10px; border-radius: var(--radius-full); display: inline-block; }
+.bal-chart-legend-dot-entrada { background: var(--color-status-success-fg); }
+.bal-chart-legend-dot-saida { background: var(--color-status-error-fg); }
+
+/* ── Tabela matricial — 1ª coluna (Categoria) sticky à ESQUERDA. Nunca
+   vira Cards no mobile — pedido explícito, é uma tabela matricial
+   financeira, não uma listagem. ───────────────────────────────────────── */
+.bal-table-card { display: flex; flex-direction: column; }
+.bal-table-card .cardHeader { flex-wrap: wrap; gap: var(--spacing-xs); align-items: baseline; }
+.bal-table-caption { color: var(--color-text-tertiary); margin: 0; }
+
+/* Shell da rolagem horizontal: `.bal-tablewrap` é quem rola de verdade
+   (overflow-x:auto do `.tableWrap` de fábrica); o shell só existe pra
+   posicionar o indicativo visual de fade (`.bal-table-scroll-fade`) num
+   ponto FIXO em relação ao card, cobrindo cabeçalho+corpo. */
+.bal-table-scroll-shell { position: relative; }
+.bal-table-scroll-fade {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to right, transparent, var(--color-gray-300));
+  transition: opacity var(--transition-fast);
+}
+@media (max-width: 767px) {
+  /* Indicativo visual da rolagem horizontal só é necessário no mobile. */
+  .bal-table-scroll-shell.bal-has-hscroll .bal-table-scroll-fade {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.bal-tablewrap { padding-top: 0; cursor: grab; -webkit-overflow-scrolling: touch; }
+.bal-tablewrap.bal-dragging { cursor: grabbing; user-select: none; }
+
+/* Scrollbar mais fino (mesmo padrão já usado na Sidebar — 6px, cor
+   `--color-border-muted`) em vez do scrollbar grosso padrão do
+   navegador — só a espessura muda, o comportamento nativo continua. */
+.bal-tablewrap,
+.bal-table-scroll-top {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-muted) transparent;
+}
+.bal-tablewrap::-webkit-scrollbar,
+.bal-table-scroll-top::-webkit-scrollbar { height: 6px; }
+.bal-tablewrap::-webkit-scrollbar-track,
+.bal-table-scroll-top::-webkit-scrollbar-track { background: transparent; }
+.bal-tablewrap::-webkit-scrollbar-thumb,
+.bal-table-scroll-top::-webkit-scrollbar-thumb {
+  background: var(--color-border-muted);
+  border-radius: var(--radius-full);
+}
+.bal-tablewrap::-webkit-scrollbar-thumb:hover,
+.bal-table-scroll-top::-webkit-scrollbar-thumb:hover { background: var(--color-border-default); }
+
+/* Scrollbar espelhada ACIMA da tabela, só no mobile: dá ao usuário um
+   indicativo de rolagem horizontal já visível no topo do card, sem
+   precisar chegar ao fim da tabela pra notar o scroll nativo. Sincronizada
+   via JS (`scrollLeft` dos dois elementos), altura mínima só pra mostrar
+   a barra fina (nenhum conteúdo visível dentro, só o espaçador). */
+.bal-table-scroll-top {
+  display: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 10px;
+}
+.bal-table-scroll-top-spacer { height: 1px; }
+@media (max-width: 767px) {
+  .bal-table-scroll-shell.bal-has-hscroll .bal-table-scroll-top { display: block; }
+}
+
+.bal-table { table-layout: auto; }
+.bal-table .th,
+.bal-table .td {
+  white-space: nowrap;
+  text-align: right;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.bal-table .th:first-child,
+.bal-table .td:first-child {
+  text-align: left;
+  white-space: normal;
+  min-width: 200px;
+}
+.bal-table .th:not(:first-child),
+.bal-table .td:not(:first-child) {
+  min-width: 84px;
+}
+
+/* Coluna Categoria sticky à esquerda — cada nível de hierarquia precisa
+   de um par de regras (linha + célula sticky) com o MESMO background,
+   já que `position:sticky` cria seu próprio contexto e `background:
+   inherit` não é confiável em todos os navegadores dentro de `<table>`. */
+.bal-table .th:first-child,
+.bal-table .td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 1px solid var(--color-gray-300);
+}
+
+.bal-row-level-0,
+.bal-row-level-0 > .td:first-child {
+  background: var(--color-bg-brand);
+  font-weight: var(--font-weight-bold);
+}
+.bal-row-level-1,
+.bal-row-level-1 > .td:first-child {
+  background: var(--color-gray-50);
+  font-weight: var(--font-weight-medium);
+}
+.bal-row-level-2,
+.bal-row-level-2 > .td:first-child {
+  background: var(--color-bg-surface);
+}
+/* Zebra striping das categorias (folhas), mesma cor de alternância já
+   padronizada nas demais tabelas do sistema (branco ímpar / Gray 50 par),
+   aplicada via classe (não `:nth-child` puro) porque o índice de
+   alternância é só entre as linhas de categoria, não entre todas as
+   `<tr>` da tabela matricial. */
+.bal-row-level-2.bal-row-zebra,
+.bal-row-level-2.bal-row-zebra > .td:first-child {
+  background: var(--color-gray-50);
+}
+.bal-row-resultado,
+.bal-row-resultado > .td:first-child {
+  background: var(--color-gray-50);
+  font-weight: var(--font-weight-medium);
+}
+.bal-row-saldo,
+.bal-row-saldo > .td:first-child {
+  background: var(--color-bg-brand);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-brand);
+}
+
+.bal-row-collapsed { display: none; }
+
+.bal-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.bal-row-indent-1 { padding-left: var(--spacing-lg); }
+.bal-row-indent-2 { padding-left: calc(var(--spacing-lg) * 2); }
+
+.bal-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.bal-group-toggle svg { transition: transform var(--transition-fast); }
+.bal-group-toggle.is-collapsed svg { transform: rotate(-90deg); }
+
+/* ── Toast de sucesso (mesma composição do resto do sistema) ──────────── */
+.bal-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.bal-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }

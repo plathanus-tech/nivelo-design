@@ -4,7 +4,7 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manifesto eletrônico — Nivelo</title>
+  <title>MDF-e (Manifesto) — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
@@ -91,7 +91,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Cliente e fornecedor</span>
+                  <span class="app-nav-label">Clientes e fornecedores</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -138,13 +138,17 @@
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
                 <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
                   <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
                   <span class="app-nav-label">Notas fiscais</span>
                 </button>
                 <button type="button" class="app-nav-subitem is-active" data-nav="fiscal-manifesto">
                   <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Manifesto</span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
                 </button>
               </div>
             </div>
@@ -185,6 +189,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
                   <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
                 </button>
 
                 <div class="app-nav-subgroup" id="group-fiscal">
@@ -254,7 +262,7 @@
 
           <div class="man-header">
             <div class="man-header-text">
-              <h1 class="man-title text-heading-6">Manifesto eletrônico</h1>
+              <h1 class="man-title text-heading-6">MDF-e (Manifesto)</h1>
               <p class="man-subtitle text-body-s">Emita e gerencie os Manifestos de Documentos Fiscais (MDF-e) dos transportes da fazenda.</p>
             </div>
             <button type="button" class="btn primary hasLeft" id="new-manifesto-btn">

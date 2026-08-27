@@ -335,7 +335,7 @@
       return '<div class="option" data-value="' + nome + '">' + nome + '</div>';
     }).join('');
     html += '<div class="novo-estoque-local-option-create" data-add-local>' +
-      '<i data-lucide="plus" width="14" height="14"></i> Adicionar novo local</div>';
+      '<i data-lucide="plus" width="14" height="14"></i> Adicionar novo depósito</div>';
     depositoMenu.innerHTML = html;
     if (window.lucide) lucide.createIcons();
   }

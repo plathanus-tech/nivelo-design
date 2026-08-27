@@ -272,19 +272,33 @@
 
   // Com Tipo em multi-seleção, o código reflete o PRIMEIRO tipo marcado
   // (ordem de exibição do menu: Cliente > Fornecedor > Transportadora) —
-  // só um prefixo cosmético, não uma regra de negócio real.
+  // só um prefixo cosmético, não uma regra de negócio real. Sem nenhum tipo
+  // marcado (campo nasce em branco, ver abaixo), o código fica vazio até o
+  // usuário escolher explicitamente.
   function updateCode(tipos) {
-    var tipo = (tipos && tipos[0]) || 'cliente';
-    codeInput.value = CODE_PREFIX[tipo] + '-' + NEXT_NUMBER[tipo];
+    var tipo = tipos && tipos[0];
+    codeInput.value = tipo ? (CODE_PREFIX[tipo] + '-' + NEXT_NUMBER[tipo]) : '';
   }
 
   // ---------- Tipo (Cliente/Fornecedor/Transportadora, multi-seleção) ----------
+  // Campo nasce SEM nenhuma seleção (pedido explícito: "o campo Tipo deve
+  // iniciar em branco. Não selecionar automaticamente nenhum tipo.") — o
+  // usuário precisa escolher pelo menos um tipo antes de salvar (ver
+  // `runValidation()` abaixo).
+  var tipoField = document.getElementById('tipo-field');
   var vehiclesSection = document.getElementById('vehicles-section');
-  var tipoDropdown = initMultiDropdown(document.getElementById('tipo-field'), function (values) {
+  var tipoDropdown = initMultiDropdown(tipoField, function (values) {
     updateCode(values);
     vehiclesSection.hidden = values.indexOf('transportadora') === -1;
   });
-  tipoDropdown.selectValues(['cliente']);
+
+  // ---------- Modo de edição: calculado cedo (via hash) porque a
+  // renderização dos veículos (abaixo) já precisa saber se está editando um
+  // cadastro existente ou criando um novo — Situação do veículo só aparece
+  // no modo de edição (ver `vehicleCardHTML()`). ----------
+  var stateMatch = location.hash.match(/state=([a-z]+)/);
+  var demoState = stateMatch ? stateMatch[1] : null;
+  var isEditMode = demoState === 'edit';
 
   // ---------- Tipo de pessoa (Física/Jurídica) → campo único de documento ----------
   // Um só campo (não dois campos alternando `hidden`): troca label,
@@ -511,6 +525,7 @@
     vehicles.push({
       id: vehicleIdSeq,
       situacao: 'ativo',
+      descricao: '',
       plates: [{ id: plateIdSeq, value: '', uf: '' }]
     });
     renderVehicles();
@@ -530,6 +545,7 @@
       return {
         id: ++vehicleIdSeq,
         situacao: v.situacao || 'ativo',
+        descricao: v.descricao || '',
         plates: plates.map(function (p) {
           return { id: ++plateIdSeq, value: p.value || '', uf: p.uf || '' };
         })
@@ -596,8 +612,28 @@
     );
   }
 
+  // Situação do veículo só aparece durante a EDIÇÃO de uma transportadora
+  // existente (`isEditMode`) — no cadastro inicial (criação), a Situação
+  // fica fora do formulário por completo (pedido explícito), mostrando só
+  // os campos necessários pra criar o veículo (Placa/UF/Descrição). O
+  // objeto `vehicle` continua guardando `situacao` (default 'ativo') mesmo
+  // quando o campo não é exibido, pra não perder o dado se a tela virar
+  // edição depois (ex.: reentrar via `#state=edit`).
   function vehicleCardHTML(vehicle, position) {
     var removablePlates = vehicle.plates.length > 1;
+    var situacaoHTML = isEditMode
+      ? ('<div class="wrapper novo-cadastro-dropdown novo-cadastro-vehicle-situacao" data-situacao-field data-value="' + vehicle.situacao + '">' +
+          '<span class="label">Situação</span>' +
+          '<button type="button" class="trigger" data-dropdown-trigger>' +
+            '<span data-dropdown-value>' + (vehicle.situacao === 'ativo' ? 'Ativo' : 'Inativo') + '</span>' +
+            '<span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>' +
+          '</button>' +
+          '<div class="menu" data-dropdown-menu>' +
+            '<div class="option' + (vehicle.situacao === 'ativo' ? ' selected' : '') + '" data-value="ativo">Ativo</div>' +
+            '<div class="option' + (vehicle.situacao === 'inativo' ? ' selected' : '') + '" data-value="inativo">Inativo</div>' +
+          '</div>' +
+        '</div>')
+      : '';
     return (
       '<div class="card novo-cadastro-vehicle" data-vehicle-id="' + vehicle.id + '">' +
         '<div class="novo-cadastro-vehicle-header">' +
@@ -612,23 +648,19 @@
             '</span>' +
           '</span>' +
         '</div>' +
-        '<div class="wrapper novo-cadastro-dropdown novo-cadastro-vehicle-situacao" data-situacao-field data-value="' + vehicle.situacao + '">' +
-          '<span class="label">Situação</span>' +
-          '<button type="button" class="trigger" data-dropdown-trigger>' +
-            '<span data-dropdown-value>' + (vehicle.situacao === 'ativo' ? 'Ativo' : 'Inativo') + '</span>' +
-            '<span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>' +
-          '</button>' +
-          '<div class="menu" data-dropdown-menu>' +
-            '<div class="option' + (vehicle.situacao === 'ativo' ? ' selected' : '') + '" data-value="ativo">Ativo</div>' +
-            '<div class="option' + (vehicle.situacao === 'inativo' ? ' selected' : '') + '" data-value="inativo">Inativo</div>' +
-          '</div>' +
-        '</div>' +
+        situacaoHTML +
         '<div>' +
           vehicle.plates.map(function (plate, index) { return plateRowHTML(vehicle, plate, index, removablePlates); }).join('') +
           '<button type="button" class="btn secondary sm hasLeft novo-cadastro-add-plate" data-add-plate' + (vehicle.plates.length >= 3 ? ' hidden' : '') + '>' +
             '<span class="icon"><i data-lucide="plus" width="14" height="14"></i></span>' +
             'Adicionar outra placa' +
           '</button>' +
+        '</div>' +
+        '<div class="wrapper" data-descricao-field>' +
+          '<label class="label" for="vehicle-descricao-' + vehicle.id + '">Descrição</label>' +
+          '<div class="inputWrap">' +
+            '<input class="input" type="text" id="vehicle-descricao-' + vehicle.id + '" data-descricao-value value="' + vehicle.descricao + '" placeholder="Ex.: Caminhão graneleiro Mercedes" />' +
+          '</div>' +
         '</div>' +
       '</div>'
     );
@@ -645,8 +677,16 @@
     vehicles.forEach(function (vehicle) {
       var card = vehiclesListEl.querySelector('[data-vehicle-id="' + vehicle.id + '"]');
 
-      initDropdown(card.querySelector('[data-situacao-field]'), function (value) {
-        vehicle.situacao = value;
+      var situacaoField = card.querySelector('[data-situacao-field]');
+      if (situacaoField) {
+        initDropdown(situacaoField, function (value) {
+          vehicle.situacao = value;
+        });
+      }
+
+      var descricaoInput = card.querySelector('[data-descricao-value]');
+      descricaoInput.addEventListener('input', function () {
+        vehicle.descricao = descricaoInput.value;
       });
 
       vehicle.plates.forEach(function (plate) {
@@ -696,6 +736,12 @@
     var hasError = !nameInput.value.trim();
     setNameError(hasError);
 
+    // Tipo nasce em branco (pedido explícito) — o usuário precisa escolher
+    // pelo menos um tipo antes de salvar, senão nem o Código (que depende
+    // do tipo) faria sentido.
+    var tipoInvalid = tipoDropdown.getValues().length === 0;
+    tipoField.classList.toggle('error', tipoInvalid);
+
     // Transportadora: cada veículo precisa de Placa 1 preenchida + UF.
     var vehiclesInvalid = false;
     if (!vehiclesSection.hidden) {
@@ -708,7 +754,7 @@
       });
     }
 
-    return !hasError && !vehiclesInvalid;
+    return !hasError && !tipoInvalid && !vehiclesInvalid;
   }
 
   // ---------- Estados de demonstração via #state= ----------
@@ -717,10 +763,8 @@
   // visualizar esse estado direto pelo prototype-nav sem precisar interagir
   // primeiro. `required`/`vehiclesinvalid`: aciona a validação sem navegar,
   // só pra exibir os estados de erro direto pelo prototype-nav. `edit`: modo
-  // de edição (ver bloco logo abaixo).
-  var stateMatch = location.hash.match(/state=([a-z]+)/);
-  var demoState = stateMatch ? stateMatch[1] : null;
-  var isEditMode = demoState === 'edit';
+  // de edição (`stateMatch`/`demoState`/`isEditMode` já calculados mais
+  // acima, antes da renderização dos veículos).
 
   // ---------- Atalho "+ Cadastrar novo fornecedor"/"+ Cadastrar novo
   // cliente" (Nova Conta a Pagar / Nova Conta a Receber) ----------
@@ -734,7 +778,8 @@
   // nova-conta-pagar.js/nova-conta-receber.js).
   var RETURN_TARGETS = {
     'nova-conta-pagar': { screen: 'nova-conta-pagar.html', sessionKey: 'nivelo.novacontapagar.fornecedor-criado' },
-    'nova-conta-receber': { screen: 'nova-conta-receber.html', sessionKey: 'nivelo.novacontareceber.cliente-criado' }
+    'nova-conta-receber': { screen: 'nova-conta-receber.html', sessionKey: 'nivelo.novacontareceber.cliente-criado' },
+    'nova-conta-receber-v2': { screen: 'nova-conta-receber-v2.html', sessionKey: 'nivelo.novacontareceberv2.cliente-criado' }
   };
 
   var urlParams = new URLSearchParams(location.search);

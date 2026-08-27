@@ -89,7 +89,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Cliente e fornecedor</span>
+                  <span class="app-nav-label">Clientes e fornecedores</span>
                 </button>
                 <button type="button" class="app-nav-subitem is-active" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -136,13 +136,17 @@
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
                 <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
                   <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
                   <span class="app-nav-label">Notas fiscais</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
                   <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Manifesto</span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
                 </button>
               </div>
             </div>
@@ -179,6 +183,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
                   <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
                 </button>
 
                 <!-- Fiscal (subgrupo dentro de Configuração) -->
@@ -348,32 +356,23 @@
                 </div>
               </div>
 
-              <!-- ══════════════ 2. CONVERSÃO E ARMAZENAMENTO ══════════════ -->
+              <!-- ══════════════ 2. CONVERSÃO E ARMAZENAMENTO ══════════════
+                   Unidade de Medida agora é sourced do catálogo central
+                   (Configuração > Unidade de medida, `window.
+                   NiveloUnidadesMedida`) em vez do vocabulário fixo CX/UN/
+                   KG/LT/PT/FR/SC que ficava hardcoded nesta tela. Os campos
+                   "Unidade de Volume" e "Fator de Conversão" foram removidos
+                   — a conversão ("1 unidade corresponde a X unidade base")
+                   já é definida uma única vez no cadastro da unidade de
+                   medida, não precisa mais ser configurada de novo por
+                   produto (ver novo-produto.js: `unidadeVolume`/
+                   `fatorConversao` continuam preenchidos automaticamente a
+                   partir da unidade escolhida, só pra não quebrar
+                   consumidores existentes como Nova Remessa/Novo Pedido de
+                   Venda, que ainda leem esses 2 campos do produto). -->
               <div class="novo-produto-subsection">
                 <h2 class="novo-produto-subsection-title">Conversão e armazenamento</h2>
                 <div class="novo-produto-grid">
-
-                  <div class="wrapper novo-produto-dropdown" id="unidade-volume-field">
-                    <span class="label">Unidade de Volume</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span class="placeholder" data-dropdown-value>Selecione</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu>
-                      <div class="option" data-value="CX">CX · Caixa</div>
-                      <div class="option" data-value="UN">UN · Unidade</div>
-                      <div class="option" data-value="KG">KG · Quilograma</div>
-                      <div class="option" data-value="LT">LT · Litro</div>
-                      <div class="option" data-value="PT">PT · Pacote</div>
-                      <div class="option" data-value="FR">FR · Fardo</div>
-                      <div class="option" data-value="SC">SC · Saco</div>
-                    </div>
-                    <span class="helperText">Unidade base usada pelo sistema para conversão e controle quantitativo.</span>
-                    <span class="errorText" id="unidade-volume-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione a unidade de volume.
-                    </span>
-                  </div>
 
                   <div class="wrapper novo-produto-dropdown" id="unidade-medida-field">
                     <span class="label">Unidade de Medida</span>
@@ -381,33 +380,15 @@
                       <span class="placeholder" data-dropdown-value>Selecione</span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
-                    <div class="menu" data-dropdown-menu>
-                      <div class="option" data-value="CX">CX · Caixa</div>
-                      <div class="option" data-value="UN">UN · Unidade</div>
-                      <div class="option" data-value="KG">KG · Quilograma</div>
-                      <div class="option" data-value="LT">LT · Litro</div>
-                      <div class="option" data-value="PT">PT · Pacote</div>
-                      <div class="option" data-value="FR">FR · Fardo</div>
-                      <div class="option" data-value="SC">SC · Saco</div>
-                    </div>
-                    <span class="helperText">Unidade usada no dia a dia para comercializar ou movimentar o produto.</span>
+                    <div class="menu" data-dropdown-menu></div>
+                    <span class="helperText">Unidade usada no dia a dia para comercializar ou movimentar o produto. Cadastrada em Configuração &gt; Unidade de medida.</span>
                     <span class="errorText" id="unidade-medida-error">
                       <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
                       Selecione a unidade de medida.
                     </span>
                   </div>
 
-                  <div class="wrapper" id="fator-conversao-field">
-                    <label class="label" for="np-fator-conversao">Fator de Conversão</label>
-                    <div class="inputWrap">
-                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="np-fator-conversao" placeholder="Ex.: 60" aria-describedby="fator-conversao-error" />
-                    </div>
-                    <span class="helperText">Quantas unidades de Unidade de Volume equivalem a 1 Unidade de Medida.</span>
-                    <span class="errorText" id="fator-conversao-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Informe o fator de conversão.
-                    </span>
-                  </div>
+                  <p class="novo-produto-unidade-resultado text-body-s" id="np-unidade-resultado" hidden></p>
 
                 </div>
               </div>
@@ -578,6 +559,7 @@
   <script src="../shared/interface-principal.js"></script>
   <script src="../shared/produtos-data.js"></script>
   <script src="../shared/categorias-data.js"></script>
+  <script src="../shared/unidades-medida-data.js"></script>
   <script src="../shared/novo-produto.js"></script>
 </body>
 </html>

@@ -107,6 +107,9 @@
 .wrapper .errorText { display: none; }
 .wrapper.error .errorText { display: flex; }
 .wrapper.error .input { border-color: var(--color-action-error); }
+/* Tipo (Dropdown multi-seleção): o campo real é o `.trigger` (botão), não
+   um `.input` — mesmo padrão de borda vermelha, escopado ao trigger. */
+.wrapper.error .trigger { border-color: var(--color-action-error); }
 
 /* Marcador "(opcional)" (E-mail, Complemento): MESMO padrão visual do Step 2
    (Endereço) do fluxo de Criar Conta (`.cadastro-optional-tag` em

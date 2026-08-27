@@ -1,0 +1,26 @@
+/* ══════════════════════════════════════════════════════════
+   NOTAS FISCAIS V2 — evolução da Central de Notas Fiscais (Vendas > Notas
+   fiscais). Carregado JUNTO com page-notas-fiscais.css (a base visual/de
+   layout é 100% reaproveitada — tabela, filtros, badges, cards, tipografia,
+   espaçamentos); este arquivo só contém o que muda na V2:
+
+   1. Sem botão "Nova nota fiscal" (removido do HTML por completo — a
+      emissão passa a ser sempre acionada a partir de Pedido de Venda ou
+      Remessa, nunca criada direto por aqui).
+   2. Coluna Ações de Notas de saída mais larga, pra caber até 4 ícones
+      (Ver detalhes/Baixar PDF/Baixar XML/Cancelar NF-e — Corrigir nota
+      substitui Cancelar quando a nota está rejeitada, nunca os dois juntos).
+   3. Campo "Origem" no Agrupamento de Filtros (mesmo `.nf-dropdown` já
+      estilizado por page-notas-fiscais.css) — visível só na aba Notas de
+      saída, escondido via JS quando a aba ativa é Notas de entrada.
+
+   V1 (notas-fiscais.html) não foi tocada — este arquivo não é carregado lá. */
+
+/* ── Coluna Ações — Notas de saída ganha mais espaço (até 4 ícones) ──────── */
+#panel-saida .th:nth-child(7) { width: 170px; }
+#panel-entrada .th:nth-child(7) { width: 120px; }
+
+/* ── Campo "Origem" no Agrupamento de Filtros: escondido via JS (não CSS)
+   quando a aba ativa é Notas de entrada — guard padrão do projeto pra
+   qualquer elemento que alterne visibilidade via atributo `hidden`. ────── */
+#nf-origem-wrap[hidden] { display: none; }

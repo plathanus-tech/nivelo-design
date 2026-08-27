@@ -392,6 +392,19 @@
   var modo = params.get('modo');
   var editingNota = numero ? window.NiveloNotasFiscais.findByNumero(numero) : null;
 
+  // ---------- Origem (V1 x V2): esta tela é compartilhada pelas duas versões da
+  // Central de Notas Fiscais ("Ver detalhes"/"Corrigir nota" apontam pra cá dos
+  // dois lugares) — sem isso, "Voltar" sempre levava pra notas-fiscais.html (V1),
+  // mesmo quando o usuário tinha chegado aqui a partir da V2. `?origem=v2` é
+  // setado por notas-fiscais-v2.js; ausência do parâmetro (V1, prototype-nav
+  // direto, fluxo de prefill via Cadastro) mantém o destino padrão de sempre. ----------
+  var origem = params.get('origem');
+  var backHref = origem === 'v2' ? 'notas-fiscais-v2.html' : 'notas-fiscais.html';
+  var backTopLink = document.getElementById('nnf-back-top');
+  var cancelLink = document.getElementById('nnf-cancel');
+  if (backTopLink) backTopLink.href = backHref;
+  if (cancelLink) cancelLink.href = backHref;
+
   var rejectionAlert = document.getElementById('nnf-rejection-alert');
   var rejectionMessage = document.getElementById('nnf-rejection-message');
   var tipoCard = document.getElementById('nnf-tipo-card');
@@ -514,6 +527,35 @@
     } catch (e) { /* sessionStorage indisponível */ }
   }
 
+  // ---------- Prefill vindo de "Emitir nota fiscal" (Pedidos de Venda) —
+  // mesmo mecanismo single-use de sessionStorage do prefill de Cadastro
+  // acima, chave própria (payload mais rico: cliente/item/transporte/
+  // observação já resolvidos no Pedido). Campos que a NF-e exige e o
+  // Pedido não tem (ex. meio de pagamento fiscal, categoria, natureza da
+  // operação com CFOP) ficam pendentes, sem valor — o usuário completa
+  // antes de emitir, como pedido explicitamente. `origemPedidoNumero`
+  // guardado pra, no sucesso da emissão, avisar `NiveloPedidosVenda` (ver
+  // handler de submit, guardado atrás de `if (window.NiveloPedidosVenda)`
+  // como qualquer integração opcional deste arquivo). ----------
+  var origemPedidoNumero = null;
+  if (!editingNota) {
+    try {
+      var pedidoPrefillRaw = sessionStorage.getItem('nivelo.novapedidodevenda.nfe-prefill');
+      if (pedidoPrefillRaw) {
+        sessionStorage.removeItem('nivelo.novapedidodevenda.nfe-prefill');
+        var pedidoPrefill = JSON.parse(pedidoPrefillRaw);
+        origemPedidoNumero = pedidoPrefill.origemPedido || null;
+        if (pedidoPrefill.clienteCodigo) destinatarioDropdown.selectValue(pedidoPrefill.clienteCodigo);
+        if (pedidoPrefill.item) {
+          items = [];
+          addItem(pedidoPrefill.item);
+        }
+        if (pedidoPrefill.observacao) document.getElementById('nnf-observacao').value = pedidoPrefill.observacao;
+        if (pedidoPrefill.transportadoraCodigo) transporteDropdown.selectValue(pedidoPrefill.transportadoraCodigo);
+      }
+    } catch (e) { /* sessionStorage indisponível */ }
+  }
+
   if (editingNota && (modo === 'ver' || modo === 'corrigir')) {
     tipoCard.hidden = true;
     isEditingCorrecao = modo === 'corrigir';
@@ -603,7 +645,7 @@
         window.NiveloNotasFiscais.addEntrada({ arquivoNome: entradaXmlInput.files[0].name });
         sessionStorage.setItem('nivelo.novanotafiscal.success', 'Nota fiscal salva com sucesso.');
       } catch (e) {}
-      window.location.href = 'notas-fiscais.html';
+      window.location.href = backHref;
       return;
     }
 
@@ -651,12 +693,29 @@
         window.NiveloNotasFiscais.updateAfterCorrecao(editingNota.numero, payload);
         message = 'Nota fiscal corrigida e reenviada com sucesso.';
       } else {
-        window.NiveloNotasFiscais.add(payload);
+        var notaCriada = window.NiveloNotasFiscais.add(payload);
         message = 'Nota fiscal emitida com sucesso.';
+        // Integração V2 (pedido explícito): tudo que for gerado a partir de
+        // uma Nota Fiscal de saída deve ser enviado automaticamente para
+        // Contas a Receber. Só a V2 recebe essa integração (a V1 continua
+        // intacta, sem nenhum vínculo automático) — se o módulo V2 não
+        // estiver carregado por algum motivo, a emissão da nota não é
+        // afetada de forma alguma.
+        if (window.NiveloContasReceberV2) {
+          window.NiveloContasReceberV2.addFromNotaFiscal(notaCriada);
+        }
+        // Emissão a partir de "Emitir nota fiscal" (Pedidos de Venda) — avisa
+        // o pedido de origem que a integração NF-e foi concluída, guardado
+        // atrás de `if (window.NiveloPedidosVenda)` como as demais
+        // integrações opcionais deste arquivo (nunca quebra a emissão se o
+        // módulo não estiver carregado).
+        if (origemPedidoNumero && window.NiveloPedidosVenda) {
+          window.NiveloPedidosVenda.marcarNfeEmitida(origemPedidoNumero, notaCriada.numero);
+        }
       }
       sessionStorage.setItem('nivelo.novanotafiscal.success', message);
     } catch (e) {}
 
-    window.location.href = 'notas-fiscais.html';
+    window.location.href = backHref;
   });
 })();

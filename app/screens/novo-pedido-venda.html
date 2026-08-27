@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novo pedido de venda — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-novo-pedido-venda.css" />
+</head>
+<body>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Meus números</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Clientes e fornecedores</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group is-open" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="true" data-tooltip="Vendas · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Vendas</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem is-active" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
+                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta Financeira</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
+                </button>
+
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVO PEDIDO DE VENDA ══════════════════ -->
+      <main class="app-main">
+        <div class="npv-page">
+
+          <div class="npv-header">
+            <a href="pedidos-de-venda.html" class="npv-back">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <h1 class="npv-title text-heading-6" id="npv-page-title">Novo pedido de venda</h1>
+            <p class="npv-subtitle text-body-s" id="npv-page-subtitle">Venda com estoque disponível</p>
+          </div>
+
+          <form id="npv-form" novalidate>
+
+            <!-- ══════════════ Operação ══════════════ -->
+            <section class="card npv-card">
+              <div class="cardHeader"><h2 class="title">Operação</h2></div>
+              <div class="npv-grid">
+
+                <div class="dpRoot" id="data-field">
+                  <label class="dpLabel" for="data-trigger">Data</label>
+                  <button type="button" class="dpTrigger" id="data-trigger">
+                    <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
+                    <span class="dpPlaceholder" id="data-value">Selecionar data</span>
+                  </button>
+                  <input type="hidden" id="npv-data" />
+                  <div class="dpPopover" id="data-popover" hidden>
+                    <div class="dpCalendarHeader">
+                      <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior"><i data-lucide="chevron-left" width="16" height="16"></i></button>
+                      <span class="dpCalendarLabel text-body-s" data-dp-label></span>
+                      <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês"><i data-lucide="chevron-right" width="16" height="16"></i></button>
+                    </div>
+                    <div class="dpWeekdays"><span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span></div>
+                    <div class="dpGrid" data-dp-grid></div>
+                  </div>
+                </div>
+
+                <div class="wrapper" id="natureza-field">
+                  <span class="label">Natureza da operação</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione a natureza da operação</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="natureza-menu" data-dropdown-menu></div>
+                  <span class="helperText">Cadastrada em Configurações &gt; Configurações Fiscais</span>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Selecione a natureza da operação.</span>
+                </div>
+
+                <div class="wrapper npv-span-2" id="cliente-field">
+                  <span class="label">Cliente</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione o cliente</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="cliente-menu" data-dropdown-menu></div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Selecione o cliente.</span>
+                </div>
+
+              </div>
+
+              <dl class="npv-cliente-info npv-span-2" id="npv-cliente-info" hidden>
+                <div><dt>CPF / CNPJ</dt><dd id="npv-cliente-documento">—</dd></div>
+                <div><dt>Inscrição Estadual</dt><dd id="npv-cliente-ie">—</dd></div>
+                <div><dt>Telefone</dt><dd id="npv-cliente-telefone">—</dd></div>
+                <div><dt>Endereço</dt><dd id="npv-cliente-endereco">—</dd></div>
+              </dl>
+            </section>
+
+            <!-- ══════════════ Modalidade de venda ══════════════ -->
+            <section class="card npv-card">
+              <div class="cardHeader"><h2 class="title">Modalidade de venda</h2></div>
+              <div class="group" role="radiogroup" aria-label="Modalidade de venda">
+                <label class="option">
+                  <input type="radio" class="input" name="modalidade" value="estoque" checked />
+                  <span class="circle"><span class="dot"></span></span>
+                  <span class="optionLabel">Estoque disponível</span>
+                </label>
+                <label class="option">
+                  <input type="radio" class="input" name="modalidade" value="futura" />
+                  <span class="circle"><span class="dot"></span></span>
+                  <span class="optionLabel">Venda futura/Antecipada</span>
+                </label>
+              </div>
+            </section>
+
+            <!-- ══════════════ Produto e estoque ══════════════ -->
+            <section class="card npv-card">
+              <div class="cardHeader"><h2 class="title" id="npv-produto-card-title">Produto e estoque</h2></div>
+              <div class="npv-grid">
+
+                <div class="wrapper" id="produto-field">
+                  <span class="label">Produto</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione o produto</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="produto-menu" data-dropdown-menu></div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Selecione o produto.</span>
+                </div>
+
+                <div class="wrapper" id="deposito-field">
+                  <span class="label">Depósito</span>
+                  <button type="button" class="trigger" data-dropdown-trigger disabled>
+                    <span data-dropdown-value class="placeholder">Selecione o produto primeiro</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="deposito-menu" data-dropdown-menu></div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Selecione o depósito.</span>
+                </div>
+
+                <div class="wrapper npv-span-2" id="saldo-field">
+                  <span class="label">Saldo disponível</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-saldo" value="—" disabled />
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ══════════════ Quantidade e Valor ══════════════ -->
+            <section class="card npv-card">
+              <div class="cardHeader"><h2 class="title">Quantidade e Valor</h2></div>
+              <div class="npv-grid">
+
+                <div class="wrapper" id="quantidade-field">
+                  <span class="label">Quantidade</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" inputmode="decimal" id="npv-quantidade" placeholder="0" />
+                  </div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe uma quantidade maior que zero.</span>
+                </div>
+
+                <div class="wrapper" id="unidade-field">
+                  <span class="label">Unidade</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione a unidade</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="unidade-menu" data-dropdown-menu></div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Selecione a unidade.</span>
+                </div>
+
+                <div class="wrapper" id="peso-field">
+                  <span class="label">Peso da saca</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-peso" value="—" disabled />
+                  </div>
+                </div>
+
+                <div class="wrapper" id="total-kg-field">
+                  <span class="label">Total em KG</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-total-kg" value="—" disabled />
+                  </div>
+                </div>
+
+                <div class="wrapper" id="preco-field">
+                  <span class="label">Preço por saca</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" inputmode="decimal" id="npv-preco" placeholder="R$ 0,00" />
+                  </div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe um preço maior que zero.</span>
+                </div>
+
+                <div class="wrapper" id="valor-bruto-field">
+                  <span class="label">Valor bruto</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-valor-bruto" value="R$ 0,00" disabled />
+                  </div>
+                </div>
+
+                <div class="wrapper" id="desconto-field">
+                  <span class="label">Desconto / Abatimento</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" inputmode="decimal" id="npv-desconto" placeholder="R$ 0,00" />
+                  </div>
+                </div>
+
+                <div class="wrapper" id="valor-liquido-field">
+                  <span class="label">Valor líquido</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-valor-liquido" value="R$ 0,00" disabled />
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ══════════════ Condição de pagamento ══════════════ -->
+            <section class="card npv-card">
+              <div class="cardHeader"><h2 class="title">Condição de pagamento</h2></div>
+              <div class="group" role="radiogroup" aria-label="Condição de pagamento">
+                <label class="option">
+                  <input type="radio" class="input" name="condicao-pagamento" value="avista" checked />
+                  <span class="circle"><span class="dot"></span></span>
+                  <span class="optionLabel">À vista / Recebido agora</span>
+                </label>
+                <label class="option">
+                  <input type="radio" class="input" name="condicao-pagamento" value="prazo" />
+                  <span class="circle"><span class="dot"></span></span>
+                  <span class="optionLabel">A prazo</span>
+                </label>
+              </div>
+
+              <div class="npv-grid npv-pagamento-block" id="pagamento-avista-block">
+                <div class="dpRoot npv-span-2" id="data-recebimento-field">
+                  <label class="dpLabel" for="data-recebimento-trigger">Data de recebimento</label>
+                  <button type="button" class="dpTrigger" id="data-recebimento-trigger">
+                    <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
+                    <span class="dpPlaceholder" id="data-recebimento-value">Selecionar data</span>
+                  </button>
+                  <input type="hidden" id="npv-data-recebimento" />
+                  <div class="dpPopover" id="data-recebimento-popover" hidden>
+                    <div class="dpCalendarHeader">
+                      <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior"><i data-lucide="chevron-left" width="16" height="16"></i></button>
+                      <span class="dpCalendarLabel text-body-s" data-dp-label></span>
+                      <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês"><i data-lucide="chevron-right" width="16" height="16"></i></button>
+                    </div>
+                    <div class="dpWeekdays"><span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span></div>
+                    <div class="dpGrid" data-dp-grid></div>
+                  </div>
+                </div>
+
+                <div class="wrapper" id="forma-recebimento-field">
+                  <span class="label">Forma de recebimento</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione a forma de recebimento</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="forma-recebimento-menu" data-dropdown-menu></div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Selecione a forma de recebimento.</span>
+                </div>
+
+                <div class="wrapper" id="conta-entrada-field">
+                  <span class="label">Conta de entrada</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione a conta</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="conta-entrada-menu" data-dropdown-menu></div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Selecione a conta de entrada.</span>
+                </div>
+              </div>
+
+              <div class="npv-grid npv-pagamento-block" id="pagamento-prazo-block" hidden>
+                <div class="wrapper" id="forma-cobranca-field">
+                  <span class="label">Forma de cobrança</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione a forma de cobrança</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="forma-cobranca-menu" data-dropdown-menu></div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Selecione a forma de cobrança.</span>
+                </div>
+
+                <div class="wrapper" id="numero-parcelas-field">
+                  <span class="label">Número de parcelas</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" inputmode="numeric" id="npv-numero-parcelas" placeholder="1" />
+                  </div>
+                  <span class="errorText"><i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>Informe um número de parcelas válido.</span>
+                </div>
+
+                <div class="wrapper" id="valor-total-field">
+                  <span class="label">Valor total</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-valor-total" value="R$ 0,00" disabled />
+                  </div>
+                </div>
+              </div>
+
+              <div class="npv-parcelas" id="npv-parcelas-list" hidden></div>
+              <div class="npv-parcelas-summary" id="npv-parcelas-summary" hidden>
+                <span class="npv-parcelas-alert" id="npv-parcelas-alert">
+                  <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                  <span id="npv-parcelas-alert-text"></span>
+                </span>
+              </div>
+            </section>
+
+            <!-- ══════════════ Transporte ══════════════ -->
+            <section class="card npv-card">
+              <div class="cardHeader"><h2 class="title">Transporte <span class="npv-optional-tag">(opcional)</span></h2></div>
+              <div class="npv-grid">
+
+                <div class="wrapper npv-span-2" id="transportadora-field">
+                  <span class="label">Transportadora</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione a transportadora</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="transportadora-menu" data-dropdown-menu></div>
+                </div>
+
+                <div class="wrapper" id="veiculo-field">
+                  <span class="label">Veículo / Placa</span>
+                  <button type="button" class="trigger" data-dropdown-trigger disabled>
+                    <span data-dropdown-value class="placeholder">Selecione a transportadora primeiro</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="veiculo-menu" data-dropdown-menu></div>
+                </div>
+
+                <div class="wrapper" id="motorista-field">
+                  <span class="label">Motorista</span>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-motorista" placeholder="Nome do motorista" />
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ══════════════ Observações ══════════════ -->
+            <section class="card npv-card">
+              <div class="cardHeader"><h2 class="title">Observações</h2></div>
+              <div class="wrapper">
+                <div class="inputWrap">
+                  <textarea class="input npv-textarea" id="npv-observacao" placeholder="Observações da operação / Informações adicionais da NF-e (opcional)"></textarea>
+                </div>
+              </div>
+            </section>
+
+            <!-- ══════════════ Ações ══════════════ -->
+            <div class="npv-actions">
+              <a href="pedidos-de-venda.html" class="btn secondaryGray" id="npv-cancel">Voltar</a>
+              <button type="submit" class="btn primary" id="npv-submit">Salvar pedido</button>
+            </div>
+
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Modal: Adicionar novo depósito (mesmo fluxo/componente já usado em
+       Novo registo de estoque — reaproveitado aqui, não recriado). -->
+  <div class="overlay" id="npv-novo-deposito-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="npv-novo-deposito-title">
+      <div class="header">
+        <h2 class="title" id="npv-novo-deposito-title">Adicionar novo depósito</h2>
+        <button class="closeBtn" id="npv-novo-deposito-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="wrapper" id="npv-novo-deposito-nome-field">
+          <label class="label" for="npv-novo-deposito-nome">Nome do depósito</label>
+          <div class="inputWrap">
+            <input class="input" type="text" id="npv-novo-deposito-nome" placeholder="Ex.: Galpão 2" />
+          </div>
+          <span class="errorText" id="npv-novo-deposito-error">
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe o nome do depósito.
+          </span>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondary sm" id="npv-novo-deposito-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="npv-novo-deposito-add">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/date-picker.js"></script>
+  <script src="../shared/cadastros-data.js"></script>
+  <script src="../shared/produtos-data.js"></script>
+  <script src="../shared/locais-data.js"></script>
+  <script src="../shared/estoque-saldos-data.js"></script>
+  <script src="../shared/naturezas-operacao-data.js"></script>
+  <script src="../shared/bancos-catalogo-data.js"></script>
+  <script src="../shared/contas-financeiras-data.js"></script>
+  <script src="../shared/contas-bancarias-data.js"></script>
+  <script src="../shared/categorias-financeiras-data.js"></script>
+  <script src="../shared/caixa-data.js"></script>
+  <script src="../shared/contas-receber-data.js"></script>
+  <script src="../shared/formas-condicao-venda-data.js"></script>
+  <script src="../shared/veiculos-transportadora-data.js"></script>
+  <script src="../shared/pedidos-venda-data.js"></script>
+  <script src="../shared/novo-pedido-venda.js"></script>
+</body>
+</html>

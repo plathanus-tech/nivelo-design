@@ -297,17 +297,22 @@
   table-layout: fixed;
 }
 
-.table-variant-compact .th:nth-child(1) { width: 24%; }   /* Nome (prioridade) */
-.table-variant-compact .th:nth-child(2) { width: 11%; }   /* Código (respiro antes do ícone de ordenação) */
-.table-variant-compact .th:nth-child(3) { width: 18%; }   /* Tipo (prioridade, cabe "Transportadora" inteiro) */
-.table-variant-compact .th:nth-child(4) { width: 10%; }   /* Status */
-.table-variant-compact .th:nth-child(5) { width: 20%; }   /* CPF/CNPJ (prioridade, cabe o documento inteiro) */
-.table-variant-compact .th:nth-child(6) { width: 14%; }   /* Cidade */
-/* Ações em px fixo (não %): precisa caber os 3 `actionBtn` de 32px + gaps +
-   padding do `.cellActions` (~112px de conteúdo real, medido via
-   `getBoundingClientRect()`) — uma % ficava estreita demais e forçava
-   scroll horizontal na tabela, exatamente o que esta variante quer evitar. */
-.table-variant-compact .th:nth-child(7) { width: 120px; }  /* Ações (compacta) */
+/* Ordem final de colunas: Código, Nome/Razão social, CPF/CNPJ, Telefone,
+   Tipo, Cidade, Status, Ações — Código primeiro, Status logo antes de
+   Ações, Ações sempre a ÚLTIMA coluna (pedido explícito), fixa via
+   `position:sticky` durante a rolagem horizontal (mesmo padrão já usado em
+   Contas a Pagar/Categorias de receitas e despesas). */
+.table-variant-compact .th:nth-child(1) { width: 9%; }    /* Código (respiro antes do ícone de ordenação) */
+.table-variant-compact .th:nth-child(2) { width: 22%; }   /* Nome/Razão social (prioridade) */
+.table-variant-compact .th:nth-child(3) { width: 16%; }   /* CPF/CNPJ (prioridade, cabe o documento inteiro) */
+.table-variant-compact .th:nth-child(4) { width: 12%; }   /* Telefone */
+.table-variant-compact .th:nth-child(5) { width: 15%; }   /* Tipo (prioridade, cabe "Transportadora" inteiro) */
+.table-variant-compact .th:nth-child(6) { width: 12%; }   /* Cidade */
+.table-variant-compact .th:nth-child(7) { width: 14%; }   /* Status */
+/* Ações em px fixo (não %): precisa caber os 2 `actionBtn` (Editar +
+   Ativar/Desativar) + gaps + padding do `.cellActions` — uma % ficava
+   estreita demais e forçava scroll horizontal na tabela. */
+.table-variant-compact .th:nth-child(8) { width: 120px; }  /* Ações (compacta, última coluna, fixa) */
 
 /* Espaçamento interno entre o conteúdo do cabeçalho e o ícone de ordenação
    (`.thInner` do Table.module.css só tem 4px de gap por padrão) — em
@@ -316,7 +321,7 @@
 .table-variant-compact .th.sortable .thInner {
   gap: var(--spacing-sm);
 }
-.table-variant-compact .th:nth-child(2) {
+.table-variant-compact .th:nth-child(1) {
   padding-right: var(--spacing-md);
 }
 
@@ -326,7 +331,7 @@
    mas SÓ na vírgula/espaço (comportamento padrão de word-wrap), nunca no
    meio de uma palavra. Nome/Cidade seguem o mesmo padrão (quebra normal,
    nunca `break-word`). */
-.table-variant-compact .td:nth-child(3) {
+.table-variant-compact .td:nth-child(5) {
   overflow-wrap: normal;
   word-break: normal;
 }
@@ -334,7 +339,7 @@
 /* Código: string curta e sem espaço (ex. "CFT-7001") — nunca precisa
    quebrar, então fica numa linha só por padrão (coluna já dimensionada
    folgada o bastante). */
-.table-variant-compact .td:nth-child(2) {
+.table-variant-compact .td:nth-child(1) {
   white-space: nowrap;
 }
 
@@ -344,10 +349,26 @@
    alargada o bastante pra isso no caso comum); quando não couber, ellipsis
    + tooltip nativo (`title`, preenchido via JS em `cadastros.js`) em vez de
    quebrar no meio — nunca `break-word`. */
-.table-variant-compact .td:nth-child(5) {
+.table-variant-compact .td:nth-child(3) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Ações (última coluna) fica `position:sticky` presa à direita, sempre
+   visível durante a rolagem horizontal — mesmo padrão de Contas a Pagar/
+   Categorias de receitas e despesas. O fundo segue o mesmo zebra ímpar/par
+   das demais colunas (`.tr:nth-child(odd/even) .td` já cobre isso); a
+   separação visual vem só de uma borda à esquerda um tom mais escura que
+   as bordas normais da tabela. */
+.table-variant-compact .th:last-child,
+.table-variant-compact .td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+}
+.table-variant-compact .td:last-child {
+  border-left: 1px solid var(--color-gray-300);
 }
 
 /* ── Paginação (composição própria a partir de tokens — sem componente

@@ -1,0 +1,249 @@
+/* ══════════════════════════════════════════════════════════
+   NOVO PEDIDO DE VENDA — Vendas > Pedidos de venda > Novo pedido de
+   venda. Mobile first. Mesmo padrão estrutural de formulário já usado em
+   Nova Nota Fiscal/Nova Conta a Pagar/Novo Manifesto: um `.card` por
+   seção (nunca um card único com subseções, diferente de Novo Cadastro/
+   Novo Produto — aqui cada seção tem identidade própria o bastante pra
+   justificar isso, mesmo padrão de Nova Nota Fiscal), grid 1 coluna
+   mobile / 2-3 colunas desktop, rodapé Voltar+Salvar. Classes próprias
+   `npv-*`. ══════════════════════════════════════════════════════════ */
+
+.npv-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.npv-header { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.npv-title { color: var(--color-text-primary); margin: 0; }
+.npv-subtitle { color: var(--color-text-tertiary); margin: 0; }
+
+/* Link "← Voltar" acima do título — mesmo padrão exato já usado em Novo
+   Manifesto/Detalhes do Pedido de Venda (`.nm-back`/`.pvd-back`), não um
+   botão. */
+.npv-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.npv-back:hover { color: var(--color-text-primary); }
+
+/* "(opcional)" discreto no título de uma seção — mesmo tratamento (peso
+   regular, cor terciária) já usado em `.novo-estoque-optional-tag` pro
+   mesmo propósito num label de campo. */
+.npv-optional-tag {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* Reforço de especificidade: RadioButton.module.css (Modalidade de venda/
+   Condição de pagamento) declara `.label{font-weight:bold;color:text-
+   primary;margin-bottom:xs}` — mesma classe usada pelos labels de campo de
+   Input/Dropdown (`.label{font-weight:medium;color:text-secondary}`),
+   carregado antes no <head>, então perdia. Mesma colisão já documentada em
+   Balancete/DRE/Natureza da Operação/Estoque — reafirma aqui os valores
+   corretos do componente Input, alinhando com o padrão de "Incluir
+   lançamento" (que não carrega RadioButton e nunca teve esse problema). */
+.npv-page .label,
+#npv-novo-deposito-overlay .label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--color-text-secondary);
+  margin-bottom: 0;
+}
+
+#npv-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.npv-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+.npv-card .cardHeader { padding: 0; }
+
+/* Grid sempre em pares de 2 colunas (nunca 3, mesmo em telas largas) —
+   toda seção do formulário foi desenhada em pares "campo | campo" ou campo
+   sozinho ocupando a linha inteira (`.npv-span-2`); um 3º trilho quebraria
+   esse pareamento (ex.: Data | Natureza ficaria ao lado de um começo de
+   Cliente cortado). Mesmo grid de 2 colunas já usado em Novo Produto/Novo
+   Cadastro — "grid padrão do Nivelo", não um valor novo inventado aqui. */
+.npv-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .npv-grid { grid-template-columns: 1fr 1fr; }
+  .npv-span-2 { grid-column: span 2; }
+}
+
+/* ── Info do cliente selecionado (read-only) ──────────────────────────── */
+.npv-cliente-info {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-sm);
+}
+.npv-cliente-info[hidden] { display: none; }
+@media (min-width: 640px) {
+  .npv-cliente-info { grid-template-columns: repeat(4, 1fr); }
+}
+.npv-cliente-info dt { font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0 0 2px; }
+.npv-cliente-info dd { color: var(--color-text-primary); margin: 0; }
+
+/* ── Radio (Modalidade / Condição de pagamento) — `.group` do
+   RadioButton.module.css já é `flex-direction:column` por padrão, sem
+   precisar de nenhum modificador aqui. ────────────────────────────────── */
+.npv-pagamento-block[hidden] { display: none; }
+.npv-pagamento-block { margin-top: var(--spacing-md); }
+
+/* ── Colisão RadioButton×Input/Dropdown, mesmo fix preventivo já
+   documentado dezenas de vezes neste projeto (Estoque/Balancete/Nova
+   Natureza de Operação/etc). ──────────────────────────────────────────── */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+  width: 100%;
+  height: 44px;
+}
+.npv-textarea.input { height: auto; min-height: 96px; resize: vertical; padding-top: var(--spacing-sm); }
+
+/* Bug real: `Input.module.css`/`Dropdown.module.css`'s `.errorText` tem
+   `display:flex` incondicional — sem essa guarda, toda mensagem de erro
+   aparecia já na abertura do formulário, mesmo sem nenhuma tentativa de
+   salvar. Mesmo padrão de correção já usado em Nova Conta a Pagar/Nova
+   Conta a Receber/Nova Nota Fiscal: erro só aparece quando o `.wrapper`
+   pai ganha a classe `.error` (via JS, só depois de validar de verdade). */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+/* Dropdown.module.css só pinta a borda de erro sob `.hasError` (classe que
+   este projeto não usa) — mesmo fix por página já usado em todo o resto do
+   sistema (Nova Conta a Pagar/Novo Produto/etc): a classe real alternada
+   via JS é `.error` no `.wrapper`. */
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* Bug real: `RadioButton.module.css`'s `.option { display:inline-flex }`
+   (carregado depois de `Dropdown.module.css` no `<head>`, mesma
+   especificidade de 1 classe) vazava pro `.option` das opções dentro de
+   qualquer menu de Dropdown desta tela — as opções apareciam lado a lado
+   em vez de uma abaixo da outra. Reafirmado aqui pra todos os dropdowns da
+   tela (Natureza/Cliente/Produto/Depósito/Unidade/Forma de recebimento/
+   Conta de entrada/Forma de cobrança/Transportadora/Veículo), mesmo padrão
+   já usado em Nova Conta a Pagar/Novo Lançamento de Caixa/Nova Nota
+   Fiscal. */
+.menu .option { display: block; width: 100%; }
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   já documentado dezenas de vezes neste projeto. */
+.overlay[hidden] { display: none; }
+
+/* "+ Adicionar novo depósito", item fixo no fim do menu de Depósito —
+   mesmo visual já usado em Novo Registo de Estoque pro mesmo fluxo
+   (`novo-estoque-local-option-create`). Classe própria (não `.option`) pra
+   não ser tratada como uma opção selecionável pelo `initDropdown()`
+   genérico. */
+.npv-deposito-create-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+  cursor: pointer;
+}
+.npv-deposito-create-option:hover { background: var(--color-bg-brand); }
+
+/* ── Textarea Observações ─────────────────────────────────────────────── */
+.npv-textarea { font-family: inherit; }
+
+/* ── Parcelas (A prazo) ────────────────────────────────────────────────── */
+.npv-parcelas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+.npv-parcelas[hidden] { display: none; }
+
+/* Cada parcela vira um card, mesmo padrão visual já usado no cadastro de
+   veículos da transportadora (Novo Cadastro > Transportadora:
+   `.novo-cadastro-vehicle` — fundo Gray 50, header com título + conteúdo
+   abaixo) em vez de uma tabela genérica, conforme pedido explícito de
+   reaproveitar esse padrão já existente. */
+.npv-parcela-card {
+  background: var(--color-gray-50);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.npv-parcela-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.npv-parcela-title { color: var(--color-text-primary); margin: 0; }
+
+.npv-parcela-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .npv-parcela-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Resumo/validação da soma das parcelas ────────────────────────────── */
+.npv-parcelas-summary[hidden] { display: none; }
+.npv-parcelas-summary { margin-top: var(--spacing-md); }
+.npv-parcelas-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error-fg);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+/* ── Rodapé (Voltar / Salvar pedido) — mesmo padrão de todo formulário do
+   sistema (empilhado invertido no mobile, lado a lado à direita no
+   desktop). ──────────────────────────────────────────────────────────── */
+.npv-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .npv-actions { flex-direction: row; justify-content: flex-end; }
+}
+.npv-actions .btn { width: 100%; justify-content: center; }
+@media (min-width: 640px) {
+  .npv-actions .btn { width: auto; min-width: 160px; }
+}

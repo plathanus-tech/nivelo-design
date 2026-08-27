@@ -1,0 +1,150 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA REMESSA — Vendas > Pedidos de venda > Novo documento > Nova
+   remessa. Mobile first. Mesmo padrão estrutural/visual de Novo Pedido de
+   Venda (page-novo-pedido-venda.css) — mesmo grid, mesmos espaçamentos,
+   mesmos estados de validação, mesmo padrão de botões — copiado (não
+   compartilhado) com prefixo próprio `nr-*`, seguindo a mesma convenção já
+   usada pra outras telas gêmeas do sistema (Nova Conta a Pagar/Nova Conta
+   a Receber). A diferença entre as duas telas está nos campos/regras de
+   negócio, não no design. ══════════════════════════════════════════════ */
+
+.nr-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.nr-header { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.nr-title { color: var(--color-text-primary); margin: 0; }
+.nr-subtitle { color: var(--color-text-tertiary); margin: 0; }
+
+/* Link "← Voltar" acima do título — mesmo padrão exato já usado em Novo
+   Pedido de Venda/Novo Manifesto (`.npv-back`/`.nm-back`), não um botão. */
+.nr-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nr-back:hover { color: var(--color-text-primary); }
+
+/* "(opcional)" discreto no título de uma seção — mesmo tratamento já
+   usado em `.npv-optional-tag`. */
+.nr-optional-tag {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+/* Reforço de especificidade: RadioButton.module.css não é carregado nesta
+   tela (Nova Remessa não tem nenhum grupo de radio), mas o `.label`
+   correto de Input/Dropdown é reafirmado aqui do mesmo jeito, por
+   consistência com Novo Pedido de Venda e segurança caso um radio seja
+   adicionado no futuro (mesma colisão já documentada dezenas de vezes
+   neste projeto). */
+.nr-page .label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--color-text-secondary);
+  margin-bottom: 0;
+}
+
+#nr-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.nr-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+.nr-card .cardHeader { padding: 0; }
+
+/* Mesmo grid de 2 colunas "padrão do Nivelo" já usado em Novo Pedido de
+   Venda/Novo Produto/Novo Cadastro. */
+.nr-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .nr-grid { grid-template-columns: 1fr 1fr; }
+  .nr-span-2 { grid-column: span 2; }
+}
+
+/* ── Info do destinatário selecionado (read-only) ─────────────────────── */
+.nr-destinatario-info {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-sm);
+}
+.nr-destinatario-info[hidden] { display: none; }
+@media (min-width: 640px) {
+  .nr-destinatario-info { grid-template-columns: repeat(4, 1fr); }
+}
+.nr-destinatario-info dt { font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0 0 2px; }
+.nr-destinatario-info dd { color: var(--color-text-primary); margin: 0; }
+
+/* ── Colisão RadioButton×Input/Dropdown — mesmo fix preventivo já
+   documentado dezenas de vezes neste projeto. RadioButton não é usado
+   aqui hoje, mas o guard fica pronto (mesmo princípio de "Data"/"Valor"
+   já usados em telas irmãs). ────────────────────────────────────────── */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+  width: 100%;
+  height: 44px;
+}
+.nr-textarea.input { height: auto; min-height: 96px; resize: vertical; padding-top: var(--spacing-sm); }
+.nr-textarea { font-family: inherit; }
+
+/* Bug real: `Input.module.css`/`Dropdown.module.css`'s `.errorText` tem
+   `display:flex` incondicional — mesmo padrão de correção já usado em
+   Novo Pedido de Venda/Nova Conta a Pagar/Nova Nota Fiscal: erro só
+   aparece quando o `.wrapper` pai ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* Bug real: `RadioButton.module.css`'s `.option{display:inline-flex}`
+   (carregado só se algum radio existir na página — reafirmado aqui por
+   segurança) vazaria pro `.option` das opções de Dropdown. */
+.menu .option { display: block; width: 100%; }
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   já documentado dezenas de vezes neste projeto (nenhum modal nesta tela
+   hoje, guard mantido por consistência/segurança). */
+.overlay[hidden] { display: none; }
+
+/* ── Rodapé (Voltar / Salvar remessa) — mesmo padrão de todo formulário
+   do sistema (empilhado invertido no mobile, lado a lado à direita no
+   desktop). ────────────────────────────────────────────────────────── */
+.nr-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .nr-actions { flex-direction: row; justify-content: flex-end; }
+}
+.nr-actions .btn { width: 100%; justify-content: center; }
+@media (min-width: 640px) {
+  .nr-actions .btn { width: auto; min-width: 160px; }
+}
