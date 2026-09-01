@@ -77,10 +77,29 @@
 /* ── Bolhas de mensagem ───────────────────────────────────────────────── */
 .nc-message {
   display: flex;
+  flex-direction: column;
+  gap: 2px;
   max-width: 78%;
 }
-.nc-message-usuario { align-self: flex-end; }
-.nc-message-assistente { align-self: flex-start; }
+.nc-message-usuario { align-self: flex-end; align-items: flex-end; }
+.nc-message-assistente { align-self: flex-start; align-items: flex-start; }
+
+/* Identificação acima de CADA balão (não mais 1x no cabeçalho da conversa,
+   ver histórico do round anterior): "Assistente de IA" nas respostas do
+   assistente, Nome · Número do contato de WhatsApp (fonte:
+   window.NiveloWhatsappNumeros — ver getContactLabel em nova-conversa.js)
+   acima de cada balão do PRODUTOR. Mesmo tratamento visual discreto
+   (menor destaque que o conteúdo da mensagem) nos dois casos — só a cor
+   distingue quem está falando (marca pro assistente, terciária/neutra pro
+   produtor), reforçando o alinhamento/cor de bolha que já diferenciam os
+   dois lados. */
+.nc-bubble-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-brand);
+  padding: 0 var(--spacing-2xs);
+}
+.nc-bubble-label-contact { color: var(--color-text-tertiary); }
 
 .nc-bubble {
   display: flex;
@@ -169,6 +188,48 @@
   color: var(--color-text-tertiary);
   margin: 0;
 }
+
+/* ── Busca por data (painel estreito, DatePicker real em vez de Popover
+   próprio — mesma técnica de "Atualizado a partir de" em Produtos) ────── */
+.nc-history-date-filter { width: 100%; }
+.nc-history-date-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.nc-history-date-row .dpTrigger {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+.nc-history-date-clear {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.nc-history-date-clear[hidden] { display: none; }
+
+/* opts.typable:true (date-picker.js) — `.dpTrigger` vira um wrapper <div>
+   em volta do ícone + de um <input> de texto real (em vez do <button> que
+   os demais ~15 consumidores do DatePicker usam), permitindo digitar
+   dd/mm/aaaa OU clicar/focar pra abrir o calendário. */
+.nc-history-date-row .dpTriggerTypable { cursor: text; }
+.nc-history-date-row .dpTriggerInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: inherit;
+  color: var(--color-text-primary);
+}
+.nc-history-date-row .dpTriggerInput:focus { outline: none; }
+.nc-history-date-row .dpTriggerInput::placeholder { color: var(--color-text-disabled); }
+
 .nc-history-list {
   flex: 1;
   overflow-y: auto;
@@ -203,6 +264,13 @@
   white-space: nowrap;
 }
 .nc-history-item-meta { color: var(--color-text-tertiary); }
+
+.nc-history-empty {
+  color: var(--color-text-tertiary);
+  text-align: center;
+  padding: var(--spacing-md) 0;
+  margin: 0;
+}
 
 .nc-loadmore-btn { width: 100%; flex-shrink: 0; }
 .nc-loadmore-btn[hidden] { display: none; }

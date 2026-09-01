@@ -4,7 +4,7 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DRE (V2) — Nivelo</title>
+  <title>DRE gerencial (V2) — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
@@ -180,7 +180,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -268,7 +272,7 @@
               <i data-lucide="arrow-left" width="18" height="18"></i>
               Voltar
             </a>
-            <h1 class="dre-title text-heading-6">Demonstração do Resultado do Exercício (DRE)</h1>
+            <h1 class="dre-title text-heading-6">Demonstração do Resultado do Exercício (DRE gerencial)</h1>
             <p class="dre-sub text-body-s">Analise o desempenho financeiro do ano por meio das receitas, despesas e resultado obtido.</p>
           </div>
 
@@ -344,7 +348,7 @@
 
             <div class="dre-resultado-header">
               <div class="dre-resultado-title-block">
-                <h2 class="dre-resultado-title text-subtitle-m">Demonstração do Resultado do Exercício (DRE)</h2>
+                <h2 class="dre-resultado-title text-subtitle-m">Demonstração do Resultado do Exercício (DRE gerencial)</h2>
                 <p class="dre-resultado-resumo text-body-s" id="dre-resumo-filtros">—</p>
               </div>
               <div class="dre-resultado-actions">
@@ -427,7 +431,7 @@
 
             <div class="card dre-table-card">
               <div class="cardHeader">
-                <h3 class="title">Demonstração do Resultado do Exercício</h3>
+                <h3 class="title">Demonstração do Resultado do Exercício (DRE gerencial)</h3>
                 <p class="dre-table-caption text-body-xs">Valores em R$, sem centavos.</p>
               </div>
               <div class="dre-table-scroll-shell">

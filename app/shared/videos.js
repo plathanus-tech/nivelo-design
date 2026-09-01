@@ -12,6 +12,9 @@
   // Mesmo padrão de cor+ícone por categoria já usado no Canal de Ideias
   // (CATEGORIA_COR/CATEGORIA_ICONE em canal-ideias.js): ícone sempre
   // reaproveitado do mesmo módulo em outra parte do sistema (Sidebar/Header).
+  // 3 categorias novas (Cadastro/Vendas/Configuração) reaproveitam a MESMA
+  // cor+ícone já usados pra elas no Canal de Ideias (canal-ideias.js),
+  // mantendo o padrão visual consistente entre as duas telas.
   var CATEGORIA_COR = {
     'Dashboard': 'warning',
     'Primeiros passos': 'info',
@@ -21,6 +24,9 @@
     'Caderno de Campo': 'violet',
     'Assistente IA': 'pink',
     'Relatórios': 'indigo',
+    'Cadastro': 'violet',
+    'Vendas': 'warning',
+    'Configuração': 'success',
     'Outros': 'info'
   };
   var CATEGORIA_ICONE = {
@@ -32,6 +38,9 @@
     'Caderno de Campo': 'book-open',
     'Assistente IA': 'bot',
     'Relatórios': 'bar-chart-3',
+    'Cadastro': 'folder-plus',
+    'Vendas': 'shopping-cart',
+    'Configuração': 'settings',
     'Outros': 'leaf'
   };
   var TODAS_ICONE = 'layout-grid';

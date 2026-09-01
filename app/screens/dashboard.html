@@ -178,7 +178,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -360,10 +364,6 @@
                 <div class="dash-headline">
                   <span class="dash-headline-value" id="estoque-headline-value">2.430 sc</span>
                   <span class="dash-headline-caption text-12-regular">Total em estoque</span>
-                  <!-- Total comprometido agregado, logo abaixo do total de sacas — mesma
-                       dimensão que cada linha por cultura já mostra individualmente, só
-                       resumida aqui pra dar uma leitura rápida sem precisar somar as 3 linhas. -->
-                  <span class="dash-comprometido-total text-12-regular" id="estoque-comprometido-total">450 sc comprometidas de 2.430 sc (18%)</span>
                 </div>
                 <div class="dash-stat-list" data-content>
                   <div class="dash-stat-row">
@@ -475,7 +475,7 @@
                 <div class="dash-stat-list">
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Vencidas</span>
+                      <span class="dash-stat-label text-16-regular is-vencida">Vencidas</span>
                     </div>
                     <div class="dash-stat-value">
                       <span class="dash-stat-value-main text-subtitle-m is-vencida">R$ 22.000,00</span>
@@ -525,7 +525,7 @@
                 <div class="dash-stat-list">
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Vencidas</span>
+                      <span class="dash-stat-label text-16-regular is-vencida">Vencidas</span>
                     </div>
                     <div class="dash-stat-value">
                       <span class="dash-stat-value-main text-subtitle-m is-vencida">R$ 64.000,00</span>

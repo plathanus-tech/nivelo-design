@@ -79,18 +79,6 @@
 }
 .fazenda-detalhe-location svg { flex-shrink: 0; }
 
-.fazenda-detalhe-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  flex-shrink: 0;
-}
-
-#nova-anotacao-fazenda-btn { flex: 1; justify-content: center; }
-@media (min-width: 640px) {
-  #nova-anotacao-fazenda-btn { flex: none; }
-}
-
 /* ── Toast de sucesso ─────────────────────────────────────────────────────── */
 .fazenda-detalhe-toast-region {
   position: fixed;

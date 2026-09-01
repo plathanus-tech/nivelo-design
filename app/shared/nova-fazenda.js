@@ -138,10 +138,19 @@
     matriculaInput.value = editingFazenda.matricula || '';
   }
 
-  // Máscara de CNPJ (mesma lógica de novo-cadastro.js, isolada só pro CNPJ —
-  // esta tela nunca alterna pra CPF, é sempre pessoa jurídica/propriedade).
-  function formatCNPJ(value) {
-    var digits = value.replace(/\D/g, '').slice(0, 14);
+  // Documento único (CNPJ ou CPF): máscara auto-detectada por tamanho, mesma
+  // técnica já usada em login.js/cadastro.js — formata como CPF enquanto
+  // tiver até 11 dígitos, vira CNPJ automaticamente a partir do 12º dígito,
+  // sem nenhum seletor de tipo. Validação real com dígito verificador dos
+  // dois documentos (não só contagem de dígitos).
+  function formatCPF(digits) {
+    var out = digits.slice(0, 3);
+    if (digits.length > 3) out += '.' + digits.slice(3, 6);
+    if (digits.length > 6) out += '.' + digits.slice(6, 9);
+    if (digits.length > 9) out += '-' + digits.slice(9, 11);
+    return out;
+  }
+  function formatCNPJ(digits) {
     var out = digits.slice(0, 2);
     if (digits.length > 2) out += '.' + digits.slice(2, 5);
     if (digits.length > 5) out += '.' + digits.slice(5, 8);
@@ -149,12 +158,61 @@
     if (digits.length > 12) out += '-' + digits.slice(12, 14);
     return out;
   }
-  function isValidCNPJ(value) {
-    return value.replace(/\D/g, '').length === 14;
+  function formatCpfCnpjAuto(value) {
+    var digits = value.replace(/\D/g, '').slice(0, 14);
+    return digits.length > 11 ? formatCNPJ(digits) : formatCPF(digits);
   }
+
+  function isValidCPF(value) {
+    var digits = value.replace(/\D/g, '');
+    if (digits.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(digits)) return false;
+
+    function checkDigit(base) {
+      var sum = 0;
+      for (var i = 0; i < base.length; i++) {
+        sum += parseInt(base.charAt(i), 10) * (base.length + 1 - i);
+      }
+      var rest = (sum * 10) % 11;
+      return rest === 10 ? 0 : rest;
+    }
+
+    var d1 = checkDigit(digits.slice(0, 9));
+    var d2 = checkDigit(digits.slice(0, 9) + d1);
+    return digits.slice(9, 11) === String(d1) + String(d2);
+  }
+
+  function isValidCNPJ(value) {
+    var digits = value.replace(/\D/g, '');
+    if (digits.length !== 14) return false;
+    if (/^(\d)\1{13}$/.test(digits)) return false;
+
+    function checkDigit(base, weights) {
+      var sum = 0;
+      for (var i = 0; i < base.length; i++) {
+        sum += parseInt(base.charAt(i), 10) * weights[i];
+      }
+      var rest = sum % 11;
+      return rest < 2 ? 0 : 11 - rest;
+    }
+
+    var w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    var w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    var base = digits.slice(0, 12);
+    var d1 = checkDigit(base, w1);
+    var d2 = checkDigit(base + d1, w2);
+    return digits.slice(12, 14) === String(d1) + String(d2);
+  }
+
+  function isValidCpfCnpj(value) {
+    var digits = value.replace(/\D/g, '');
+    if (!digits) return false;
+    return digits.length > 11 ? isValidCNPJ(value) : isValidCPF(value);
+  }
+
   cnpjInput.addEventListener('input', function () {
-    cnpjInput.value = formatCNPJ(cnpjInput.value);
-    if (cnpjField.classList.contains('error') && isValidCNPJ(cnpjInput.value)) {
+    cnpjInput.value = formatCpfCnpjAuto(cnpjInput.value);
+    if (cnpjField.classList.contains('error') && isValidCpfCnpj(cnpjInput.value)) {
       cnpjField.classList.remove('error');
     }
   });
@@ -177,7 +235,7 @@
     nomeField.classList.toggle('error', nomeInvalid);
     var proprietarioInvalid = !proprietarioInput.value.trim();
     proprietarioField.classList.toggle('error', proprietarioInvalid);
-    var cnpjInvalid = !isValidCNPJ(cnpjInput.value);
+    var cnpjInvalid = !isValidCpfCnpj(cnpjInput.value);
     cnpjField.classList.toggle('error', cnpjInvalid);
     var ieInvalid = !ieInput.value.trim();
     ieField.classList.toggle('error', ieInvalid);

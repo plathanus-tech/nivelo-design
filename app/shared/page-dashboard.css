@@ -336,13 +336,10 @@
   color: var(--color-text-tertiary);
 }
 
-/* ── Estoque de grãos: comprometido (total agregado no headline + barra/
-   rótulo por cultura, dentro de cada `.dash-stat-value`) — card promovido
-   da versão alternativa de teste (round 2026-08-03), que substituiu de vez
-   o card antigo baseado em valor estimado (R$). ─────────────────────────── */
-.dash-comprometido-total {
-  color: var(--color-text-tertiary);
-}
+/* ── Estoque de grãos: comprometido (barra/rótulo por cultura, dentro de
+   cada `.dash-stat-value`) — card promovido da versão alternativa de teste
+   (round 2026-08-03), que substituiu de vez o card antigo baseado em valor
+   estimado (R$). ─────────────────────────────────────────────────────── */
 .dash-comprometido-bar {
   width: 96px;
   height: 4px;
@@ -431,7 +428,8 @@
 
 /* ── Vencidas (Contas a pagar/receber) — sempre em vermelho, nas 2 telas ── */
 
-.dash-stat-value-main.is-vencida {
+.dash-stat-value-main.is-vencida,
+.dash-stat-label.is-vencida {
   color: var(--color-text-error);
 }
 

@@ -7,18 +7,20 @@
    1. Sem botão "Nova nota fiscal" (removido do HTML por completo — a
       emissão passa a ser sempre acionada a partir de Pedido de Venda ou
       Remessa, nunca criada direto por aqui).
-   2. Coluna Ações de Notas de saída mais larga, pra caber até 4 ícones
-      (Ver detalhes/Baixar PDF/Baixar XML/Cancelar NF-e — Corrigir nota
-      substitui Cancelar quando a nota está rejeitada, nunca os dois juntos).
+   2. Coluna Ações de Notas de saída mais larga, pra caber até 5 ícones
+      (Ver detalhes/Baixar PDF/Enviar para WhatsApp/Baixar XML/Cancelar
+      NF-e — Corrigir nota substitui Cancelar quando a nota está rejeitada,
+      nunca os dois juntos); Notas de entrada até 4 (sem Corrigir/Cancelar).
    3. Campo "Origem" no Agrupamento de Filtros (mesmo `.nf-dropdown` já
       estilizado por page-notas-fiscais.css) — visível só na aba Notas de
       saída, escondido via JS quando a aba ativa é Notas de entrada.
 
    V1 (notas-fiscais.html) não foi tocada — este arquivo não é carregado lá. */
 
-/* ── Coluna Ações — Notas de saída ganha mais espaço (até 4 ícones) ──────── */
-#panel-saida .th:nth-child(7) { width: 170px; }
-#panel-entrada .th:nth-child(7) { width: 120px; }
+/* ── Coluna Ações — Notas de saída ganha mais espaço (até 5 ícones,
+   Notas de entrada até 4, ambas +1 depois de "Enviar para WhatsApp"). ──── */
+#panel-saida .th:nth-child(7) { width: 210px; }
+#panel-entrada .th:nth-child(7) { width: 160px; }
 
 /* ── Campo "Origem" no Agrupamento de Filtros: escondido via JS (não CSS)
    quando a aba ativa é Notas de entrada — guard padrão do projeto pra

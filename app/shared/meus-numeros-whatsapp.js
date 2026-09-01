@@ -50,7 +50,10 @@
     return digits.length === 10 || digits.length === 11;
   }
 
-  // ---------- Campo do número (direto na tela, sempre editável) ----------
+  // ---------- Campos (direto na tela, sempre editáveis) ----------
+  var nomeInput = document.getElementById('mnw-nome');
+  var nomeField = document.getElementById('mnw-nome-field');
+  var nomeErrorTextEl = document.getElementById('mnw-nome-error-text');
   var numeroInput = document.getElementById('mnw-numero');
   var numeroField = document.getElementById('mnw-numero-field');
   var numeroErrorTextEl = document.getElementById('mnw-numero-error-text');
@@ -60,6 +63,14 @@
   var connectBtn = document.getElementById('mnw-connect-btn');
   var disconnectBtn = document.getElementById('mnw-disconnect-btn');
 
+  function setNomeError(message) {
+    nomeErrorTextEl.textContent = message;
+    nomeField.classList.add('error');
+  }
+  function clearNomeError() {
+    nomeField.classList.remove('error');
+  }
+
   function setNumeroError(message) {
     numeroErrorTextEl.textContent = message;
     numeroField.classList.add('error');
@@ -67,6 +78,10 @@
   function clearNumeroError() {
     numeroField.classList.remove('error');
   }
+
+  nomeInput.addEventListener('input', function () {
+    if (nomeField.classList.contains('error')) clearNomeError();
+  });
 
   numeroInput.addEventListener('input', function (event) {
     var cursorWasAtEnd = event.target.selectionStart === event.target.value.length;
@@ -82,19 +97,32 @@
     var conectado = window.NiveloWhatsappNumeros.isConnected();
     if (conectado) {
       var numeroFormatado = window.NiveloWhatsappNumeros.formatNumero(window.NiveloWhatsappNumeros.getNumero());
+      var nomeConectado = window.NiveloWhatsappNumeros.getNome();
+      nomeInput.value = nomeConectado || '';
       numeroInput.value = numeroFormatado;
       statusBadge.hidden = false;
-      statusBadgeTextEl.textContent = numeroFormatado + ' conectado';
+      statusBadgeTextEl.textContent = (nomeConectado ? nomeConectado + ' · ' : '') + numeroFormatado + ' conectado';
       numeroHelperEl.hidden = true;
       connectBtn.textContent = 'Atualizar número';
       disconnectBtn.hidden = false;
     } else {
+      nomeInput.value = '';
       numeroInput.value = '+55 ';
       statusBadge.hidden = true;
       numeroHelperEl.hidden = false;
       connectBtn.textContent = 'Conectar';
       disconnectBtn.hidden = true;
     }
+  }
+
+  function validateNome() {
+    var nome = nomeInput.value.trim();
+    if (!nome) {
+      setNomeError('Informe o nome.');
+      return false;
+    }
+    clearNomeError();
+    return true;
   }
 
   function validateNumero() {
@@ -121,7 +149,7 @@
   function openConnectDialog() {
     var jaConectado = window.NiveloWhatsappNumeros.isConnected();
     var numeroFormatado = window.NiveloWhatsappNumeros.formatNumero(numeroInput.value.trim());
-    connectNumeroEl.textContent = numeroFormatado;
+    connectNumeroEl.textContent = nomeInput.value.trim() + ' · ' + numeroFormatado;
     if (jaConectado) {
       connectTitle.textContent = 'Atualizar número de WhatsApp';
       connectText.textContent = 'Este número vai substituir o atual conectado ao Assistente de IA. O número anterior deixará de poder conversar com o Assistente:';
@@ -138,13 +166,17 @@
   }
 
   connectBtn.addEventListener('click', function () {
-    if (!validateNumero()) return;
+    // Nome primeiro (ordem de leitura do formulário), mas os dois campos
+    // são validados sempre, mesmo se o primeiro já falhar.
+    var nomeOk = validateNome();
+    var numeroOk = validateNumero();
+    if (!nomeOk || !numeroOk) return;
     openConnectDialog();
   });
 
   connectConfirmBtn.addEventListener('click', function () {
     var jaConectado = window.NiveloWhatsappNumeros.isConnected();
-    var registro = window.NiveloWhatsappNumeros.connect(numeroInput.value.trim());
+    var registro = window.NiveloWhatsappNumeros.connect(numeroInput.value.trim(), nomeInput.value.trim());
     simulateWelcomeMessage(registro);
     closeConnectDialog();
     render();
@@ -197,6 +229,7 @@
     window.NiveloWhatsappNumeros.disconnect();
     closeDisconnectDialog();
     clearNumeroError();
+    clearNomeError();
     render();
     showSuccessToast('Número de WhatsApp desconectado.', 'Esse número não pode mais conversar com o Assistente de IA até que um novo número seja conectado.');
   });

@@ -43,6 +43,26 @@
     return 'TED';
   }
 
+  // Banco (coluna nova) — mesma técnica já usada em caixa-v2.js's aba "Contas
+  // financeiras": resolve a Conta Bancária REAL vinculada à Conta Financeira do
+  // lançamento (window.NiveloContasBancarias) e, a partir dela, o nome do banco
+  // real (catálogo Febraban, window.NiveloBancosCatalogo) — nunca o nome da
+  // própria Conta Financeira. Lançamentos sem Conta Bancária vinculada (ex.
+  // "Caixa Geral", dinheiro em espécie) mostram "—", nunca um banco inventado.
+  function findContaBancariaByFinanceira(codigoFinanceira) {
+    if (!window.NiveloContasBancarias || codigoFinanceira == null) return null;
+    var lista = window.NiveloContasBancarias.list().filter(function (c) {
+      return c.contaFinanceiraCodigo === codigoFinanceira;
+    });
+    return lista[0] || null;
+  }
+  function resolveBancoNome(l) {
+    var bancaria = findContaBancariaByFinanceira(l.contaFinanceiraCodigo);
+    if (!bancaria) return '—';
+    var banco = window.NiveloBancosCatalogo ? window.NiveloBancosCatalogo.findByCodigo(bancaria.bancoCodigo) : null;
+    return banco ? banco.nome : '—';
+  }
+
   // ---------- Toast (validação de filtros) ----------
   var toastRegion = document.getElementById('toast-region');
   function showToast(title, message) {
@@ -145,6 +165,7 @@
       saldoCorrente += entrada - saida;
       return {
         data: l.data,
+        banco: resolveBancoNome(l),
         documento: l.codigo,
         documentoTipo: inferDocumentoFiscal(l),
         historico: l.historico,
@@ -251,6 +272,7 @@
       return (
         '<tr class="tr">' +
           '<td class="td">' + formatDataPt(l.data) + '</td>' +
+          '<td class="td">' + l.banco + '</td>' +
           '<td class="td"><span class="lcdpr-doc-tipo">' + l.documentoTipo + '</span><span class="lcdpr-doc-ref">' + l.documento + '</span></td>' +
           '<td class="td">' + l.historico + '</td>' +
           '<td class="td">' + l.categoria + '</td>' +
@@ -263,13 +285,13 @@
 
     tfoot.innerHTML =
       '<tr class="tr lcdpr-foot-row">' +
-        '<td class="td lcdpr-td-label" colspan="4">Total</td>' +
+        '<td class="td lcdpr-td-label" colspan="5">Total</td>' +
         '<td class="td lcdpr-foot-value">' + formatMoeda(report.totalReceitas) + '</td>' +
         '<td class="td lcdpr-foot-value">' + formatMoeda(report.totalDespesas) + '</td>' +
         '<td class="td lcdpr-foot-value">' + formatMoeda(report.saldoFinal) + '</td>' +
       '</tr>' +
       '<tr class="tr lcdpr-foot-row lcdpr-foot-resultado">' +
-        '<td class="td lcdpr-td-label" colspan="4">Resultado do período</td>' +
+        '<td class="td lcdpr-td-label" colspan="5">Resultado do período</td>' +
         '<td class="td lcdpr-foot-value" colspan="3">' + formatMoeda(report.resultado) + '</td>' +
       '</tr>';
 
@@ -355,7 +377,7 @@
 
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
-    doc.text('Livro Caixa Digital do Produtor Rural (LCDPR)', marginX, y);
+    doc.text('Livro caixa', marginX, y);
     doc.setFont(undefined, 'normal');
     y += 22;
 
@@ -375,12 +397,13 @@
     doc.text('Resultado do período: ' + formatMoeda(report.resultado), marginX, y); y += 20;
     doc.setFont(undefined, 'normal');
 
-    var colX = { data: marginX, doc: marginX + 55, hist: marginX + 150, nat: marginX + 300, ent: marginX + 380, sai: marginX + 445, sal: marginX + 505 };
+    var colX = { data: marginX, banco: marginX + 50, doc: marginX + 115, hist: marginX + 195, nat: marginX + 330, ent: marginX + 400, sai: marginX + 460, sal: marginX + 515 };
 
     function drawHeader() {
       doc.setFontSize(9);
       doc.setFont(undefined, 'bold');
       doc.text('Data', colX.data, y);
+      doc.text('Banco', colX.banco, y);
       doc.text('Documento', colX.doc, y);
       doc.text('Histórico', colX.hist, y);
       doc.text('Natureza', colX.nat, y);
@@ -398,9 +421,10 @@
     report.linhas.forEach(function (l) {
       if (y > pageBottom) { doc.addPage(); y = 50; drawHeader(); }
       doc.text(formatDataPt(l.data), colX.data, y);
+      doc.text(String(l.banco).slice(0, 14), colX.banco, y);
       doc.text(l.documentoTipo + ' ' + l.documento, colX.doc, y);
-      doc.text(String(l.historico).slice(0, 26), colX.hist, y);
-      doc.text(String(l.categoria).slice(0, 16), colX.nat, y);
+      doc.text(String(l.historico).slice(0, 22), colX.hist, y);
+      doc.text(String(l.categoria).slice(0, 14), colX.nat, y);
       if (l.entrada) doc.text(formatMoeda(l.entrada), colX.ent, y);
       if (l.saida) doc.text(formatMoeda(l.saida), colX.sai, y);
       doc.text(formatMoeda(l.saldo), colX.sal, y);
@@ -428,7 +452,7 @@
     if (!window.XLSX) { showToast('Não foi possível exportar', 'A biblioteca de planilhas não carregou. Tente novamente.'); return; }
     var g = report.dadosGerais;
     var rows = [
-      ['Livro Caixa Digital do Produtor Rural (LCDPR) - V2'],
+      ['Livro caixa - V2'],
       ['Produtor Rural', g.produtor],
       ['CPF', g.cpf],
       ['Exercício', g.exercicio],
@@ -446,10 +470,11 @@
       rows.push([row.mes, row.totalDespesas, row.totalReceitas]);
     });
     rows.push([]);
-    rows.push(['Data', 'Documento Fiscal / Documento', 'Histórico', 'Natureza', 'Entradas', 'Saídas', 'Saldo']);
+    rows.push(['Data', 'Banco', 'Documento Fiscal / Documento', 'Histórico', 'Natureza', 'Entradas', 'Saídas', 'Saldo']);
     report.linhas.forEach(function (l) {
       rows.push([
         formatDataPt(l.data),
+        l.banco,
         l.documentoTipo + ' ' + l.documento,
         l.historico,
         l.categoria,
@@ -458,11 +483,11 @@
         l.saldo
       ]);
     });
-    rows.push(['Total', '', '', '', report.totalReceitas, report.totalDespesas, report.saldoFinal]);
-    rows.push(['Resultado do período', '', '', '', '', '', report.resultado]);
+    rows.push(['Total', '', '', '', '', report.totalReceitas, report.totalDespesas, report.saldoFinal]);
+    rows.push(['Resultado do período', '', '', '', '', '', '', report.resultado]);
 
     var ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [{ wch: 26 }, { wch: 20 }, { wch: 20 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
+    ws['!cols'] = [{ wch: 14 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'LCDPR');
     XLSX.writeFile(wb, 'LCDPR-V2-' + g.exercicio + '.xlsx');

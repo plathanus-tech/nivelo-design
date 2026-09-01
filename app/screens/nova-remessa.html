@@ -176,7 +176,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -440,6 +444,17 @@
 
           </form>
 
+          <!-- Nota para desenvolvimento (nunca visível na interface do
+               produto — só quando "Notas para desenvolvimento" está
+               habilitado no Navegador de Protótipos, ver dev-notes.js). -->
+          <div class="dev-note" data-dev-note>
+            <span class="dev-note-tag">Nota para desenvolvimento</span>
+            <p class="dev-note-text text-12-regular">
+              Nova remessa não impacta em outras páginas do sistema, não sendo lançada em
+              nenhum outro local.
+            </p>
+          </div>
+
         </div>
       </main>
 
@@ -452,6 +467,7 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/dev-notes.js"></script>
   <script src="../shared/date-picker.js"></script>
   <script src="../shared/cadastros-data.js"></script>
   <script src="../shared/produtos-data.js"></script>

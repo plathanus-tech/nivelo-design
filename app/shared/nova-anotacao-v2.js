@@ -226,8 +226,12 @@
     custoCalculadoInput.value = formatBRL(custoMedio * quantidade);
   }
 
+  // Só produtos de uso (nunca produtos de venda, ex. Soja/Milho/Trigo/Sorgo/
+  // Café/Cana-de-açúcar) e ativos — mesmo cuidado já usado no combobox de
+  // Colheita logo abaixo (categoria === 'Grãos' && status === 'ativo').
+  var PRODUTOS_USO = window.NiveloProdutos.list().filter(function (p) { return p.tipoProduto === 'uso' && p.status === 'ativo'; });
   var produtoInsumoCombobox = initProductCombobox('produto-insumo-field', 'na-produto-insumo', 'produto-insumo-menu',
-    window.NiveloProdutos.list(),
+    PRODUTOS_USO,
     function (produto) {
       produtoInsumoField.classList.remove('error');
       unidadeInsumoInput.value = siglaUnidade(produto.unidade);
@@ -250,8 +254,14 @@
     depositoField.classList.remove('error');
   });
 
-  // ---------- Despesa manual: Categoria + Valor (máscara) ----------
+  // ---------- Despesa manual: Categoria (opcional, catálogo real de
+  // Categorias Financeiras) + Valor (máscara) ----------
   var categoriaDespesaField = document.getElementById('categoria-despesa-field');
+  var categoriaDespesaMenu = categoriaDespesaField.querySelector('[data-dropdown-menu]');
+  var categoriasFinanceirasAtivas = window.NiveloCategoriasFinanceiras.list().filter(function (c) { return c.ativo; });
+  categoriaDespesaMenu.innerHTML = categoriasFinanceirasAtivas.map(function (c) {
+    return '<div class="option" data-value="' + c.codigo + '">' + c.descricao + '</div>';
+  }).join('');
   var categoriaDespesaDropdown = initDropdown(categoriaDespesaField, function () {
     categoriaDespesaField.classList.remove('error');
   });
@@ -300,11 +310,6 @@
     }
   }
 
-  var tituloInput = document.getElementById('na-titulo');
-  var tituloField = document.getElementById('titulo-field');
-  tituloInput.addEventListener('input', function () {
-    if (tituloInput.value.trim()) tituloField.classList.remove('error');
-  });
   var descricaoInput = document.getElementById('na-descricao');
   var descricaoField = document.getElementById('descricao-field');
   descricaoInput.addEventListener('input', function () {
@@ -324,14 +329,12 @@
     }
 
     if (tipo === 'anotacao') {
-      markInvalid(tituloField, !tituloInput.value.trim());
       markInvalid(descricaoField, !descricaoInput.value.trim());
     } else if (tipo === 'aplicacao-insumo') {
       markInvalid(produtoInsumoField, !produtoInsumoCombobox.getSelected());
       markInvalid(document.getElementById('quantidade-insumo-field'), !(Number(quantidadeInsumoInput.value) > 0));
       markInvalid(depositoField, !depositoField.dataset.value);
     } else if (tipo === 'despesa-manual') {
-      markInvalid(categoriaDespesaField, !categoriaDespesaField.dataset.value);
       markInvalid(valorDespesaField, !(valorDespesaCentavos > 0));
     } else if (tipo === 'colheita') {
       markInvalid(produtoColheitaField, !produtoColheitaField.dataset.value);
@@ -350,7 +353,6 @@
     };
 
     if (tipo === 'anotacao') {
-      registro.titulo = tituloInput.value.trim();
       registro.descricao = descricaoInput.value.trim();
     } else if (tipo === 'aplicacao-insumo') {
       var produto = produtoInsumoCombobox.getSelected();
@@ -362,7 +364,7 @@
       registro.depositoNome = depositoField.dataset.value;
       registro.custoCalculado = window.NiveloCadernoV2.getCustoMedioBySku(produto.sku) * quantidade;
     } else if (tipo === 'despesa-manual') {
-      registro.categoria = categoriaDespesaField.dataset.value;
+      registro.categoriaCodigo = categoriaDespesaField.dataset.value || null;
       registro.valor = valorDespesaCentavos / 100;
       registro.observacao = document.getElementById('na-observacao-despesa').value.trim();
     } else if (tipo === 'colheita') {

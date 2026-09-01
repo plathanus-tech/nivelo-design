@@ -6,6 +6,9 @@
    configura o WhatsApp que ele mesmo vai usar pra conversar com o
    Assistente, não uma lista de números de terceiros autorizados.
 
+     nome,          // nome de quem está conectando o número (obrigatório,
+                     // texto livre) — null quando nenhum número está
+                     // conectado
      numero,        // normalizado: '+55' + DDD + número, só dígitos além do
                      // '+' (ex.: '+5547999999999') — formato pronto pra
                      // integração futura com a API do WhatsApp; null quando
@@ -23,6 +26,7 @@
   // Seed: já nasce conectado, pra demonstrar de cara o estado "Conectado"
   // (o estado "sem número" é só um clique de Desconectar de distância).
   var state = {
+    nome: 'João da Silva',
     numero: '+5547999990001',
     connectedAt: TODAY,
     updatedAt: TODAY
@@ -30,6 +34,10 @@
 
   function getNumero() {
     return state.numero;
+  }
+
+  function getNome() {
+    return state.nome;
   }
 
   function isConnected() {
@@ -67,15 +75,17 @@
     return out;
   }
 
-  function connect(value) {
+  function connect(value, nome) {
     if (!state.connectedAt) state.connectedAt = TODAY;
     state.numero = normalizeNumero(value);
+    state.nome = (nome || '').toString().trim();
     state.updatedAt = TODAY;
     return state;
   }
 
   function disconnect() {
     state.numero = null;
+    state.nome = null;
     state.connectedAt = null;
     state.updatedAt = TODAY;
     return state;
@@ -83,6 +93,7 @@
 
   window.NiveloWhatsappNumeros = {
     getNumero: getNumero,
+    getNome: getNome,
     isConnected: isConnected,
     normalizeNumero: normalizeNumero,
     formatNumero: formatNumero,

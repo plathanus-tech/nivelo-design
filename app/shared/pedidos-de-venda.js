@@ -225,9 +225,11 @@
   var emptyGlobal = document.getElementById('pv-empty-global');
   var searchInput = document.getElementById('pv-search-input');
   var PAGE_SIZE = 10;
-  var state = { search: '', page: 1 };
+  var state = { search: '', page: 1, periodStart: null, periodEnd: null };
 
   function rowMatches(row) {
+    if (state.periodStart && row.dataset.data < state.periodStart) return false;
+    if (state.periodEnd && row.dataset.data > state.periodEnd) return false;
     if (!state.search) return true;
     return normalize(row.dataset.search).indexOf(normalize(state.search)) !== -1;
   }
@@ -244,12 +246,28 @@
     applyPagination();
   }
 
+  // ---------- Total do período: soma o Valor de TODOS os registros que
+  // batem com busca+Período (nunca só a página atual da paginação) — mesma
+  // fonte (`rowMatches`) já usada pra filtrar/ocultar linhas, garantindo
+  // que o total sempre reflete exatamente o que está filtrado. ----------
+  var totalValorEl = document.getElementById('pv-total-valor');
+  var mobileTotalEl = document.getElementById('pv-mobile-total');
+  var mobileTotalValorEl = document.getElementById('pv-mobile-total-valor');
+  function updateTotal(matching) {
+    var total = matching.reduce(function (sum, row) { return sum + (Number(row.dataset.valor) || 0); }, 0);
+    var label = formatBRL(total);
+    totalValorEl.textContent = label;
+    mobileTotalValorEl.textContent = label;
+    mobileTotalEl.hidden = matching.length === 0;
+  }
+
   function applyPagination() {
     var rows = Array.prototype.slice.call(tbody.querySelectorAll('.tr'));
     var matching = rows.filter(function (row) { return !row.classList.contains('is-filtered-out'); });
     var totalRows = rows.length;
     emptyState.hidden = matching.length > 0 || totalRows === 0;
     emptyGlobal.hidden = totalRows > 0;
+    updateTotal(matching);
 
     var totalPages = Math.max(1, Math.ceil(matching.length / PAGE_SIZE));
     if (state.page > totalPages) state.page = totalPages;
@@ -303,6 +321,21 @@
     state.search = searchInput.value;
     state.page = 1;
     applyFilters();
+  });
+
+  // ---------- Único filtro além da busca: Período (NiveloPeriodFilter,
+  // mesmo componente único usado em toda tabela/relatório do sistema —
+  // ver period-filter.js). Alterar o período reaplica os filtros na hora,
+  // atualizando tanto as linhas exibidas quanto o Total do período. ----------
+  window.NiveloPeriodFilter.init({
+    mount: document.getElementById('pv-period-mount'),
+    noneLabel: 'Sem filtro de período',
+    onApply: function (result) {
+      state.periodStart = result.mode === 'none' ? null : result.start;
+      state.periodEnd = result.mode === 'none' ? null : result.end;
+      state.page = 1;
+      applyFilters();
+    }
   });
 
   // ---------- Ordenação ----------

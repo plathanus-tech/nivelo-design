@@ -3953,6 +3953,179 @@ campo → V2); V1 (`caderno-de-campo.html` e as demais 3 telas) confirmado intoc
 funcional, acessível só pelo `prototype-nav`; nenhum erro de console real em nenhuma das 4 telas
 novas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo o sistema).
 
+## Ajustes 2026-09-01 (round 97) — Caderno de Campo V2: 5 ajustes pontuais
+
+Pedido em 5 itens sobre a Jornada · Caderno de Campo V2 (rounds 86-88). V1 não foi tocado.
+
+1. **Fazenda — "Nova anotação" removido do nível da fazenda.** `fazenda-detalhe-caderno-v2.html`:
+   `#nova-anotacao-fazenda-btn` (bloco `.fazenda-detalhe-actions` inteiro) removido do cabeçalho;
+   handler correspondente removido de `fazenda-detalhe-caderno-v2.js`; CSS órfão
+   (`.fazenda-detalhe-actions`/`#nova-anotacao-fazenda-btn`) removido de
+   `page-fazenda-detalhe-caderno-v2.css`. `.fazenda-detalhe-title-row` ficou só com o bloco de
+   título/localização — sem sobra de espaço vazio (confirmado ao vivo, mobile e desktop). Ação
+   "Nova anotação" DENTRO da tabela de Talhões (por linha/card) e no cabeçalho de
+   `talhao-detalhe-v2.html` continuam intactas, como pedido.
+2. **Nova Anotação — Tipo "Anotação" perdeu o campo Título.** `nova-anotacao-v2.html`: bloco
+   `#titulo-field` removido; `Descrição` (já existente desde o round 88, renomeada de
+   "Observação" no round 86) é o único campo do tipo agora. `nova-anotacao-v2.js`: variáveis
+   `tituloInput`/`tituloField`, a validação (`markInvalid(tituloField, ...)`) e a atribuição
+   `registro.titulo = ...` removidas — o payload salvo pra Anotação agora só tem `descricao`.
+3. **Aplicação de insumo — Produto filtrado por `tipoProduto === 'uso'`.** O combobox
+   `produtoInsumoCombobox` (`nova-anotacao-v2.js`) lia `window.NiveloProdutos.list()` inteiro
+   (incluindo Soja/Milho/Trigo/Sorgo/Café/Cana-de-açúcar, todos `tipoProduto:'venda'`). Novo
+   `PRODUTOS_USO = window.NiveloProdutos.list().filter(p => p.tipoProduto === 'uso' && p.status
+   === 'ativo')`, mesmo cuidado (produto ativo) já usado no combobox de Colheita logo abaixo.
+   Verificado ao vivo: só "Adubo"/"Defensivo" aparecem (Semente, também `uso` mas
+   `status:'bloqueado'`, corretamente excluída; nenhum produto de venda aparece).
+4. **Despesa manual — Categoria trocada pelo catálogo real de Categorias Financeiras.** A
+   divergência reportada nesta mesma rodada (o dropdown "Categoria" era hardcoded, 3 valores
+   fixos Serviço/Frete/Outro, sem nenhuma referência a `window.NiveloCategoriasFinanceiras`) foi
+   confirmada com o usuário e implementada: label virou "Categorias de receitas e despesas
+   (opcional)", menu populado dinamicamente a partir de `NiveloCategoriasFinanceiras.list()`
+   filtrado por `ativo` (mesmo catálogo já usado em Caixa/Contas a Pagar/Notas Fiscais), help
+   text "Cadastradas em Configurações → Categorias de receitas e despesas.". Validação de
+   obrigatoriedade removida (`markInvalid` do campo tirado do handler de submit); payload salvo
+   trocou de `registro.categoria` (string livre) pra `registro.categoriaCodigo` (código real,
+   `null` quando nada selecionado). `categorias-financeiras-data.js` adicionado ao `<head>` de
+   `nova-anotacao-v2.html`. **Bug real corrigido no mesmo lote, achado ao migrar o consumidor:**
+   `talhao-detalhe-v2.js`'s `buildSubtitleText()` resolvia a categoria como `r.categoria` direto
+   (string) — atualizado pra resolver `r.categoriaCodigo` via `findByCodigo()` e mostrar a
+   `descricao` real; a mesma função também lia `r.titulo` pro tipo "Anotação" (campo removido no
+   item 2 desta mesma rodada, nunca atualizado ali), o que quebrava o subtítulo do histórico de
+   anotações no Talhão — corrigido pra ler `r.descricao`. `categorias-financeiras-data.js`
+   adicionado também ao `<head>` de `talhao-detalhe-v2.html`. Verificado ao vivo: dropdown
+   populado com as 7 categorias de despesa ativas (excluindo a inativa "Transferência entre
+   contas próprias"); submit sem selecionar categoria salva normalmente; nova linha "Despesa
+   manual" aparece no histórico do Talhão sem categoria (só o valor/data), sem erro de console.
+5. **Padrão "(opcional)" — auditoria confirmou que nada mais precisava do sufixo.** Conferida a
+   função de validação de cada um dos 4 tipos (`nova-anotacao-v2.js`'s handler de submit): todo
+   campo de texto/dropdown/combobox real é OBRIGATÓRIO em cada tipo (Anotação: Descrição;
+   Aplicação de insumo: Produto/Quantidade/Depósito; Despesa manual: Categoria/Valor; Colheita:
+   Produto/Quantidade) — o único campo opcional do formulário inteiro (`Observação`, em Despesa
+   manual) já tinha o sufixo "(opcional)" desde antes desta rodada. Campos de Unidade
+   (Aplicação de insumo e Colheita) e Custo calculado são `disabled readonly`/auto-preenchidos,
+   nunca validados como obrigatórios nem opcionais — não é o tipo de campo que esse padrão
+   cobre (mesmo tratamento de "Código" auto-gerado em outras telas do sistema). Nenhuma
+   mudança de código foi necessária neste item.
+
+Verificado ao vivo (`http-server`, porta 8099): cabeçalho da Tela 2 sem o botão de nível-fazenda
+e sem espaço vazio; ação "Nova anotação" da tabela de Talhões e do cabeçalho de Talhão > Ver
+detalhes continuam navegando normalmente pra `nova-anotacao-v2.html?fazenda=&talhao=`; Nova
+Anotação com Tipo=Anotação mostrando só Descrição; Tipo=Aplicação de insumo com o combobox de
+Produto listando só Adubo/Defensivo; nenhum erro de console.
+
+## Ajustes 2026-09-01 (round 98b) — Relatório de Safra reformulado por completo: "Resultado
+de Safra", centrado em Fazenda, com custo
+
+Pedido amplo demais pra caber na "Relatório de Safra" existente sem reformular: a tela antiga
+(`relatorio-safra.html`, acessível de `relatorios-v2.html`) era uma comparação simples
+Plantado×Colhido por PRODUTO/cultura, com só o filtro de Safra, alimentada por `fazendas-data.js`
+(Plantado) + `caderno-data.js` V1 (Colhido). O pedido novo é centrado em FAZENDA (não produto),
+com CUSTO (que a tela antiga nem tinha), alimentado pelo **Caderno de Campo V2**
+(`caderno-v2-data.js`). **Confirmado via `grep -ri "resultado de safra" app/` que não existia
+nenhuma tela com esse nome antes** — decisão tomada: REFORMULAR a mesma tela (mesmos 3 arquivos:
+`relatorio-safra.html`/`.js`/`page-relatorio-safra.css`, mesmo ponto de entrada em
+`relatorios-v2.html`) em vez de criar uma tela paralela, já que o nome mudou (Relatório de
+Safra → Resultado de Safra) mas o PAPEL na navegação (o card "Resultado de Safra" dentro de
+Relatórios) é o mesmo — duas telas faria o usuário escolher entre duas opções de "relatório de
+safra" sem nenhuma vantagem.
+
+- **Fonte de dados trocada de V1 pra V2**: `caderno-data.js` (V1, anotações genéricas) saiu do
+  `<head>`; entraram `caderno-v2-data.js` + as 3 dependências que ele precisa pra calcular
+  `custoCalculado` de Aplicação de insumo em tempo de carga do módulo
+  (`getCustoMedioBySku` lê `window.NiveloEstoqueUsoV2`, que por sua vez depende de
+  `produtos-data.js`/`unidades-medida-data.js`) — **bug real pego ao vivo**: sem essas 3
+  dependências carregadas ANTES de `caderno-v2-data.js`, todo `custoCalculado` de Aplicação de
+  insumo nascia zerado (o cálculo roda uma vez só, na definição do array `REGISTROS`, não sob
+  demanda), inflando artificialmente o Custo total pra menos. Corrigido replicando a MESMA ordem
+  de `<script>` já usada em `fazenda-detalhe-caderno-v2.html` (`fazendas-data.js` →
+  `produtos-data.js` → `unidades-medida-data.js` → `estoque-uso-v2-data.js` →
+  `caderno-v2-data.js`).
+- **Filtros: Safra (existia) + Cultura (novo), dependente de Safra.** Dropdown reais do
+  Storybook (mesmo padrão já usado nesta tela — aplica na hora, sem popover "Filtros"/Aplicar/
+  Limpar, já que o padrão anterior da tela já era direto). `culturasNaSafra(safra)` recalcula as
+  opções de Cultura a cada troca de Safra (união de `talhao.cultura` dos talhões com essa safra +
+  `registro.cultura` dos registros do Caderno com essa safra) — mesmo espírito do dropdown
+  dependente Fazenda→Talhão já usado no Caderno de Campo. Trocar Safra reseta Cultura pra "Todas"
+  (evita ficar preso a uma cultura que não existe na nova safra).
+- **Bug real de recursão infinita, pego ao vivo antes de qualquer verificação de dado:** o
+  `initDropdown()` genérico (copiado da versão anterior desta tela) disparava `onChange` mesmo
+  quando o valor era reaplicado PROGRAMATICAMENTE via `selectValue()` — como `render()` chama
+  `rebuildCulturaOptions()` (que popula o menu de Cultura e reaplica a seleção atual via
+  `selectValue`) a cada render, e `culturaDropdown.onChange` também chama `render()`, o ciclo
+  `render → rebuildCulturaOptions → selectValue → onChange → render → ...` estourava a pilha
+  (`RangeError: Maximum call stack size exceeded`) na primeira carga da página. Corrigido com um
+  parâmetro `silent` em `selectOption`/`selectValue` — `rebuildCulturaOptions()` e a seleção
+  inicial de Safra agora chamam `selectValue(valor, true)`, nunca disparando `onChange` de novo.
+- **KPIs (item 5 do pedido):** 4 cards, mesma cópia estrutural exata de KPI já usada em Estoque/
+  Caixa/Contas a Pagar/Receber (12px/24px fixo em qualquer largura, regra do round 55), grid
+  1→2→4 colunas — a versão anterior desta tela só tinha 2 KPIs num grid 1→2, ajustado pro padrão
+  de 4.
+  - **Área total**: soma de `areaHa` de todos os talhões (de todas as fazendas) cuja
+    `talhao.safra` bate com a Safra filtrada e `talhao.cultura` bate com a Cultura filtrada (ou
+    qualquer cultura truthy, quando Cultura = "Todas").
+  - **Custo total**: soma de `custoCalculado` (Aplicação de insumo) + `valor` (Despesa manual)
+    de TODOS os registros do Caderno (todas as fazendas) que batem com Safra+Cultura — mesma
+    decisão já documentada em `fazenda-detalhe-caderno-v2.js` (os dois representam gasto real da
+    operação, mesmo Aplicação de insumo não sendo literalmente um "registro de Despesa").
+  - **Produção**: soma de `quantidade` de Colheita que bate com o filtro, unit-aware — agrupada
+    por sigla de unidade (`producaoPorUnidade`), a maior soma vira o valor em destaque, as
+    demais viram linhas secundárias ("+ N kg" etc.) — mesmo algoritmo já usado no card
+    "Produção registrada"/"Colheita" de `caderno-de-campo-v2.js`/`fazenda-detalhe-caderno-v2.js`
+    (copiado, não compartilhado via `<script>` — convenção do projeto pra telas de relatório).
+  - **Custo médio / Safra**: Custo total ÷ Produção total, **usando a unidade de MAIOR volume
+    quando há mais de uma envolvida** (decisão documentada no código, mesmo princípio já usado
+    em outros relatórios do sistema pra nunca dividir por uma soma inválida entre unidades
+    incompatíveis) — o rótulo do valor sempre cita a unidade usada (ex. "R$ 3,96/sc"), deixando
+    explícito qual unidade foi a base do cálculo.
+- **Tabela por Fazenda (item 6 do pedido), substitui a antiga tabela por Produto:** colunas
+  exatas Fazenda | Área | Custo total | Produção | Produtividade | Custo / Ha | Custo / Saca |
+  Ação, `table-layout:fixed`, zebra branco/gray-50 escopada ao `#relsafra-tbody` (nunca a uma
+  classe genérica, mesma lição de especificidade já documentada em LCDPR/DRE — evita a zebra
+  vazar pro rodapé/outras seções). **Cards no mobile** (`.relsafra-mobile-card`, cópia
+  estrutural do padrão de Talhões em `fazenda-detalhe-caderno-v2.js`), abaixo de 768px — pedido
+  explícito ("mesmo padrão visual/estrutural das demais tabelas do sistema... Cards no mobile"),
+  diferente da convenção "nunca vira Cards" que os relatórios financeiros (Balancete/LCDPR/DRE)
+  adotam por serem matrizes densas — aqui a tabela é uma lista simples por fazenda, mais perto
+  do padrão de Talhões/Cadastro/Estoque do que de um relatório financeiro matricial.
+  - 1 linha por fazenda com pelo menos 1 registro do Caderno batendo com Safra+Cultura — fazenda
+    sem nenhum dado no filtro atual não aparece (`buildRows()` só inclui fazendas com
+    `registrosFazenda(...).length > 0`).
+  - Área/Custo total/Produção: mesma agregação dos KPIs, escopada a UMA fazenda por vez.
+  - Produtividade: Produção (na unidade dominante da fazenda) ÷ Área, formato "X,X un/ha".
+  - Custo / Ha: Custo total ÷ Área.
+  - **Custo / Saca**: apesar do nome literal do cabeçalho (pedido explícito, mesmo que a fazenda
+    colha em kg — ex. cana-de-açúcar), o VALOR é sempre Custo total ÷ Produção NA UNIDADE REAL
+    daquela fazenda, rotulado com a sigla real (ex. "R$ 2,82/kg" quando a produção da fazenda é
+    em kg, "R$ 3,74/sc" quando é em sacas) — só o cabeçalho da coluna usa literalmente
+    "Custo / Saca". Decisão documentada em comentário no código (`relatorio-safra.js`).
+  - **Ação "Ver talhões"**: novo ícone `.actionBtn`+`.tip` (mesmo padrão de tooltip fixo
+    reparentado pra `document.body` já usado em `fazenda-detalhe-caderno-v2.js`/`produtos.js`),
+    navega pra `fazenda-detalhe-caderno-v2.html#id=<fazendaId>` — confirmado lendo
+    `fazenda-detalhe-caderno-v2.js`'s `boot()` que o parâmetro de hash é `id=`, não `fazenda=`.
+  - Exportação (Excel, SheetJS, já existia) refeita pras 7 colunas de dado (Fazenda/Área/Custo
+    total/Produção/Produtividade/Custo por Ha/Custo por Saca), sem a coluna Ação.
+- **Voltar/entrada preservados**: `relatorios-v2.html` continua sendo a tela de origem correta
+  (confirmado lendo `relatorios-v2.js`'s `REAL_DESTINATIONS`, chave `relatorio-safra` →
+  `relatorio-safra.html`) — só o título/descrição do card foram atualizados ("Relatório de
+  Safra" → "Resultado de Safra", descrição citando custo/produtividade em vez de plantado×
+  colhido). `<h1>`/`<title>` da própria tela também atualizados.
+
+Verificado ao vivo (`http-server`, porta 8123): Safra 2026/27 + Cultura "Todas" reproduzindo os
+valores esperados a partir dos 10 registros seed de `caderno-v2-data.js` (Área total 326 ha,
+Custo total R$ 5.699,20 — conferido à mão: São João 1.450 despesa + 868,20 insumo = 2.318,20;
+Santa Rita 2.100 despesa + 1.281,00 insumo = 3.381,00; Boa Esperança R$ 0,00; soma bate — Produção
+1.440 sc + 1.200 kg, Custo médio/Safra R$ 3,96/sc); trocar Cultura pra "Soja" isola corretamente
+só São João/Santa Rita (Boa Esperança some da tabela, sem nenhum registro de Soja) e recalcula
+Área/Custo/Produção/Custo médio; recursão infinita corrigida (interações repetidas de troca de
+Safra/Cultura via clique real, sem nenhum erro de `window.onerror`); "Ver talhões" navegando de
+verdade pra `fazenda-detalhe-caderno-v2.html#id=santa-rita` (confirmado o título da tela de
+destino carregando); Exportar Excel disparando sem erro (`window.XLSX` presente, blob gerado);
+mobile (375px): KPIs em 1 coluna, Cards da tabela sem overflow horizontal, todos os campos
+legíveis; desktop (1280px): KPIs em 4 colunas, tabela real com scroll — nenhum corte de coluna;
+nenhum erro de console real (só os 404 de fontes `.otf` já documentados como pré-existentes em
+todo o sistema).
+
 ## Storybook
 Sempre usar `Storybook-Nivelo/` — nunca `Storybook/`.
 
@@ -4529,6 +4702,202 @@ rolagem horizontal funcionando (scrollWidth 1120 > clientWidth do card) com Aç�
 visível/fixa durante o scroll; filtro de Status isolando corretamente Ativos/Inativos; modal de
 Desativar (botão vermelho) e o ciclo completo (badge Ativo→Inativo, ícone do botão trocando pra
 "Ativar", toast de sucesso); Cards no mobile com o campo Status incluído; nenhum erro de console.
+
+## Ajustes 2026-09-01 (round 98) — Produtos V2: filtro de Status direto na barra (padrão
+Parceiros), Tipo de produto pré-selecionado pela aba
+
+2 ajustes pontuais em `produtos-v2.html`/`novo-produto-v2.html`, escopo restrito a essas 2 telas.
+
+- **Filtro de Status: saiu de trás do botão "Filtros" (popover com Status+Categoria+"Atualizado
+  a partir de") e virou um `Dropdown` direto na barra**, ao lado da busca — mesmo padrão visual/
+  de interação já usado em Parceiros (`cadastros.html`'s `dropdown-situacao`: sem label solto,
+  aplica na hora ao selecionar, sem botão "Aplicar"). Categoria e "Atualizado a partir de" (que
+  viviam no mesmo popover) foram removidos por completo, não só escondidos — não fazem parte do
+  pedido e não tinham nenhum outro consumidor na tela. `produtos-v2.js`: `filtrosPopoverEl`/
+  `openFiltrosPopover`/`closeFiltrosPopover`/`positionFiltrosPopover`/
+  `outsideFiltrosClickHandler`/os handlers de "Aplicar"/"Limpar"/o `NiveloDatePicker.initDay()`
+  do campo de data removidos; `statusDropdown = initDropdown(dropdown-status, onChange)` agora
+  aplica o filtro direto no `onChange`, mesmo mecanismo de `cadastros.js`. `state.categoria`/
+  `state.atualizadoDesde` removidos do estado de filtro. Limpeza de dependências órfãs:
+  `categorias-data.js` (só alimentava o dropdown de Categoria removido) e `date-picker.js` +
+  `DatePicker.module.css`/`FilterPopover.module.css` (sem mais nenhum consumidor na tela) tirados
+  do `<head>`/fim do `<body>` de `produtos-v2.html`. CSS morto (`.prod-date-filter`/
+  `.prod-trigger-row`/`.prod-filter-clear`/`#produtos-filtros-trigger-root .trigger`/
+  `.prod-filtros-icon`/`.produtos-filter-popover*`) removido de `page-produtos-v2.css`.
+- **Tipo de produto pré-selecionado pela aba de origem.** "Novo produto" (botão do cabeçalho e
+  do estado vazio global) agora navega com `?tipo=venda|uso` conforme a aba ativa no momento do
+  clique (`activeTab`, já existia). `novo-produto-v2.js`: no modo de CRIAÇÃO (nunca em edição,
+  que já pré-seleciona a partir do produto real via `?sku=`), lê `?tipo=` e marca o radio
+  correspondente + roda `syncTipoProdutoChecked()`/`refreshTipoProdutoVisibility()` — mesma
+  função já usada por `fillForm()`. Campo continua 100% editável (é só uma pré-seleção, nunca um
+  bloqueio) — nenhuma mudança na lógica de validação/submit.
+
+Verificado ao vivo: filtro de Status direto na barra (sem popover), aplicando na hora
+(`inativo` isola corretamente só PRD-005/Feijão, o único produto inativo do seed); "Novo
+produto" a partir da aba "Produtos de uso" chega em `novo-produto-v2.html?tipo=uso` com
+"Produto de uso" já marcado e a seção Dados Fiscais escondida; sem `?tipo=` (link direto) cai no
+padrão "Produto de venda", como sempre foi; `?sku=` (edição) continua ditando o Tipo a partir do
+produto real, sem interferência do novo parâmetro; nenhum erro de console real em nenhuma das 2
+telas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo o sistema).
+
+## Ajustes 2026-09-01 (round 99) — Estoque V2: bug real de largura em "Valor estimado"
+(2 causas), Estoque Comprometido com filtro de Situação direto (padrão Parceiros)
+
+2 pedidos pontuais em `estoque-v2.html`, escopo restrito à aba Vendas (coluna) e à aba
+Comprometido (filtros). V1 (`estoque.html`) não foi tocado.
+
+- **"Valor estimado" cortando o próprio rótulo — 2 bugs reais empilhados, não 1.** O primeiro
+  ajuste (só aumentar a % da coluna) não teve NENHUM efeito visual — investigação
+  (`getComputedStyle`+inspeção de todas as regras que casam no elemento) achou a causa raiz
+  real: `page-estoque.css` (V1) ainda tem `#panel-vendas .th:nth-child(N){width:...}` (layout
+  antigo de 4 colunas, de antes da V2 ganhar a coluna "Ações") — como a V2 reaproveita o MESMO
+  `id="panel-vendas"`, esse seletor por ID sempre vencia contra a regra de 2 classes da V2,
+  aplicando pra sempre a largura antiga (120px fixo) em "Valor estimado", nunca a % nova.
+  Corrigido prefixando `#panel-vendas` também na regra da V2 (empata o ID, vence pela classe
+  extra). **Segundo bug, exposto só depois de corrigir o primeiro:** misturar colunas em `%`
+  (1-4) com uma em `px` fixo (Ações) faz o `table-layout:fixed` do navegador jogar TODO o espaço
+  não coberto pelas % pra dentro da única coluna sem %, ignorando o `width:170px` declarado nela
+  — Ações ficava ~229px em vez dos 170px pedidos pros 4 ícones, uma consequência colateral nunca
+  pedida. Resolvido adotando o MESMO padrão já usado em Categorias Financeiras/Contas a Pagar:
+  só uma coluna (a mais "elástica", aqui Produto) fica em `width:auto` — absorve o espaço
+  restante — e todas as outras, incluindo Ações, ficam em `px` fixo de verdade (Quantidade
+  190px/Preço atual 150px/Valor estimado 170px/Ações 170px, mantido). Verificado ao vivo
+  (`getBoundingClientRect`/`scrollWidth` de cada `.th`): as 5 colunas cabem exatamente o
+  conteúdo/rótulo, sem overflow, em 1280px e responsivo.
+- **Estoque Comprometido: filtro de Situação direto na barra**, mesmo padrão visual/de interação
+  de Parceiros (`cadastros.js`'s `dropdown-situacao` — sem label solto, aplica na hora ao
+  selecionar). O botão "Filtros" (popover com Situação + Cliente + Aplicar/Limpar) foi removido
+  por completo — Cliente não fazia parte do pedido e não tinha outro consumidor na tela.
+  `estoque-v2.js`: `filtrosPopoverEl`/`positionFiltrosPopover`/`outsideFiltrosClickHandler`/
+  `openFiltrosPopover`/`closeFiltrosPopover`/os handlers de "Aplicar"/"Limpar"/a população do
+  menu de Cliente removidos; `situacaoDropdown = initDropdown(filtro-situacao-field, onChange)`
+  agora aplica `comprometidoFilters.situacao` e chama `applyVisibility('comprometido')` direto no
+  `onChange`, mesmo mecanismo de Parceiros/Produtos. O campo continua só visível na aba
+  Comprometido (mesmo `hidden` já controlado pela troca de aba, sem mudança nesse mecanismo).
+  CSS compacto (altura/fonte 28px, igual ao campo de busca ao lado) adicionado só em
+  `page-estoque-v2.css` (nunca em `page-estoque.css`, compartilhado com a V1, que ainda usa o
+  popover original com Situação+Destinatário). Verificado ao vivo: selecionar "Concluído" isola
+  só os registros `situacao:'quitado'` na hora, sem nenhum botão "Aplicar".
+
+Verificado ao vivo (`http-server`, force-reload pra garantir CSS fresco): nenhum erro de console
+real em nenhuma das 2 abas tocadas (só os 404 de `/fonts/*.otf` já documentados como
+pré-existentes em todo o sistema); V1 (`estoque.html`) confirmado intocado, ainda com o popover
+"Filtros" original de Situação+Destinatário.
+
+## Ajustes 2026-09-01 (round 100) — Caixa V2: filtro de Categoria removido do Consolidado,
+reorganização do formulário de Incluir Lançamento (Cliente/Fornecedor + Documento/Descrição
+na mesma linha, subseção "Classificação" removida)
+
+2 ajustes pontuais sobre a V2 do Caixa (rounds 90/93). V1 não foi tocado.
+
+- **Aba Consolidado: filtro de Categoria removido, sem substituição.** `caixa-v2.html`: bloco
+  `#dropdown-categoria` (dentro do popover "Filtros") removido; `caixa-v2.js`: população do
+  menu (`window.NiveloCategoriasFinanceiras.list()...`), `categoriaDropdown`, `state.categoria`
+  e a checagem correspondente em `rowMatches()` removidos, junto das 2 linhas que liam/resetavam
+  o valor nos handlers "Aplicar"/"Limpar". Período e Conta (os "demais filtros já definidos")
+  intocados. **Nota: `data-categoria`/a busca por nome de categoria dentro de "Descrição" (busca
+  textual livre) foram mantidos** — são um comportamento diferente (já existente, não é a UI do
+  filtro em si) e o pedido não mencionou tocar nisso.
+- **Incluir Lançamento: Categoria financeira + Cliente ou Fornecedor na mesma linha.** Label
+  "Categoria Financeira" → "Categoria financeira" (só a primeira palavra maiúscula, como pedido
+  literalmente). "Cliente ou Fornecedor" saiu da antiga subseção "Classificação" e entrou logo
+  depois de Categoria financeira, no mesmo grid 2 colunas — ficam lado a lado (não mais
+  `nlc-span-2`, agora meia largura como Categoria).
+- **Descrição + Documento na mesma linha:** "Descrição" (`historico-field`, antes `nlc-span-2`,
+  sozinha numa linha própria) perdeu o `nlc-span-2` e passou a vir ANTES de "Documento" no HTML
+  — ficam lado a lado, Descrição à esquerda/Documento à direita, como pedido.
+- **Subseção "Classificação" removida por completo** (o `<h2>Classificação</h2>` + o `<div
+  class="nlc-subsection">` que a envolvia) — não havia nenhum campo chamado literalmente
+  "Classificação", era o título da 2ª subseção do formulário; removê-la significava fundir os 2
+  campos que ainda restavam nela (Cliente ou Fornecedor, já movido pro grid principal acima; e
+  Competência) na ÚNICA subseção "Dados do lançamento" que sobrou, evitando deixar um título
+  "solto" cobrindo só 1 campo. **Competência** (única sobrevivente da antiga subseção) virou
+  `nlc-span-2` — como ficou como último campo do grid principal (ímpar, sem par pra completar a
+  linha), spanar a largura toda evita deixar meia coluna vazia à direita dela, mesmo raciocínio
+  já usado em outros formulários do sistema pro campo ímpar final de um grid 2 colunas. Nenhum
+  outro campo/lógica de validação (`novo-lancamento-caixa-v2.js`, todo baseado em IDs, nenhuma
+  dependência de estrutura de subseção) precisou de ajuste.
+- Ordem final do grid único "Dados do lançamento": Data | Tipo de movimento → Contas bancárias |
+  Valor → Categoria financeira | Cliente ou Fornecedor → Descrição | Documento → Competência
+  (span-2). "Resumo financeiro do lançamento" (subseção separada, abaixo) não foi tocado.
+
+Verificado ao vivo (`http-server`, force-reload): Consolidado sem o filtro de Categoria (só
+Período+Conta no popover "Filtros"); Incluir Lançamento com "Categoria financeira"/"Cliente ou
+Fornecedor" na mesma linha e "Descrição"/"Documento" na linha seguinte, em 1280px; Competência
+ocupando a linha inteira sozinha, sem meia coluna vazia; mobile (375px): grid stack single-column
+(`grid-template-columns` calculado em px único), `scrollWidth === innerWidth` (sem overflow
+horizontal); nenhum erro de console real em nenhuma das 2 telas (só os 404 de `/fonts/*.otf` já
+documentados como pré-existentes em todo o sistema); V1 (`caixa.html`/`novo-lancamento-
+caixa.html`) confirmado intocado.
+
+## Ajustes 2026-09-01 (round 101) — Renomeação de nomenclatura: Relatórios V2 (Livro caixa/
+Balancete financeiro/DRE gerencial), coluna Banco no Livro caixa, Landing Page
+
+Ajuste de nomenclatura em 4 telas de Relatórios V2 (as reais, navegadas pela Sidebar via
+`NAV_DESTINATIONS['financeiro-relatorios'] = 'relatorios-v2.html'`) + na 2ª seção da home da
+Landing Page. V1 (`relatorios.html`/`lcdpr.html`/`balancete.html`/`dre.html`) não foi tocada —
+continua só como protótipo histórico no navegador de protótipo.
+
+1. **Relatórios V2 — card "LCDPR" → "Livro caixa"** (`relatorios-v2.html`, `data-report="lcdpr-
+   v2"`): título do card trocado; descrição trocada para o texto exato "Gere e consulte o Livro
+   caixa, ano a ano" (substituiu "Gere e consulte o Livro Caixa Digital do Produtor Rural, mês a
+   mês."). Os outros 3 cards não foram tocados neste item.
+   - **Tela `lcdpr-v2.html`/`lcdpr-v2.js`:** `<title>`, `<h1>`, cabeçalho do resultado
+     (`.lcdpr-resultado-title`) e o texto do banner de export PDF trocados de "Livro Caixa
+     Digital do Produtor Rural (LCDPR)" pra "Livro caixa"; título da tabela "Lançamentos do
+     Livro Caixa (LCDPR)" → "Lançamentos do livro caixa" (capitalização exata pedida). Título da
+     planilha Excel também ajustado ("Livro caixa - V2").
+   - **Nova coluna "Banco"**, posicionada imediatamente depois de "Data" (2ª coluna). Fonte do
+     dado: `resolveBancoNome(l)` (novo em `lcdpr-v2.js`) resolve a Conta Bancária REAL vinculada
+     à Conta Financeira do lançamento (`window.NiveloContasBancarias`, filtrando por
+     `contaFinanceiraCodigo === l.contaFinanceiraCodigo`) e, a partir dela, o nome do banco real
+     via `window.NiveloBancosCatalogo.findByCodigo()` — mesma técnica já usada em
+     `caixa-v2.js`'s aba "Contas financeiras" (`findContaBancariaByFinanceira`/
+     `contasFinanceirasDisplay`), não o nome da Conta Financeira. Lançamentos sem conta bancária
+     vinculada (`contaFinanceiraCodigo: 1`, "Caixa Geral"/dinheiro em espécie, sem nenhuma linha
+     em `contas-bancarias-data.js` apontando pra ela) mostram "—", nunca um banco inventado —
+     confirmado ao vivo via `window.NiveloContasBancarias.list().filter(...)` retornando `[]`
+     pra esse código. `lcdpr-v2.html` ganhou 2 `<script>` novos no `<head>` que faltavam:
+     `bancos-catalogo-data.js` e `contas-bancarias-data.js`.
+   - **Larguras de coluna ajustadas** em `page-lcdpr-v2.css` (mesmo padrão `table-layout:auto` +
+     `nth-child` já usado nesta tabela): todos os seletores de coluna deslocados em +1 posição
+     pela coluna nova (`-n+4`→`-n+5` texto à esquerda, `n+5`→`n+6` colunas monetárias à direita),
+     Banco ganhou `min-width:130px`, Documento/Histórico recalculados (150px/220px). Coluna Data
+     continua sticky (1ª coluna, `first-child`, não afetada pela inserção da coluna Banco). Rodapé
+     (`colspan` de "Total"/"Resultado do período") ajustado de 4 pra 5 em `lcdpr-v2.js`.
+   - **Exportação PDF/Excel atualizada** pra incluir a coluna Banco logo após Data, mantendo a
+     mesma ordem das demais colunas (`colX.banco` novo em `exportarPdf()`, coluna extra nas linhas
+     de `exportarExcel()`) — nenhuma outra funcionalidade da tela (filtros, "Dados gerais do
+     relatório", Documento Fiscal/Natureza/Saldo, rodapé de totais, Imprimir) foi alterada.
+2. **Relatórios V2 — card "Balancete" → "Balancete financeiro"** (`data-report="balancete-v2"`,
+   só o título; descrição mantida). Tela `balancete-v2.html`: `<title>`, `<h1>`, cabeçalho do
+   resultado (`.bal-resultado-title`) e título da tabela ("Balancete detalhado" → "Balancete
+   financeiro detalhado", pra manter consistência) trocados. Sem export real nesta tela (flash-
+   disable, já documentado desde o round 66) — nenhum texto de export a ajustar.
+3. **Relatórios V2 — card "DRE" → "DRE gerencial"** (`data-report="dre-v2"`, só o título;
+   descrição mantida). Tela `dre-v2.html`: toda ocorrência de "Demonstração do Resultado do
+   Exercício (DRE)" (`<title>`, `<h1>`, cabeçalho do resultado, título da tabela) trocada pra
+   "Demonstração do Resultado do Exercício (DRE gerencial)". **Sigla "DRE" sozinha mantida** nos
+   demais lugares (comentário de seção HTML, comentários de código, nomes de variável como
+   `ANOS_DISPONIVEIS_DRE`) — são referências secundárias/internas, não título principal da
+   funcionalidade, conforme o critério do pedido.
+4. **Landing Page — 2ª seção da home (`landing/screens/index-v3.html`, `#funcionalidades`,
+   confirmada como a home real via `prototype-nav/nav.config.js`).** Card "Relatórios" da grade
+   de funcionalidades: descrição trocada de "LCDPR, DRE e balancete prontos em segundos." pra
+   "Livro caixa, DRE gerencial e balancete financeiro prontos em segundos." Nenhuma outra seção
+   da landing foi tocada.
+
+Verificado ao vivo (`http-server`, porta 8090): os 4 cards de `relatorios-v2.html` renderizando
+com os títulos novos em desktop (1400px, 5 cards sem overflow) e mobile (375px, títulos quebram
+em até 2 linhas sem cortar); `lcdpr-v2.html` gerando o relatório (Ano-calendário 2025) com a
+coluna Banco mostrando "Banco do Brasil" corretamente resolvido a partir da Conta Bancária real,
+tabela/rodapé com o colspan/alinhamento corretos, título "Lançamentos do livro caixa" e cabeçalho
+"Livro caixa" confirmados via `get_page_text` em desktop e mobile (scroll horizontal real, coluna
+Data sticky preservada); `balancete-v2.html`/`dre-v2.html` com os títulos "Balancete financeiro"/
+"Demonstração do Resultado do Exercício (DRE gerencial)" confirmados; landing com a descrição do
+card "Relatórios" exata; nenhum erro real de console em nenhuma das 5 telas tocadas (só os 404 de
+`/fonts/*.otf` já documentados como pré-existentes em todo o sistema); V1 das 4 telas de
+Relatórios confirmada intocada.
 
 ## Screens status
 | Tela | Status |
@@ -5972,3 +6341,447 @@ placeholder/help text "Contas bancárias"/"Selecione a conta bancária"/"Contas 
 Configurações → Contas Bancárias"; `grep -rc` confirmando 0 ocorrências restantes de
 "config-conta-financeira"/"Vendas e fiscal"/"Clientes e fornecedores" em `app/screens`; nenhum
 erro de console nas telas verificadas.
+
+## Ajustes 2026-09-01 (round 95) — Configurar WhatsApp: campo Nome; Histórico: busca por
+data, identificação do contato e do Assistente
+
+Pedido em 4 partes sobre "Meus números do WhatsApp"/"Nova Conversa". **Achado importante antes
+de codar, que muda o formato dos 2 primeiros itens:** o pedido original descrevia um modelo de
+"lista de números cadastrados" com modal de cadastro e checagem de duplicidade por número
+normalizado (redação que ainda constava do changelog do round 61) — mas esse modelo já não
+existe mais no código. Em algum round posterior não documentado explicitamente aqui (trabalho
+concorrente de outra sessão neste mesmo repositório, já mencionado em rounds anteriores como
+"outra sessão trabalhando em paralelo"), "Meus números do WhatsApp" virou **"Configurar
+WhatsApp"**: um único número por conta, conectado/desconectado direto na tela (sem lista, sem
+modal de cadastro) — `whatsapp-numeros-data.js`'s `state` já não é mais um array, é um objeto
+único (`{numero, connectedAt, updatedAt}`). Do mesmo jeito, `assistente-data.js` não tem mais
+campo `origem` (`sistema`/`whatsapp`) — comentário no próprio arquivo documenta que "toda
+conversa acontece via WhatsApp... por isso não há mais um campo de origem por conversa", e
+"Nova Conversa" virou uma tela só de leitura ("Histórico de conversas... Registro cronológico e
+somente leitura para auditoria e suporte"), sem composer de mensagem nem botão "+ Nova
+conversa". Os 4 itens abaixo foram implementados adaptados a essa arquitetura real e atual, não
+ao modelo antigo descrito no pedido — decisão registrada aqui.
+
+1. **Configurar WhatsApp — campo "Nome" adicionado.** `whatsapp-numeros-data.js`: `state` ganhou
+   `nome` (par com `numero`, ambos `null` quando desconectado); seed conectado com o nome
+   fictício "João da Silva". `connect(value, nome)` grava os dois; `disconnect()` zera os dois.
+   `meus-numeros-whatsapp.html`: novo campo "Nome" (Input real, obrigatório) ANTES de "Número de
+   WhatsApp", mesmo padrão de erro "só borda" já usado no campo de número desta mesma tela
+   (`#mnw-nome-field.error` — borda vermelha via `.input`, nunca fundo, mesma correção da
+   colisão `Feedback`'s `.error` cru já documentada aqui pro campo de número). Tag de status e o
+   modal de Conectar/Atualizar passaram a mostrar "Nome · Número" (ex. "João da Silva · +55 (47)
+   99999-0001 conectado"). Duplicidade continua sendo responsabilidade só do número (não existe
+   handle de "outro número" pra checar contra, já que é um único registro por conta) — a menção
+   do pedido a "duplicidade só pelo número normalizado" ficou sem efeito prático nesse modelo de
+   dado, mas a função `normalizeNumero()` que faria esse papel continua exposta no módulo.
+2. **Histórico — busca por data.** Novo campo no painel do histórico (`nc-history-date-filter`),
+   reaproveitando `window.NiveloDatePicker.initDay()` (padrão oficial único de calendário do
+   sistema) em vez de um Input com máscara — o painel é estreito (320px no desktop) e o
+   DatePicker real já cabe inteiro no espaço, com o benefício de digitar OU selecionar de
+   graça. Filtra a lista comparando a data local (dia/mês/ano, sem hora) da referência de cada
+   conversa — a mesma já usada pra ORDENAR o histórico, "por horário da última mensagem" (ou a
+   de criação, se a conversa não tem nenhuma mensagem ainda) — com a data escolhida. Botão de
+   limpar (×) reaproveita `.actionBtn` do Table, aparece só depois de uma data aplicada, mesmo
+   padrão de "Atualizado a partir de" (Produtos). "Ver mais" (paginação de 5 em 5) continua
+   funcionando sobre a lista já filtrada (o filtro roda ANTES da paginação, mesma ordem já usada
+   pra outras combinações filtro+paginação no sistema). Lista vazia mostra "Nenhuma conversa
+   encontrada para esta data." em vez de ficar em branco.
+3. **Conversa aberta — Nome/Número do contato, 1x por conversa.** Adaptado à arquitetura atual
+   (ver nota acima): como hoje existe um único número de WhatsApp conectado por conta e TODA
+   conversa do Histórico acontece por esse mesmo canal (não há mais um número por conversa nem
+   uma distinção sistema/whatsapp), o "contexto da conversa" pedido é resolvido a partir do
+   número atualmente conectado em `window.NiveloWhatsappNumeros` — decisão documentada em
+   comentário no próprio `nova-conversa.js`. Renderizado 1x, numa linha nova
+   (`#nc-chat-contact`) logo abaixo do título da conversa aberta (posição escolhida por ser o
+   mesmo lugar onde "contexto da conversa" já aparece em outras telas do sistema, ex. tag de
+   tipo no cabeçalho de Contas a Pagar/Receber) — nunca repetido em cada mensagem do produtor.
+   Fonte discreta (`--color-text-tertiary`, `text-12-regular`), menor destaque que o título.
+   Se não houver nenhum número conectado no momento, a linha simplesmente não aparece (nunca um
+   número inventado).
+4. **Identificação do Assistente — "Assistente de IA".** Rótulo pequeno acima de cada bolha de
+   resposta do assistente (`.nc-bubble-label`, só quando `mensagem.autor === 'assistente'`,
+   nunca do lado do produtor), cor de marca (`--color-text-brand`) — visualmente distinto do
+   contexto do produtor do item 3 (cor terciária, aparece 1x no cabeçalho, não por bolha) e do
+   alinhamento/cor de bolha que já distinguia os dois lados (azul à direita vs. cinza à
+   esquerda, herdado, não tocado).
+
+**Arquivos alterados:** `app/shared/whatsapp-numeros-data.js`, `app/screens/meus-numeros-
+whatsapp.html`, `app/shared/meus-numeros-whatsapp.js`, `app/shared/page-meus-numeros-
+whatsapp.css`, `app/screens/nova-conversa.html`, `app/shared/nova-conversa.js`, `app/shared/
+page-nova-conversa.css`. `nova-conversa.html` passou a carregar `DatePicker.module.css`/
+`date-picker.js`/`whatsapp-numeros-data.js` (nenhum dos 3 carregava antes nesta tela).
+
+Verificado ao vivo (`http-server`, porta 8099, preserva query string/hash): Configurar WhatsApp
+com "Nome" antes de "Número de WhatsApp", tag de status "João da Silva · +55 (47) 99999-0001
+conectado", erro "só borda" (sem fundo) ao limpar o Nome e tentar Atualizar; Histórico com
+"Buscar por data" abrindo o calendário, filtrando pra 1 conversa ao selecionar 01/09/2026 e
+restaurando a lista completa (5 conversas) ao limpar; conversa aberta mostrando "João da Silva ·
++55 (47) 99999-0001" 1x logo abaixo do título e "Assistente de IA" acima de cada bolha do
+assistente (nunca do produtor); mobile (375px, via inspeção de `getBoundingClientRect`, já que o
+Browser pane deste sandbox apresentou a mesma instabilidade de compositing/screenshot já
+documentada em rounds anteriores): sem overflow horizontal na área de mensagens, linha de
+contato cabendo inteira na largura da viewport sem cortar (`right:334px` dentro de 375px) e sem
+sobrepor o título; nenhum erro de console real em nenhuma das 2 telas (só os 404 de
+`/fonts/*.otf` já documentados como pré-existentes em todo o sistema).
+
+## Ajustes 2026-09-01 (round 96) — DatePicker ganha modo digitável (opt-in); contato do
+produtor sai do cabeçalho e passa pra cima de cada balão (Nova Conversa)
+
+Dois ajustes pedidos sobre o Histórico de "Nova Conversa" (rounds 61/95), sendo o 1º uma lacuna
+real do `NiveloDatePicker` (`app/shared/date-picker.js`) — o componente compartilhado usado por
+~15 telas do sistema — não uma correção isolada desta tela.
+
+1. **`NiveloDatePicker.initDay()` ganhou um parâmetro opcional `opts.typable`** (default
+   `false`/ausente, então nenhum dos ~15 consumidores existentes muda de comportamento — só
+   `nova-conversa.js` passa `typable: true` nesta rodada). Escolhida a **abordagem (A)**
+   (estender o componente compartilhado) em vez de uma implementação isolada: o esforço foi
+   razoável (a mudança ficou contida em `initDay()`, sem tocar `initMonth()`/`initYear()`) e
+   mantém a regra explícita do projeto de "1 implementação única de calendário" (ver seção
+   "DatePicker — padrão OFICIAL único de calendário do sistema" acima) — abrir uma exceção por
+   tela reintroduziria exatamente o problema que a unificação do round 68 resolveu.
+   - Quando `typable:true`, o `trigger` (`opts.triggerId`) deixa de ser o `<button class="dpTrigger">`
+     usado pelos demais consumidores e passa a ser um `<input type="text" class="dpTriggerInput">`
+     dentro do MESMO wrapper `.dpTrigger` (agora um `<div>`, com o ícone de calendário ao lado) —
+     mudança de markup só na tela que faz o opt-in; o CSS/HTML dos outros consumidores continua
+     idêntico. Digitação livre com máscara progressiva dd/mm/aaaa (`maskDateBR()`, nova função em
+     `date-picker.js`, mesma técnica de extrair dígitos + reinserir barras já usada em
+     `formatCentavosBRL`/CPF/CNPJ — não havia nenhuma máscara de DATA reaproveitável no projeto
+     antes desta, procurada em `novo-manifesto.js` e outros lugares antes de escrever uma nova).
+   - Só dispara `onChange(iso)` (mesmo callback que a seleção no calendário já dispara) quando a
+     data digitada está **completa E válida** (10 caracteres, `isValidDMY()` — dia/mês plausíveis
+     E o dia existe de verdade naquele mês/ano, ex. rejeita 31/04) — nunca a cada tecla parcial.
+     Apagar o campo por completo chama `onChange(null)` (mesmo efeito do botão limpar). Uma data
+     completa mas inválida (ex. "32/13/2026") não filtra, não fecha o popover, não trava —
+     só ignora silenciosamente até o usuário corrigir.
+   - Clicar/focar o `<input>` (ou clicar no ícone de calendário ao lado, que encaminha o foco pro
+     input) continua abrindo o popover, exatamente como os outros consumidores — só que sem
+     alternar fechar no clique (fechar no clique feio pra um campo de texto real, onde o usuário
+     também clica pra reposicionar o cursor). Selecionar um dia no calendário escreve o valor
+     formatado direto no `<input>` (`applySelected()`/`applyCleared()` agora brancham por
+     `typable` em vez de sempre usar `valueEl.textContent`), preenchendo o campo de texto também,
+     como pedido.
+   - `nova-conversa.html`: `#nc-history-date-trigger` virou o `<input>` (removido o `<span
+     id="nc-history-date-value">` — `opts.valueId` não é mais passado nesta chamada, já que o
+     modo digitável não usa esse elemento). `nova-conversa.js`: `initDay({..., typable: true})`.
+   - **Verificado que os outros consumidores de `initDay`/`initMonth` não regrediram**, abrindo
+     3 telas ao vivo: `nova-conta-pagar-v2.html` (Vencimento, `initDay` sem `typable` — continua
+     um `<button>`, calendário abre/fecha normalmente, nenhuma caixa de texto nova); e
+     `balancete-v2.html` (Mês/Ano, `initMonth`, função nem tocada nesta rodada) — ambos
+     idênticos ao comportamento anterior.
+2. **Cabeçalho de nome+número do produtor movido pra cima de CADA balão do produtor** (nunca do
+   assistente), removendo o bloco único que existia no cabeçalho da conversa (`#nc-chat-contact`,
+   introduzido no round 95). Decisão: a leitura mais direta do pedido ("acima do balão da
+   mensagem que o produtor mandou") é que o bloco único do cabeçalho vira redundante e sai —
+   implementado assim, evitando mostrar a mesma informação 2x seguidas no topo da conversa.
+   - `nova-conversa.js`: `renderContactInfo()`/`contactEl` removidos; nova função
+     `getContactLabel()` (mesma fonte de dado — `window.NiveloWhatsappNumeros`, único número
+     conectado por conta, mesma decisão de arquitetura já documentada no round 95: não existe
+     origem/número por conversa/mensagem neste sistema) chamada de dentro de `buildMensagemHTML()`
+     pra cada mensagem com `autor === 'usuario'`, reaproveitando o mesmo elemento `.nc-bubble-label`
+     já usado pro rótulo "Assistente de IA" (`.nc-bubble-label-contact`, modificador só de cor).
+   - `nova-conversa.html`: `<p class="nc-chat-contact" id="nc-chat-contact">` removido do
+     `.nc-chat-header`.
+   - **"Assistente de IA" não foi tocado** — continua exatamente como estava (mesmo elemento,
+     mesma cor de marca, só do lado do assistente).
+   - Tratamento visual: mesmo discreto já estabelecido (menor destaque que o conteúdo da
+     mensagem — `--font-size-xs`), só a cor distingue os dois rótulos agora que os dois
+     aparecem por bolha (`--color-text-brand` pro assistente, `--color-text-tertiary`, cor
+     neutra/discreta, pro contato do produtor — antes era a cor do cabeçalho removido).
+
+Verificado ao vivo (`http-server`, porta 8099, preserva query string/hash): campo "Buscar por
+data" digitando "01092026" formata pra "01/09/2026" progressivamente, abre o calendário
+automaticamente no foco com o dia 1 já destacado, filtra a lista pra só a conversa de
+01/09/2026 e mostra o botão de limpar; digitar uma data completa mas inválida ("32/13/2026") não
+filtra nem quebra nada; clique num dia do calendário aberto preenche o campo de texto também
+(testado indiretamente ao clicar "25" — campo virou "25/09/2026" e a lista mostrou "Nenhuma
+conversa encontrada para esta data."); botão de limpar (×) restaura a lista completa; abrir uma
+conversa mostra "João da Silva · +55 (47) 99999-0001" acima de CADA balão do produtor (nunca do
+assistente) e "Assistente de IA" acima de cada balão do assistente, sem nenhum bloco no
+cabeçalho da conversa; mobile (375px) sem overflow horizontal, rótulo do contato cabendo
+inteiro alinhado à direita acima da bolha; `nova-conta-pagar-v2.html`/`balancete-v2.html`
+confirmados sem regressão (calendário de dia/mês continuam `<button>`, sem campo de texto novo);
+nenhum erro real de console em nenhuma das telas (só os 404 de `/fonts/*.otf` já documentados
+como pré-existentes em todo o sistema).
+
+## Ajustes 2026-09-01 (round 102) — Resultado de Safra: filtros/"Gerar relatório" e tabela
+no mesmo padrão do sistema (Balancete/LCDPR/DRE)
+
+Pedido explícito: alinhar `relatorio-safra.html` (round 98b) ao mesmo padrão visual/
+estrutural/de interação já usado nos demais relatórios (Balancete/LCDPR/DRE V2), sem alterar
+estrutura de dados/funcionalidades além do visual.
+
+- **Filtros viraram um card accordion com "Gerar relatório"** (mesma estrutura exata de
+  `page-balancete-v2.css`: cabeçalho clicável com chevron, conteúdo recolhe sozinho depois de
+  gerar, `#relsafra-resultado` fica `hidden` até o primeiro clique). Únicos 2 filtros mantidos
+  (Safra/Cultura, nenhum novo adicionado) — Cultura continua dependente de Safra, recalculada
+  via `rebuildCulturaOptions()`, mas só o clique em "Gerar relatório" (`gerarRelatorio()`, novo)
+  de fato recalcula/exibe KPIs e tabela, respeitando o estado dos filtros no momento do clique
+  (mesmo padrão de Balancete: trocar o filtro sozinho não re-renderiza nada).
+- **Tabela "Resultado por fazenda":** cabeçalho reescrito pro padrão Brand 50/Gray 600
+  Semibold/CAIXA ALTA/letter-spacing já usado em Contas a Pagar/Categorias de receitas e
+  despesas (`page-relatorio-safra.css`), substituindo o header cru herdado de `Table.module.css`.
+  Alinhamento/zebra/ações/responsividade (Cards no mobile) preservados como já estavam — só a
+  tipografia/cor do cabeçalho mudou, nenhuma coluna nova, nenhuma paginação adicionada (dataset
+  de poucas fazendas, "quando aplicável" não se aplicou aqui).
+
+Verificado ao vivo (`http-server`, porta 8090): filtros expandidos por padrão, resultado
+escondido até "Gerar relatório"; selecionar Safra 2026/27 e gerar reproduz os mesmos valores já
+validados no round 98b (Área 326 ha/Custo R$ 5.699,20/Produção 1.440 sc + 1.200 kg/Custo médio
+R$ 3,96/sc), filtros recolhem sozinhos; "Filtros" reabre normalmente; mobile (375px) KPIs em 1
+coluna e Cards sem overflow; nenhum erro de console (só os 404 de fontes já documentados).
+
+## Ajustes 2026-09-01 (round 103) — Pedidos de Venda: filtro de Período + Total do período;
+Notas Fiscais V2: bug real no filtro de Período corrigido + ação "Enviar para WhatsApp"; Nova
+Remessa: nota para desenvolvimento (Destinatário já pautava só Clientes cadastrados, confirmado
+sem necessidade de mudança)
+
+Pedido em 6 itens sobre Pedidos de Venda, Notas Fiscais V2 e Nova Remessa.
+
+1. **Pedidos de Venda — filtros:** único filtro além da Busca agora é **Período**
+   (`window.NiveloPeriodFilter`, mesmo componente único já usado em Notas Fiscais/Caixa/Contas a
+   Pagar/Receber/Balancete/LCDPR/DRE/Entradas e Saídas — ver `period-filter.js`), montado direto
+   na barra de filtros (`#pv-period-mount`, sem popover "Filtros" — a tela nunca teve outros
+   filtros além da busca, então não havia nada a remover; só o Período foi adicionado, seguindo o
+   mesmo padrão "único filtro direto na barra" já usado em Produtos/Estoque Comprometido).
+2. **Pedidos de Venda — coluna Valor + Total do período:** coluna **Valor** movida pra 1 posição
+   antes de **Integrações** (nova ordem: Data/Cliente/Tipo/Produto/Quantidade/Condição/Status/
+   **Valor**/Integrações/Ações — `pedidos-de-venda.js`'s `buildRowHTML`/`SORTABLE_COLUMNS`/
+   `buildCardHTML` e `page-pedidos-de-venda.css`'s larguras de coluna atualizados juntos). Nova
+   linha de rodapé **"Total do período"** (`<tfoot>`, mesmo padrão de "linha de destaque" já
+   usado em Balancete/LCDPR/DRE: fundo Brand 50 + texto/negrito na cor de marca), valor sempre
+   embaixo da coluna Valor, somando só os registros que batem com busca+Período no momento
+   (`updateTotal()`, chamada de dentro de `applyPagination()` — soma TODOS os registros
+   filtrados, nunca só a página atual). Versão mobile equivalente (`#pv-mobile-total`, já que
+   Cards não têm `<tfoot>`). **Bug real evitado preventivamente:** zebra striping do corpo
+   (`.tr:nth-child(odd/even)`) escopada ao ID `#pv-tbody` (não a `.pv-table-card` genérica) —
+   sem isso, a mesma colisão zebra×linha-de-total já documentada em LCDPR/DRE (`:nth-child`
+   reinicia a contagem em cada `<tbody>`/`<tfoot>`) apagaria o fundo de marca do rodapé.
+3. **Notas Fiscais V2 — bug real no filtro de Período, corrigido.** `onApply` do
+   `NiveloPeriodFilter` só atualizava `state.periodStart`/`-End`, sem nunca chamar
+   `applyFilters()` — o filtro só valia de verdade se o usuário clicasse "Aplicar" (do widget de
+   Período) E DEPOIS reabrisse o Agrupamento de Filtros e clicasse no "Aplicar" de FORA de novo.
+   Agravado por um 2º efeito colateral: o popover do período (anexado a `document.body`, fora da
+   árvore de `filtrosPopoverEl`) já fecha o Agrupamento de Filtros sozinho ao ser clicado
+   (`outsideFiltrosClickHandler` não reconhece esse popover como "dentro"), então na prática o
+   usuário selecionava um período, clicava Aplicar, o popover externo sumia, e a tabela
+   continuava exatamente igual — lido corretamente como "o filtro não funciona". Corrigido
+   chamando `applyFilters()` direto no `onApply` (mesmo padrão já usado em Pedidos de Venda,
+   item 1) — mudar o período já atualiza a tabela na hora, sem depender de nenhum 2º clique.
+4. **Notas Fiscais V2 — ação "Enviar para WhatsApp"** (`buildActionsHTML`, ícone SVG inline do
+   WhatsApp — mesma exceção já documentada à regra "sem SVG inline", reaproveitado de "Configurar
+   WhatsApp"/Sidebar "Suporte"), disponível nas duas abas (saída e entrada). Usa **sempre** a
+   MESMA conexão já configurada em Assistente IA > Configurar WhatsApp
+   (`window.NiveloWhatsappNumeros.isConnected()`), nunca solicita uma conexão própria — se não
+   há número conectado, mostra um toast de erro claro explicando o motivo, sem enviar nada.
+   Destinatário resolvido a partir do cliente/fornecedor já vinculado à nota
+   (`resolveContato()`: casa `clienteDocumento`/`fornecedorDocumento` contra
+   `window.NiveloCadastros.list()` pelo campo `documento`, pega o `telefone` de lá — nunca um
+   número digitado na hora); sem telefone cadastrado pro contato, mesmo toast de erro claro.
+   Envio simulado (mock de ~600ms de latência, sem backend real neste protótipo) sempre termina
+   em sucesso (toast verde, citando nota/destinatário/telefone) ou falha (toast vermelho),
+   nunca silencioso. `notas-fiscais-v2.html` ganhou `cadastros-data.js`/
+   `whatsapp-numeros-data.js` no `<head>` (não carregavam antes); `page-notas-fiscais-v2.css`
+   ajustada pra caber o ícone a mais na coluna Ações (saída até 5 ícones/entrada até 4).
+5. **Nova Remessa — nota para desenvolvimento** adicionada (`.dev-note`, mesmo padrão exato já
+   usado em Meus números do WhatsApp/`cadastro-planos.html` — visível só com "Notas para
+   desenvolvimento" habilitado no navegador de protótipo): "Nova remessa não impacta em outras
+   páginas do sistema, não sendo lançada em nenhum outro local." CSS copiado pra
+   `page-nova-remessa.css` (tela não carrega `page-cadastro.css`).
+6. **Nova Remessa — Destinatário, confirmado sem necessidade de mudança.** Auditado antes de
+   codar: `nova-remessa.js` já popula o campo via `window.NiveloCadastros.findByTipo('cliente')`
+   (mesmo catálogo central de Parceiros, sem duplicidade) e não tem nenhum item de "+ Cadastrar
+   novo cliente" no menu — já atendia o pedido por completo desde a criação da tela.
+
+Verificado ao vivo (`http-server`, porta 8090): Pedidos de Venda com Período filtrando de
+verdade (selecionar 24/08/2026 isola 1 pedido e recalcula o Total pra R$ 14.500,00, batendo com
+a única linha exibida) e coluna Valor imediatamente antes de Integrações em desktop (1000px+,
+`table-layout:fixed`) e mobile (375px, Cards com Condição/Status/Valor na ordem certa); Total do
+período (R$ 104.200,00 sem filtro, conferido à mão) em azul da marca nas duas visões; Notas
+Fiscais V2 com o filtro de Mês/Dia realmente isolando as notas certas com 1 único clique em
+"Aplicar" (testado com Julho isolando 5 notas e Agosto retornando "Nenhuma nota fiscal
+encontrada", "Limpar" restaurando as 6 notas); ação "Enviar para WhatsApp" com sucesso (toast
+verde citando NF-1001/Cerealista Bom Grão S.A./+55 (17) 3322-4455) e falha (WhatsApp
+desconectado via `disconnect()`, toast vermelho com o motivo exato) nas duas telas (desktop e
+Cards mobile, sem corte/sobreposição); Nova Remessa com a nota de desenvolvimento renderizando
+só com o toggle ligado e o Destinatário confirmado listando só clientes reais cadastrados, sem
+opção de criação inline; nenhum erro real de console em nenhuma das 3 telas tocadas (só os 404
+de `/fonts/*.otf` já documentados como pré-existentes em todo o sistema).
+
+## Ajustes 2026-09-01 (round 104) — Pedidos de Venda: barra de busca/período redesenhada,
+Total do período elevado, Valor revertido pra ANTES de Status (correção do round 103), bug
+real de scroll horizontal corrigido
+
+Correção/refinamento explícito sobre o round 103, em 3 partes.
+
+1. **Barra de busca + Período:** Busca agora ocupa quase toda a largura (`flex:1 1 auto`, sem
+   teto de `max-width` — antes tinha um cap de 420px); Período reserva só o espaço necessário
+   (`flex:0 0 220px` a partir de 768px, no lugar de `width:100%` — que fazia o campo competir por
+   espaço com a Busca e cair pra uma linha própria abaixo dela). **Label "Período" removido**
+   (`.pv-filter-period .label{display:none}`) — o próprio trigger já mostra a opção selecionada.
+   **`period-filter.js` (componente compartilhado por Notas Fiscais/Caixa/Contas a Pagar/
+   Receber/Balancete/LCDPR/DRE/Entradas e Saídas) ganhou um novo `opts.noneLabel`**, opcional,
+   default `'Sem filtro'` (preserva 100% o comportamento de todas as outras telas) — só Pedidos
+   de Venda passa `noneLabel:'Sem filtro de período'`, usado nos 4 lugares que hardcodavam o
+   texto (opção "Sem filtro" na lista de modos, trigger inicial, `reset()`, `computeResult()`).
+   Implementado com uma cópia LOCAL do array `MODES` por instância (`modes = MODES.map(...)`),
+   nunca mutando o array do módulo — evita qualquer vazamento entre instâncias/telas.
+2. **Total do período elevado:** valor do rodapé passou de `--font-size-md` (14px, só 1 token
+   acima do `.td` padrão) pra `--font-size-base` (16px) — mesmo salto "um nível acima" já
+   estabelecido em DRE (linhas de destaque saltam de 12px pro dobro do passo do token seguinte,
+   não só +2px). Fundo/rótulo (Brand 50 + CAIXA ALTA/Semibold na cor de marca) já batiam com o
+   pedido desde o round 103, confirmado sem mudança necessária ali.
+3. **Ordem das colunas revertida: Valor voltou pra ANTES de Condição/Status** (nova ordem: Data/
+   Cliente/Tipo/Produto/Quantidade/**Valor**/Condição/Status/Integrações/Ações) — o round 103
+   tinha movido Valor pra logo antes de Integrações (depois de Status) atendendo um pedido
+   anterior; este round corrige isso por instrução explícita ("não mover Valor pra depois de
+   Status só pra acomodar a totalização"). `buildRowHTML`/`SORTABLE_COLUMNS`/`buildCardHTML`
+   (pedidos-de-venda.js) e larguras/alinhamento de coluna (page-pedidos-de-venda.css)
+   atualizados juntos; `<tfoot>` recalculado (`colspan="5"` pro rótulo + célula de Valor + 4
+   `<td>` vazios pra Condição/Status/Integrações/Ações, mantendo os 2 últimos sticky).
+4. **Bug real de scroll horizontal, causa raiz encontrada e corrigida.** Investigação (`wrap.
+   scrollWidth` vs `table.offsetWidth`, medido ao vivo) achou uma diferença de ~127px — a
+   `.tableWrap` (e o `.pv-mobile-card` no Cards) ficava rolável bem além do fim real do
+   conteúdo. Causa: `.tip` (Tooltip.module.css) é `position:absolute` e só é reparentado pra
+   `document.body` (escapando de qualquer clipping) no PRIMEIRO hover/focus
+   (`getActionTip()`) — antes disso, mesmo com `opacity:0`, o texto (nos 3 indicadores de
+   Integrações, frases inteiras como "Estoque não é alterado nesta etapa...") continua ocupando
+   espaço em layout dentro da célula (`white-space:nowrap`), empurrando o `scrollWidth` do
+   wrapper além do necessário — bug pré-existente desde o round 24/qualquer tela com tooltip
+   longo, só que invisível na maioria das telas (tooltips curtos, "Editar"/"Excluir") e bem
+   perceptível aqui (tooltips de frase inteira). Corrigido com `overflow:hidden` em `.pv-table-
+   card .td` (desktop) e `.pv-mobile-card-actions`/`.pv-mobile-card-integracoes` (Cards) — clipa
+   só o estado pré-hover invisível, nunca o tooltip DE VERDADE visível no hover (a essa altura o
+   JS já reparentou o `.tip` pra fora da célula, antes de setar `opacity:1`). Fix escopado só a
+   esta tela, por não ter sido pedido nas demais (embora a mesma classe de bug possa existir
+   silenciosamente em qualquer tabela do sistema com tooltips mais longos que o normal).
+
+Verificado ao vivo (`http-server`, porta 8090): `wrap.scrollWidth === table.offsetWidth` (1180
+= 1180, antes 1307 vs 1180 — ~127px de área vazia rolável eliminados) e, na prática, arrastar o
+scroll horizontal até o fim não passa mais do fim real da última coluna (Ações); mobile (375px)
+sem overflow horizontal (`document.body.scrollWidth === innerWidth`) e sem espaço morto abaixo
+da paginação; Busca esticando/Período compacto (220px) lado a lado em 1280px, sem quebrar linha;
+trigger mostrando "Sem filtro de período" por padrão e a mesma string como 1ª opção da lista de
+modos, "Intervalo" revelando Data inicial/Data final normalmente; Notas Fiscais V2 confirmada
+SEM regressão (`noneLabel` não passado ali, continua mostrando "Período"/"Sem filtro" como
+sempre); cabeçalho da tabela com Valor imediatamente antes de Condição/Status (`getBoundingClientRect`
+confirmando a célula de Total exatamente alinhada sob a coluna Valor, mesma posição X/largura);
+valor do Total em 16px/bold; nenhum erro real de console (só os 404 de `/fonts/*.otf` já
+documentados como pré-existentes em todo o sistema).
+
+## Ajustes 2026-09-01 (round 105) — Pedidos de Venda: 3 bugs reais na barra de filtros e no
+Total do período
+
+3 correções pontuais sobre o round 104, todas causa-raiz encontrada via inspeção de layout ao
+vivo (`getBoundingClientRect`/`getComputedStyle`), não só ajuste visual.
+
+1. **Busca e Período agora ficam na MESMA linha de verdade.** Bug real: `.pv-filter-search{flex:
+   1 1 auto}` (round 104) tinha `flex-basis:auto`, que usa o `width:100%` herdado da regra
+   genérica `.pv-filter` como base de cálculo do flex — a Busca reivindicava a LINHA INTEIRA
+   sozinha (100% do container) antes mesmo de crescer, empurrando o Período pra quebrar numa 2ª
+   linha, mesmo sobrando espaço de sobra pros dois cabarem lado a lado. Corrigido com
+   `flex-basis:0` (`flex:1 1 0%`) + `width:auto`, que ignora o `width:100%` herdado e deixa o
+   `flex-grow` dividir o espaço de verdade a partir de zero — a Busca cresce até exatamente o
+   espaço que sobra depois do Período (`flex:0 0 220px`, mantido do round 104) + o gap entre
+   eles, nunca mais.
+2. **Bug real: selecionar "Mês" cortava o rodapé Cancelar/Aplicar do popover de Período (sem
+   respeitar o padding inferior).** Causa: `positionPopover()` (period-filter.js) calcula
+   `maxHeight` do popover UMA ÚNICA VEZ, em `open()`, pro conteúdo do modo ativo NAQUELE
+   momento — que é sempre "Sem filtro" (sem nenhum detalhe visível, o mais baixo de todos os 5
+   modos). Trocar pra um modo com detalhe mais alto depois (ex. "Mês": cabeçalho de ano + grade
+   de 12 meses) nunca recalculava esse `maxHeight` — como o popover é `overflow:hidden` (não
+   `auto`), o conteúdo novo, mais alto que o limite antigo, tinha o rodapé (padding + botões
+   Cancelar/Aplicar) cortado por inteiro, sem nenhum indício visual de que havia mais conteúdo.
+   Corrigido chamando `positionPopover(trigger, popover)` de novo dentro do listener de clique
+   da lista de modos (sempre que o popover já estiver aberto) — recalcula `maxHeight` pro
+   tamanho real do modo recém-selecionado. Mesmo componente compartilhado por Notas Fiscais/
+   Caixa/Contas a Pagar/Receber/Balancete/LCDPR/DRE/Entradas e Saídas — fix beneficia todas,
+   nenhuma mudança de comportamento pras que não tinham esse sintoma (só reposiciona de novo,
+   nunca muda o resultado do cálculo em telas onde já cabia tudo).
+3. **Bug real: "Total do período" não estava com o azul da linha de labels — estava CINZA.**
+   Causa, mesma classe de colisão de especificidade já documentada dezenas de vezes neste
+   projeto (LCDPR/DRE): `Table.module.css` tem um zebra PRÓPRIO e global, sem escopo nenhum
+   (`.tr:nth-child(odd) .td{background:var(--color-bg-subtle)}`, 3 níveis de especificidade:
+   `.tr`+`:nth-child`+`.td`) — a única linha do `<tfoot>` (sempre `:nth-child(1)`, ímpar) batia
+   nessa regra também, e como `.pv-tfoot-row .td` (a regra do fundo azul) só tinha 2 níveis,
+   SEMPRE perdia pro zebra do componente, não importa a ordem de carregamento no `<head>`.
+   Confirmado ao vivo: fundo do rodapé em `rgb(245,245,245)` (cinza) contra `rgb(238,243,251)`
+   (azul) do cabeçalho. Corrigido reforçando o seletor pra 4 níveis
+   (`.pv-table-card .table .pv-tfoot-row .td`), vencendo com folga — confirmado que os dois
+   `background-color` computados agora são idênticos.
+
+Verificado ao vivo (`http-server`, porta 8090): Busca+Período na mesma linha em 1000/1280px,
+sem quebra, Busca ocupando o espaço restante calculado (não mais 100% sozinha); popover de
+Período com "Mês" selecionado mostrando a grade de 12 meses + rodapé Cancelar/Aplicar
+INTEIRAMENTE visível (`actionsRect.bottom <= popRect.bottom`, confirmado em 1280×900 — o mesmo
+teste numa janela artificialmente baixa, ~686px, ainda clipa por falta real de espaço em tela,
+comportamento esperado/correto do `overflow:hidden`, não o bug reportado); Total do período com
+`background-color` idêntico ao cabeçalho da tabela nos dois casos (`rgb(238,243,251)`); Notas
+Fiscais V2 confirmada sem regressão (popover de Período com Mês/Dia/Intervalo continua abrindo
+e reposicionando corretamente, nenhum erro de console); nenhum erro real de console em nenhuma
+das telas tocadas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo o
+sistema).
+
+## Ajustes 2026-09-01 (round 106) — Pedidos de Venda: valor do Total do período um nível de
+text style acima (+ 2 bugs reais de especificidade pegos no processo)
+
+Valor do rodapé "Total do período" subiu mais um nível: desktop de `--font-size-base` (16px)
+pra `--font-size-lg` (18px); mobile de `.text-subtitle-s` (14px) pra `.text-subtitle-m` (16px).
+
+- **Bug real #1, pego ao aplicar a mudança:** `.pv-tfoot-valor` (1 classe) perdia pro
+  `font-size:sm` (12px) da regra de fundo azul do rodapé (`.pv-table-card .table .pv-tfoot-row
+  .td`, 4 classes — reforçada no round 105 pra vencer o zebra do componente) — o valor
+  continuava saindo em 12px mesmo com a regra "certa" no CSS. Reforçada pro mesmo nível de
+  especificidade (`.pv-table-card .table .pv-tfoot-row .pv-tfoot-valor`), vencendo por ordem no
+  arquivo (declarada depois).
+- **Bug real #2, pego ao verificar visualmente (não só via `getComputedStyle`):** com 18px/bold,
+  "R$ 104.200,00" não cabia mais numa linha só dentro dos 120px da coluna Valor — quebrava em 2
+  linhas ("R$" / "104.200,00"), aumentando a altura da linha do rodapé sem necessidade. Coluna
+  Valor alargada de 120px pra 140px (cabe "R$ 999.999,99" com folga de padding, sem quebrar).
+
+Verificado ao vivo: `getComputedStyle` do valor confirmando 18px/700 (desktop) e 16px (mobile,
+via classe); célula de Total ainda exatamente alinhada sob o cabeçalho "Valor" (mesma X/largura,
+140px nos dois); altura da linha voltou a 44px (1 linha só, sem quebra) em 1280px real; mobile
+(375px) com o valor maior, sem corte/sobreposição; nenhum erro de console.
+
+## Ajustes 2026-09-01 (round 107) — Pedidos de Venda: valor do Total do período reduzido pro
+MESMO text style do rótulo "Total do período" (revertendo o round 106)
+
+Pedido explícito do usuário revertendo a elevação de hierarquia do round 106: valor volta a usar
+exatamente o mesmo text style do rótulo, não mais um nível acima.
+
+- **Desktop:** `.pv-tfoot-valor` não tem mais nenhum override de fonte — herda 100% de
+  `.pv-tfoot-row .td` (12px/Semibold/CAIXA ALTA, o mesmo do rótulo "Total do período"), só
+  mantendo `text-align:right` (único jeito de diferenciar visualmente onde o valor cai, já que
+  ele mora numa coluna diferente da label). Coluna Valor revertida de volta pra 120px (não
+  precisa mais dos 140px do round 106, que existiam só pra caber o texto maior).
+- **Mobile:** `.pv-mobile-total-value` trocou a classe `text-subtitle-m` (16px, round 106) pela
+  MESMA classe do rótulo, `text-body-s` (14px) — e o CSS unificado num só seletor
+  (`.pv-mobile-total-label, .pv-mobile-total-value`) garante peso/caixa-alta/letter-spacing
+  idênticos, com só o valor saindo de `text-transform:uppercase` (não afeta números, mas deixa
+  o CSS correto/explícito de qualquer forma).
+
+Verificado ao vivo: `getComputedStyle` do rótulo e do valor idênticos (12px/600/uppercase,
+desktop); valor continua alinhado à direita sob a coluna Valor (120px, sem quebra de linha);
+mobile com rótulo e valor no mesmo tamanho; nenhum erro de console.
+
+## Ajustes 2026-09-01 (round 108) — Pedidos de Venda: valor do Total do período 1 nível
+acima do rótulo (a partir do estado atual, não do estado antigo)
+
+Pedido de esclarecimento + ajuste: depois do round 107 (valor = mesmo estilo do rótulo, 12px),
+o usuário perguntou explicitamente qual token era "1 nível acima" a partir de onde estava AGORA
+(não de onde estava antes de todos os ajustes) — resposta: `--font-size-sm` (12px, estado atual)
+→ `--font-size-md` (14px), não mais `--font-size-base`/`-lg` usados em tentativas anteriores.
+Pedido confirmado: subir pra md.
+
+- **Desktop:** `.pv-tfoot-valor` ganhou `font-size:var(--font-size-md)` (14px), mantendo peso/
+  caixa-alta/letter-spacing herdados de `.pv-tfoot-row .td` (12px/Semibold do rótulo — só o
+  tamanho é diferente agora). **Mesmo bug de especificidade já documentado no round 106**
+  reapareceu (regra de 1 classe perdendo pro `font-size:sm` da regra de fundo de 4 classes) —
+  corrigido reforçando `.pv-tfoot-valor` pro mesmo nível (`.pv-table-card .table .pv-tfoot-row
+  .pv-tfoot-valor`) desde a criação desta vez, não como correção separada depois.
+- **Mobile:** `.pv-mobile-total-value` trocou a classe `text-body-s` (14px, round 107) pela
+  próxima da escala, `text-body-m` (16px) — mesmo salto relativo (1 nível) do lado mobile.
+
+Verificado ao vivo: valor em 14px/600 contra 12px/600 do rótulo (desktop), sem quebra de linha
+(120px de coluna, sem precisar alargar); mobile com o valor visivelmente 1 nível maior que o
+rótulo, sem corte/sobreposição; nenhum erro de console.

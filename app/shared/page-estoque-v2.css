@@ -8,6 +8,21 @@
 
 .estoquev2-dropdown { position: relative; }
 
+/* ── Situação (Estoque Comprometido): dropdown direto na barra de filtros,
+   fora do popover "Filtros" (removido) — mesma altura/fonte compactas já
+   usadas pelo campo de busca ao lado, mesmo padrão de `.cad-dropdown` em
+   `page-cadastros.css` (Parceiros). Escopado a esta tela (V2), nunca em
+   `page-estoque.css`, que a V1 (`estoque.html`) ainda usa com o popover
+   intacto. */
+.estoque-filters #filtro-situacao-field.estoque-dropdown .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+.estoque-filters #filtro-situacao-field.estoque-dropdown .option {
+  font-size: var(--font-size-sm);
+}
+
 /* ── Abas: "Estoque Comprometido" (a mais longa das 3) cortava em telas
    estreitas — `Tab.module.css`'s `.tab` é `white-space:nowrap` sempre, sem
    quebra em nenhum breakpoint, e `.list` esconde a própria scrollbar
@@ -77,10 +92,30 @@
    Mesma disciplina de largura por coluna já usada nas demais tabelas do
    sistema. */
 .estoquev2-vendas-table { table-layout: fixed; }
-.estoquev2-vendas-table .th:nth-child(1) { width: 24%; }  /* Produto */
-.estoquev2-vendas-table .th:nth-child(2) { width: 20%; }  /* Quantidade */
-.estoquev2-vendas-table .th:nth-child(3) { width: 16%; }  /* Preço atual */
-.estoquev2-vendas-table .th:nth-child(4) { width: 16%; }  /* Valor estimado */
+/* Bug real encontrado ao ajustar "Valor estimado": `page-estoque.css` (V1)
+   ainda tem `#panel-vendas .th:nth-child(N){width:...}` (layout antigo de 4
+   colunas, sem "Ações") — como o V2 reaproveita o mesmo `id="panel-vendas"`,
+   aquele seletor por ID (especificidade maior que as 2 classes abaixo)
+   sempre vencia e SEMPRE aplicava a largura antiga (120px fixo pra "Valor
+   estimado"), nunca a % daqui — a causa raiz do corte relatado. Corrigido
+   prefixando `#panel-vendas` aqui também, empatando o ID e vencendo pela
+   classe extra. */
+/* Segundo bug real encontrado no mesmo ajuste: misturar % (colunas 1-4) com
+   px fixo (Ações) faz o `table-layout:fixed` do navegador jogar TODO o
+   espaço não coberto pelas % (aqui, 100%-76%=24% do card) pra dentro da
+   única coluna sem %, ignorando o `width:170px` declarado nela — Ações
+   ficava bem mais larga que as outras (~229px numa tela de 1280px) em vez
+   dos 170px pedidos pros 4 ícones. Mesmo padrão já estabelecido em outras
+   tabelas do sistema (Categorias Financeiras/Contas a Pagar) resolve os
+   dois problemas de uma vez: só UMA coluna (a mais "elástica", aqui
+   Produto) fica em `width:auto` — absorve o espaço que sobrar — e todas as
+   outras, incl. Ações, ficam em `px` fixo de verdade. */
+#panel-vendas .estoquev2-vendas-table .th:nth-child(1) { width: auto; }   /* Produto — preenche o resto */
+#panel-vendas .estoquev2-vendas-table .th:nth-child(2) { width: 190px; } /* Quantidade */
+#panel-vendas .estoquev2-vendas-table .th:nth-child(3) { width: 150px; } /* Preço atual */
+#panel-vendas .estoquev2-vendas-table .th:nth-child(4) { width: 170px; } /* Valor estimado — antes
+   120px fixo (herdado por engano do V1, ver comentário acima) cortava o
+   próprio rótulo do cabeçalho; alinhado perto de Quantidade/Preço atual. */
 .estoquev2-vendas-table .th:nth-child(5) { width: 170px; } /* Ações (4 ícones) */
 
 .estoquev2-row-qty {

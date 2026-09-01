@@ -26,6 +26,24 @@
   function pad2(n) { return n < 10 ? '0' + n : String(n); }
   function capitalize(text) { return text.charAt(0).toUpperCase() + text.slice(1); }
 
+  // ---------- Máscara/validação de data digitada (modo "day" com opts.typable) ----------
+  // Mesma técnica de máscara progressiva já usada em outros campos do sistema
+  // (ex. formatCentavosBRL/CPF/CNPJ): extrai só os dígitos e reinsere as
+  // barras conforme o usuário digita.
+  function maskDateBR(raw) {
+    var digits = raw.replace(/\D/g, '').slice(0, 8);
+    if (digits.length > 4) return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+    if (digits.length > 2) return digits.slice(0, 2) + '/' + digits.slice(2);
+    return digits;
+  }
+  function isValidDMY(day, month, year) {
+    if (!day || !month || !year) return false;
+    if (month < 1 || month > 12) return false;
+    if (year < 1000 || year > 9999) return false;
+    var d = new Date(year, month - 1, day);
+    return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+  }
+
   function positionPopover(trigger, popover) {
     var margin = 16;
     var width = Math.min(240, window.innerWidth - margin * 2);
@@ -53,6 +71,12 @@
     var formatValue = opts.formatValue || function (date) {
       return pad2(date.getDate()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear();
     };
+    // opts.typable (default false/ausente): quando ligado, o `trigger` é um
+    // <input type="text"> real (não um <button>) que aceita digitação livre
+    // com máscara dd/mm/aaaa, ALÉM de continuar abrindo o popover do
+    // calendário no clique/foco — nenhum dos ~15 consumidores existentes
+    // passa essa opção, então o comportamento deles fica 100% inalterado.
+    var typable = !!opts.typable;
 
     var selected = null;
     var viewYear = 0, viewMonth = 0;
@@ -96,22 +120,77 @@
 
     function applySelected(date) {
       selected = date;
-      valueEl.textContent = formatValue(date);
-      valueEl.classList.remove('dpPlaceholder');
+      if (typable) {
+        trigger.value = formatValue(date);
+      } else {
+        valueEl.textContent = formatValue(date);
+        valueEl.classList.remove('dpPlaceholder');
+      }
       if (hiddenInput) hiddenInput.value = toInputValue(date);
       if (clearBtn) clearBtn.hidden = false;
     }
     function applyCleared() {
       selected = null;
-      valueEl.textContent = placeholder;
-      valueEl.classList.add('dpPlaceholder');
+      if (typable) {
+        trigger.value = '';
+      } else {
+        valueEl.textContent = placeholder;
+        valueEl.classList.add('dpPlaceholder');
+      }
       if (hiddenInput) hiddenInput.value = '';
       if (clearBtn) clearBtn.hidden = true;
     }
 
-    trigger.addEventListener('click', function () {
-      if (popover.hidden) open(); else close();
-    });
+    if (typable) {
+      // No modo digitável, clicar/focar SÓ abre (nunca fecha) — fechar no
+      // clique seria ruim aqui, já que o trigger é um campo de texto de
+      // verdade (o usuário clica nele pra reposicionar o cursor/editar, não
+      // só pra alternar o calendário). Fechar continua acontecendo por
+      // clique fora, Esc, ou seleção de um dia no calendário.
+      trigger.addEventListener('focus', function () {
+        if (popover.hidden) open();
+      });
+      trigger.addEventListener('click', function () {
+        if (popover.hidden) open();
+      });
+      // Clique no ícone de calendário (mesmo `.dpTrigger`, elemento
+      // irmão do input) também abre — encaminha o foco pro input real.
+      var triggerWrap = trigger.closest('.dpTrigger');
+      if (triggerWrap) {
+        triggerWrap.addEventListener('click', function (event) {
+          if (event.target !== trigger) trigger.focus();
+        });
+      }
+      trigger.addEventListener('input', function () {
+        var masked = maskDateBR(trigger.value);
+        trigger.value = masked;
+        if (masked.length === 0) {
+          if (selected) {
+            selected = null;
+            if (hiddenInput) hiddenInput.value = '';
+            if (clearBtn) clearBtn.hidden = true;
+            if (opts.onChange) opts.onChange(null);
+          }
+          return;
+        }
+        if (masked.length < 10) return; // data incompleta: nunca dispara o filtro no meio da digitação
+        var parts = masked.split('/');
+        var day = Number(parts[0]), month = Number(parts[1]), year = Number(parts[2]);
+        if (!isValidDMY(day, month, year)) return; // completa mas inválida: não filtra, não fecha, deixa o usuário corrigir
+        var date = new Date(year, month - 1, day);
+        selected = date;
+        viewYear = date.getFullYear();
+        viewMonth = date.getMonth();
+        renderCalendar();
+        if (hiddenInput) hiddenInput.value = toInputValue(date);
+        if (clearBtn) clearBtn.hidden = false;
+        if (opts.onChange) opts.onChange(toInputValue(date));
+      });
+    } else {
+      trigger.addEventListener('click', function () {
+        if (popover.hidden) open(); else close();
+      });
+    }
 
     gridEl.addEventListener('click', function (event) {
       var btn = event.target.closest('.dpDay');

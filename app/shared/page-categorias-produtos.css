@@ -1,0 +1,286 @@
+/* ══════════════════════════════════════════════════════════
+   CATEGORIAS DE PRODUTOS — Configuração > Categorias de produtos. Mobile
+   first. Mesmos padrões já usados em Categorias financeiras/Produtos/
+   Cadastro/Estoque: `Table` como Card genérico, Dropdown/Input compostos a
+   partir de tokens/componentes reais.
+
+   Nota: os padrões de filtro/tabela (`.catprod-*`) duplicam de propósito os
+   equivalentes `.catfin-*`/`.prod-*`/`.cad-*` de page-categorias-
+   financeiras.css/page-produtos.css/page-cadastros.css em vez de
+   compartilhar um arquivo comum — mesma convenção já estabelecida entre
+   essas telas (cada `page-*.css` fica independente). Sem paginação nesta
+   tela: tabela de só 3 colunas, número de categorias esperado pequeno (mesmo
+   raciocínio já aplicado a Categorias financeiras/Estoque/Fazendas). */
+
+.catprod-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.catprod-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .catprod-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.catprod-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+
+.catprod-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.catprod-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0;
+  max-width: 560px;
+}
+
+#new-categoria-btn {
+  width: 100%;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  #new-categoria-btn {
+    width: auto;
+  }
+}
+
+/* ── Abas Produtos de venda/Produtos de uso — filtram a MESMA tabela por
+   `data-grupo` (mesma técnica já usada em Categorias financeiras/Natureza
+   da Operação). ───────────────────────────────────────────────────────── */
+.catprod-tabs {
+  margin-bottom: 0;
+}
+
+/* ── Busca fundida com a tabela (mesmo padrão final já adotado em
+   Categorias financeiras/Produtos/Cadastro/Estoque) ─────────────────────── */
+.card.catprod-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.catprod-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.catprod-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+.catprod-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.catprod-filter {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .catprod-filter-search {
+    flex: 0 1 320px;
+    min-width: 240px;
+  }
+}
+
+.catprod-filters .catprod-filter.catprod-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+/* ── Tabela (desktop) / Cards (mobile) ──────────────────────────────────── */
+
+.catprod-table-card .tableWrap {
+  display: none;
+  padding-top: 0;
+}
+
+.catprod-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .catprod-table-card .tableWrap {
+    display: block;
+  }
+  .catprod-cards {
+    display: none;
+  }
+}
+
+.catprod-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.catprod-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.catprod-table-card .td {
+  border-color: var(--color-gray-200);
+}
+.catprod-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.catprod-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.catprod-table-card .tr:hover .td { filter: brightness(0.97); }
+
+.catprod-table-card .th:nth-child(1) { width: auto; }  /* Nome — preenche o resto */
+.catprod-table-card .th:nth-child(2) { width: 160px; } /* Status */
+.catprod-table-card .th:nth-child(3) { width: 100px; } /* Ações */
+
+.catprod-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.catprod-empty:not([hidden]) { display: flex; }
+.catprod-empty p { margin: 0; }
+
+/* Estado "nenhuma categoria cadastrada nesta aba" (diferente do estado
+   acima, que é sobre uma busca sem resultado) — mesmo padrão de Categorias
+   financeiras/Produtos/Cadastro. */
+.catprod-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.catprod-empty-global:not([hidden]) { display: flex; }
+.catprod-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.catprod-empty-global-title {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.catprod-empty-global-subtitle {
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--spacing-sm);
+  max-width: 360px;
+}
+
+/* Quando a aba ativa não tem nenhuma categoria (`is-demo-empty`, ver
+   categorias-produtos.js), tabela/Cards somem por completo em favor do
+   estado vazio acima — mesmo padrão de Categorias financeiras. */
+.catprod-table-card.is-demo-empty .tableWrap,
+.catprod-table-card.is-demo-empty .catprod-cards,
+.catprod-table-card.is-demo-empty .catprod-empty {
+  display: none;
+}
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.catprod-mobile-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.catprod-mobile-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  min-width: 0;
+}
+
+.catprod-mobile-card-name {
+  color: var(--color-text-primary);
+}
+
+/* ── Toast de sucesso ("Categoria salva com sucesso") ─────────────────────
+   Mesma composição já usada em Categorias financeiras/Produtos/Cadastro/
+   Estoque (Feedback reaproveitado como Toast). */
+.catprod-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+
+.catprod-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+.catprod-toast {
+  box-shadow: var(--shadow-lg);
+  animation: catprod-toast-in 0.25s ease;
+}
+
+.catprod-toast .body {
+  padding: 0;
+  color: inherit;
+  line-height: inherit;
+}
+.catprod-toast .title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  margin: 0 0 var(--spacing-xs);
+}
+
+@keyframes catprod-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard (o componente
+   React resolve com `if (!open) return null`) — mesmo bug já documentado em
+   page-categorias-financeiras.css/page-produtos.css/page-cadastros.css. */
+.overlay[hidden] { display: none; }

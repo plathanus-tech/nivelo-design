@@ -169,7 +169,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -340,16 +344,6 @@
               <div class="nova-anotacao-subsection" id="secao-anotacao">
                 <h2 class="nova-anotacao-subsection-title">Detalhes da anotação</h2>
                 <div class="nova-anotacao-grid">
-                  <div class="wrapper nova-anotacao-span-2" id="titulo-field">
-                    <label class="label" for="na-titulo">Título</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="na-titulo" placeholder="Ex.: Monitoramento de pragas" />
-                    </div>
-                    <span class="errorText" id="titulo-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Informe o título da anotação.
-                    </span>
-                  </div>
                   <div class="wrapper nova-anotacao-span-2" id="descricao-field">
                     <label class="label" for="na-descricao">Descrição</label>
                     <textarea class="input nova-anotacao-textarea" id="na-descricao" rows="3" placeholder="Escreva os detalhes desta anotação..."></textarea>
@@ -427,20 +421,13 @@
                 <div class="nova-anotacao-grid">
 
                   <div class="wrapper nova-anotacao-dropdown" id="categoria-despesa-field">
-                    <span class="label">Categoria</span>
+                    <span class="label">Categorias financeiras <span class="nova-anotacao-optional-tag">(opcional)</span></span>
                     <button type="button" class="trigger" data-dropdown-trigger>
                       <span class="placeholder" data-dropdown-value>Selecione a categoria</span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
-                    <div class="menu" data-dropdown-menu>
-                      <div class="option" data-value="Servico">Serviço</div>
-                      <div class="option" data-value="Frete">Frete</div>
-                      <div class="option" data-value="Outro">Outro</div>
-                    </div>
-                    <span class="errorText" id="categoria-despesa-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione a categoria da despesa.
-                    </span>
+                    <div class="menu" data-dropdown-menu></div>
+                    <span class="helperText">Cadastradas em Configurações → Categorias financeiras.</span>
                   </div>
 
                   <div class="wrapper" id="valor-despesa-field">
@@ -526,6 +513,7 @@
   <script src="../shared/unidades-medida-data.js"></script>
   <script src="../shared/estoque-uso-v2-data.js"></script>
   <script src="../shared/locais-data.js"></script>
+  <script src="../shared/categorias-financeiras-data.js"></script>
   <script src="../shared/caderno-v2-data.js"></script>
   <script src="../shared/nova-anotacao-v2.js"></script>
 </body>

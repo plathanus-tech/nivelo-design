@@ -179,7 +179,6 @@
 
   var state = {
     search: '',
-    categoria: '',
     conta: '',
     periodStart: null,
     periodEnd: null,
@@ -187,7 +186,6 @@
   };
 
   function rowMatches(row) {
-    if (state.categoria && row.dataset.categoria !== state.categoria) return false;
     if (state.conta && row.dataset.conta !== state.conta) return false;
     if (state.periodStart && row.dataset.data < state.periodStart) return false;
     if (state.periodEnd && row.dataset.data > state.periodEnd) return false;
@@ -418,17 +416,6 @@
     return { selectOption: selectOption, reset: reset };
   }
 
-  // Categoria: populada em runtime com TODAS as categorias (receita e despesa).
-  var categoriaMenu = document.getElementById('caixa-categoria-menu');
-  window.NiveloCategoriasFinanceiras.list().forEach(function (categoria) {
-    var optionEl = document.createElement('div');
-    optionEl.className = 'option';
-    optionEl.dataset.value = categoria.codigo;
-    optionEl.textContent = categoria.descricao;
-    categoriaMenu.appendChild(optionEl);
-  });
-  var categoriaDropdown = initDropdown(document.getElementById('dropdown-categoria'));
-
   // Conta: populada a partir do catálogo real de Contas Financeiras (mesma
   // fonte da coluna "Conta" e da aba "Contas financeiras").
   var contaMenu = document.getElementById('caixa-conta-menu');
@@ -482,7 +469,6 @@
   });
 
   document.getElementById('caixa-filtros-aplicar').addEventListener('click', function () {
-    state.categoria = document.getElementById('dropdown-categoria').dataset.value || '';
     state.conta = document.getElementById('dropdown-conta').dataset.value || '';
     state.page = 1;
     closeFiltrosPopover();
@@ -490,9 +476,7 @@
   });
 
   document.getElementById('caixa-filtros-limpar').addEventListener('click', function () {
-    categoriaDropdown.reset('', 'Todas as categorias');
     contaDropdown.reset('', 'Todas as contas');
-    state.categoria = '';
     state.conta = '';
     resetPeriod();
     state.page = 1;

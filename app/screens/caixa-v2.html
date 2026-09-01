@@ -182,7 +182,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -416,20 +420,10 @@
             </div>
 
             <!-- Popover "Filtros": Período (seletor de modo, ver
-                 period-filter.js) + Categoria + Conta. -->
+                 period-filter.js) + Conta. Categoria removida por pedido
+                 explícito, sem substituição. -->
             <div class="caixa-filter-popover" id="caixa-filtros-popover" hidden>
               <div id="caixa-period-mount"></div>
-
-              <div class="wrapper caixa-dropdown" id="dropdown-categoria">
-                <span class="label">Categoria</span>
-                <button type="button" class="trigger" data-dropdown-trigger>
-                  <span data-dropdown-value>Todas as categorias</span>
-                  <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                </button>
-                <div class="menu" data-dropdown-menu id="caixa-categoria-menu">
-                  <div class="option selected" data-value="">Todas as categorias</div>
-                </div>
-              </div>
 
               <div class="wrapper caixa-dropdown" id="dropdown-conta">
                 <span class="label">Conta</span>

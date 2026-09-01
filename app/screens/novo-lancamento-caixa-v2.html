@@ -177,7 +177,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -364,7 +368,7 @@
                   </div>
 
                   <div class="wrapper nlc-dropdown" id="categoria-field">
-                    <span class="label">Categoria Financeira</span>
+                    <span class="label">Categoria financeira</span>
                     <button type="button" class="trigger" data-dropdown-trigger>
                       <span class="placeholder" data-dropdown-value>Selecione a categoria</span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
@@ -376,15 +380,16 @@
                     </span>
                   </div>
 
-                  <div class="wrapper" id="documento-field">
-                    <label class="label" for="nlc-documento">Documento <span class="nlc-optional-tag">(opcional)</span></label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="nlc-documento" placeholder="Ex.: NF-e 12345, boleto, referência" />
-                    </div>
-                    <span class="helperText">Número da NF-e, número do documento ou outra referência.</span>
+                  <div class="wrapper nlc-dropdown" id="pessoa-field">
+                    <span class="label">Cliente ou Fornecedor <span class="nlc-optional-tag">(opcional)</span></span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Nenhum selecionado</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="pessoa-menu"></div>
                   </div>
 
-                  <div class="wrapper nlc-span-2" id="historico-field">
+                  <div class="wrapper" id="historico-field">
                     <label class="label" for="nlc-historico">Descrição</label>
                     <div class="inputWrap">
                       <input class="input" type="text" id="nlc-historico" placeholder="Ex.: Venda de soja, Combustível, Energia elétrica" aria-describedby="historico-error" />
@@ -395,15 +400,19 @@
                     </span>
                   </div>
 
-                </div>
-              </div>
+                  <div class="wrapper" id="documento-field">
+                    <label class="label" for="nlc-documento">Documento <span class="nlc-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="nlc-documento" placeholder="Ex.: NF-e 12345, boleto, referência" />
+                    </div>
+                    <span class="helperText">Número da NF-e, número do documento ou outra referência.</span>
+                  </div>
 
-              <!-- ══════════════ CLASSIFICAÇÃO ══════════════ -->
-              <div class="nlc-subsection">
-                <h2 class="nlc-subsection-title">Classificação</h2>
-                <div class="nlc-grid">
-
-                  <div class="dpRoot" id="competencia-field">
+                  <!-- Competência: único sobrevivente da antiga subseção
+                       "Classificação" (removida por pedido explícito, sem
+                       deixar vazio) — span-2 pra não sobrar meia coluna vazia
+                       como último campo ímpar do grid. -->
+                  <div class="dpRoot nlc-span-2" id="competencia-field">
                     <span class="label">Competência <span class="nlc-optional-tag">(opcional)</span></span>
                     <div class="dpTriggerRow">
                       <button type="button" class="dpTrigger" id="competencia-trigger">
@@ -426,15 +435,6 @@
                       </div>
                       <div class="dpMonthGrid" data-competencia-grid></div>
                     </div>
-                  </div>
-
-                  <div class="wrapper nlc-dropdown nlc-span-2" id="pessoa-field">
-                    <span class="label">Cliente ou Fornecedor <span class="nlc-optional-tag">(opcional)</span></span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span class="placeholder" data-dropdown-value>Nenhum selecionado</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="pessoa-menu"></div>
                   </div>
 
                 </div>

@@ -99,13 +99,20 @@
     var today = opts.today || DEFAULT_TODAY;
     var onApply = opts.onApply || function () {};
     var fieldLabel = opts.label || 'Período';
+    // Rótulo do modo "Sem filtro" — customizável por instância (ex.:
+    // Pedidos de Venda pede "Sem filtro de período", explícito, pra deixar
+    // claro que o controle se refere ao período). Nunca muta o array
+    // `MODES` do módulo (compartilhado por todas as telas que usam este
+    // componente) — usa uma cópia local só desta instância.
+    var noneLabel = opts.noneLabel || 'Sem filtro';
+    var modes = MODES.map(function (m) { return m.value === 'none' ? { value: 'none', label: noneLabel } : m; });
 
     // ---------- Trigger (dentro do `mount`) ----------
     mount.classList.add('wrapper', 'pf-field');
     mount.innerHTML =
       '<span class="label">' + fieldLabel + '</span>' +
       '<button type="button" class="trigger" data-pf-trigger>' +
-      '<span class="placeholder" data-pf-value>Sem filtro</span>' +
+      '<span class="placeholder" data-pf-value>' + noneLabel + '</span>' +
       '<span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>' +
       '</button>';
     if (window.lucide) lucide.createIcons();
@@ -119,7 +126,7 @@
     popover.hidden = true;
     popover.innerHTML =
       '<div class="pf-mode-list" role="radiogroup" aria-label="Tipo de filtro de período">' +
-      MODES.map(function (m) {
+      modes.map(function (m) {
         return '<button type="button" class="pf-mode-option" data-pf-mode="' + m.value + '">' + m.label + '</button>';
       }).join('') +
       '</div>' +
@@ -135,7 +142,7 @@
     var applyBtn = popover.querySelector('[data-pf-apply]');
     var cancelBtn = popover.querySelector('[data-pf-cancel]');
 
-    var applied = { mode: 'none', start: null, end: null, label: 'Sem filtro' };
+    var applied = { mode: 'none', start: null, end: null, label: noneLabel };
     var draft = { mode: 'none', date: null, year: today ? parseISO(today).getFullYear() : new Date().getFullYear(), month: 0, start: null, end: null };
 
     // ---------- Calendário de dia — dropdown clássico, flutuante, fora do
@@ -348,6 +355,18 @@
       var btn = event.target.closest('[data-pf-mode]');
       if (!btn) return;
       selectMode(btn.dataset.pfMode);
+      // Bug real corrigido: `maxHeight`/`top`/`bottom` do popover são
+      // calculados uma única vez em `open()`, pro conteúdo do modo ATIVO
+      // naquele momento ("Sem filtro", sem nenhum detalhe visível — o mais
+      // baixo de todos). Trocar pra um modo com detalhe mais alto (ex.
+      // "Mês", que soma cabeçalho de ano + grade de 12 meses) sem
+      // recalcular deixava o `maxHeight` antigo valendo — como o popover é
+      // `overflow:hidden`, o conteúdo novo (mais alto) estourava esse
+      // limite e cortava o padding inferior + o rodapé Cancelar/Aplicar
+      // inteiro, sem nenhum indício visual de que havia mais conteúdo.
+      // Reposicionar de novo aqui recalcula `maxHeight` pro tamanho real do
+      // modo recém-selecionado, sempre que o popover já estiver aberto.
+      if (!popover.hidden) positionPopover(trigger, popover);
     });
 
     // ---------- Abrir/fechar popover ----------
@@ -400,7 +419,7 @@
     // ---------- Aplicar ----------
     function computeResult() {
       if (draft.mode === 'none') {
-        return { mode: 'none', start: null, end: null, label: 'Sem filtro' };
+        return { mode: 'none', start: null, end: null, label: noneLabel };
       }
       if (draft.mode === '30d') {
         var end30 = today;
@@ -438,7 +457,7 @@
     valueEl.classList.add('placeholder');
 
     function reset() {
-      applied = { mode: 'none', start: null, end: null, label: 'Sem filtro' };
+      applied = { mode: 'none', start: null, end: null, label: noneLabel };
       valueEl.textContent = applied.label;
       valueEl.classList.add('placeholder');
     }

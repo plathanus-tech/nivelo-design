@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-nova-conversa.css" />
 </head>
@@ -174,7 +175,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -258,6 +263,40 @@
               <h2 class="nc-history-title text-body-s">Histórico de conversas</h2>
               <p class="nc-history-subtitle text-12-regular">Registro cronológico e somente leitura para auditoria e suporte.</p>
             </div>
+
+            <!-- Busca por data: filtra a lista pelo dia da última mensagem de
+                 cada conversa. DatePicker real (Storybook), modo dia único,
+                 com opts.typable:true (única tela do sistema a usar essa
+                 opção) — permite digitar dd/mm/aaaa OU abrir o calendário,
+                 já que o resto do sistema só clica pra escolher. Ver
+                 date-picker.js. -->
+            <div class="dpRoot nc-history-date-filter" id="nc-history-date-filter">
+              <div class="nc-history-date-row">
+                <div class="dpTrigger dpTriggerTypable">
+                  <span class="dpTriggerIcon"><i data-lucide="calendar" width="14" height="14"></i></span>
+                  <input type="text" class="dpTriggerInput" id="nc-history-date-trigger" placeholder="dd/mm/aaaa" inputmode="numeric" maxlength="10" autocomplete="off">
+                </div>
+                <button type="button" class="actionBtn nc-history-date-clear" id="nc-history-date-clear" hidden aria-label="Limpar data" title="Limpar filtro">
+                  <i data-lucide="x" width="14" height="14"></i>
+                </button>
+              </div>
+              <div class="dpPopover" id="nc-history-date-popover" hidden>
+                <div class="dpCalendarHeader">
+                  <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior">
+                    <i data-lucide="chevron-left" width="16" height="16"></i>
+                  </button>
+                  <span class="dpCalendarLabel text-body-s" data-dp-label></span>
+                  <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês">
+                    <i data-lucide="chevron-right" width="16" height="16"></i>
+                  </button>
+                </div>
+                <div class="dpWeekdays">
+                  <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+                </div>
+                <div class="dpGrid" data-dp-grid></div>
+              </div>
+            </div>
+
             <div class="nc-history-list" id="nc-history-list"></div>
             <button type="button" class="btn secondary nc-loadmore-btn" id="nc-loadmore-btn" hidden>Ver mais</button>
           </aside>
@@ -287,6 +326,8 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/date-picker.js"></script>
+  <script src="../shared/whatsapp-numeros-data.js"></script>
   <script src="../shared/assistente-data.js"></script>
   <script src="../shared/nova-conversa.js"></script>
 </body>

@@ -8,21 +8,25 @@
   'use strict';
 
   // Ordem segue a mesma ordem da Sidebar (mesmo critério já aplicado às
-  // categorias do Canal de Ideias) — "Notas Fiscais" na posição de "Vendas e
-  // fiscal"; "Primeiros passos"/"Outros" não têm item correspondente na
-  // Sidebar, ficam por último (mesmo raciocínio do catch-all "Outros" do
-  // Canal de Ideias). Conjunto de categorias alinhado ao Canal de Ideias
-  // (Dashboard/Relatórios/Outros adicionados por paridade entre as duas
+  // categorias do Canal de Ideias) — "Notas Fiscais" logo depois de "Vendas"
+  // (é um subitem do grupo Vendas na Sidebar); "Primeiros passos"/"Outros"
+  // não têm item correspondente na Sidebar, ficam por último (mesmo
+  // raciocínio do catch-all "Outros" do Canal de Ideias). Conjunto de
+  // categorias alinhado ao Canal de Ideias (Dashboard/Cadastro/Relatórios/
+  // Vendas/Configuração/Outros adicionados por paridade entre as duas
   // telas), mais as 2 categorias específicas de Vídeos (Notas Fiscais/
   // Primeiros passos) que não existem lá.
   var CATEGORIAS = [
     'Dashboard',
     'Assistente IA',
     'Caderno de Campo',
+    'Cadastro',
     'Estoque',
     'Financeiro',
     'Relatórios',
+    'Vendas',
     'Notas Fiscais',
+    'Configuração',
     'Primeiros passos',
     'Outros'
   ];

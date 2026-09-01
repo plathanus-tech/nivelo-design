@@ -183,8 +183,13 @@
   }
 
   function buildSubtitleText(r) {
-    if (r.tipo === 'anotacao') return r.titulo;
-    if (r.tipo === 'despesa-manual') return (r.categoria || '') + (r.observacao ? ' · ' + r.observacao : '');
+    if (r.tipo === 'anotacao') return r.descricao || '';
+    if (r.tipo === 'despesa-manual') {
+      var categoria = r.categoriaCodigo && window.NiveloCategoriasFinanceiras
+        ? (window.NiveloCategoriasFinanceiras.findByCodigo(r.categoriaCodigo) || {}).descricao
+        : null;
+      return (categoria || '') + (r.observacao ? ' · ' + r.observacao : '');
+    }
     if (r.tipo === 'aplicacao-insumo') return (r.produtoNome || '') + (r.depositoNome ? ' · ' + r.depositoNome : '');
     if (r.tipo === 'colheita') return r.produtoNome || '';
     return '';

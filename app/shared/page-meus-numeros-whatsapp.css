@@ -99,9 +99,12 @@
    Mesmo padrão de erro "só borda" já usado em Conta Financeira/Fazendas
    (`.wrapper.error .errorText{display:flex}` — sem fundo colorido cobrindo
    o campo, ver app/CLAUDE.md round 37). */
-#mnw-numero-field .errorText { display: none; }
-#mnw-numero-field.error .errorText { display: flex; }
-#mnw-numero-field.error .input { border-color: var(--color-action-error); }
+#mnw-numero-field .errorText,
+#mnw-nome-field .errorText { display: none; }
+#mnw-numero-field.error .errorText,
+#mnw-nome-field.error .errorText { display: flex; }
+#mnw-numero-field.error .input,
+#mnw-nome-field.error .input { border-color: var(--color-action-error); }
 /* Feedback.module.css (carregado nesta tela pro toast) declara `.error`
    crua (fundo+borda vermelhos) — como o `.wrapper` do Input reaproveita a
    mesma classe `.error` pra marcar estado de erro, o fundo vermelho vazava
@@ -109,7 +112,8 @@
    page-cadastro.css/page-nova-fazenda.css). Padrão de erro do sistema é só
    a borda vermelha (já aplicada acima via `.input`), nunca um fundo
    cobrindo o `.wrapper`. */
-#mnw-numero-field.error { background: transparent; border-color: transparent; }
+#mnw-numero-field.error,
+#mnw-nome-field.error { background: transparent; border-color: transparent; }
 #mnw-numero-field .helperText { margin-top: 2px; }
 
 /* Texto do número dentro do modal de Conectar/Atualizar. */

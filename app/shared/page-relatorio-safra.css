@@ -1,17 +1,19 @@
 /* ══════════════════════════════════════════════════════════
-   RELATÓRIO DE SAFRA (Financeiro > Relatórios > Relatório de Safra).
-   Filtro de Safra (Dropdown) + resumo (Total plantado/Total colhido) + UMA
-   tabela (Produto/Plantado/Colhido) para a safra selecionada. Tudo reage ao
-   filtro na hora, sem passo de "Gerar relatório" (ver relatorio-safra.js).
-   Fontes read-only: `fazendas-data.js` (Plantado) e `caderno-data.js`
-   (Colhido), nunca escreve em nenhum dos dois. Mobile first.
+   RESULTADO DE SAFRA (Financeiro > Relatórios > Resultado de Safra).
+   Filtros de Safra + Cultura (Dropdowns, aplicam na hora) + 4 KPIs (Área
+   total/Custo total/Produção/Custo médio por Safra) + UMA tabela por
+   FAZENDA (Área/Custo total/Produção/Produtividade/Custo por Ha/Custo por
+   Saca/Ação), Cards no mobile. Tudo reage ao filtro na hora, sem passo de
+   "Gerar relatório" (ver relatorio-safra.js). Fontes read-only:
+   `fazendas-data.js` (área dos talhões) e `caderno-v2-data.js` (registros
+   do Caderno de Campo V2), nunca escreve em nenhum dos dois. Mobile first.
    ══════════════════════════════════════════════════════════ */
 
 .relsafra-page {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -37,33 +39,97 @@
   color: var(--color-text-primary);
 }
 
-/* ── Filtro de Safra ──────────────────────────────────────────────────── */
+/* ── Filtros (accordion: recolhe sozinho após gerar) ───────────────────────
+   Mesmo padrão visual/estrutural/de interação já usado em Balancete/LCDPR/
+   DRE (ver page-balancete-v2.css) — cabeçalho inteiro clicável, conteúdo
+   alterna via `hidden`, grid 1→2→4 colunas mesmo só com 2 campos. */
+.relsafra-filtros-card { display: flex; flex-direction: column; }
 
-.relsafra-filter-bar {
+.relsafra-filtros-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+}
+.relsafra-filtros-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+}
+.relsafra-filtros-toggle svg { transition: transform var(--transition-fast); }
+.relsafra-filtros-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.relsafra-filtros-content:not([hidden]) { display: flex; flex-direction: column; }
+
+.relsafra-filtros-body { padding: 0 var(--spacing-lg) var(--spacing-lg); }
+
+.relsafra-filtros-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .relsafra-filtros-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 1024px) {
+  .relsafra-filtros-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.relsafra-filtros-actions {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.relsafra-filtros-actions .btn { width: 100%; }
+@media (min-width: 640px) {
+  .relsafra-filtros-actions .btn { width: auto; min-width: 200px; }
+}
+
+/* ── Resultado: só aparece depois de "Gerar relatório" ────────────────────
+   Mesmo espaçamento de 16px entre os blocos internos já usado em Balancete/
+   LCDPR/DRE (diferente dos 24px usados entre as seções de topo da página). */
+#relsafra-resultado:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.relsafra-resultado-header {
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-md);
 }
+.relsafra-resultado-title { color: var(--color-text-primary); margin: 0 0 var(--spacing-2xs); }
+.relsafra-resultado-resumo { color: var(--color-text-tertiary); margin: 0; }
 
-.relsafra-dropdown {
-  width: 100%;
-  max-width: 260px;
-}
-
-/* ── Resumo (Total plantado / Total colhido) ──────────────────────────────
-   Mesma cópia estrutural do padrão de KPI já usado em Estoque/Caixa/Contas
-   a Pagar/Receber: título+valor no mesmo tamanho compacto (12px/24px) em
-   qualquer largura de tela, 1 coluna no mobile, 2 iguais a partir de
-   1024px (só 2 cards aqui, diferente dos 3-4 de outras telas). */
+/* ── KPIs (Área total / Custo total / Produção / Custo médio / Safra) ─────
+   Mesma cópia estrutural exata do padrão de KPI já usado em Estoque/Caixa/
+   Contas a Pagar/Receber: título+valor no mesmo tamanho compacto (12px/24px)
+   em qualquer largura de tela (regra do round 55), grid 1→2→4 colunas. */
 .relsafra-summary-row {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
   align-items: stretch;
 }
-@media (min-width: 1024px) {
+@media (min-width: 640px) {
   .relsafra-summary-row {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .relsafra-summary-row {
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-lg);
   }
 }
@@ -108,16 +174,14 @@
   line-height: 1.3;
   letter-spacing: 0.01em;
 }
-.relsafra-summary-caption {
+.relsafra-summary-caption,
+.relsafra-kpi-secondary-line {
   color: var(--color-text-tertiary);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: var(--font-weight-regular);
 }
-@media (min-width: 1024px) {
-  .relsafra-summary-caption { font-size: 12px; font-weight: var(--font-weight-regular); }
-}
 
-/* ── Tabela (Produto/Plantado/Colhido) ─────────────────────────────────── */
+/* ── Tabela por Fazenda ───────────────────────────────────────────────── */
 
 .card.relsafra-table-card {
   padding: 0;
@@ -158,28 +222,113 @@
   #relsafra-export-btn { width: auto; }
 }
 
+/* Desktop: tabela real, escondida no mobile (Cards assumem abaixo de
+   768px) — mesmo padrão "Tabela → Cards no mobile" já usado em Talhões
+   (fazenda-detalhe-caderno-v2.js) e nas demais tabelas do sistema. */
+#relsafra-table-wrap { display: none; }
+@media (min-width: 768px) {
+  #relsafra-table-wrap:not([hidden]) { display: block; }
+}
+
+/* Cabeçalho: mesmo padrão exato já usado nas demais tabelas do sistema
+   (Contas a Pagar/Receber, Categorias de receitas e despesas) — fundo Brand
+   50, texto Gray 600 Semibold em CAIXA ALTA, altura livre (quebra em até 2
+   linhas quando o rótulo não cabe, em vez do `height:37px`/`white-space:
+   nowrap` fixos do componente, que cortariam/sobrepoririam o texto). */
+.relsafra-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  min-height: 40px;
+  white-space: normal;
+  line-height: 1.3;
+  vertical-align: middle;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.relsafra-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+.relsafra-table-card .td { border-color: var(--color-gray-200); padding: var(--spacing-xs) var(--spacing-sm); }
+
+.relsafra-table-card .table { table-layout: fixed; }
+.relsafra-table-card .th:nth-child(1), .relsafra-table-card .td:nth-child(1) { width: 20%; min-width: 140px; } /* Fazenda */
+.relsafra-table-card .th:nth-child(2), .relsafra-table-card .td:nth-child(2) { width: 10%; } /* Área */
+.relsafra-table-card .th:nth-child(3), .relsafra-table-card .td:nth-child(3) { width: 13%; } /* Custo total */
+.relsafra-table-card .th:nth-child(4), .relsafra-table-card .td:nth-child(4) { width: 13%; } /* Produção */
+.relsafra-table-card .th:nth-child(5), .relsafra-table-card .td:nth-child(5) { width: 13%; } /* Produtividade */
+.relsafra-table-card .th:nth-child(6), .relsafra-table-card .td:nth-child(6) { width: 12%; } /* Custo / Ha */
+.relsafra-table-card .th:nth-child(7), .relsafra-table-card .td:nth-child(7) { width: 13%; } /* Custo / Saca */
+.relsafra-table-card .th:nth-child(8), .relsafra-table-card .td:nth-child(8) { width: 96px; } /* Ação (1 ícone) */
+
 .relsafra-table-card .td:nth-child(2),
-.relsafra-table-card .td:nth-child(3) {
+.relsafra-table-card .td:nth-child(3),
+.relsafra-table-card .td:nth-child(4),
+.relsafra-table-card .td:nth-child(5),
+.relsafra-table-card .td:nth-child(6),
+.relsafra-table-card .td:nth-child(7) {
   text-align: right;
 }
 .relsafra-table-card .th:nth-child(2),
-.relsafra-table-card .th:nth-child(3) {
+.relsafra-table-card .th:nth-child(3),
+.relsafra-table-card .th:nth-child(4),
+.relsafra-table-card .th:nth-child(5),
+.relsafra-table-card .th:nth-child(6),
+.relsafra-table-card .th:nth-child(7) {
   text-align: right;
 }
+.relsafra-table-card .td:nth-child(8) { text-align: center; }
 
-/* Zebra striping (branco/gray-50) escopado ao TBODY (`#relsafra-tbody`, id — nunca a
-   uma classe genérica da tabela), mesmo padrão/mesma lição já documentada em LCDPR/
-   DRE/Balancete V2: sobrescreve o zebra padrão (bg-subtle/bg-default) de
-   Table.module.css pelo par branco/gray-50 usado nos demais relatórios da V2. */
+/* Zebra striping (branco/gray-50) escopado ao TBODY (`#relsafra-tbody`, id
+   — nunca a uma classe genérica da tabela), mesmo padrão já documentado em
+   LCDPR/DRE/Balancete V2. */
 #relsafra-tbody .tr:nth-child(odd) .td { background: var(--color-bg-surface); }
 #relsafra-tbody .tr:nth-child(even) .td { background: var(--color-gray-50); }
 .relsafra-table-card .tr:hover .td { filter: brightness(0.97); }
 
-/* Mensagem "nenhum dado" pra safra inteira (nem plantado, nem colhido) —
-   some a tabela por completo, mostra só a mensagem central. Guard
-   `hidden`+`display` incondicional: `.relsafra-empty` abaixo é
-   `display:flex` sem guarda, então precisa reforçar `[hidden]{display:none}`
-   (mesmo padrão documentado dezenas de vezes em app/CLAUDE.md). */
+.relsafra-table-card .cellActions { justify-content: center; }
+
+/* ── Cards no mobile (abaixo de 768px) ──────────────────────────────────
+   Mesma arquitetura já usada pela tabela de Talhões (page-fazenda-detalhe-
+   caderno-v2.css's .talhao-mobile-card). */
+#relsafra-mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  #relsafra-mobile-list { display: none; }
+}
+
+.relsafra-mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+.relsafra-mobile-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.relsafra-mobile-card-name { color: var(--color-text-primary); }
+.relsafra-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.relsafra-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.relsafra-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+
+/* Mensagem "nenhuma fazenda" pro filtro atual — some tabela/cards por
+   completo, mostra só a mensagem central. Guard `hidden`+`display`
+   incondicional: `.relsafra-empty` abaixo é `display:flex` sem guarda,
+   então precisa reforçar `[hidden]{display:none}` (mesmo padrão
+   documentado dezenas de vezes em app/CLAUDE.md). */
 .relsafra-empty[hidden] { display: none; }
 .relsafra-empty:not([hidden]) {
   display: flex;

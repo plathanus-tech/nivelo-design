@@ -203,17 +203,6 @@
     renderTalhoes(currentFazenda);
   }
 
-  // ---------- Ações do cabeçalho ----------
-  document.getElementById('nova-anotacao-fazenda-btn').addEventListener('click', function () {
-    if (!currentFazenda) return;
-    var primeiroTalhao = currentFazenda.talhoes[0];
-    if (!primeiroTalhao) {
-      window.alert('Cadastre um talhão nesta fazenda antes de registrar uma anotação — todo registro do Caderno de Campo precisa estar vinculado a um talhão.');
-      return;
-    }
-    window.location.href = 'nova-anotacao-v2.html?fazenda=' + encodeURIComponent(currentFazenda.id) + '&talhao=' + encodeURIComponent(primeiroTalhao.id);
-  });
-
   // ---------- Modal: Encerrar safra ----------
   var encerrarOverlay = document.getElementById('encerrar-safra-overlay');
   var encerrarTarget = null;

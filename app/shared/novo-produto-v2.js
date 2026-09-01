@@ -378,6 +378,17 @@
     document.title = 'Editar produto — Nivelo';
     document.getElementById('novo-produto-submit').textContent = 'Salvar alterações';
     fillForm(editingProduct);
+  } else {
+    // Pré-seleção inteligente do Tipo de produto a partir da aba de origem
+    // (`?tipo=venda|uso`, ver produtos-v2.js's "Novo produto") — só sugere o
+    // valor inicial, o campo continua editável normalmente pelo usuário.
+    var tipoParam = params.get('tipo');
+    if (tipoParam === 'uso' || tipoParam === 'venda') {
+      var tipoRadioPreset = document.querySelector('input[name="tipo-produto"][value="' + tipoParam + '"]');
+      if (tipoRadioPreset) tipoRadioPreset.checked = true;
+      syncTipoProdutoChecked();
+      refreshTipoProdutoVisibility();
+    }
   }
 
   // ---------- Validação + envio ----------

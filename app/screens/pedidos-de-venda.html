@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../shared/period-filter.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-pedidos-de-venda.css" />
 </head>
@@ -180,7 +181,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -286,6 +291,13 @@
                     </div>
                   </div>
                 </div>
+                <!-- Único filtro além da busca: Período (seletor de modo —
+                     Sem filtro/Últimos 30 dias/Dia/Mês/Intervalo, ver
+                     period-filter.js, mesmo componente usado em toda
+                     tabela/relatório do sistema). Direto na barra, sem
+                     popover "Filtros" (mesmo padrão de "só 1 filtro" já
+                     usado em Produtos/Estoque Comprometido). -->
+                <div class="pv-filter pv-filter-period" id="pv-period-mount"></div>
               </div>
             </div>
 
@@ -307,10 +319,34 @@
                     </tr>
                   </thead>
                   <tbody id="pv-tbody"></tbody>
+                  <!-- Total do período: mesma linguagem visual da linha de
+                       labels da tabela (CAIXA ALTA/Semibold), em azul da
+                       marca — mesmo padrão de "linha de destaque" já usado
+                       em Balancete/LCDPR/DRE. Valor sempre embaixo da coluna
+                       Valor (mantida ANTES de Condição/Status, nunca movida
+                       pra depois só pra acomodar esta linha), recalculado a
+                       cada mudança de busca/período (ver pedidos-de-venda.js). -->
+                  <tfoot>
+                    <tr class="tr pv-tfoot-row">
+                      <td class="td" colspan="5">Total do período</td>
+                      <td class="td pv-tfoot-valor" id="pv-total-valor">R$ 0,00</td>
+                      <td class="td"></td>
+                      <td class="td"></td>
+                      <td class="td"></td>
+                      <td class="td"></td>
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
 
               <div class="pv-cards" id="pv-cards"></div>
+
+              <!-- Mesmo total, versão mobile (o `<tfoot>` acima não existe
+                   na visão em Cards) — mesma cor/destaque de marca. -->
+              <div class="pv-mobile-total" id="pv-mobile-total">
+                <span class="pv-mobile-total-label text-body-s">Total do período</span>
+                <span class="pv-mobile-total-value text-body-m" id="pv-mobile-total-valor">R$ 0,00</span>
+              </div>
 
               <div class="pv-empty" id="pv-empty-state" hidden>
                 <i data-lucide="search-x" width="28" height="28"></i>
@@ -424,6 +460,7 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/period-filter.js"></script>
   <script src="../shared/emitente-data.js"></script>
   <script src="../shared/natureza-operacao-data.js"></script>
   <script src="../shared/categorias-financeiras-data.js"></script>

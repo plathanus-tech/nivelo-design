@@ -12,6 +12,16 @@
 
   var currentConversaId = null;
   var historyVisibleCount = HISTORY_PAGE_SIZE;
+  var dateFilter = null; // 'YYYY-MM-DD' ou null
+
+  function pad2(n) { return n < 10 ? '0' + n : String(n); }
+  // Chave de data local (sem hora), no mesmo formato que o NiveloDatePicker
+  // usa internamente — usada pra comparar a data de uma mensagem com a
+  // data escolhida no filtro, ignorando fuso/hora.
+  function toLocalDateKey(iso) {
+    var d = new Date(iso);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
 
   function formatHora(iso) {
     var d = new Date(iso);
@@ -85,6 +95,22 @@
   });
 
   // ---------- Render de mensagens ----------
+  // Nome/Número do contato do produtor. Decisão de arquitetura: hoje o
+  // sistema conecta um ÚNICO número de WhatsApp por conta (Assistente IA >
+  // Configurar WhatsApp) e todas as conversas do Histórico acontecem por
+  // esse mesmo canal — não existe mais um campo de origem/número por
+  // conversa ou por mensagem (ver assistente-data.js). Por isso o contato
+  // mostrado aqui vem sempre do número atualmente conectado
+  // (window.NiveloWhatsappNumeros); se nenhum número estiver conectado no
+  // momento, retorna null (nunca um número inventado).
+  function getContactLabel() {
+    var conectado = window.NiveloWhatsappNumeros && window.NiveloWhatsappNumeros.isConnected();
+    if (!conectado) return null;
+    var nome = window.NiveloWhatsappNumeros.getNome();
+    var numeroFormatado = window.NiveloWhatsappNumeros.formatNumero(window.NiveloWhatsappNumeros.getNumero());
+    return (nome ? nome + ' · ' : '') + numeroFormatado;
+  }
+
   function buildMensagemHTML(mensagem) {
     var conteudoHTML;
     if (mensagem.tipo === 'audio') {
@@ -97,8 +123,22 @@
     } else {
       conteudoHTML = '<div class="nc-bubble-content">' + mensagem.conteudo + '</div>';
     }
+    // "Assistente de IA" — identificação textual do lado do assistente,
+    // acima de cada balão (nunca do lado do produtor). Nome/número do
+    // contato — acima de CADA balão do PRODUTOR (nunca do assistente),
+    // mesmo tratamento visual discreto, só troca de "1x no cabeçalho" pra
+    // "por mensagem" (ver getContactLabel acima).
+    var labelHTML = mensagem.autor === 'assistente'
+      ? '<span class="nc-bubble-label">Assistente de IA</span>'
+      : '';
+    if (mensagem.autor === 'usuario') {
+      var contactText = getContactLabel();
+      if (contactText) labelHTML = '<span class="nc-bubble-label nc-bubble-label-contact">' + contactText + '</span>';
+    }
+
     return (
       '<div class="nc-message nc-message-' + mensagem.autor + '">' +
+        labelHTML +
         '<div class="nc-bubble">' +
           conteudoHTML +
           '<span class="nc-bubble-time">' + formatHora(mensagem.horario) + '</span>' +
@@ -130,22 +170,54 @@
   // ---------- Histórico ----------
   // Todas as conversas acontecem via WhatsApp agora — sem indicação de
   // origem por conversa (o sistema não inicia/recebe conversas direto).
+  // Data de referência de cada conversa pro filtro/ordenação: a da última
+  // mensagem quando existe (mesmo critério já usado por
+  // NiveloAssistente.list() pra ordenar "por horário da última mensagem"),
+  // senão a de criação.
+  function conversaDataRef(conversa) {
+    var ultima = conversa.mensagens.length ? conversa.mensagens[conversa.mensagens.length - 1] : null;
+    return ultima ? ultima.horario : conversa.criadaEm;
+  }
+
   function renderHistory() {
     var todas = window.NiveloAssistente.list();
+    if (dateFilter) {
+      todas = todas.filter(function (conversa) {
+        return toLocalDateKey(conversaDataRef(conversa)) === dateFilter;
+      });
+    }
+    if (todas.length === 0) {
+      historyList.innerHTML = '<p class="nc-history-empty text-body-s">Nenhuma conversa encontrada para esta data.</p>';
+      loadMoreBtn.hidden = true;
+      return;
+    }
     var visiveis = todas.slice(0, historyVisibleCount);
     historyList.innerHTML = visiveis.map(function (conversa) {
-      var ultima = conversa.mensagens.length ? conversa.mensagens[conversa.mensagens.length - 1] : null;
-      var dataRef = ultima ? ultima.horario : conversa.criadaEm;
       var ativa = conversa.id === currentConversaId;
       return (
         '<button type="button" class="nc-history-item' + (ativa ? ' is-active' : '') + '" data-id="' + conversa.id + '">' +
           '<span class="nc-history-item-title text-body-s">' + conversa.titulo + '</span>' +
-          '<span class="nc-history-item-meta text-10-regular">' + formatData(dataRef) + '</span>' +
+          '<span class="nc-history-item-meta text-10-regular">' + formatData(conversaDataRef(conversa)) + '</span>' +
         '</button>'
       );
     }).join('');
     loadMoreBtn.hidden = todas.length <= historyVisibleCount;
   }
+
+  // ---------- Busca por data ----------
+  window.NiveloDatePicker.initDay({
+    rootId: 'nc-history-date-filter',
+    triggerId: 'nc-history-date-trigger',
+    clearId: 'nc-history-date-clear',
+    popoverId: 'nc-history-date-popover',
+    placeholder: 'Buscar por data',
+    typable: true,
+    onChange: function (iso) {
+      dateFilter = iso;
+      historyVisibleCount = HISTORY_PAGE_SIZE;
+      renderHistory();
+    }
+  });
 
   historyList.addEventListener('click', function (event) {
     var item = event.target.closest('.nc-history-item');

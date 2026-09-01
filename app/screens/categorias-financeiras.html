@@ -4,7 +4,7 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Categorias de receitas e despesas — Nivelo</title>
+  <title>Categorias financeiras — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
@@ -12,11 +12,10 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tab/Tab.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/FilterPopover/FilterPopover.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-categorias-financeiras.css" />
 </head>
@@ -187,7 +186,11 @@
                 </button>
                 <button type="button" class="app-nav-subitem is-active" data-nav="config-categorias">
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                  <span class="app-nav-label">Categorias financeiras</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                  <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de produtos</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
@@ -265,13 +268,21 @@
 
           <div class="catfin-header">
             <div class="catfin-header-text">
-              <h1 class="catfin-title text-heading-6">Categorias de receitas e despesas</h1>
-              <p class="catfin-subtitle text-body-s">Cadastre e organize as categorias utilizadas nos lançamentos financeiros, no DRE e no LCDPR.</p>
+              <h1 class="catfin-title text-heading-6">Categorias financeiras</h1>
+              <p class="catfin-subtitle text-body-s">Cadastre e organize as categorias utilizadas nos lançamentos financeiros, no DRE gerencial e no Livro caixa</p>
             </div>
             <button type="button" class="btn primary hasLeft" id="new-categoria-btn">
               <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
               Nova categoria
             </button>
+          </div>
+
+          <!-- Abas Receitas/Despesas — filtram a MESMA tabela por `data-grupo`
+               (mesma técnica já usada em Natureza da Operação: abas
+               Entrada/Saída sobre 1 tabela só, sem popover de filtro). -->
+          <div class="list catfin-tabs" role="tablist" id="catfin-tablist">
+            <button type="button" role="tab" aria-selected="true" class="tab active" data-tab="receita">Receitas</button>
+            <button type="button" role="tab" aria-selected="false" class="tab" data-tab="despesa">Despesas</button>
           </div>
 
           <div class="card catfin-list-card">
@@ -283,18 +294,6 @@
                       <span class="iconLeft"><i data-lucide="search" width="18" height="18"></i></span>
                       <input type="text" class="input" id="catfin-search-input" placeholder="Busque por descrição." />
                     </div>
-                  </div>
-                </div>
-
-                <!-- Agrupamento de Filtros (FilterPopover, mesmo componente e
-                     comportamento já usados em Estoque Comprometido/Produtos):
-                     Grupo, Considera no DRE, Considera no LCDPR. -->
-                <div class="catfin-filter" id="catfin-filtros-field">
-                  <div class="wrapper" id="catfin-filtros-trigger-root">
-                    <button type="button" class="trigger" id="catfin-filtros-trigger">
-                      <span class="catfin-filtros-icon"><i data-lucide="sliders-horizontal" width="16" height="16"></i></span>
-                      <span>Filtros</span>
-                    </button>
                   </div>
                 </div>
               </div>
@@ -324,7 +323,6 @@
                     <tr class="headerRow" id="catfin-header-row">
                       <th class="th sortable" data-sort-key="codigo" aria-sort="none"><span class="thInner">Código<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="descricao" aria-sort="none"><span class="thInner">Descrição<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th sortable" data-sort-key="grupo" aria-sort="none"><span class="thInner">Grupo<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="status" aria-sort="none"><span class="thInner">Status<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th">DRE</th>
                       <th class="th">Classificação DRE</th>
@@ -357,68 +355,6 @@
                 </button>
               </div>
             </section>
-          </div>
-
-          <!-- Popover "Filtros": Grupo + Status + Considera no DRE +
-               Considera no LCDPR, mesma composição do FilterPopover usado em
-               Produtos/Estoque Comprometido. -->
-          <div class="catfin-filter-popover" id="catfin-filtros-popover" hidden>
-            <div class="wrapper catfin-dropdown" id="dropdown-grupo">
-              <span class="label">Grupo</span>
-              <button type="button" class="trigger" data-dropdown-trigger>
-                <span data-dropdown-value>Todos os grupos</span>
-                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="menu" data-dropdown-menu>
-                <div class="option selected" data-value="">Todos os grupos</div>
-                <div class="option" data-value="receita">Receita</div>
-                <div class="option" data-value="despesa">Despesa</div>
-              </div>
-            </div>
-
-            <div class="wrapper catfin-dropdown" id="dropdown-status">
-              <span class="label">Status</span>
-              <button type="button" class="trigger" data-dropdown-trigger>
-                <span data-dropdown-value>Todos os status</span>
-                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="menu" data-dropdown-menu>
-                <div class="option selected" data-value="">Todos os status</div>
-                <div class="option" data-value="ativo">Ativo</div>
-                <div class="option" data-value="inativo">Inativo</div>
-              </div>
-            </div>
-
-            <div class="wrapper catfin-dropdown" id="dropdown-dre">
-              <span class="label">Considera no DRE</span>
-              <button type="button" class="trigger" data-dropdown-trigger>
-                <span data-dropdown-value>Todas</span>
-                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="menu" data-dropdown-menu>
-                <div class="option selected" data-value="">Todas</div>
-                <div class="option" data-value="sim">Sim</div>
-                <div class="option" data-value="nao">Não</div>
-              </div>
-            </div>
-
-            <div class="wrapper catfin-dropdown" id="dropdown-lcdpr">
-              <span class="label">Considera no LCDPR</span>
-              <button type="button" class="trigger" data-dropdown-trigger>
-                <span data-dropdown-value>Todas</span>
-                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="menu" data-dropdown-menu>
-                <div class="option selected" data-value="">Todas</div>
-                <div class="option" data-value="sim">Sim</div>
-                <div class="option" data-value="nao">Não</div>
-              </div>
-            </div>
-
-            <div class="catfin-filter-popover-actions">
-              <button type="button" class="btn secondary sm" id="catfin-filtros-limpar">Limpar</button>
-              <button type="button" class="btn primary sm" id="catfin-filtros-aplicar">Aplicar</button>
-            </div>
           </div>
 
         </div>

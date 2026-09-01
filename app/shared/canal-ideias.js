@@ -24,8 +24,13 @@
 
   // Mapeamento categoria → cor do `.badge` real (Table.module.css, 8
   // variantes prontas) — nunca uma cor solta. `outros` cai no `pink`, única
-  // sobrando das 6 categorias sem usar `error` (vermelho lê como "problema",
-  // não faz sentido pra nenhuma categoria de ideia).
+  // sobrando das 6 categorias originais sem usar `error` (vermelho lê como
+  // "problema", não faz sentido pra nenhuma categoria de ideia). As 3
+  // categorias novas (`cadastro`/`vendas`/`configuracao`) esgotam as 7 cores
+  // não-`error` disponíveis — reaproveitadas de propósito por categorias
+  // distantes na ordem dos chips, pra minimizar duas cores iguais lado a
+  // lado (`cadastro`↔`relatorios`, `vendas`↔`dashboard`,
+  // `configuracao`↔`financeiro`, todas a 3+ posições de distância).
   var CATEGORIA_COR = {
     dashboard: 'warning',
     financeiro: 'success',
@@ -33,6 +38,9 @@
     'caderno-de-campo': 'info',
     relatorios: 'violet',
     'assistente-ia': 'indigo',
+    cadastro: 'violet',
+    vendas: 'warning',
+    configuracao: 'success',
     outros: 'pink'
   };
 
@@ -40,10 +48,12 @@
   // módulo correspondente em outra parte do sistema (Sidebar/Header), nunca
   // um símbolo novo: `wallet` é Financeiro na Sidebar, `package` é Estoque,
   // `book-open` é o botão "Caderno de campo" do Header, `bar-chart-3` é
-  // "Relatórios" dentro do submenu Financeiro, `bot` é Assistente IA. Nenhum
-  // desses transmite status/prioridade (não são setas, estrelas, flags).
-  // `outros`/`todas` não têm módulo correspondente — `leaf`/`layout-grid`
-  // escolhidos só pelo tom suave e neutro pedido.
+  // "Relatórios" dentro do submenu Financeiro, `bot` é Assistente IA,
+  // `folder-plus` é o grupo "Cadastros" na Sidebar, `shopping-cart` é
+  // "Vendas", `settings` é "Configurações". Nenhum desses transmite status/
+  // prioridade (não são setas, estrelas, flags). `outros`/`todas` não têm
+  // módulo correspondente — `leaf`/`layout-grid` escolhidos só pelo tom
+  // suave e neutro pedido.
   var CATEGORIA_ICONE = {
     dashboard: 'layout-dashboard',
     financeiro: 'wallet',
@@ -51,6 +61,9 @@
     'caderno-de-campo': 'book-open',
     relatorios: 'bar-chart-3',
     'assistente-ia': 'bot',
+    cadastro: 'folder-plus',
+    vendas: 'shopping-cart',
+    configuracao: 'settings',
     outros: 'leaf'
   };
   var TODAS_ICONE = 'layout-grid';

@@ -89,7 +89,15 @@
 .pv-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-md); }
 .pv-filter { width: 100%; }
 @media (min-width: 768px) {
-  .pv-filter-search { flex: 1 1 320px; min-width: 260px; max-width: 420px; }
+  /* Busca ocupa quase toda a largura disponível: `flex-basis:0` (não
+     `auto`) de propósito — com `auto`, o `width:100%` herdado de
+     `.pv-filter` vira a base de cálculo do flex e a Busca reivindica a
+     LINHA INTEIRA sozinha, empurrando o Período pra quebrar numa 2ª linha
+     mesmo sobrando espaço de sobra (bug real corrigido aqui). Sem teto
+     próprio; Período reserva só o espaço necessário pro próprio conteúdo
+     (`flex:0 0 220px`, ver `.pv-filter-period` abaixo) — juntos preenchem
+     a barra inteira, na MESMA linha, sem sobra nem wrap. */
+  .pv-filter-search { flex: 1 1 0%; min-width: 260px; width: auto; }
 }
 .pv-filters .pv-filter-search .input {
   height: 28px;
@@ -97,6 +105,30 @@
   padding-top: var(--spacing-xs);
   padding-bottom: var(--spacing-xs);
   padding-left: 40px;
+}
+
+/* Único filtro além da busca: Período (NiveloPeriodFilter), direto na
+   barra, mesma altura/fonte compactas do campo de busca ao lado — mesmo
+   padrão já usado em outros filtros diretos-na-barra do sistema (Situação
+   de Produtos/Estoque Comprometido). Sem label "Período" (removido — o
+   próprio controle já mostra a opção selecionada, ver `noneLabel: "Sem
+   filtro de período"` em pedidos-de-venda.js): `.label` nasce escondida,
+   nunca reserva espaço acima do trigger. Largura mantida como já estava
+   (não aumentada) — só deixa de esticar em telas largas (`flex:0 0 auto`
+   no lugar de `width:100%`, que fazia o item competir por espaço com a
+   Busca e cair pra linha de baixo). */
+.pv-filter-period { width: 100%; max-width: 260px; }
+.pv-filter-period .label { display: none; }
+.pv-filter-period .trigger {
+  height: 28px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+@media (min-width: 768px) {
+  /* Largura fixa (não cresce nem encolhe) — mesma largura que o campo já
+     tinha, evitando depender de sizing implícito de flex-item com filho em
+     `width:100%` (`.trigger`, Dropdown.module.css). */
+  .pv-filter-period { flex: 0 0 220px; width: 220px; max-width: none; }
 }
 
 /* ── Tabela (desktop) / Cards (mobile) ──────────────────────────────────── */
@@ -121,13 +153,30 @@
 .pv-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
 .pv-table-card .sortIcon { color: var(--color-gray-500); }
 
+/* Bug real de scroll: `.tip` (Tooltip.module.css) é `position:absolute` e só
+   é reparentado pra `document.body` (escapando do clipping) no PRIMEIRO
+   hover/focus (ver `getActionTip()` em pedidos-de-venda.js) — antes disso,
+   mesmo com `opacity:0`, o texto (às vezes uma frase inteira, nos 3
+   indicadores de Integrações) segue ocupando espaço em layout dentro da
+   célula, empurrando o `scrollWidth` de `.tableWrap` bem além do fim real
+   da tabela (medido ao vivo: ~127px de área vazia rolável à direita da
+   última coluna). `overflow:hidden` no `.td` clipa esse estado invisível
+   pré-hover sem afetar o tooltip DE VERDADE visível no hover — a essa
+   altura o JS já reparentou o `.tip` pra fora do `.td`, então o clipping
+   nunca chega a escondê-lo. */
 .pv-table-card .td {
   height: 44px;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-color: var(--color-gray-200);
+  overflow: hidden;
 }
-.pv-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
-.pv-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+/* Zebra escopado ao ID do `<tbody>` (nunca a uma classe genérica da
+   tabela) — `:nth-child` reinicia a contagem em cada `<tbody>`/`<tfoot>`,
+   então uma regra genérica também pintaria a linha do `<tfoot>` (Total do
+   período), competindo com o fundo de marca da linha de total. Mesma
+   lição já documentada em LCDPR/DRE/Entradas e Saídas. */
+#pv-tbody .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+#pv-tbody .tr:nth-child(even) .td { background: var(--color-gray-50); }
 .pv-table-card .tr:hover .td { filter: brightness(0.97); }
 .pv-table-card .tr[hidden] { display: none; }
 
@@ -137,11 +186,14 @@
 .pv-table-card .th:nth-child(3) { width: 110px; } /* Tipo */
 .pv-table-card .th:nth-child(4) { width: 12%; }   /* Produto */
 .pv-table-card .th:nth-child(5) { width: 110px; } /* Quantidade */
-.pv-table-card .th:nth-child(6) { width: 120px; } /* Valor */
+.pv-table-card .th:nth-child(6) { width: 120px; } /* Valor — sempre antes de Condição/Status, nunca depois só pra acomodar o Total */
 .pv-table-card .th:nth-child(7) { width: 130px; } /* Condição */
 .pv-table-card .th:nth-child(8) { width: 140px; } /* Status */
 .pv-table-card .th:nth-child(9) { width: 110px; } /* Integrações */
 .pv-table-card .th:nth-child(10) { width: 128px; } /* Ações */
+
+.pv-table-card .th:nth-child(6),
+.pv-table-card .td:nth-child(6) { text-align: right; }
 
 /* Integrações + Ações formam uma única área fixa (sticky) durante o scroll
    horizontal — nunca separadas, mesmo padrão já usado em Categorias/Contas
@@ -161,6 +213,74 @@
 .pv-table-card .td .cellActions {
   padding: 0;
   height: 100%;
+}
+
+/* ── Total do período (rodapé da tabela) ─────────────────────────────────
+   Mesma linguagem visual da linha de labels (CAIXA ALTA/Semibold), em azul
+   da marca — mesmo padrão de "linha de destaque" já usado em Balancete/
+   LCDPR/DRE (fundo Brand 50 + texto/negrito na cor de marca).
+   Bug real corrigido: `<tfoot>` reinicia a contagem de `:nth-child`
+   relativa ao PRÓPRIO pai (nunca compete com o zebra escopado a
+   `#pv-tbody` acima) — só que `Table.module.css` também tem um zebra
+   PRÓPRIO, global e sem escopo nenhum (`.tr:nth-child(odd) .td{background:
+   var(--color-bg-subtle)}`, 3 níveis de especificidade: `.tr`+
+   `:nth-child`+`.td`), que batia igual na única linha do `<tfoot>`
+   (`:nth-child(1)`, ímpar) — com só 2 níveis (`.pv-tfoot-row`+`.td`), a
+   regra de fundo azul aqui SEMPRE perdia pra esse zebra do componente,
+   deixando a linha cinza em vez de azul. Reforçada pra 4 níveis
+   (`.pv-table-card`+`.table`+`.pv-tfoot-row`+`.td`), vencendo com folga. */
+.pv-table-card .table .pv-tfoot-row .td {
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: var(--font-size-sm);
+  border-color: var(--color-gray-200);
+}
+/* Valor total: mesmo peso/caixa-alta/letter-spacing do rótulo "Total do
+   período" (herdado de `.pv-tfoot-row .td` acima), só o tamanho 1 nível
+   acima (`--font-size-sm` 12px → `--font-size-md` 14px) — hierarquia sutil
+   sem destoar do resto da linha. Alinhamento à direita é próprio (valor
+   numérico embaixo da coluna Valor, nunca à esquerda como o rótulo).
+   Especificidade reforçada (4 classes, mesmo nível de `.pv-table-card
+   .table .pv-tfoot-row .td` acima) — sem isso, o `font-size:sm` daquela
+   regra vence por especificidade e o "1 nível acima" nunca aparece de
+   verdade (mesmo bug já corrigido no round 106 pra esta mesma célula). */
+.pv-table-card .table .pv-tfoot-row .pv-tfoot-valor {
+  text-align: right;
+  font-size: var(--font-size-md);
+}
+/* Integrações/Ações ficam sticky também no rodapé (mesma faixa fixa das
+   colunas 9/10 do corpo), sem conteúdo — só acompanha o fundo de marca
+   durante o scroll horizontal, sem deixar uma "janela" sem cor. */
+.pv-tfoot-row .td:nth-child(5),
+.pv-tfoot-row .td:nth-child(6) { position: sticky; right: 128px; }
+.pv-tfoot-row .td:nth-child(6) { right: 0; }
+
+/* Mesmo total, versão mobile (Cards não têm `<tfoot>`) — mesma cor de
+   marca, sempre visível acima da paginação. */
+.pv-mobile-total {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin: 0 var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-brand);
+}
+.pv-mobile-total[hidden] { display: none; }
+.pv-mobile-total:not([hidden]) { display: flex; }
+/* Rótulo e valor com o MESMO text style (mesma classe `text-body-s` no
+   HTML + mesmo peso/caixa-alta/letter-spacing aqui) — só o valor não é
+   maiúsculo (não faz sentido pra número). */
+.pv-mobile-total-label,
+.pv-mobile-total-value { text-transform: uppercase; letter-spacing: 0.04em; font-weight: var(--font-weight-semibold); }
+.pv-mobile-total-value { text-transform: none; }
+@media (min-width: 768px) {
+  .pv-mobile-total { display: none !important; }
 }
 
 .pv-empty {
@@ -284,12 +404,17 @@
 }
 .pv-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
 .pv-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
-.pv-mobile-card-integracoes { padding-top: var(--spacing-2xs); }
+/* Mesmo fix do bug de scroll horizontal da tabela (ver `.pv-table-card .td`
+   acima) — os mesmos `.tip` pré-hover, dentro dos Cards, empurravam o
+   `scrollWidth` do CARD (e por consequência o da página) além da largura
+   real do conteúdo. */
+.pv-mobile-card-integracoes { padding-top: var(--spacing-2xs); overflow: hidden; }
 .pv-mobile-card-actions {
   display: flex;
   gap: var(--spacing-2xs);
   padding-top: var(--spacing-sm);
   border-top: var(--border-width-thin) solid var(--color-gray-200);
+  overflow: hidden;
 }
 
 /* ── Toast de sucesso ─────────────────────────────────────────────────── */

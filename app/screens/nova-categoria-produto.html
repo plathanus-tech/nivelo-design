@@ -4,17 +4,17 @@
   <script src="../shared/nav-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nova ideia — Nivelo</title>
+  <title>Nova categoria — Nivelo</title>
 
   <link rel="stylesheet" href="../shared/fonts.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
-  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
-  <link rel="stylesheet" href="../shared/page-nova-ideia.css" />
+  <link rel="stylesheet" href="../shared/page-nova-categoria-produto.css" />
 </head>
 <body>
 
@@ -149,17 +149,19 @@
               </div>
             </div>
 
-            
 
-            
+
+
 
           </div>
 
           <div class="app-nav-section">
             <span class="app-nav-section-title">Gestão</span>
 
-            <div class="app-nav-group" id="group-configuracao">
-              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
+            <!-- Configuração já nasce aberta nesta tela, com "Categorias de
+                 produtos" ativo. -->
+            <div class="app-nav-group is-open" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="true" data-tooltip="Configurações · opções">
                 <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
                 <span class="app-nav-label">Configurações</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
@@ -181,7 +183,7 @@
                   <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
                   <span class="app-nav-label">Categorias financeiras</span>
                 </button>
-                <button type="button" class="app-nav-subitem" data-nav="config-categorias-produtos">
+                <button type="button" class="app-nav-subitem is-active" data-nav="config-categorias-produtos">
                   <span class="app-nav-icon"><i data-lucide="layers" width="16" height="16"></i></span>
                   <span class="app-nav-label">Categorias de produtos</span>
                 </button>
@@ -218,7 +220,7 @@
               </div>
             </div>
 
-            <button type="button" class="app-nav-item is-active" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
               <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
               <span class="app-nav-label">Canal de ideias</span>
             </button>
@@ -255,74 +257,58 @@
         </div>
       </aside>
 
-      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVA IDEIA ══════════════════ -->
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — NOVA CATEGORIA DE PRODUTO ══════════════════ -->
       <main class="app-main">
-        <div class="nova-ideia-page">
+        <div class="ncatprod-page">
 
-          <a href="canal-ideias.html" class="nova-ideia-back">
-            <i data-lucide="arrow-left" width="18" height="18"></i>
-            Canal de Ideias
-          </a>
-
-          <div class="nova-ideia-header">
-            <h1 class="nova-ideia-title text-heading-6">Nova ideia</h1>
-            <p class="nova-ideia-description text-body-s">Descreva sua sugestão em poucas palavras — outros usuários vão poder votar e comentar.</p>
+          <div class="ncatprod-header">
+            <a href="categorias-produtos.html" class="ncatprod-back" id="ncatprod-back-top">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <h1 class="ncatprod-title text-heading-6">Nova categoria</h1>
           </div>
 
-          <form class="card nova-ideia-card" id="nova-ideia-form">
+          <form id="ncatprod-form" novalidate>
 
-            <div class="wrapper" id="titulo-field">
-              <label class="label" for="ni-titulo">Título</label>
-              <div class="inputWrap">
-                <input class="input" type="text" id="ni-titulo" placeholder="Ex.: Filtro por safra no Caderno de Campo" maxlength="120" aria-describedby="titulo-error" />
+            <section class="card ncatprod-card">
+              <div class="ncatprod-subsection">
+                <div class="ncatprod-grid">
+
+                  <div class="wrapper ncatprod-span-2" id="grupo-field">
+                    <span class="label">Grupo</span>
+                    <div class="group horizontal" role="radiogroup" aria-label="Grupo">
+                      <label class="option">
+                        <input type="radio" class="input" name="grupo" value="venda" checked />
+                        <span class="circle"><span class="dot"></span></span>
+                        <span class="optionLabel">Produtos de venda</span>
+                      </label>
+                      <label class="option">
+                        <input type="radio" class="input" name="grupo" value="uso" />
+                        <span class="circle"><span class="dot"></span></span>
+                        <span class="optionLabel">Produtos de uso</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="wrapper ncatprod-span-2" id="nome-field">
+                    <label class="label" for="ncatprod-nome">Nome da categoria</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="ncatprod-nome" placeholder="Ex.: Grãos, Fertilizantes, Sementes" aria-describedby="nome-error" />
+                    </div>
+                    <span class="errorText" id="nome-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o nome da categoria.
+                    </span>
+                  </div>
+
+                </div>
               </div>
-              <span class="errorText" id="titulo-error">
-                <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                Informe um título pra sua ideia.
-              </span>
-            </div>
+            </section>
 
-            <div class="wrapper" id="categoria-field" data-dropdown>
-              <label class="label" for="ni-categoria">Categoria</label>
-              <button type="button" class="trigger" data-dropdown-trigger id="ni-categoria" aria-describedby="categoria-error">
-                <span class="placeholder" data-dropdown-value>Selecione uma categoria</span>
-                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="menu" data-dropdown-menu>
-                <div class="option" data-value="dashboard">Dashboard</div>
-                <div class="option" data-value="assistente-ia">Assistente de IA</div>
-                <div class="option" data-value="caderno-de-campo">Caderno de campo</div>
-                <div class="option" data-value="cadastro">Cadastro</div>
-                <div class="option" data-value="estoque">Estoque</div>
-                <div class="option" data-value="financeiro">Financeiro</div>
-                <div class="option" data-value="relatorios">Relatórios</div>
-                <div class="option" data-value="vendas">Vendas</div>
-                <div class="option" data-value="configuracao">Configuração</div>
-                <div class="option" data-value="outros">Outros</div>
-              </div>
-              <span class="errorText" id="categoria-error">
-                <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                Escolha uma categoria.
-              </span>
-            </div>
-
-            <div class="wrapper" id="descricao-field">
-              <label class="label" for="ni-descricao">Descrição</label>
-              <div class="inputWrap">
-                <textarea class="input nova-ideia-textarea" id="ni-descricao" placeholder="Explique sua ideia: o que você gostaria que existisse e por quê." rows="5" maxlength="1000" aria-describedby="descricao-error"></textarea>
-              </div>
-              <span class="errorText" id="descricao-error">
-                <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                Descreva sua ideia com um pouco mais de detalhe.
-              </span>
-            </div>
-
-            <div class="nova-ideia-actions">
-              <a href="canal-ideias.html" class="btn secondary">Cancelar</a>
-              <button type="submit" class="btn primary hasLeft" id="publicar-btn">
-                <span class="icon"><i data-lucide="send" width="16" height="16"></i></span>
-                Publicar ideia
-              </button>
+            <div class="ncatprod-actions">
+              <a href="categorias-produtos.html" class="btn secondary" id="ncatprod-voltar">Voltar</a>
+              <button type="submit" class="btn primary" id="ncatprod-submit">Salvar categoria</button>
             </div>
 
           </form>
@@ -339,7 +325,7 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
-  <script src="../shared/ideias-data.js"></script>
-  <script src="../shared/nova-ideia.js"></script>
+  <script src="../shared/categorias-produtos-data.js"></script>
+  <script src="../shared/nova-categoria-produto.js"></script>
 </body>
 </html>

@@ -108,7 +108,7 @@
   var emptyGlobalBtn = document.getElementById('produtos-empty-global-btn');
   if (emptyGlobalBtn) {
     emptyGlobalBtn.addEventListener('click', function () {
-      window.location.href = 'novo-produto-v2.html';
+      window.location.href = 'novo-produto-v2.html?tipo=' + activeTab;
     });
   }
 
@@ -257,8 +257,6 @@
 
   var state = {
     status: '',
-    categoria: '',
-    atualizadoDesde: null,
     search: '',
     sortKey: {},
     sortDir: {},
@@ -270,12 +268,6 @@
       var ativo = row.dataset.ativo === '1';
       if (state.status === 'ativo' && !ativo) return false;
       if (state.status === 'inativo' && ativo) return false;
-    }
-    if (state.categoria && row.dataset.categoria !== state.categoria) return false;
-
-    if (state.atualizadoDesde) {
-      var atualizado = row.dataset.atualizado;
-      if (!atualizado || atualizado < state.atualizadoDesde) return false;
     }
 
     if (state.search) {
@@ -434,87 +426,13 @@
     return { selectOption: selectOption, reset: reset };
   }
 
-  var statusDropdown = initDropdown(document.getElementById('dropdown-status'));
-
-  var categoriaMenuEl = document.getElementById('dropdown-categoria-menu');
-  window.NiveloCategorias.list().forEach(function (categoria) {
-    var optionEl = document.createElement('div');
-    optionEl.className = 'option';
-    optionEl.dataset.value = categoria;
-    optionEl.textContent = categoria;
-    categoriaMenuEl.appendChild(optionEl);
-  });
-  var categoriaDropdown = initDropdown(document.getElementById('dropdown-categoria'));
-
-  var filtrosPopoverEl = document.getElementById('produtos-filtros-popover');
-  var filtrosTriggerRoot = document.getElementById('produtos-filtros-trigger-root');
-  var filtrosTriggerBtn = document.getElementById('produtos-filtros-trigger');
-
-  function positionFiltrosPopover(anchorRect) {
-    var margin = 16;
-    var width = Math.min(320, window.innerWidth - margin * 2);
-    filtrosPopoverEl.style.width = width + 'px';
-    var left = anchorRect.left;
-    if (left + width > window.innerWidth - margin) left = window.innerWidth - margin - width;
-    if (left < margin) left = margin;
-    filtrosPopoverEl.style.left = left + 'px';
-    filtrosPopoverEl.style.top = (anchorRect.bottom + 8) + 'px';
-  }
-
-  function outsideFiltrosClickHandler(event) {
-    var path = event.composedPath ? event.composedPath() : [event.target];
-    if (path.indexOf(filtrosPopoverEl) === -1 && path.indexOf(filtrosTriggerRoot) === -1) closeFiltrosPopover();
-  }
-
-  function openFiltrosPopover() {
-    filtrosPopoverEl.hidden = false;
-    positionFiltrosPopover(filtrosTriggerRoot.getBoundingClientRect());
-    window.setTimeout(function () { document.addEventListener('click', outsideFiltrosClickHandler); }, 0);
-  }
-
-  function closeFiltrosPopover() {
-    filtrosPopoverEl.hidden = true;
-    document.removeEventListener('click', outsideFiltrosClickHandler);
-  }
-
-  filtrosTriggerBtn.addEventListener('click', function () {
-    if (filtrosPopoverEl.hidden) openFiltrosPopover(); else closeFiltrosPopover();
-  });
-
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' && !filtrosPopoverEl.hidden) closeFiltrosPopover();
-  });
-
-  document.getElementById('produtos-filtros-aplicar').addEventListener('click', function () {
-    state.status = document.getElementById('dropdown-status').dataset.value || '';
-    state.categoria = document.getElementById('dropdown-categoria').dataset.value || '';
-    closeFiltrosPopover();
+  // Status disponível direto na barra de filtros (mesmo padrão de Parceiros,
+  // `cadastros.js`'s `dropdown-situacao`) — aplica na hora, sem botão
+  // "Aplicar"/popover "Filtros" (removido; Categoria/"Atualizado a partir
+  // de" saíram junto, não pedidos pra continuar existindo).
+  var statusDropdown = initDropdown(document.getElementById('dropdown-status'), function (value) {
+    state.status = value || '';
     applyFilters();
-  });
-
-  document.getElementById('produtos-filtros-limpar').addEventListener('click', function () {
-    statusDropdown.reset('', 'Todos os status');
-    categoriaDropdown.reset('', 'Todas as categorias');
-    state.status = '';
-    state.categoria = '';
-    applyFilters();
-  });
-
-  window.NiveloDatePicker.initDay({
-    rootId: 'atualizado-filter',
-    triggerId: 'atualizado-trigger',
-    valueId: 'atualizado-value',
-    clearId: 'atualizado-clear',
-    popoverId: 'atualizado-popover',
-    placeholder: 'Atualizado a partir de',
-    formatValue: function (date) {
-      var pad2 = function (n) { return n < 10 ? '0' + n : String(n); };
-      return 'Atualizado a partir de ' + pad2(date.getDate()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear();
-    },
-    onChange: function (iso) {
-      state.atualizadoDesde = iso;
-      applyFilters();
-    }
   });
 
   // ---------- Ações da tabela: Editar + Ativar/Desativar (com confirmação,
@@ -589,8 +507,11 @@
     });
   });
 
+  // Tipo de produto do formulário vem pré-selecionado pela aba atual
+  // (Produtos de venda/uso) — só uma sugestão inicial, campo continua
+  // editável em novo-produto-v2.html.
   document.getElementById('new-produto-btn').addEventListener('click', function () {
-    window.location.href = 'novo-produto-v2.html';
+    window.location.href = 'novo-produto-v2.html?tipo=' + activeTab;
   });
 
   // ---------- Cards (Mobile) ----------

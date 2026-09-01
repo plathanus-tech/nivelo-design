@@ -414,7 +414,6 @@
     });
 
     filtrosFieldEl.hidden = target !== 'comprometido';
-    if (target !== 'comprometido') closeFiltrosPopover();
     applyVisibility(target);
   });
 
@@ -505,7 +504,7 @@
   });
 
   var searchInput = document.getElementById('estoque-search-input');
-  var comprometidoFilters = { situacao: 'todas', cliente: 'todos' };
+  var comprometidoFilters = { situacao: 'todas' };
 
   function applyVisibility(panelKey) {
     if (panelKey === 'vendas') {
@@ -522,7 +521,6 @@
       var matchesFilters = true;
       if (panelKey === 'comprometido') {
         if (comprometidoFilters.situacao !== 'todas' && record.situacao !== comprometidoFilters.situacao) matchesFilters = false;
-        if (comprometidoFilters.cliente !== 'todos' && record.cliente !== comprometidoFilters.cliente) matchesFilters = false;
         // Registros Concluídos ficam ocultos por padrão — só aparecem quando
         // o usuário seleciona "Concluído" explicitamente no filtro de
         // Status (pedido explícito), nunca dentro de "Todas".
@@ -615,66 +613,10 @@
     return { selectOption: selectOption, reset: reset };
   }
 
-  var clientes = COMPROMETIDO.map(function (item) { return item.cliente; })
-    .filter(function (value, index, arr) { return arr.indexOf(value) === index; });
-  document.getElementById('filtro-cliente-menu').innerHTML =
-    '<div class="option selected" data-value="todos">Todos</div>' +
-    clientes.map(function (c) { return '<div class="option" data-value="' + c + '">' + c + '</div>'; }).join('');
-
-  var situacaoDropdown = initDropdown(document.getElementById('filtro-situacao-field'));
-  var clienteDropdown = initDropdown(document.getElementById('filtro-cliente-field'));
-
-  var filtrosPopoverEl = document.getElementById('estoque-filtros-popover');
-  var filtrosTriggerRoot = document.getElementById('estoque-filtros-trigger-root');
-  var filtrosTriggerBtn = document.getElementById('estoque-filtros-trigger');
-
-  function positionFiltrosPopover(anchorRect) {
-    var margin = 16;
-    var width = Math.min(320, window.innerWidth - margin * 2);
-    filtrosPopoverEl.style.width = width + 'px';
-    var left = anchorRect.left;
-    if (left + width > window.innerWidth - margin) left = window.innerWidth - margin - width;
-    if (left < margin) left = margin;
-    filtrosPopoverEl.style.left = left + 'px';
-    filtrosPopoverEl.style.top = (anchorRect.bottom + 8) + 'px';
-  }
-
-  function outsideFiltrosClickHandler(event) {
-    var path = event.composedPath ? event.composedPath() : [event.target];
-    if (path.indexOf(filtrosPopoverEl) === -1 && path.indexOf(filtrosTriggerRoot) === -1) closeFiltrosPopover();
-  }
-
-  function openFiltrosPopover() {
-    filtrosPopoverEl.hidden = false;
-    positionFiltrosPopover(filtrosTriggerRoot.getBoundingClientRect());
-    window.setTimeout(function () { document.addEventListener('click', outsideFiltrosClickHandler); }, 0);
-  }
-
-  function closeFiltrosPopover() {
-    filtrosPopoverEl.hidden = true;
-    document.removeEventListener('click', outsideFiltrosClickHandler);
-  }
-
-  filtrosTriggerBtn.addEventListener('click', function () {
-    if (filtrosPopoverEl.hidden) openFiltrosPopover(); else closeFiltrosPopover();
-  });
-
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' && !filtrosPopoverEl.hidden) closeFiltrosPopover();
-  });
-
-  document.getElementById('estoque-filtros-aplicar').addEventListener('click', function () {
-    comprometidoFilters.situacao = document.getElementById('filtro-situacao-field').dataset.value || 'todas';
-    comprometidoFilters.cliente = document.getElementById('filtro-cliente-field').dataset.value || 'todos';
-    closeFiltrosPopover();
-    applyVisibility('comprometido');
-  });
-
-  document.getElementById('estoque-filtros-limpar').addEventListener('click', function () {
-    situacaoDropdown.reset('todas', 'Todas');
-    clienteDropdown.reset('todos', 'Todos');
-    comprometidoFilters.situacao = 'todas';
-    comprometidoFilters.cliente = 'todos';
+  // Situação aplica direto no `onChange` (mesmo mecanismo de
+  // `cadastros.js`'s `dropdown-situacao`) — sem popover/Aplicar/Limpar.
+  var situacaoDropdown = initDropdown(document.getElementById('filtro-situacao-field'), function (value) {
+    comprometidoFilters.situacao = value || 'todas';
     applyVisibility('comprometido');
   });
 

@@ -367,7 +367,7 @@ window.PROTO_NAV_CONFIG = {
         },
         {
           id: 'categorias-financeiras',
-          label: 'Categorias de receitas e despesas',
+          label: 'Categorias financeiras',
           desktop: '../app/screens/categorias-financeiras.html',
           variants: [
             { id: 'categorias-financeiras-empty', label: 'Nenhuma categoria', desktop: '../app/screens/categorias-financeiras.html#state=empty' },
@@ -381,6 +381,30 @@ window.PROTO_NAV_CONFIG = {
           desktop: '../app/screens/nova-categoria-financeira.html',
           variants: [
             { id: 'nova-categoria-financeira-editar', label: 'Editar categoria (exemplo)', desktop: '../app/screens/nova-categoria-financeira.html?codigo=CAT-001' }
+          ]
+        },
+        // Épico "Categorias de Produtos" (`type:'flow'`) — Configuração >
+        // Categorias de produtos: organização das categorias de Produtos de
+        // venda/Produtos de uso (abas), separado de "Categorias financeiras"
+        // (classificação de lançamentos, não de produtos).
+        {
+          id: 'categorias-produtos-epico',
+          label: 'Categorias de Produtos',
+          type: 'flow',
+          screens: [
+            {
+              id: 'categorias-produtos',
+              label: 'Categorias de produtos',
+              desktop: '../app/screens/categorias-produtos.html'
+            },
+            {
+              id: 'nova-categoria-produto',
+              label: 'Nova categoria',
+              desktop: '../app/screens/nova-categoria-produto.html',
+              variants: [
+                { id: 'nova-categoria-produto-uso', label: 'Pré-selecionado: Produtos de uso', desktop: '../app/screens/nova-categoria-produto.html?grupo=uso' }
+              ]
+            }
           ]
         },
         // Épico "Unidade de Medida" (`type:'flow'`) — Configuração > Unidade
