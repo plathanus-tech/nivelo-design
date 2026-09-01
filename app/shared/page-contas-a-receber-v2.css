@@ -1,10 +1,10 @@
 /* ══════════════════════════════════════════════════════════
-   CONTAS A RECEBER — V2. Carregado JUNTO com page-contas-a-receber.css
-   (a base visual/estrutural é 100% a mesma da V1, pedido explícito de
-   manter o padrão já existente) — este arquivo tem só o DELTA da V2:
-   faixa de versão, tag de banco filtrado, coluna Banco, e os campos
-   novos do modal "Registrar recebimento" (Desconto/Banco obrigatório/
-   Categoria/Forma de Recebimento + histórico de recebimentos já feitos).
+   CONTAS A RECEBER — V2. Carregado JUNTO com page-contas-a-receber.css (a
+   base visual/estrutural é 100% a mesma da V1, pedido explícito de manter
+   o padrão já existente) — este arquivo tem só o DELTA da V2: faixa de
+   versão, abas (Todas/Em aberto/Recebidas), e a coluna Ações reduzida (só
+   1 ícone agora, "Registrar recebimento"). Mesmo padrão exato de
+   page-contas-a-pagar-v2.css.
    ══════════════════════════════════════════════════════════ */
 
 /* ── Faixa de versão (V1 ⇄ V2) ───────────────────────────────────────────── */
@@ -27,38 +27,11 @@
 }
 .ctr-version-switch:hover { color: var(--color-text-brand); }
 
-/* ── Tag de banco filtrado (acima do Resumo) ─────────────────────────────── */
-.ctr-summary-filter-tag { display: flex; margin-bottom: var(--spacing-sm); }
-.ctr-summary-filter-tag[hidden] { display: none; }
+/* ── Abas (Todas/Em aberto/Recebidas) ─────────────────────────────────── */
+.ctr-tabs { margin-bottom: var(--spacing-sm); }
 
-/* ── Coluna Banco nova (10ª coluna no total agora) — larguras da V1
-   reafirmadas + a nova coluna, mesmo padrão de scroll horizontal +
-   Ações sticky (`:last-child`, já genérico, continua funcionando sem
-   mudança). Largura total do `.table` cresce de 1290px pra 1440px. ── */
-.ctr-table-card .table { width: 1440px; }
-.ctr-table-card .th:nth-child(8) { width: 150px; } /* Banco (era Status) */
-.ctr-table-card .th:nth-child(9) { width: 110px; } /* Status (era Ações) */
-.ctr-table-card .th:nth-child(10) { width: 170px; } /* Ações */
-
-/* ── Modal "Registrar recebimento": campos novos ─────────────────────────
-   Desconto/Banco/Categoria/Forma reaproveitam a MESMA classe `.wrapper`
-   genérica de Input/Dropdown (sem `.ctr-dropdown`, que é a versão
-   compacta de 28px usada só na barra de filtros) — dentro do modal, os
-   campos têm a altura padrão de 44px, igual Valor/Data. ── */
-.ctr-optional-tag { font-weight: var(--font-weight-regular); color: var(--color-text-tertiary); }
-
-/* Bug real: `FilterPopover.module.css` também declara `.trigger` (28px, o
-   botão "Filtros" compacto) e é carregado DEPOIS de `Dropdown.module.css`
-   no <head> — colisão de nome de classe genérica, mesma especificidade,
-   vencendo por ordem no arquivo e derrubando Banco/Categoria/Forma pra
-   28px dentro do modal. Reafirma os 44px do Dropdown só dentro do modal. */
-#recebimento-dialog-overlay .trigger { height: 44px; }
-
-.ctr-modal-recebimentos {
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-md);
-  border-top: var(--border-width-thin) solid var(--color-border-subtle);
-}
-.ctr-modal-recebimentos-title { display: block; color: var(--color-text-tertiary); margin-bottom: var(--spacing-xs); }
-.ctr-modal-recebimentos ul { margin: 0; padding-left: var(--spacing-md); display: flex; flex-direction: column; gap: 2px; }
-.ctr-modal-recebimentos li { color: var(--color-text-primary); }
+/* ── Coluna Ações: só 1 ícone agora (era 4 na V1) ────────────────────────
+   Reafirma a largura das 9 colunas (mesmas posições da V1, só Valor→Valor
+   original/Recebido/Saldo reordenadas — larguras idênticas, sem mudança
+   visual ali) e reduz só a última. */
+.ctr-table-card .th:nth-child(9) { width: 96px; }

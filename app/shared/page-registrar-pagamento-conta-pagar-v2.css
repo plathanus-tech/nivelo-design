@@ -1,0 +1,79 @@
+/* ══════════════════════════════════════════════════════════
+   REGISTRAR PAGAMENTO — Contas a Pagar V2. Carregado JUNTO com
+   page-contas-a-pagar.css + page-nova-conta-pagar.css (reaproveita
+   `.ncp-page`/`.ncp-header`/`.ncp-back`/`.ncp-title`/`.ncp-subtitle`/
+   `.ncp-grid`/`.ncp-span-2`/`.ncp-optional-tag`/`.ncp-actions`, mesmo
+   padrão visual de todo formulário do sistema). Este arquivo tem só o
+   necessário pra esta página: accordion de Histórico de Pagamentos, os 2
+   cards novos (Conta somente-leitura + Novo Pagamento) e o padding de
+   corpo que `.card`/`.cardHeader` (Table.module.css) não fornece sozinho
+   (só o cabeçalho tem padding embutido).
+   ══════════════════════════════════════════════════════════ */
+
+.rpg-page { gap: var(--spacing-md); }
+
+/* ── Accordion "Histórico de Pagamentos" — mesmo padrão exato já usado em
+   "Filtros" de Balancete/DRE (cabeçalho inteiro clicável, chevron gira,
+   conteúdo alterna via `hidden`). Recolhido por padrão. ────────────────── */
+.rpg-historico-card { display: flex; flex-direction: column; }
+
+.rpg-historico-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: var(--spacing-sm);
+}
+.rpg-historico-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+}
+.rpg-historico-toggle svg { transition: transform var(--transition-fast); }
+.rpg-historico-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.rpg-historico-content:not([hidden]) { display: flex; flex-direction: column; }
+.rpg-historico-content { padding: 0 var(--spacing-lg) var(--spacing-lg); }
+
+.rpg-historico-empty { display: none; padding: var(--spacing-md) 0; text-align: center; color: var(--color-text-tertiary); }
+.rpg-historico-empty.is-visible { display: block; }
+
+/* ── Card "Conta" (somente-leitura) ──────────────────────────────────── */
+.rpg-conta-card { display: flex; flex-direction: column; }
+
+.rpg-conta-fields {
+  margin: 0;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm) var(--spacing-lg);
+}
+@media (min-width: 640px) {
+  .rpg-conta-fields { grid-template-columns: repeat(3, 1fr); }
+}
+.rpg-conta-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.rpg-conta-fields dd { color: var(--color-text-primary); margin: 0; }
+
+/* ── Card "Novo Pagamento" ────────────────────────────────────────────── */
+.rpg-pagamento-card {
+  display: flex;
+  flex-direction: column;
+}
+.rpg-pagamento-card .ncp-grid { padding: 0 var(--spacing-lg) var(--spacing-lg); }
+
+/* Total que sai da conta / Saldo principal após: mesmo tratamento visual
+   de campo calculado (readonly) já usado em outros formulários — texto em
+   negrito pra reforçar que é o resultado do cálculo, não um dado digitado. */
+#rpg-total-saida-input,
+#rpg-saldo-apos-input {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}

@@ -27,6 +27,7 @@
   // sobrando das 6 categorias sem usar `error` (vermelho lê como "problema",
   // não faz sentido pra nenhuma categoria de ideia).
   var CATEGORIA_COR = {
+    dashboard: 'warning',
     financeiro: 'success',
     estoque: 'orange',
     'caderno-de-campo': 'info',
@@ -44,6 +45,7 @@
   // `outros`/`todas` não têm módulo correspondente — `leaf`/`layout-grid`
   // escolhidos só pelo tom suave e neutro pedido.
   var CATEGORIA_ICONE = {
+    dashboard: 'layout-dashboard',
     financeiro: 'wallet',
     estoque: 'package',
     'caderno-de-campo': 'book-open',

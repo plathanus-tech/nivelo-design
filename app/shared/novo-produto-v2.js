@@ -282,14 +282,23 @@
     String(new Date().getMonth() + 1).padStart(2, '0') + '-' +
     String(new Date().getDate()).padStart(2, '0'));
 
+  // Só pré-cadastrados e ATIVOS (`d.ativo`), sem cadastro rápido inline (V2,
+  // ver rules.md). Sem nenhum depósito ativo, o Dropdown fica vazio (sem
+  // opção selecionável) e um helper text orienta o usuário a cadastrar um em
+  // Configurações.
   var entradaDepositoMenu = document.getElementById('entrada-deposito-menu');
-  (window.NiveloLocais ? window.NiveloLocais.list() : []).forEach(function (local) {
+  var entradaDepositoTrigger = entradaDepositoField.querySelector('[data-dropdown-trigger]');
+  var entradaDepositoEmptyHelper = document.getElementById('entrada-deposito-empty-helper');
+  var entradaDepositosAtivos = (window.NiveloLocais ? window.NiveloLocais.list() : []).filter(function (local) { return local.ativo; });
+  entradaDepositosAtivos.forEach(function (local) {
     var optionEl = document.createElement('div');
     optionEl.className = 'option';
     optionEl.dataset.value = local.nome || local;
     optionEl.textContent = local.nome || local;
     entradaDepositoMenu.appendChild(optionEl);
   });
+  if (entradaDepositoEmptyHelper) entradaDepositoEmptyHelper.hidden = entradaDepositosAtivos.length > 0;
+  if (entradaDepositoTrigger) entradaDepositoTrigger.disabled = entradaDepositosAtivos.length === 0;
   initDropdown(entradaDepositoField);
 
   var entradaFornecedorMenu = document.getElementById('entrada-fornecedor-menu');

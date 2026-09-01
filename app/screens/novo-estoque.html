@@ -18,6 +18,11 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-novo-estoque.css" />
+  <!-- "Origem da entrada" (só Estoque de vendas) reaproveita literalmente as
+       classes `.entradav2-*`/`.estoquev2-*` já usadas em
+       registrar-entrada-estoque-v2.html — mesmo padrão visual/comportamental,
+       sem inventar um 2º "Origem da entrada" com aparência própria. -->
+  <link rel="stylesheet" href="../shared/page-registrar-entrada-estoque-v2.css" />
 </head>
 <body>
 
@@ -67,7 +72,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
                   <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
                   <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
@@ -90,7 +95,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Clientes e fornecedores</span>
+                  <span class="app-nav-label">Parceiros</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -159,9 +164,9 @@
 
             <!-- Configuração (expansível; contém, entre seus subitens, o subgrupo Fiscal) -->
             <div class="app-nav-group" id="group-configuracao">
-              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
                 <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
-                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-label">Configurações</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -172,10 +177,6 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
                   <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
                   <span class="app-nav-label">Cadastro de fazenda</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
-                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Conta Financeira</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
                   <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
@@ -188,6 +189,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
                   <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
                 </button>
 
                 <!-- Fiscal (subgrupo dentro de Configuração) -->
@@ -268,32 +273,33 @@
 
             <section class="card novo-estoque-card">
 
-              <!-- ══════════════ 1. TIPO DE ESTOQUE ══════════════ -->
+              <!-- ══════════════ 1. TIPO DE ESTOQUE ══════════════
+                   3 opções — Estoque Comprometido voltou nesta rodada
+                   (pedido explícito), disparando Destinatário (obrigatório)
+                   + Data prevista de entrega (opcional). Cartões de seleção
+                   (radio nativo + `.is-selected`), mesma técnica visual de
+                   "Origem da entrada" (registrar-entrada-estoque-v2.html) —
+                   nunca mais um Dropdown fechado pra este campo. Sem preview
+                   de Código: o campo foi removido por completo, incluindo o
+                   preview cosmético que existia aqui. -->
               <div class="novo-estoque-subsection">
                 <h2 class="novo-estoque-subsection-title">Tipo de estoque</h2>
-                <div class="novo-estoque-grid">
-                  <div class="wrapper novo-estoque-dropdown" id="tipo-estoque-field">
-                    <span class="label">Tipo de estoque</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span data-dropdown-value>Estoque de Vendas</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu>
-                      <div class="option selected" data-value="vendas">Estoque de Vendas</div>
-                      <div class="option" data-value="compras">Estoque de Uso</div>
-                      <div class="option" data-value="comprometido">Estoque Comprometido</div>
-                    </div>
-                  </div>
-
-                  <!-- Preview cosmético, sem persistência (mesmo escopo do resto
-                       do formulário) — gerado conforme Tipo/Forma de entrada. -->
-                  <div class="wrapper" id="codigo-field">
-                    <label class="label" for="ne-codigo">Código</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="ne-codigo" disabled readonly />
-                    </div>
-                    <span class="helperText">Gerado automaticamente.</span>
-                  </div>
+                <div class="novo-estoque-tipo-group" role="radiogroup" aria-label="Tipo de estoque">
+                  <label class="novo-estoque-tipo-card is-selected">
+                    <input type="radio" name="tipo-estoque" value="vendas" class="novo-estoque-tipo-input" checked />
+                    <span class="novo-estoque-tipo-icon"><i data-lucide="warehouse" width="20" height="20"></i></span>
+                    <span class="novo-estoque-tipo-label text-body-s">Estoque de vendas</span>
+                  </label>
+                  <label class="novo-estoque-tipo-card">
+                    <input type="radio" name="tipo-estoque" value="compras" class="novo-estoque-tipo-input" />
+                    <span class="novo-estoque-tipo-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                    <span class="novo-estoque-tipo-label text-body-s">Estoque de uso</span>
+                  </label>
+                  <label class="novo-estoque-tipo-card">
+                    <input type="radio" name="tipo-estoque" value="comprometido" class="novo-estoque-tipo-input" />
+                    <span class="novo-estoque-tipo-icon"><i data-lucide="handshake" width="20" height="20"></i></span>
+                    <span class="novo-estoque-tipo-label text-body-s">Estoque comprometido</span>
+                  </label>
                 </div>
               </div>
 
@@ -321,6 +327,7 @@
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
                     <div class="menu" data-dropdown-menu id="deposito-menu"></div>
+                    <span class="helperText" id="deposito-empty-helper" hidden>Nenhum depósito cadastrado. Cadastre um em Configurações &gt; Depósitos / Locais de Estoque.</span>
                   </div>
 
                   <!-- Disponível para qualquer tipo de estoque -->
@@ -378,8 +385,8 @@
                     </span>
                   </div>
 
-                  <!-- Bloco Manual: Vendas/Comprometido sempre, Compras só
-                       quando Forma de entrada = Manual. -->
+                  <!-- Bloco Manual: Vendas sempre, Uso só quando
+                       Forma de entrada = Manual. -->
                   <div class="novo-estoque-span-2" id="produto-manual-block">
                     <div class="novo-estoque-grid">
 
@@ -453,7 +460,7 @@
                       </div>
 
                       <div class="wrapper" id="quantidade-field">
-                        <label class="label" for="ne-quantidade" id="quantidade-label">Quantidade</label>
+                        <label class="label" for="ne-quantidade">Quantidade</label>
                         <div class="inputWrap">
                           <input class="input" type="number" inputmode="decimal" min="0" step="1" id="ne-quantidade" placeholder="0" aria-describedby="quantidade-error" />
                         </div>
@@ -463,15 +470,48 @@
                         </span>
                       </div>
 
-                      <!-- Só Estoque de Compras + Manual -->
+                      <!-- Unidade de medida do LANÇAMENTO (Vendas e Uso): no
+                           máximo 2 opções (a sigla do próprio produto +, se
+                           houver conversão registrada, a unidade base), nunca
+                           uma unidade digitada/criada aqui — ver
+                           `getConversao()`/`resolveSiglaForProduct()` em
+                           novo-estoque.js. Desabilitado até um Produto ser
+                           selecionado. -->
+                      <div class="wrapper novo-estoque-dropdown" id="unidade-medida-field">
+                        <span class="label">Unidade de medida</span>
+                        <button type="button" class="trigger" data-dropdown-trigger disabled>
+                          <span class="placeholder" data-dropdown-value>Selecione um produto</span>
+                          <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                        </button>
+                        <div class="menu" data-dropdown-menu id="unidade-medida-menu"></div>
+                      </div>
+
+                      <!-- Só Estoque de Uso. Nota para desenvolvimento: este
+                           "Valor" representa o preço efetivamente PAGO nesta
+                           entrada (custo de aquisição) — alimenta, em uma
+                           rodada futura, o histórico de custo/cálculo de
+                           custo médio do produto. Reaproveita o campo "Valor
+                           unitário" já existente nesta tela, só renomeado. -->
                       <div class="wrapper" id="valor-unitario-field" hidden>
-                        <label class="label" for="ne-valor-unitario">Valor unitário <span class="novo-estoque-optional-tag">(opcional)</span></label>
+                        <label class="label" for="ne-valor-unitario">Valor pago <span class="novo-estoque-optional-tag">(opcional)</span></label>
                         <div class="inputWrap">
                           <input class="input" type="text" inputmode="numeric" id="ne-valor-unitario" placeholder="R$ 0,00" />
                         </div>
                       </div>
 
-                      <!-- Só Estoque de Compras + Manual -->
+                      <!-- Só Estoque Comprometido -->
+                      <div class="wrapper" id="destinatario-field" hidden>
+                        <label class="label" for="ne-destinatario">Cliente</label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" id="ne-destinatario" placeholder="Nome do cliente" aria-describedby="destinatario-error" />
+                        </div>
+                        <span class="errorText" id="destinatario-error">
+                          <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                          Informe o cliente.
+                        </span>
+                      </div>
+
+                      <!-- Só Estoque de Uso -->
                       <div class="wrapper" id="fornecedor-field" hidden>
                         <label class="label" for="ne-fornecedor">Fornecedor <span class="novo-estoque-optional-tag">(opcional)</span></label>
                         <div class="novo-estoque-combobox" id="fornecedor-combobox">
@@ -483,23 +523,140 @@
                         </div>
                       </div>
 
-                      <!-- Só Estoque Comprometido: destinatário nem sempre é uma
-                           cooperativa (ver rules.md) — texto livre, não um
-                           dropdown fechado. -->
-                      <div class="wrapper" id="destinatario-field" hidden>
-                        <label class="label" for="ne-destinatario">Destinatário</label>
+                      <!-- Só Estoque de Uso -->
+                      <div class="wrapper" id="nota-documento-field" hidden>
+                        <label class="label" for="ne-nota-documento">Nota fiscal / Documento <span class="novo-estoque-optional-tag">(opcional)</span></label>
                         <div class="inputWrap">
-                          <input class="input" type="text" id="ne-destinatario" placeholder="Cooperativa, comprador ou empresa" aria-describedby="destinatario-error" />
+                          <input class="input" type="text" id="ne-nota-documento" placeholder="Número da nota fiscal/documento" />
                         </div>
-                        <span class="errorText" id="destinatario-error">
-                          <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                          Informe o destinatário.
-                        </span>
+                      </div>
+
+                      <!-- Só Estoque de Vendas. Nota para desenvolvimento:
+                           este "Valor" representa o preço ATUAL/de mercado do
+                           produto (mesma semântica gerencial da precificação
+                           real de Vendas) — conceitualmente diferente do
+                           "Valor pago" de Estoque de Uso, mesmo os dois
+                           usando a mesma máscara de moeda. -->
+                      <div class="wrapper" id="preco-atual-field" hidden>
+                        <label class="label" for="ne-preco-atual">Preço atual <span class="novo-estoque-optional-tag">(opcional)</span></label>
+                        <div class="inputWrap">
+                          <input class="input" type="text" inputmode="numeric" id="ne-preco-atual" placeholder="R$ 0,00" />
+                        </div>
                       </div>
 
                     </div>
                   </div>
 
+                </div>
+              </div>
+
+              <!-- ══════════════ Origem da entrada (só Estoque de Vendas) ══════════════
+                   Estrutura/comportamento copiados verbatim de
+                   registrar-entrada-estoque-v2.html/.js (2 cartões de seleção:
+                   Produção própria/Colheita → Fazenda+Talhão+Safra; Compra de
+                   terceiro → Fornecedor+Nota/Documento+dropzone+Preço de
+                   compra+Valor total) — mesmo padrão visual/comportamental
+                   desta tela real, sem inventar um 2º "Origem da entrada" só
+                   pra este formulário. Ids prefixados (`ne-origem-*`) pra não
+                   colidir com nenhum campo já existente. -->
+              <div class="novo-estoque-subsection" id="origem-entrada-section" hidden>
+                <h2 class="novo-estoque-subsection-title">Origem da entrada</h2>
+
+                <div class="entradav2-origem-group" role="radiogroup" aria-label="Origem da entrada">
+                  <label class="entradav2-origem-card is-selected">
+                    <input type="radio" name="ne-origem-entrada" value="producao" class="entradav2-origem-input" checked />
+                    <span class="entradav2-origem-icon"><i data-lucide="wheat" width="20" height="20"></i></span>
+                    <span class="entradav2-origem-label text-body-s">Produção própria / Colheita</span>
+                  </label>
+                  <label class="entradav2-origem-card">
+                    <input type="radio" name="ne-origem-entrada" value="compra" class="entradav2-origem-input" />
+                    <span class="entradav2-origem-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                    <span class="entradav2-origem-label text-body-s">Compra de terceiro</span>
+                  </label>
+                </div>
+
+                <!-- Bloco: Produção própria / Colheita -->
+                <div class="novo-estoque-grid entradav2-origem-block" id="ne-origem-producao-block">
+                  <div class="wrapper novo-estoque-dropdown" id="ne-origem-fazenda-field">
+                    <span class="label">Fazenda</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione a fazenda</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="ne-origem-fazenda-menu"></div>
+                    <span class="errorText" id="ne-origem-fazenda-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione a fazenda.
+                    </span>
+                  </div>
+
+                  <div class="wrapper novo-estoque-dropdown" id="ne-origem-talhao-field">
+                    <span class="label">Talhão</span>
+                    <button type="button" class="trigger" data-dropdown-trigger disabled>
+                      <span class="placeholder" data-dropdown-value>Selecione a fazenda primeiro</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="ne-origem-talhao-menu"></div>
+                    <span class="errorText" id="ne-origem-talhao-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione o talhão.
+                    </span>
+                  </div>
+
+                  <div class="wrapper novo-estoque-dropdown" id="ne-origem-safra-field">
+                    <span class="label">Safra</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione a safra</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="ne-origem-safra-menu"></div>
+                  </div>
+                </div>
+
+                <!-- Bloco: Compra de terceiro -->
+                <div class="novo-estoque-grid entradav2-origem-block" id="ne-origem-compra-block" hidden>
+                  <div class="wrapper novo-estoque-dropdown" id="ne-origem-fornecedor-field">
+                    <span class="label">Fornecedor</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione o fornecedor</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="ne-origem-fornecedor-menu"></div>
+                    <span class="errorText" id="ne-origem-fornecedor-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione o fornecedor.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="ne-origem-documento-field">
+                    <label class="label" for="ne-origem-documento-input">Nota/Documento <span class="novo-estoque-optional-tag">(opcional)</span></label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="ne-origem-documento-input" placeholder="Número da nota/documento" />
+                    </div>
+                  </div>
+
+                  <div class="novo-estoque-span-2 novo-estoque-dropzone entradav2-dropzone">
+                    <input type="file" id="ne-origem-arquivo-input" class="novo-estoque-dropzone-input" />
+                    <label for="ne-origem-arquivo-input" class="novo-estoque-dropzone-label">
+                      <i data-lucide="upload" width="20" height="20"></i>
+                      <span id="ne-origem-arquivo-nome">Anexar nota/documento (opcional)</span>
+                    </label>
+                  </div>
+
+                  <div class="wrapper" id="ne-origem-preco-compra-field">
+                    <label class="label" for="ne-origem-preco-compra-input">Preço de compra</label>
+                    <div class="inputWrap hasLeft entradav2-currency-wrap">
+                      <span class="iconLeft entradav2-currency-prefix">R$</span>
+                      <input class="input" type="text" inputmode="decimal" id="ne-origem-preco-compra-input" placeholder="0,00" />
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="ne-origem-valor-total-field">
+                    <label class="label">Valor total</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="ne-origem-valor-total-input" disabled readonly placeholder="R$ 0,00" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -533,9 +690,10 @@
                     </div>
                   </div>
 
+                  <!-- Só Estoque Comprometido -->
                   <div class="dpRoot" id="data-entrega-field" hidden>
-                    <span class="dpLabel text-16-bold">Data prevista de entrega <span class="novo-estoque-optional-tag">(opcional)</span></span>
-                    <button type="button" class="dpTrigger text-body-m" id="data-entrega-trigger">
+                    <label class="dpLabel" for="data-entrega-trigger">Data prevista de entrega <span class="novo-estoque-optional-tag">(opcional)</span></label>
+                    <button type="button" class="dpTrigger" id="data-entrega-trigger">
                       <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
                       <span class="dpPlaceholder" id="data-entrega-value">Selecionar data</span>
                     </button>
@@ -579,31 +737,6 @@
 
     </div>
 
-  </div>
-
-  <div class="overlay" id="novo-local-overlay" hidden>
-    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="novo-local-title">
-      <div class="header">
-        <h2 class="title" id="novo-local-title">Adicionar novo depósito</h2>
-        <button class="closeBtn" id="novo-local-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
-      </div>
-      <div class="body">
-        <div class="wrapper" id="novo-local-nome-field">
-          <label class="label" for="novo-local-nome">Nome do depósito</label>
-          <div class="inputWrap">
-            <input class="input" type="text" id="novo-local-nome" placeholder="Ex.: Galpão 2" />
-          </div>
-          <span class="errorText" id="novo-local-error">
-            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-            Informe o nome do depósito.
-          </span>
-        </div>
-      </div>
-      <div class="footer">
-        <button type="button" class="btn secondary sm" id="novo-local-cancel">Cancelar</button>
-        <button type="button" class="btn primary sm" id="novo-local-add">Adicionar</button>
-      </div>
-    </div>
   </div>
 
   <!-- ══════════════ Sugestão de Conta a Pagar (só Estoque de Uso) ══════════════
@@ -688,8 +821,11 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
   <script src="../shared/produtos-data.js"></script>
+  <script src="../shared/unidades-medida-data.js"></script>
   <script src="../shared/locais-data.js"></script>
   <script src="../shared/cadastros-data.js"></script>
+  <script src="../shared/fazendas-data.js"></script>
+  <script src="../shared/safras-data.js"></script>
   <script src="../shared/formas-pagamento-data.js"></script>
   <script src="../shared/categorias-financeiras-data.js"></script>
   <script src="../shared/contas-pagar-data.js"></script>

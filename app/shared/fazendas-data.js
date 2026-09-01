@@ -31,6 +31,14 @@
 window.NiveloFazendas = (function () {
   'use strict';
 
+  // Data de referência fixa do protótipo (mesma convenção já usada em
+  // contas-pagar-data.js/contas-receber-data.js/dre.js/etc: TODAY = '2026-07-31',
+  // nunca `new Date()`, pra manter a simulação de negócio consistente entre
+  // telas). Usada pelo Histórico de Safras (talhao-detalhe-v2.js) como "hoje"
+  // no cálculo de Período da safra ainda em produção, e por `encerrarSafraTalhao`
+  // como data de fechamento (`dataFim`) do registro de histórico.
+  var TODAY = '2026-07-31';
+
   var FAZENDAS = [
     {
       id: 'sao-joao', nome: 'Fazenda São João', cidade: 'Tijucas', estado: 'SC',
@@ -42,14 +50,14 @@ window.NiveloFazendas = (function () {
       latitude: '-27.2400', longitude: '-48.6350', areaAgricultura: 98,
       arrendamento: null,
       talhoes: [
-        { id: 't1', codigo: '001', nome: 'Talhão 01', areaHa: 18, cultura: 'Soja', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't2', codigo: '002', nome: 'Talhão 02', areaHa: 24, cultura: 'Milho', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't3', codigo: '003', nome: 'Talhão 03', areaHa: 12, cultura: null, safra: null, status: 'disponivel', ativo: true },
-        { id: 't4', codigo: '004', nome: 'Talhão 04', areaHa: 15, cultura: 'Soja', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't5', codigo: '005', nome: 'Talhão 05', areaHa: 10, cultura: null, safra: null, status: 'em-pousio', ativo: true },
-        { id: 't6', codigo: '006', nome: 'Talhão 06', areaHa: 20, cultura: 'Milho', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't7', codigo: '007', nome: 'Talhão 07', areaHa: 14, cultura: 'Soja', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't8', codigo: '008', nome: 'Talhão 08', areaHa: 12, cultura: null, safra: null, status: 'disponivel', ativo: false }
+        { id: 't1', codigo: '001', nome: 'Talhão 01', areaHa: 18, cultura: 'Soja', safra: '2026/27', safraInicio: '2026-06-01', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Soja', dataInicio: '2025-06-01', dataFim: '2026-05-15', status: 'Encerrada' } ] },
+        { id: 't2', codigo: '002', nome: 'Talhão 02', areaHa: 24, cultura: 'Milho', safra: '2026/27', safraInicio: '2026-05-20', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-15', dataFim: '2026-05-01', status: 'Encerrada' } ] },
+        { id: 't3', codigo: '003', nome: 'Talhão 03', areaHa: 12, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Trigo', dataInicio: '2025-06-10', dataFim: '2026-06-20', status: 'Encerrada' } ] },
+        { id: 't4', codigo: '004', nome: 'Talhão 04', areaHa: 15, cultura: 'Soja', safra: '2026/27', safraInicio: '2026-06-05', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Soja', dataInicio: '2025-06-05', dataFim: '2026-05-25', status: 'Encerrada' } ] },
+        { id: 't5', codigo: '005', nome: 'Talhão 05', areaHa: 10, cultura: null, safra: null, safraInicio: null, status: 'em-pousio', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-01', dataFim: '2026-04-15', status: 'Encerrada' } ] },
+        { id: 't6', codigo: '006', nome: 'Talhão 06', areaHa: 20, cultura: 'Milho', safra: '2026/27', safraInicio: '2026-05-25', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-20', dataFim: '2026-05-10', status: 'Encerrada' } ] },
+        { id: 't7', codigo: '007', nome: 'Talhão 07', areaHa: 14, cultura: 'Soja', safra: '2026/27', safraInicio: '2026-06-10', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Soja', dataInicio: '2025-06-08', dataFim: '2026-05-30', status: 'Encerrada' } ] },
+        { id: 't8', codigo: '008', nome: 'Talhão 08', areaHa: 12, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: false, historicoSafras: [ { safra: '2025/26', cultura: 'Café', dataInicio: '2025-06-15', dataFim: '2026-06-01', status: 'Encerrada' } ] }
       ]
     },
     {
@@ -62,11 +70,11 @@ window.NiveloFazendas = (function () {
       latitude: '-21.1775', longitude: '-47.8103', areaAgricultura: 290,
       arrendamento: { arrendatario: 'Cooperativa Central do Agro Ltda.', areaHa: 40, vigencia: '01/03/2024 a 01/03/2029' },
       talhoes: [
-        { id: 't1', codigo: '001', nome: 'Talhão 01', areaHa: 80, cultura: 'Cana-de-açúcar', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't2', codigo: '002', nome: 'Talhão 02', areaHa: 65, cultura: 'Milho', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't3', codigo: '003', nome: 'Talhão 03', areaHa: 50, cultura: 'Soja', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't4', codigo: '004', nome: 'Talhão 04', areaHa: 40, cultura: null, safra: null, status: 'disponivel', ativo: true },
-        { id: 't5', codigo: '005', nome: 'Talhão 05', areaHa: 35, cultura: null, safra: null, status: 'disponivel', ativo: false }
+        { id: 't1', codigo: '001', nome: 'Talhão 01', areaHa: 80, cultura: 'Cana-de-açúcar', safra: '2026/27', safraInicio: '2026-04-01', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Cana-de-açúcar', dataInicio: '2025-04-01', dataFim: '2026-03-15', status: 'Encerrada' } ] },
+        { id: 't2', codigo: '002', nome: 'Talhão 02', areaHa: 65, cultura: 'Milho', safra: '2026/27', safraInicio: '2026-05-15', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-10', dataFim: '2026-05-01', status: 'Encerrada' } ] },
+        { id: 't3', codigo: '003', nome: 'Talhão 03', areaHa: 50, cultura: 'Soja', safra: '2026/27', safraInicio: '2026-06-01', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Soja', dataInicio: '2025-06-01', dataFim: '2026-05-20', status: 'Encerrada' } ] },
+        { id: 't4', codigo: '004', nome: 'Talhão 04', areaHa: 40, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Soja', dataInicio: '2025-06-05', dataFim: '2026-06-10', status: 'Encerrada' } ] },
+        { id: 't5', codigo: '005', nome: 'Talhão 05', areaHa: 35, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: false, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-20', dataFim: '2026-05-05', status: 'Encerrada' } ] }
       ]
     },
     {
@@ -79,10 +87,10 @@ window.NiveloFazendas = (function () {
       latitude: '-17.7975', longitude: '-50.9264', areaAgricultura: 45,
       arrendamento: null,
       talhoes: [
-        { id: 't1', codigo: '001', nome: 'Talhão 01', areaHa: 22, cultura: 'Café', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't2', codigo: '002', nome: 'Talhão 02', areaHa: 18, cultura: 'Café', safra: '2026/27', status: 'em-producao', ativo: true },
-        { id: 't3', codigo: '003', nome: 'Talhão 03', areaHa: 12, cultura: null, safra: null, status: 'disponivel', ativo: true },
-        { id: 't4', codigo: '004', nome: 'Talhão 04', areaHa: 10, cultura: null, safra: null, status: 'disponivel', ativo: false }
+        { id: 't1', codigo: '001', nome: 'Talhão 01', areaHa: 22, cultura: 'Café', safra: '2026/27', safraInicio: '2026-04-15', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Café', dataInicio: '2025-04-15', dataFim: '2026-04-01', status: 'Encerrada' } ] },
+        { id: 't2', codigo: '002', nome: 'Talhão 02', areaHa: 18, cultura: 'Café', safra: '2026/27', safraInicio: '2026-04-20', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Café', dataInicio: '2025-04-18', dataFim: '2026-04-05', status: 'Encerrada' } ] },
+        { id: 't3', codigo: '003', nome: 'Talhão 03', areaHa: 12, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Café', dataInicio: '2025-05-01', dataFim: '2026-05-15', status: 'Encerrada' } ] },
+        { id: 't4', codigo: '004', nome: 'Talhão 04', areaHa: 10, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: false, historicoSafras: [ { safra: '2025/26', cultura: 'Café', dataInicio: '2025-05-05', dataFim: '2026-05-20', status: 'Encerrada' } ] }
       ]
     }
   ];
@@ -206,5 +214,45 @@ window.NiveloFazendas = (function () {
     return farm;
   }
 
-  return { list: list, findById: findById, add: add, update: update };
+  // ---------- Encerrar safra de um talhão (round Histórico de Safras) ----------
+  // Ação REAL compartilhada pelas duas telas que a disparam (tabela de
+  // Talhões em fazenda-detalhe-caderno-v2.js e o cabeçalho de "Ver detalhes"
+  // em talhao-detalhe-v2.js) — vive aqui (camada de dados, já importada por
+  // ambas) em vez de duplicada em cada script de página, pra não deixar a
+  // regra de negócio (fechar o registro de histórico + limpar o talhão)
+  // divergir entre as duas cópias de UI. Isso não fere a convenção de "sem
+  // JS compartilhado entre telas" do sistema, que é sobre lógica de
+  // interface/DOM, não sobre mutação de dados de um catálogo central.
+  //
+  // Antes de limpar `cultura`/`safra`, empurra a safra corrente pra
+  // `historicoSafras` como um registro `Encerrada` (dataFim = TODAY). Se o
+  // talhão não tiver `cultura` no momento (já "Disponível"/"Em pousio" sem
+  // plantio ativo), não há o que encerrar: função é no-op e retorna null.
+  // Mesma limitação de sempre já documentada neste arquivo: mutação só em
+  // memória, não persiste em sessionStorage (igual ao comportamento já
+  // existente desta ação desde o round que a criou) — uma navegação real de
+  // página perde o encerramento, só sobrevive dentro da mesma tela/SPA-like
+  // re-render.
+  function encerrarSafraTalhao(fazendaId, talhaoId) {
+    var fazenda = findById(fazendaId);
+    var talhao = fazenda && fazenda.talhoes.filter(function (t) { return t.id === talhaoId; })[0];
+    if (!talhao) return null;
+    if (talhao.cultura) {
+      if (!talhao.historicoSafras) talhao.historicoSafras = [];
+      talhao.historicoSafras.push({
+        safra: talhao.safra,
+        cultura: talhao.cultura,
+        dataInicio: talhao.safraInicio || null,
+        dataFim: TODAY,
+        status: 'Encerrada'
+      });
+    }
+    talhao.cultura = null;
+    talhao.safra = null;
+    talhao.safraInicio = null;
+    talhao.status = 'disponivel';
+    return talhao;
+  }
+
+  return { list: list, findById: findById, add: add, update: update, encerrarSafraTalhao: encerrarSafraTalhao, TODAY: TODAY };
 })();

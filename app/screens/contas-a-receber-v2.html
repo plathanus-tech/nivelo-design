@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/FilterPopover/FilterPopover.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tab/Tab.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/period-filter.css" />
   <link rel="stylesheet" href="../shared/page-contas-a-receber.css" />
@@ -73,7 +74,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
                   <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
                   <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
@@ -96,7 +97,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Clientes e fornecedores</span>
+                  <span class="app-nav-label">Parceiros</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -158,21 +159,15 @@
               </div>
             </div>
 
-            
-
-            <!-- Financeiro já nasce aberto nesta tela, com "Contas a receber" ativo. -->
-
-            
-
           </div>
 
           <div class="app-nav-section">
             <span class="app-nav-section-title">Gestão</span>
 
             <div class="app-nav-group" id="group-configuracao">
-              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
                 <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
-                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-label">Configurações</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -183,10 +178,6 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
                   <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
                   <span class="app-nav-label">Cadastro de fazenda</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
-                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Conta Financeira</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
                   <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
@@ -199,6 +190,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
                   <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
                 </button>
 
                 <div class="app-nav-subgroup" id="group-fiscal">
@@ -262,16 +257,13 @@
         </div>
       </aside>
 
-      <!-- ══════════════════ CONTEÚDO PRINCIPAL — CONTAS A RECEBER ══════════════════ -->
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — CONTAS A RECEBER (V2) ══════════════════ -->
       <main class="app-main">
         <div class="ctr-page">
 
-          <!-- Faixa de versão: deixa claro que esta é a V2 e permite voltar
-               pra V1 pra comparação, sem precisar do navegador de protótipo —
-               pedido explícito ("a troca entre V1 e V2 deve ser simples e
-               visualmente clara"). -->
+          <!-- Faixa de versão: mesmo padrão exato já usado em Contas a Pagar V2. -->
           <div class="ctr-version-banner">
-            <span class="badge" data-status="info"><span class="badgeDot"></span>Versão 2 · Recebimentos parciais, múltiplos bancos e desconto</span>
+            <span class="badge" data-status="info"><span class="badgeDot"></span>Versão 2 · Descrição, valores e status simplificados, recebimento em página própria</span>
             <a href="contas-a-receber.html" class="ctr-version-switch">Ver versão anterior (V1)<i data-lucide="arrow-right" width="14" height="14"></i></a>
           </div>
 
@@ -286,14 +278,7 @@
             </button>
           </div>
 
-          <!-- Tag de banco filtrado — mesmo padrão já usado em Caixa, só
-               aparece quando o filtro de Banco está ativo. -->
-          <div class="ctr-summary-filter-tag" id="ctr-summary-banco-tag" hidden>
-            <span class="badge" data-status="info"><span class="badgeDot"></span>Banco: <span id="ctr-summary-banco-tag-text"></span></span>
-          </div>
-
-          <!-- KPIs no topo — mesma cópia estrutural de Contas a Pagar, refletem
-               sempre os filtros aplicados (busca+Agrupamento de Filtros). -->
+          <!-- KPIs no topo — mesma cópia estrutural de Contas a Pagar V2. -->
           <div class="ctr-summary-row">
             <div class="card ctr-summary-card">
               <div class="cardHeader">
@@ -344,6 +329,14 @@
             </div>
           </div>
 
+          <!-- Abas: Todas / Em aberto / Recebidas — "Em aberto" inclui os
+               títulos 'em-aberto' E 'vencida'. -->
+          <div class="list ctr-tabs" role="tablist" id="ctr-tablist">
+            <button type="button" role="tab" aria-selected="true" class="tab active" data-tab="todas">Todas</button>
+            <button type="button" role="tab" aria-selected="false" class="tab" data-tab="em-aberto">Em aberto</button>
+            <button type="button" role="tab" aria-selected="false" class="tab" data-tab="recebidas">Recebidas</button>
+          </div>
+
           <div class="card ctr-list-card">
             <div class="ctr-filter-bar">
               <div class="ctr-filters">
@@ -351,7 +344,7 @@
                   <div class="wrapper">
                     <div class="inputWrap hasLeft">
                       <span class="iconLeft"><i data-lucide="search" width="18" height="18"></i></span>
-                      <input type="text" class="input" id="ctr-search-input" placeholder="Busque por cliente, histórico ou nº do documento." />
+                      <input type="text" class="input" id="ctr-search-input" placeholder="Busque por cliente, descrição ou documento." />
                     </div>
                   </div>
                 </div>
@@ -384,14 +377,13 @@
                   <thead>
                     <tr class="headerRow" id="ctr-header-row">
                       <th class="th sortable" data-sort-key="cliente" aria-sort="none"><span class="thInner">Cliente<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th sortable" data-sort-key="documento" aria-sort="none"><span class="thInner">Nº Documento<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th sortable" data-sort-key="historico" aria-sort="none"><span class="thInner">Histórico<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="descricao" aria-sort="none"><span class="thInner">Descrição<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="documento" aria-sort="none"><span class="thInner">Documento / NF<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="vencimento" aria-sort="none"><span class="thInner">Vencimento<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th sortable" data-sort-key="valor" aria-sort="none"><span class="thInner">Valor<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th sortable" data-sort-key="emissao" aria-sort="none"><span class="thInner">Data de Emissão<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th sortable" data-sort-key="categoria" aria-sort="none"><span class="thInner">Categoria<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th">Banco</th>
                       <th class="th sortable" data-sort-key="status" aria-sort="none"><span class="thInner">Status<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="valorOriginal" aria-sort="none"><span class="thInner">Valor original<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="recebido" aria-sort="none"><span class="thInner">Recebido<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="saldo" aria-sort="none"><span class="thInner">Saldo<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th">Ações</th>
                     </tr>
                   </thead>
@@ -432,191 +424,42 @@
             </section>
           </div>
 
-          <!-- Popover "Filtros": Categoria (múltipla escolha) / Forma de
-               Recebimento / Status. -->
+          <!-- Popover "Filtros": Período (sobre Vencimento) + Situação de
+               Recebimento (integral/parcial/não recebido) + Status. -->
           <div class="ctr-filter-popover" id="ctr-filtros-popover" hidden>
             <div id="ctr-period-mount"></div>
 
-            <div class="wrapper ctr-dropdown ctr-multidropdown" id="dropdown-categoria">
-              <span class="label">Categoria</span>
-              <button type="button" class="trigger" data-multidropdown-trigger>
-                <span data-multidropdown-value>Todas as categorias</span>
-                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="menu" data-multidropdown-menu id="ctr-categoria-menu"></div>
-            </div>
-
-            <div class="wrapper ctr-dropdown" id="dropdown-forma">
-              <span class="label">Forma de Recebimento</span>
+            <div class="wrapper ctr-dropdown" id="dropdown-situacao">
+              <span class="label">Situação de Recebimento</span>
               <button type="button" class="trigger" data-dropdown-trigger>
-                <span data-dropdown-value>Todas as formas</span>
+                <span data-dropdown-value>Todas</span>
                 <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
-              <div class="menu" data-dropdown-menu id="ctr-forma-menu">
-                <div class="option selected" data-value="">Todas as formas</div>
+              <div class="menu" data-dropdown-menu>
+                <div class="option selected" data-value="">Todas</div>
+                <div class="option" data-value="integral">Recebido integralmente</div>
+                <div class="option" data-value="parcial">Recebido parcialmente</div>
+                <div class="option" data-value="nao-recebido">Não recebido</div>
               </div>
             </div>
 
             <div class="wrapper ctr-dropdown" id="dropdown-status">
               <span class="label">Status</span>
               <button type="button" class="trigger" data-dropdown-trigger>
-                <span data-dropdown-value>Todos</span>
+                <span data-dropdown-value>Todas</span>
                 <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="menu" data-dropdown-menu>
-                <div class="option selected" data-value="">Todos</div>
-                <div class="option" data-value="em-aberto">Em Aberto</div>
-                <div class="option" data-value="emitida">Emitidas</div>
-                <div class="option" data-value="recebida">Recebidas</div>
-                <div class="option" data-value="atrasada">Atrasadas</div>
-                <div class="option" data-value="cancelada">Canceladas</div>
-              </div>
-            </div>
-
-            <div class="wrapper ctr-dropdown" id="dropdown-banco">
-              <span class="label">Banco</span>
-              <button type="button" class="trigger" data-dropdown-trigger>
-                <span data-dropdown-value>Todos os bancos</span>
-                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-              </button>
-              <div class="menu" data-dropdown-menu id="ctr-banco-menu">
-                <div class="option selected" data-value="">Todos os bancos</div>
+                <div class="option selected" data-value="">Todas</div>
+                <div class="option" data-value="em-aberto">Em aberto</div>
+                <div class="option" data-value="vencida">Vencida</div>
+                <div class="option" data-value="recebida">Recebida</div>
               </div>
             </div>
 
             <div class="ctr-filter-popover-actions">
               <button type="button" class="btn secondary sm" id="ctr-filtros-limpar">Limpar</button>
               <button type="button" class="btn primary sm" id="ctr-filtros-aplicar">Aplicar</button>
-            </div>
-          </div>
-
-          <!-- Modal: Registrar Recebimento (total ou parcial). -->
-          <div class="overlay" id="recebimento-dialog-overlay" hidden>
-            <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="recebimento-dialog-title">
-              <div class="header">
-                <h2 class="title" id="recebimento-dialog-title">Registrar recebimento</h2>
-                <button type="button" class="closeBtn" id="recebimento-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
-              </div>
-              <div class="body">
-                <div class="ctr-modal-recap">
-                  <div class="ctr-modal-recap-title text-subtitle-s" id="recebimento-recap-title">—</div>
-                  <dl class="ctr-modal-recap-fields">
-                    <div><dt class="text-10-regular">Nº Documento</dt><dd class="text-12-regular" id="recebimento-recap-documento">—</dd></div>
-                    <div><dt class="text-10-regular">Vencimento</dt><dd class="text-12-regular" id="recebimento-recap-vencimento">—</dd></div>
-                    <div><dt class="text-10-regular">Valor original</dt><dd class="text-12-regular" id="recebimento-recap-valor">—</dd></div>
-                    <div><dt class="text-10-regular">Total recebido</dt><dd class="text-12-regular" id="recebimento-recap-recebido">—</dd></div>
-                    <div><dt class="text-10-regular">Total de descontos</dt><dd class="text-12-regular" id="recebimento-recap-desconto">—</dd></div>
-                    <div><dt class="text-10-regular">Saldo pendente</dt><dd class="text-12-regular" id="recebimento-recap-saldo">—</dd></div>
-                  </dl>
-                  <!-- Histórico de recebimentos já feitos neste título — permite
-                       mais de um recebimento (parciais, bancos diferentes,
-                       desconto quando houver), como pedido explicitamente. -->
-                  <div class="ctr-modal-recebimentos" id="recebimento-recap-lista" hidden>
-                    <span class="text-10-regular ctr-modal-recebimentos-title">Recebimentos já registrados</span>
-                    <ul id="recebimento-recap-lista-items"></ul>
-                  </div>
-                </div>
-
-                <div class="ctr-modal-grid">
-                  <div class="wrapper" id="recebimento-valor-field">
-                    <label class="label" for="recebimento-valor-input">Valor recebido</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" inputmode="numeric" id="recebimento-valor-input" placeholder="R$ 0,00" aria-describedby="recebimento-valor-error" />
-                    </div>
-                    <span class="errorText" id="recebimento-valor-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Informe um valor maior que zero e até o saldo pendente.
-                    </span>
-                  </div>
-
-                  <div class="wrapper" id="recebimento-desconto-field">
-                    <label class="label" for="recebimento-desconto-input">Desconto <span class="ctr-optional-tag">(opcional)</span></label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" inputmode="numeric" id="recebimento-desconto-input" placeholder="R$ 0,00" />
-                    </div>
-                    <span class="helperText">Valor concedido ao cliente, separado do valor recebido.</span>
-                  </div>
-
-                  <div class="dpRoot" id="recebimento-data-field">
-                    <label class="dpLabel" for="recebimento-data-trigger">Data do recebimento</label>
-                    <button type="button" class="dpTrigger" id="recebimento-data-trigger">
-                      <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
-                      <span class="dpPlaceholder" id="recebimento-data-value">Selecionar data</span>
-                    </button>
-                    <input type="hidden" id="recebimento-data-input" />
-                    <div class="dpPopover" id="recebimento-data-popover" hidden>
-                      <div class="dpCalendarHeader">
-                        <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior">
-                          <i data-lucide="chevron-left" width="16" height="16"></i>
-                        </button>
-                        <span class="dpCalendarLabel text-body-s" data-dp-label></span>
-                        <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês">
-                          <i data-lucide="chevron-right" width="16" height="16"></i>
-                        </button>
-                      </div>
-                      <div class="dpWeekdays">
-                        <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
-                      </div>
-                      <div class="dpGrid" data-dp-grid></div>
-                    </div>
-                  </div>
-
-                  <div class="wrapper" id="recebimento-banco-field">
-                    <span class="label">Banco/Conta de recebimento</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span data-dropdown-value>Selecione o banco</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="recebimento-banco-menu"></div>
-                    <span class="errorText" id="recebimento-banco-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione o banco/conta de recebimento.
-                    </span>
-                  </div>
-
-                  <!-- Demais informações que já existem em Contas a Receber mas
-                       não vêm da Nota Fiscal (Categoria/Forma de Recebimento) —
-                       selecionáveis aqui, no momento do recebimento. -->
-                  <div class="wrapper" id="recebimento-categoria-field">
-                    <span class="label">Categoria</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span data-dropdown-value>Selecione a categoria</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="recebimento-categoria-menu"></div>
-                  </div>
-
-                  <div class="wrapper" id="recebimento-forma-field">
-                    <span class="label">Forma de Recebimento</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span data-dropdown-value>Selecione a forma</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="recebimento-forma-menu"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="footer">
-                <button type="button" class="btn secondaryGray sm" id="recebimento-cancel">Cancelar</button>
-                <button type="button" class="btn primary sm" id="recebimento-confirm">Registrar recebimento</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal: Cancelar conta a receber. -->
-          <div class="overlay" id="cancelar-dialog-overlay" hidden>
-            <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="cancelar-dialog-title">
-              <div class="header">
-                <h2 class="title" id="cancelar-dialog-title">Cancelar conta a receber</h2>
-                <button type="button" class="closeBtn" id="cancelar-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
-              </div>
-              <div class="body">
-                <p class="text-body-s" id="cancelar-dialog-message">Tem certeza que deseja cancelar esta conta a receber? Contas canceladas não podem mais receber pagamentos do cliente.</p>
-              </div>
-              <div class="footer">
-                <button type="button" class="btn secondaryGray sm" id="cancelar-dialog-voltar">Voltar</button>
-                <button type="button" class="btn destructive sm" id="cancelar-dialog-confirmar">Cancelar conta</button>
-              </div>
             </div>
           </div>
 
@@ -634,11 +477,6 @@
   <script src="../shared/interface-principal.js"></script>
   <script src="../shared/period-filter.js"></script>
   <script src="../shared/categorias-financeiras-data.js"></script>
-  <script src="../shared/formas-recebimento-data.js"></script>
-  <script src="../shared/bancos-catalogo-data.js"></script>
-  <script src="../shared/contas-financeiras-data.js"></script>
-  <script src="../shared/contas-bancarias-data.js"></script>
-  <script src="../shared/caixa-data.js"></script>
   <script src="../shared/contas-receber-v2-data.js"></script>
   <script src="../shared/date-picker.js"></script>
   <script src="../shared/contas-a-receber-v2.js"></script>

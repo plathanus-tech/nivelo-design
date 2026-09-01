@@ -67,7 +67,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
                   <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
                   <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
@@ -90,7 +90,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Clientes e fornecedores</span>
+                  <span class="app-nav-label">Parceiros</span>
                 </button>
                 <button type="button" class="app-nav-subitem is-active" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -158,9 +158,9 @@
             <span class="app-nav-section-title">Gestão</span>
 
             <div class="app-nav-group" id="group-configuracao">
-              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
                 <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
-                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-label">Configurações</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -171,10 +171,6 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
                   <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
                   <span class="app-nav-label">Cadastro de fazenda</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
-                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Conta Financeira</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
                   <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
@@ -187,6 +183,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
                   <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
                 </button>
 
                 <div class="app-nav-subgroup" id="group-fiscal">
@@ -431,6 +431,7 @@
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
                     <div class="menu" data-dropdown-menu id="entrada-deposito-menu"></div>
+                    <span class="helperText" id="entrada-deposito-empty-helper" hidden>Nenhum depósito cadastrado. Cadastre um em Configurações &gt; Depósitos / Locais de Estoque.</span>
                   </div>
 
                   <div class="wrapper novo-produto-dropdown" id="entrada-fornecedor-field">

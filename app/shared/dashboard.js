@@ -156,9 +156,7 @@
   var CURRENCY_ZERO = 'R$ 0,00';
   var ZERO_FIELD_VALUES = {
     'estoque-headline-value': '0 sc',
-    'saldo-headline-value': CURRENCY_ZERO,
-    'pagar-meta-value': CURRENCY_ZERO,
-    'receber-meta-value': CURRENCY_ZERO
+    'saldo-headline-value': CURRENCY_ZERO
   };
   var currencyOriginals = {};
   Object.keys(ZERO_FIELD_VALUES).forEach(function (id) {
@@ -181,6 +179,26 @@
     document.body.classList.add('is-demo-empty');
     setCurrencyZero(true);
   }
+
+  // ---------- Contas a pagar/receber: 3º período futuro, mês/ano dinâmico ----------
+  // Antes um rótulo genérico ("Seguinte"), agora o mês/ano real seguinte ao
+  // "Próximo mês" (hoje+2 meses), calculado em runtime — não é um registro de
+  // negócio simulado (como o resto dos dados fictícios deste protótipo), é só
+  // um rótulo de exibição relativo à data real do dispositivo, então usar a
+  // data real aqui é a exceção documentada (mesmo raciocínio já usado pra
+  // timestamps de conteúdo gerado pelo usuário em Canal de Ideias/Nova Conversa).
+  var MES_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  function labelMesSeguinte() {
+    var d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() + 2);
+    return MES_ABREV[d.getMonth()] + '/' + d.getFullYear();
+  }
+  var periodo3Label = labelMesSeguinte();
+  ['pagar-periodo3-label', 'receber-periodo3-label'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = periodo3Label;
+  });
 
   // ---------- Estoque de grãos: barra de comprometido por cultura (card
   // promovido da versão alternativa de teste, round 2026-08-03) — largura

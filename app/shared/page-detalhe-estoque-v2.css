@@ -1,0 +1,158 @@
+/* ══════════════════════════════════════════════════════════
+   DETALHES DO ESTOQUE DE VENDAS (V2) — só o que é novo/diferente da V1
+   (`page-detalhe-estoque.css`, já carregado antes deste arquivo e continua
+   fornecendo `.detalhe-estoque-section`/`.detalhe-estoque-timeline*`/
+   `.detalhe-estoque-not-found` etc., reaproveitados aqui sem alteração).
+   ══════════════════════════════════════════════════════════ */
+
+.detalhev2-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+/* Guard obrigatório (bug recorrente `hidden`+`display` incondicional já
+   documentado dezenas de vezes em CLAUDE.md): sem isso, o bloco de ações
+   do cabeçalho continuaria visível mesmo com `hidden` setado no estado
+   "Registro não encontrado" (`detalhe-estoque-v2.js`/
+   `detalhe-estoque-uso-v2.js`). */
+.detalhev2-header-actions[hidden] { display: none; }
+.detalhev2-header-actions .btn { flex: 1; justify-content: center; }
+/* Bug real: `flex:1` acima também esticava o botão "mais" (`.iconOnly`,
+   só o ícone "⋮") pra dividir a largura igualmente com os botões de
+   texto — ele deveria ficar quadrado (largura = altura), não esticado.
+   `flex: none` reverte pro tamanho natural do padding do `.iconOnly`
+   (`Button.module.css`, 12px ao redor do ícone). */
+.detalhev2-header-actions .btn.iconOnly { flex: none; }
+@media (min-width: 640px) {
+  .detalhev2-header-actions { width: auto; }
+  .detalhev2-header-actions .btn { flex: none; }
+}
+
+/* ── Resumo do estoque: mesmo padrão de card de KPI já usado em Estoque/
+   Caixa/Contas a Pagar/Receber (`.estoque-summary-card`/`.ctp-summary-card`
+   etc. — cardHeader com ícone+título, valor em destaque abaixo, 12px/24px
+   fixo em qualquer largura). Cópia estrutural, classes próprias
+   `detalhev2-summary-*`, mesma convenção de não compartilhar CSS entre
+   telas já usada em todo o projeto. 1 coluna mobile → 2 a partir de 640px
+   → 4 a partir de 1024px (mesmo padrão de Contas a Pagar/Receber, que
+   também têm até 4 KPIs). ────────────────────────────────────────────── */
+.detalhev2-summary-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+@media (min-width: 640px) {
+  .detalhev2-summary-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .detalhev2-summary-row {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+.card.detalhev2-summary-card {
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.card.detalhev2-summary-card[hidden] { display: none; }
+
+.detalhev2-summary-card .cardHeader {
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+}
+.detalhev2-summary-card .title {
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.detalhev2-summary-icon svg { width: 14px; height: 14px; }
+
+.detalhev2-summary-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.detalhev2-summary-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+.detalhev2-summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+.detalhev2-summary-value {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+/* ── Estoque por depósito: itens inline, sem borda/card por depósito
+   (pedido explícito: "tirar as linhas dos cards, fazer inline") — mesma
+   ideia dos itens do Resumo antes de virarem KPI cards, só que em linha
+   (`flex-wrap`) em vez de grid, já que o número de depósitos varia. Divisor
+   vertical fraco entre os itens (`border-left`, mesmo token `--color-border-
+   subtle` já usado como divider padrão em Dashboard/Nova Conversa) — via
+   margin+padding em vez de `gap`, pra caber a linha entre um item e outro. */
+.detalhev2-depositos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: var(--spacing-lg);
+}
+
+.detalhev2-deposito-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: var(--spacing-lg);
+  padding-left: var(--spacing-lg);
+}
+.detalhev2-deposito-item:not(:first-child) {
+  border-left: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.detalhev2-deposito-item:first-child {
+  margin-left: 0;
+  padding-left: 0;
+}
+.detalhev2-deposito-nome {
+  color: var(--color-text-secondary);
+}
+.detalhev2-deposito-qty {
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+.detalhev2-deposito-conversao {
+  color: var(--color-text-tertiary);
+}
+
+/* ── Histórico: documento anexo + observação de ajuste ────────────────── */
+.detalhev2-doc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.detalhev2-obs-note {
+  font-style: italic;
+}

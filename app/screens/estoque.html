@@ -72,7 +72,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
                   <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
                   <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
@@ -95,7 +95,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Clientes e fornecedores</span>
+                  <span class="app-nav-label">Parceiros</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -164,9 +164,9 @@
 
             <!-- Configuração (expansível; contém, entre seus subitens, o subgrupo Fiscal) -->
             <div class="app-nav-group" id="group-configuracao">
-              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
                 <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
-                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-label">Configurações</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -177,10 +177,6 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
                   <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
                   <span class="app-nav-label">Cadastro de fazenda</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
-                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Conta Financeira</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
                   <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
@@ -193,6 +189,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
                   <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
                 </button>
 
                 <!-- Fiscal (subgrupo dentro de Configuração) -->
@@ -415,7 +415,7 @@
                   <thead>
                     <tr class="headerRow">
                       <th class="th sortable" data-sort-key="produto" aria-sort="none"><span class="thInner">Produto<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
-                      <th class="th sortable" data-sort-key="destinatario" aria-sort="none"><span class="thInner">Destinatário<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="destinatario" aria-sort="none"><span class="thInner">Cliente<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="comprometida" aria-sort="none"><span class="thInner">Qtd. comprometida<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="abatida" aria-sort="none"><span class="thInner">Qtd. abatida<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
                       <th class="th sortable" data-sort-key="pendente" aria-sort="none"><span class="thInner">Qtd. pendente<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
@@ -455,7 +455,7 @@
             </div>
 
             <div class="wrapper estoque-dropdown" id="filtro-destinatario-field">
-              <span class="label">Destinatário</span>
+              <span class="label">Cliente</span>
               <button type="button" class="trigger" data-dropdown-trigger>
                 <span data-dropdown-value>Todos</span>
                 <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>

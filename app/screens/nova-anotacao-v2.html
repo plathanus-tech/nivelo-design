@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova anotação — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-nova-anotacao-v2.css" />
+</head>
+<body>
+
+  <div class="app-shell" id="app-shell">
+
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item is-active" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Parceiros</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Vendas · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Vendas</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configurações</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
+                </button>
+
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <div class="nova-anotacao-page">
+
+          <div class="nova-anotacao-header">
+            <a href="caderno-de-campo-v2.html" class="nova-anotacao-back" id="nova-anotacao-back">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <h1 class="nova-anotacao-title text-heading-6">Nova anotação</h1>
+            <p class="nova-anotacao-subtitle text-body-s">Registre um evento do campo vinculado a um talhão específico.</p>
+          </div>
+
+          <!-- Estado de erro: chegar nesta tela sem talhão pré-selecionado é
+               sempre um erro de navegação — V2 não permite registro sem
+               talhão, sem exceções. -->
+          <div id="nova-anotacao-sem-talhao" class="nova-anotacao-error-card" hidden>
+            <i data-lucide="alert-triangle" width="28" height="28"></i>
+            <p class="text-body-s">Nenhum talhão selecionado. Todo registro do Caderno de Campo precisa estar vinculado a um talhão.</p>
+            <a href="caderno-de-campo-v2.html" class="btn secondary">Voltar para o Caderno de Campo</a>
+          </div>
+
+          <form id="nova-anotacao-form" novalidate>
+
+            <section class="card nova-anotacao-card">
+
+              <!-- ══════════════ CONTEXTO (não editável) ══════════════ -->
+              <div class="nova-anotacao-subsection">
+                <h2 class="nova-anotacao-subsection-title">Contexto</h2>
+                <div class="nova-anotacao-grid">
+
+                  <div class="wrapper" id="fazenda-field">
+                    <label class="label" for="na-fazenda">Fazenda</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-fazenda" disabled readonly />
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="talhao-field">
+                    <label class="label" for="na-talhao">Talhão</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-talhao" disabled readonly />
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="cultura-field">
+                    <label class="label" for="na-cultura">Cultura atual</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-cultura" disabled readonly />
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="safra-field">
+                    <label class="label" for="na-safra">Safra atual</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-safra" disabled readonly />
+                    </div>
+                  </div>
+
+                  <div class="wrapper" id="data-hora-field">
+                    <label class="label" for="na-data-hora">Data e hora</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-data-hora" disabled readonly />
+                    </div>
+                    <span class="helperText">Preenchido automaticamente pelo sistema.</span>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- ══════════════ TIPO DE REGISTRO ══════════════ -->
+              <div class="nova-anotacao-subsection">
+                <h2 class="nova-anotacao-subsection-title">Tipo de registro</h2>
+                <div class="nova-anotacao-tipo-group" role="radiogroup" aria-label="Tipo de registro" id="tipo-registro-group">
+                  <label class="nova-anotacao-tipo-card is-selected">
+                    <input type="radio" name="tipo-registro" value="anotacao" class="nova-anotacao-tipo-input" checked />
+                    <span class="nova-anotacao-tipo-icon"><i data-lucide="file-text" width="20" height="20"></i></span>
+                    <span class="nova-anotacao-tipo-label text-body-s">Anotação</span>
+                  </label>
+                  <label class="nova-anotacao-tipo-card">
+                    <input type="radio" name="tipo-registro" value="aplicacao-insumo" class="nova-anotacao-tipo-input" />
+                    <span class="nova-anotacao-tipo-icon"><i data-lucide="flask-conical" width="20" height="20"></i></span>
+                    <span class="nova-anotacao-tipo-label text-body-s">Aplicação de insumo</span>
+                  </label>
+                  <label class="nova-anotacao-tipo-card">
+                    <input type="radio" name="tipo-registro" value="despesa-manual" class="nova-anotacao-tipo-input" />
+                    <span class="nova-anotacao-tipo-icon"><i data-lucide="arrow-up-circle" width="20" height="20"></i></span>
+                    <span class="nova-anotacao-tipo-label text-body-s">Despesa manual</span>
+                  </label>
+                  <label class="nova-anotacao-tipo-card">
+                    <input type="radio" name="tipo-registro" value="colheita" class="nova-anotacao-tipo-input" />
+                    <span class="nova-anotacao-tipo-icon"><i data-lucide="wheat" width="20" height="20"></i></span>
+                    <span class="nova-anotacao-tipo-label text-body-s">Colheita</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- ══════════════ ANOTAÇÃO ══════════════ -->
+              <div class="nova-anotacao-subsection" id="secao-anotacao">
+                <h2 class="nova-anotacao-subsection-title">Detalhes da anotação</h2>
+                <div class="nova-anotacao-grid">
+                  <div class="wrapper nova-anotacao-span-2" id="titulo-field">
+                    <label class="label" for="na-titulo">Título</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-titulo" placeholder="Ex.: Monitoramento de pragas" />
+                    </div>
+                    <span class="errorText" id="titulo-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe o título da anotação.
+                    </span>
+                  </div>
+                  <div class="wrapper nova-anotacao-span-2" id="descricao-field">
+                    <label class="label" for="na-descricao">Descrição</label>
+                    <textarea class="input nova-anotacao-textarea" id="na-descricao" rows="3" placeholder="Escreva os detalhes desta anotação..."></textarea>
+                    <span class="errorText" id="descricao-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Escreva a descrição da anotação.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ══════════════ APLICAÇÃO DE INSUMO ══════════════ -->
+              <div class="nova-anotacao-subsection" id="secao-insumo" hidden>
+                <h2 class="nova-anotacao-subsection-title">Detalhes da aplicação de insumo</h2>
+                <div class="nova-anotacao-grid">
+
+                  <div class="wrapper nova-anotacao-combobox" id="produto-insumo-field">
+                    <label class="label" for="na-produto-insumo">Produto</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-produto-insumo" placeholder="Buscar produto..." autocomplete="off" />
+                    </div>
+                    <div class="menu" id="produto-insumo-menu"></div>
+                    <span class="errorText" id="produto-insumo-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione o produto aplicado.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="quantidade-insumo-field">
+                    <label class="label" for="na-quantidade-insumo">Quantidade</label>
+                    <div class="inputWrap">
+                      <input class="input" type="number" inputmode="decimal" min="0" step="0.01" id="na-quantidade-insumo" placeholder="0" />
+                    </div>
+                    <span class="errorText" id="quantidade-insumo-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe uma quantidade maior que zero.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="unidade-insumo-field">
+                    <label class="label" for="na-unidade-insumo">Unidade</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-unidade-insumo" disabled readonly placeholder="Selecione o produto" />
+                    </div>
+                    <span class="helperText">Preenchida automaticamente a partir do Produto.</span>
+                  </div>
+
+                  <div class="wrapper nova-anotacao-dropdown" id="deposito-field">
+                    <span class="label">Depósito</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione o depósito</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="deposito-menu"></div>
+                    <span class="errorText" id="deposito-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione o depósito de origem.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="custo-calculado-field">
+                    <label class="label" for="na-custo-calculado">Custo calculado</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-custo-calculado" disabled readonly placeholder="R$ 0,00" />
+                    </div>
+                    <span class="helperText">Calculado a partir do custo médio do produto em estoque.</span>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- ══════════════ DESPESA MANUAL ══════════════ -->
+              <div class="nova-anotacao-subsection" id="secao-despesa" hidden>
+                <h2 class="nova-anotacao-subsection-title">Detalhes da despesa</h2>
+                <div class="nova-anotacao-grid">
+
+                  <div class="wrapper nova-anotacao-dropdown" id="categoria-despesa-field">
+                    <span class="label">Categoria</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione a categoria</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu>
+                      <div class="option" data-value="Servico">Serviço</div>
+                      <div class="option" data-value="Frete">Frete</div>
+                      <div class="option" data-value="Outro">Outro</div>
+                    </div>
+                    <span class="errorText" id="categoria-despesa-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione a categoria da despesa.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="valor-despesa-field">
+                    <label class="label" for="na-valor-despesa">Valor (R$)</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" inputmode="numeric" id="na-valor-despesa" placeholder="R$ 0,00" />
+                    </div>
+                    <span class="errorText" id="valor-despesa-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe um valor maior que zero.
+                    </span>
+                  </div>
+
+                  <div class="wrapper nova-anotacao-span-2" id="observacao-despesa-field">
+                    <label class="label" for="na-observacao-despesa">Observação <span class="nova-anotacao-optional-tag">(opcional)</span></label>
+                    <textarea class="input nova-anotacao-textarea" id="na-observacao-despesa" rows="2" placeholder="Ex.: Frete de sementes de soja"></textarea>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- ══════════════ COLHEITA ══════════════ -->
+              <div class="nova-anotacao-subsection" id="secao-colheita" hidden>
+                <h2 class="nova-anotacao-subsection-title">Detalhes da colheita</h2>
+                <div class="nova-anotacao-grid">
+
+                  <div class="wrapper nova-anotacao-dropdown" id="produto-colheita-field">
+                    <span class="label">Produto</span>
+                    <button type="button" class="trigger" data-dropdown-trigger>
+                      <span class="placeholder" data-dropdown-value>Selecione o produto</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu id="produto-colheita-menu"></div>
+                    <span class="errorText" id="produto-colheita-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Selecione o produto colhido.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="quantidade-colheita-field">
+                    <label class="label" for="na-quantidade-colheita">Quantidade</label>
+                    <div class="inputWrap">
+                      <input class="input" type="number" inputmode="decimal" min="0" step="1" id="na-quantidade-colheita" placeholder="0" />
+                    </div>
+                    <span class="errorText" id="quantidade-colheita-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe uma quantidade maior que zero.
+                    </span>
+                  </div>
+
+                  <div class="wrapper" id="unidade-colheita-field">
+                    <label class="label" for="na-unidade-colheita">Unidade</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="na-unidade-colheita" disabled readonly placeholder="Selecione o produto" />
+                    </div>
+                    <span class="helperText">Preenchida automaticamente a partir do Produto.</span>
+                  </div>
+
+                </div>
+              </div>
+
+            </section>
+
+            <div class="nova-anotacao-actions">
+              <a href="caderno-de-campo-v2.html" class="btn secondary" id="nova-anotacao-cancel">Cancelar</a>
+              <button type="submit" class="btn primary" id="nova-anotacao-submit">Salvar registro</button>
+            </div>
+
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/fazendas-data.js"></script>
+  <script src="../shared/produtos-data.js"></script>
+  <script src="../shared/unidades-medida-data.js"></script>
+  <script src="../shared/estoque-uso-v2-data.js"></script>
+  <script src="../shared/locais-data.js"></script>
+  <script src="../shared/caderno-v2-data.js"></script>
+  <script src="../shared/nova-anotacao-v2.js"></script>
+</body>
+</html>

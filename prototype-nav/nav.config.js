@@ -341,6 +341,30 @@ window.PROTO_NAV_CONFIG = {
             }
           ]
         },
+        // Épico "Depósitos" (`type:'flow'`) — Configuração > Depósitos,
+        // catálogo de locais de estoque (silo próprio/cooperativa/depósito
+        // de produtos), reaproveitado pelos dropdowns de Depósito de várias
+        // telas de Estoque.
+        {
+          id: 'depositos-epico',
+          label: 'Depósitos',
+          type: 'flow',
+          screens: [
+            {
+              id: 'depositos',
+              label: 'Depósitos',
+              desktop: '../app/screens/depositos.html'
+            },
+            {
+              id: 'novo-deposito',
+              label: 'Novo depósito',
+              desktop: '../app/screens/novo-deposito.html',
+              variants: [
+                { id: 'novo-deposito-editar', label: 'Editar depósito (exemplo)', desktop: '../app/screens/novo-deposito.html?nome=' + encodeURIComponent('Fazenda Boa Vista') }
+              ]
+            }
+          ]
+        },
         {
           id: 'categorias-financeiras',
           label: 'Categorias de receitas e despesas',
@@ -499,18 +523,64 @@ window.PROTO_NAV_CONFIG = {
       id: 'caderno-de-campo',
       label: 'Jornada · Caderno de Campo',
       screens: [
-        // Épico "Caderno de Campo" (`type:'flow'`, mesmo mecanismo de
-        // agrupamento já usado no épico "Fazendas" dentro de Configuração) —
-        // Caderno de Campo (listagem) → Detalhe da fazenda (operacional) →
-        // Detalhe do talhão → Nova anotação são a mesma jornada/fluxo.
+        // Épico "Caderno de Campo V2" — versão que virou o destino real da
+        // Sidebar (interface-principal.js's NAV_DESTINATIONS). Produtividade/
+        // despesa por hectare nos KPIs, tabela de Talhões com Última
+        // Anotação + 3 ações, e Nova anotação sempre vinculada a um talhão
+        // (sem entrada farm-only). Ver app/CLAUDE.md pro round completo.
+        {
+          id: 'caderno-de-campo-v2-epico',
+          label: 'Caderno de Campo (V2)',
+          type: 'flow',
+          screens: [
+            {
+              id: 'caderno-de-campo-v2-listagem',
+              label: 'Caderno de Campo',
+              desktop: '../app/screens/caderno-de-campo-v2.html',
+              variants: [
+                { id: 'caderno-de-campo-v2-empty', label: 'Nenhuma fazenda', desktop: '../app/screens/caderno-de-campo-v2.html#state=empty' }
+              ]
+            },
+            {
+              id: 'fazenda-detalhe-caderno-v2',
+              label: 'Entrada na Fazenda',
+              desktop: '../app/screens/fazenda-detalhe-caderno-v2.html#id=sao-joao',
+              variants: [
+                { id: 'fazenda-detalhe-caderno-v2-sem-talhoes', label: 'Sem talhões cadastrados', desktop: '../app/screens/fazenda-detalhe-caderno-v2.html#id=sao-joao&state=empty' },
+                { id: 'fazenda-detalhe-caderno-v2-nao-encontrada', label: 'Fazenda não encontrada', desktop: '../app/screens/fazenda-detalhe-caderno-v2.html#id=inexistente' }
+              ]
+            },
+            {
+              id: 'talhao-detalhe-v2',
+              label: 'Detalhe do talhão',
+              desktop: '../app/screens/talhao-detalhe-v2.html#fazenda=sao-joao&talhao=t1',
+              variants: [
+                { id: 'talhao-detalhe-v2-sem-registros', label: 'Sem registros', desktop: '../app/screens/talhao-detalhe-v2.html#fazenda=santa-rita&talhao=t4' },
+                { id: 'talhao-detalhe-v2-nao-encontrado', label: 'Talhão não encontrado', desktop: '../app/screens/talhao-detalhe-v2.html#fazenda=sao-joao&talhao=inexistente' }
+              ]
+            },
+            {
+              id: 'nova-anotacao-v2',
+              label: 'Nova anotação',
+              desktop: '../app/screens/nova-anotacao-v2.html?fazenda=sao-joao&talhao=t1',
+              variants: [
+                { id: 'nova-anotacao-v2-insumo', label: 'Aplicação de insumo', desktop: '../app/screens/nova-anotacao-v2.html?fazenda=sao-joao&talhao=t1' },
+                { id: 'nova-anotacao-v2-sem-talhao', label: 'Sem talhão (erro)', desktop: '../app/screens/nova-anotacao-v2.html' }
+              ]
+            }
+          ]
+        },
+        // Épico "Caderno de Campo (V1)" — versão anterior, mantida intacta e
+        // acessível só por aqui (nunca mais wired na Sidebar real do
+        // produto). Ver round de V2 em app/CLAUDE.md.
         {
           id: 'caderno-de-campo-epico',
-          label: 'Caderno de Campo',
+          label: 'Caderno de Campo (V1)',
           type: 'flow',
           screens: [
             {
               id: 'caderno-de-campo-listagem',
-              label: 'Caderno de Campo',
+              label: 'Caderno de Campo (V1)',
               desktop: '../app/screens/caderno-de-campo.html',
               variants: [
                 { id: 'caderno-de-campo-empty', label: 'Nenhuma fazenda', desktop: '../app/screens/caderno-de-campo.html#state=empty' }
@@ -518,7 +588,7 @@ window.PROTO_NAV_CONFIG = {
             },
             {
               id: 'fazenda-detalhe-operacional',
-              label: 'Detalhe da fazenda (operacional)',
+              label: 'Detalhe da fazenda (operacional, V1)',
               desktop: '../app/screens/fazenda-detalhe.html#id=sao-joao',
               variants: [
                 { id: 'fazenda-detalhe-operacional-sem-talhoes', label: 'Sem talhões cadastrados', desktop: '../app/screens/fazenda-detalhe.html#id=sao-joao&state=empty' },
@@ -527,7 +597,7 @@ window.PROTO_NAV_CONFIG = {
             },
             {
               id: 'talhao-detalhe',
-              label: 'Detalhe do talhão',
+              label: 'Detalhe do talhão (V1)',
               desktop: '../app/screens/talhao-detalhe.html#fazenda=sao-joao&talhao=t1',
               variants: [
                 { id: 'talhao-detalhe-sem-anotacoes', label: 'Sem anotações registradas', desktop: '../app/screens/talhao-detalhe.html#fazenda=santa-rita&talhao=t4' },
@@ -536,7 +606,7 @@ window.PROTO_NAV_CONFIG = {
             },
             {
               id: 'nova-anotacao',
-              label: 'Nova anotação',
+              label: 'Nova anotação (V1)',
               desktop: '../app/screens/nova-anotacao.html',
               variants: [
                 { id: 'nova-anotacao-fazenda', label: 'Com fazenda pré-selecionada', desktop: '../app/screens/nova-anotacao.html?fazenda=sao-joao' },
@@ -581,6 +651,61 @@ window.PROTO_NAV_CONFIG = {
             { id: 'estoque-detalhe-comprometido', label: 'Estoque Comprometido', desktop: '../app/screens/detalhe-estoque.html#codigo=CMT-001' },
             { id: 'estoque-detalhe-nao-encontrado', label: 'Registro não encontrado', desktop: '../app/screens/detalhe-estoque.html#codigo=inexistente' }
           ]
+        },
+        // V2 — reconstrução da aba "Estoque de vendas" (cards por depósito,
+        // preço mutável, Registrar entrada/Atualizar preço/Ajustar estoque).
+        // É o destino real da Sidebar (`NAV_DESTINATIONS['estoque']`) — V1
+        // acima continua só pro navegador de protótipo. Compras/Comprometido
+        // seguem essencialmente como V1 dentro da própria estoque-v2.html.
+        {
+          id: 'estoque-v2',
+          label: 'Estoque (V2)',
+          desktop: '../app/screens/estoque-v2.html'
+        },
+        {
+          id: 'estoque-detalhe-v2',
+          label: 'Detalhes do estoque de vendas (V2)',
+          desktop: '../app/screens/detalhe-estoque-v2.html#codigo=VND-001',
+          variants: [
+            { id: 'estoque-detalhe-v2-nao-encontrado', label: 'Registro não encontrado', desktop: '../app/screens/detalhe-estoque-v2.html#codigo=inexistente' }
+          ]
+        },
+        {
+          id: 'estoque-registrar-entrada-v2',
+          label: 'Registrar entrada (V2)',
+          desktop: '../app/screens/registrar-entrada-estoque-v2.html?codigo=VND-001'
+        },
+        {
+          id: 'estoque-registrar-entrega-v2',
+          label: 'Registrar entrega (Estoque Comprometido)',
+          desktop: '../app/screens/registrar-entrega-estoque-v2.html?codigo=CMT-001',
+          variants: [
+            { id: 'estoque-registrar-entrega-v2-nao-encontrado', label: 'Compromisso não encontrado', desktop: '../app/screens/registrar-entrega-estoque-v2.html?codigo=inexistente' }
+          ]
+        },
+        {
+          id: 'estoque-historico-entrega-v2',
+          label: 'Ver histórico (Estoque Comprometido)',
+          desktop: '../app/screens/historico-entrega-estoque-v2.html?codigo=CMT-001',
+          variants: [
+            { id: 'estoque-historico-entrega-v2-nao-encontrado', label: 'Compromisso não encontrado', desktop: '../app/screens/historico-entrega-estoque-v2.html?codigo=inexistente' }
+          ]
+        },
+        // V2 — Estoque de Uso (mesmo tratamento V2 de Vendas/Comprometido,
+        // ver CLAUDE.md): saldo por depósito, custo médio, Registrar
+        // entrada/Registrar consumo/Ver detalhes/Ajustar estoque.
+        {
+          id: 'estoque-detalhe-uso-v2',
+          label: 'Detalhes do estoque de uso (V2)',
+          desktop: '../app/screens/detalhe-estoque-uso-v2.html#codigo=USO-001',
+          variants: [
+            { id: 'estoque-detalhe-uso-v2-nao-encontrado', label: 'Registro não encontrado', desktop: '../app/screens/detalhe-estoque-uso-v2.html#codigo=inexistente' }
+          ]
+        },
+        {
+          id: 'estoque-registrar-entrada-uso-v2',
+          label: 'Registrar entrada (Estoque de Uso, V2)',
+          desktop: '../app/screens/registrar-entrada-estoque-uso-v2.html?codigo=USO-001'
         }
       ]
     },
@@ -594,41 +719,106 @@ window.PROTO_NAV_CONFIG = {
         // produto (Sidebar/`interface-principal.js`) continua com um item
         // leaf só pra cada tela de listagem (decisão revertida em
         // 2026-08-03, ver app/CLAUDE.md).
+        // Caixa V2 (2026-08-31): Consolidado + Contas financeiras (2 abas,
+        // ver caixa-v2.html), Incluir Lançamento V2 (aviso de duplicidade +
+        // Resumo financeiro reativo) e Transferência entre Contas V2 (Saldo
+        // disponível/Novo saldo estimado). É a versão real do produto agora
+        // (`interface-principal.js`'s NAV_DESTINATIONS repontado) — V1
+        // preservada 100% intacta, só acessível daqui pra baixo.
         {
-          id: 'caixa-epico',
-          label: 'Caixa',
+          id: 'caixa-v2-epico',
+          label: 'Caixa V2',
           type: 'flow',
           screens: [
             {
-              id: 'caixa',
+              id: 'caixa-v2',
               label: 'Caixa',
-              desktop: '../app/screens/caixa.html'
+              desktop: '../app/screens/caixa-v2.html',
+              variants: [
+                { id: 'caixa-v2-contas-financeiras', label: 'Aba Contas financeiras', desktop: '../app/screens/caixa-v2.html' }
+              ]
             },
             {
-              id: 'novo-lancamento-caixa',
+              id: 'novo-lancamento-caixa-v2',
               label: 'Incluir lançamento',
-              desktop: '../app/screens/novo-lancamento-caixa.html'
+              desktop: '../app/screens/novo-lancamento-caixa-v2.html'
             },
             {
-              id: 'transferencia-entre-contas',
+              id: 'transferencia-entre-contas-v2',
               label: 'Transferência entre contas',
-              desktop: '../app/screens/transferencia-entre-contas.html'
+              desktop: '../app/screens/transferencia-entre-contas-v2.html'
             }
           ]
         },
         {
+          id: 'caixa-epico',
+          label: 'Caixa (V1)',
+          type: 'flow',
+          screens: [
+            {
+              id: 'caixa',
+              label: 'Caixa (V1)',
+              desktop: '../app/screens/caixa.html'
+            },
+            {
+              id: 'novo-lancamento-caixa',
+              label: 'Incluir lançamento (V1)',
+              desktop: '../app/screens/novo-lancamento-caixa.html'
+            },
+            {
+              id: 'transferencia-entre-contas',
+              label: 'Transferência entre contas (V1)',
+              desktop: '../app/screens/transferencia-entre-contas.html'
+            }
+          ]
+        },
+        // Contas a Pagar V2 (padrão): abas Todas/Em aberto/Pagas, Descrição/
+        // Valor original/Pago/Saldo, só 3 status (Em aberto/Vencida/Paga),
+        // só a ação Registrar pagamento (agora página própria, com
+        // accordion de Histórico de Pagamentos + separação principal ×
+        // juros × desconto). A V1 (épico seguinte) permanece intacta e
+        // disponível pra comparação — mesmo padrão já usado em Contas a
+        // Receber V1/V2.
+        {
+          id: 'contas-a-pagar-v2-epico',
+          label: 'Contas a pagar (V2)',
+          type: 'flow',
+          screens: [
+            {
+              id: 'contas-a-pagar-v2',
+              label: 'Contas a pagar (V2)',
+              desktop: '../app/screens/contas-a-pagar-v2.html'
+            },
+            {
+              id: 'nova-conta-pagar-v2',
+              label: 'Nova Conta a Pagar (V2)',
+              desktop: '../app/screens/nova-conta-pagar-v2.html'
+            },
+            {
+              id: 'registrar-pagamento-conta-pagar-v2',
+              label: 'Registrar pagamento (V2)',
+              desktop: '../app/screens/registrar-pagamento-conta-pagar-v2.html?codigo=CTP-0004',
+              variants: [
+                { id: 'registrar-pagamento-conta-pagar-v2-parcelada', label: 'Título parcelado, já com pagamento (CTP-0010)', desktop: '../app/screens/registrar-pagamento-conta-pagar-v2.html?codigo=CTP-0010' },
+                { id: 'registrar-pagamento-conta-pagar-v2-nao-encontrada', label: 'Conta não encontrada', desktop: '../app/screens/registrar-pagamento-conta-pagar-v2.html?codigo=inexistente' }
+              ]
+            }
+          ]
+        },
+        // Contas a Pagar V1 (versão anterior, mantida intacta pra comparação).
+        {
           id: 'contas-a-pagar-epico',
-          label: 'Contas a pagar',
+          label: 'Contas a pagar (V1)',
           type: 'flow',
           screens: [
             {
               id: 'contas-a-pagar',
-              label: 'Contas a pagar',
+              label: 'Contas a pagar (V1)',
               desktop: '../app/screens/contas-a-pagar.html'
             },
             {
               id: 'nova-conta-pagar',
-              label: 'Nova Conta a Pagar',
+              label: 'Nova Conta a Pagar (V1)',
               desktop: '../app/screens/nova-conta-pagar.html',
               variants: [
                 { id: 'nova-conta-pagar-editar', label: 'Editar (CTP-0001)', desktop: '../app/screens/nova-conta-pagar.html?codigo=CTP-0001&modo=editar' }
@@ -636,7 +826,7 @@ window.PROTO_NAV_CONFIG = {
             },
             {
               id: 'detalhe-conta-pagar',
-              label: 'Ver detalhes (Contas a pagar)',
+              label: 'Ver detalhes (Contas a pagar V1)',
               desktop: '../app/screens/detalhe-conta-pagar.html?codigo=CTP-0001',
               variants: [
                 { id: 'detalhe-conta-pagar-parcelada', label: 'Conta parcelada (CTP-0009)', desktop: '../app/screens/detalhe-conta-pagar.html?codigo=CTP-0009' },
@@ -663,18 +853,15 @@ window.PROTO_NAV_CONFIG = {
             {
               id: 'nova-conta-receber-v2',
               label: 'Nova Conta a Receber (V2)',
-              desktop: '../app/screens/nova-conta-receber-v2.html',
-              variants: [
-                { id: 'nova-conta-receber-v2-editar', label: 'Editar (CTR-0003)', desktop: '../app/screens/nova-conta-receber-v2.html?codigo=CTR-0003&modo=editar' }
-              ]
+              desktop: '../app/screens/nova-conta-receber-v2.html'
             },
             {
-              id: 'detalhe-conta-receber-v2',
-              label: 'Ver detalhes (Contas a receber V2)',
-              desktop: '../app/screens/detalhe-conta-receber-v2.html?codigo=CTR-0009',
+              id: 'registrar-recebimento-conta-receber-v2',
+              label: 'Registrar Recebimento (V2)',
+              desktop: '../app/screens/registrar-recebimento-conta-receber-v2.html?codigo=CTR-0008',
               variants: [
-                { id: 'detalhe-conta-receber-v2-parcial', label: 'Recebimentos parciais/múltiplos bancos (CTR-0003)', desktop: '../app/screens/detalhe-conta-receber-v2.html?codigo=CTR-0003' },
-                { id: 'detalhe-conta-receber-v2-nao-encontrada', label: 'Conta não encontrada', desktop: '../app/screens/detalhe-conta-receber-v2.html?codigo=inexistente' }
+                { id: 'registrar-recebimento-conta-receber-v2-com-historico', label: 'Com histórico de recebimentos', desktop: '../app/screens/registrar-recebimento-conta-receber-v2.html?codigo=CTR-0008' },
+                { id: 'registrar-recebimento-conta-receber-v2-nao-encontrada', label: 'Conta não encontrada', desktop: '../app/screens/registrar-recebimento-conta-receber-v2.html?codigo=inexistente' }
               ]
             }
           ]

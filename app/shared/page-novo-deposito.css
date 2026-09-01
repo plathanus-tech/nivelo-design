@@ -1,0 +1,88 @@
+/* ══════════════════════════════════════════════════════════
+   NOVO DEPÓSITO / LOCAL DE ESTOQUE — formulário de cadastro/edição, dentro
+   de Configuração > Depósitos. Mobile first. Estrutura/tokens copiados
+   deliberadamente de page-nova-conta-bancaria.css (mesmo "card único + grid
+   de 2 colunas" já aprovado no restante do sistema) — classes próprias
+   (`ndep-*`), não um arquivo compartilhado.
+   ══════════════════════════════════════════════════════════ */
+
+.ndep-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.ndep-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ndep-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.ndep-back:hover { color: var(--color-text-primary); }
+
+.ndep-title { color: var(--color-text-primary); margin: 0; }
+.ndep-subtitle { color: var(--color-text-tertiary); margin: 0; }
+
+/* ── Card único (mesmo padrão de Nova Conta Bancária/Nova Categoria) ────── */
+
+#ndep-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.ndep-card { padding: var(--spacing-lg); }
+
+.ndep-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .ndep-grid { grid-template-columns: 1fr 1fr; }
+  .ndep-span-2 { grid-column: span 2; }
+}
+
+.ndep-dropdown { position: relative; }
+
+.menu .option { display: block; }
+
+/* Mensagem de erro: mesmo padrão de Nova Conta Bancária/Nova categoria —
+   `.errorText` só aparece quando `.wrapper` ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.ndep-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+
+@media (min-width: 768px) {
+  .ndep-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .ndep-actions .btn { min-width: 160px; }
+}

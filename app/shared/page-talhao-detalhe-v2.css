@@ -1,0 +1,277 @@
+/* ══════════════════════════════════════════════════════════
+   TALHÃO — DETALHE (V2, Caderno de Campo → Fazenda X → Talhão Y). Mesma
+   estrutura de `page-talhao-detalhe.css` (V1) — status/indicadores/registros
+   do Caderno/lista de anotações — adaptada aos 4 tipos de registro do V2
+   (Anotação/Aplicação de insumo/Despesa manual/Colheita) e à ação "Encerrar
+   safra" no lugar do genérico "Alterar status" do V1.
+   ══════════════════════════════════════════════════════════ */
+
+.talhao-detalhe-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+#talhao-detalhe-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.talhao-detalhe-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.talhao-detalhe-back:hover { color: var(--color-text-primary); }
+
+.talhao-detalhe-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.talhao-detalhe-not-found:not([hidden]) { display: flex; }
+.talhao-detalhe-not-found p { margin: 0; }
+
+.talhao-detalhe-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .talhao-detalhe-title-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.talhao-detalhe-title-block { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.talhao-detalhe-title-line { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; }
+.talhao-detalhe-title { color: var(--color-text-primary); margin: 0; }
+
+.talhao-detalhe-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+@media (min-width: 480px) {
+  .talhao-detalhe-actions { flex-direction: row; }
+}
+.talhao-detalhe-actions .btn { justify-content: center; }
+
+/* Informações do talhão — Fazenda/Hectares/Cultura atual/Safra atual, movidas
+   pra cá do antigo subtítulo do cabeçalho + dos 3 primeiros cards de KPI
+   (Área/Cultura atual/Safra), pra não duplicar a mesma informação em 2
+   lugares. Mesmo padrão dl/dt/dd read-only já usado em outras telas
+   (ex. LCDPR "Dados gerais do relatório"). */
+.talhao-info-card { box-shadow: var(--shadow-sm); }
+.talhao-info-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md); }
+.talhao-info-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  margin: 0;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+@media (min-width: 560px) {
+  .talhao-info-fields { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .talhao-info-fields { grid-template-columns: repeat(4, 1fr); }
+}
+.talhao-info-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.talhao-info-fields dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; }
+
+.talhao-resumo-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 560px) {
+  .talhao-resumo-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .talhao-resumo-row { gap: var(--spacing-lg); }
+}
+
+.card.talhao-resumo-card { box-shadow: var(--shadow-sm); display: flex; flex-direction: column; }
+.talhao-resumo-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md); }
+.talhao-resumo-card .title { font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
+.talhao-resumo-title-row { display: flex; align-items: center; gap: var(--spacing-xs); }
+.talhao-resumo-icon { display: inline-flex; flex-shrink: 0; color: var(--color-text-brand); }
+.talhao-resumo-body { display: flex; flex-direction: column; gap: 2px; padding: 0 var(--spacing-lg) var(--spacing-lg); }
+.talhao-resumo-value { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: var(--font-weight-medium); color: var(--color-text-primary); overflow-wrap: break-word; }
+.talhao-resumo-value.is-secondary-line { font-family: var(--font-body); font-weight: var(--font-weight-regular); font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+.talhao-resumo-row-caderno .talhao-resumo-value { font-size: var(--font-size-xl); }
+
+.anotacoes-section { padding: var(--spacing-lg); display: flex; flex-direction: column; gap: var(--spacing-md); }
+.anotacoes-section-title-block { display: flex; flex-direction: column; gap: 2px; }
+.anotacoes-section-title { color: var(--color-text-primary); margin: 0; }
+.anotacoes-section-description { color: var(--color-text-tertiary); margin: 0; max-width: 480px; }
+
+.anotacoes-list { display: flex; flex-direction: column; }
+
+.anotacao-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.anotacoes-list .anotacao-row:first-child { border-top: none; }
+
+.anotacao-row-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-action-primary);
+  flex-shrink: 0;
+}
+.anotacao-row-icon[data-tipo="despesa-manual"] { color: var(--color-status-error-fg); }
+.anotacao-row-icon[data-tipo="colheita"] { color: var(--color-status-success-fg); }
+
+.anotacao-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.anotacao-row-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-sm); }
+.anotacao-row-tipo { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.anotacao-row-value { flex-shrink: 0; color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.anotacao-row-observacao { color: var(--color-text-secondary); }
+.anotacao-row-meta { color: var(--color-text-tertiary); }
+
+.anotacoes-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.anotacoes-empty:not([hidden]) { display: flex; }
+
+.anotacoes-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.anotacoes-empty-title { color: var(--color-text-primary); margin: 0; }
+.anotacoes-empty-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 360px; }
+
+/* ══════ Histórico de Safras do Talhão (Safra/Cultura/Período/Status) ══════
+   Mesma arquitetura "Tabela → Cards no mobile" já usada na tabela de Talhões
+   de fazenda-detalhe-caderno-v2.js/page-fazenda-detalhe-caderno-v2.css:
+   tabela real a partir de 768px, Cards abaixo disso. */
+.historico-safras-section { padding: var(--spacing-lg); display: flex; flex-direction: column; gap: var(--spacing-md); }
+.historico-safras-section-header { display: flex; flex-direction: column; gap: var(--spacing-md); }
+@media (min-width: 640px) {
+  .historico-safras-section-header { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+.historico-safras-section-title-block { display: flex; flex-direction: column; gap: 2px; }
+.historico-safras-section-title { color: var(--color-text-primary); margin: 0; }
+.historico-safras-section-description { color: var(--color-text-tertiary); margin: 0; max-width: 480px; }
+
+.historico-safras-table-wrap { display: none; }
+@media (min-width: 768px) {
+  .historico-safras-table-wrap:not([hidden]) { display: block; }
+}
+.historico-safras-table-wrap .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  white-space: normal;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.historico-safras-table-wrap .headerRow { border-bottom-color: var(--color-gray-200); }
+.historico-safras-table-wrap .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.historico-safras-table-wrap .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.historico-safras-table-wrap .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.historico-safras-table-wrap .tr:hover .td { filter: brightness(0.97); }
+.historico-safras-table-wrap .table { table-layout: fixed; }
+.historico-safras-table-wrap .th:nth-child(1), .historico-safras-table-wrap .td:nth-child(1) { width: 20%; } /* Safra */
+.historico-safras-table-wrap .th:nth-child(2), .historico-safras-table-wrap .td:nth-child(2) { width: 30%; } /* Cultura */
+.historico-safras-table-wrap .th:nth-child(3), .historico-safras-table-wrap .td:nth-child(3) { width: 25%; } /* Período */
+.historico-safras-table-wrap .th:nth-child(4), .historico-safras-table-wrap .td:nth-child(4) { width: 25%; } /* Status */
+
+.historico-safras-mobile-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+@media (min-width: 768px) {
+  .historico-safras-mobile-list { display: none; }
+}
+.historico-safra-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.historico-safra-mobile-card-header { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-sm); }
+.historico-safra-mobile-card-name { color: var(--color-text-primary); }
+.historico-safra-mobile-card-fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm) var(--spacing-md); margin: 0; }
+.historico-safra-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.historico-safra-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+
+.historico-safras-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.historico-safras-empty:not([hidden]) { display: flex; }
+.historico-safras-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.historico-safras-empty-title { color: var(--color-text-primary); margin: 0; }
+.historico-safras-empty-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 360px; }
+
+/* Modal: Encerrar safra — mesmo bug de hidden+display incondicional já
+   documentado dezenas de vezes neste projeto. */
+.overlay[hidden] { display: none; }
+
+.talhao-detalhe-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.talhao-detalhe-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.talhao-detalhe-toast { box-shadow: var(--shadow-lg); animation: talhao-detalhe-toast-in 0.25s ease; }
+.talhao-detalhe-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.talhao-detalhe-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0; }
+@keyframes talhao-detalhe-toast-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }

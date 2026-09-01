@@ -86,6 +86,26 @@ window.NiveloPedidosVenda = (function () {
       transportadoraCodigo: null, transportadoraNome: null, veiculoPlaca: null, motorista: null,
       observacao: 'Colheita prevista para dezembro/2026.', tipo: 'venda-futura', status: 'pendente-nfe', numeroNotaFiscal: null, criadoEm: '2026-08-26T14:15:00',
       integracaoEstoqueConcluida: false, integracaoFinanceiroConcluida: true
+    },
+    // PV-0004: exemplo fictício de REMESSA vinculada a um pedido de venda já
+    // existente (PV-0002) — `pedidoOrigemNumero` é o único campo novo aqui,
+    // lido só pela listagem (buildRowHTML) pra mostrar a legenda "Vinculado
+    // ao Pedido PV-000X" sob a coluna Cliente/Destinatário, mesma técnica já
+    // usada pra "Parcela N/M" em Contas a Pagar/Receber (caption sob a
+    // coluna de texto principal, não uma coluna nova). Mesmo cliente/produto/
+    // quantidade do pedido de origem (a remessa entrega o que foi vendido
+    // lá), shape idêntico ao de `addRemessa()`.
+    {
+      numero: 'PV-0004', data: '2026-08-28', naturezaOperacaoCodigo: null, naturezaOperacaoDescricao: 'Remessa para depósito/armazém',
+      clienteCodigo: null, clienteNome: 'Agropecuária Central Ltda', clienteDocumento: '55.666.777/0001-88', clienteIe: '223.445.667.100', clienteTelefone: '(49) 3255-1188', clienteEndereco: 'Av. Central, 1200 - Tijucas/SC',
+      modalidade: 'remessa', produtoSku: 'PRD-003', produtoNome: 'Trigo', produtoUnidadeLegado: 'Saca', unidadeCodigo: 'SC', depositoNome: null,
+      quantidade: 150, pesoPorUnidade: 60, totalKg: 9000, precoUnitario: 98, valorBruto: 14700, desconto: 0, valorLiquido: 14700,
+      condicaoPagamento: null, formaRecebimentoCodigo: null, formaRecebimentoNome: null, contaEntradaCodigo: null, contaEntradaNome: null, dataRecebimento: null,
+      formaCobrancaCodigo: null, formaCobrancaNome: null, numeroParcelas: null, parcelas: [],
+      transportadoraCodigo: null, transportadoraNome: 'Transportes Rio Verde Ltda', veiculoPlaca: 'ABC-1D23', motorista: 'José Carlos Menezes',
+      observacao: '', tipo: 'remessa', status: 'pendente-nfe', numeroNotaFiscal: null, criadoEm: '2026-08-28T11:00:00',
+      integracaoEstoqueConcluida: false, integracaoFinanceiroConcluida: false,
+      pedidoOrigemNumero: 'PV-0002'
     }
   ];
 

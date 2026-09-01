@@ -1,0 +1,36 @@
+/* ══════════════════════════════════════════════════════════
+   CONTAS A PAGAR — V2. Carregado JUNTO com page-contas-a-pagar.css (a base
+   visual/estrutural é 100% a mesma da V1, pedido explícito de manter o
+   padrão já existente) — este arquivo tem só o DELTA da V2: faixa de
+   versão, abas (Todas/Em aberto/Pagas), e a coluna Ações reduzida (só 1
+   ícone agora, "Registrar pagamento").
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Faixa de versão (V1 ⇄ V2), mesmo padrão exato de Contas a Receber V2 ── */
+.ctp-version-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+.ctp-version-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.ctp-version-switch:hover { color: var(--color-text-brand); }
+
+/* ── Abas (Todas/Em aberto/Pagas) ─────────────────────────────────────── */
+.ctp-tabs { margin-bottom: var(--spacing-sm); }
+
+/* ── Coluna Ações: só 1 ícone agora (era 4 na V1) ────────────────────────
+   Reafirma a largura de todas as 9 colunas (mesmas posições da V1, só
+   Valor→Valor original/Pago/Saldo reordenadas — larguras idênticas, sem
+   mudança visual ali) e reduz só a última. */
+.ctp-table-card .th:nth-child(9) { width: 96px; }

@@ -184,10 +184,16 @@
     var tipoBadge = TIPO_BADGE[pedido.tipo] || TIPO_BADGE.venda;
     var statusBadge = pedido.status === 'cancelado' ? STATUS_BADGE.cancelado : STATUS_BADGE[pedido.status];
     var searchText = normalize(pedido.numero + ' ' + pedido.clienteNome + ' ' + pedido.produtoNome);
+    // Remessa vinculada a um pedido de venda: legenda "Vinculado ao Pedido
+    // PV-000X" sob a coluna Cliente/Destinatário — mesma técnica já usada
+    // pra "Parcela N/M" em Contas a Pagar/Receber (`.ctp-cell-parcela`),
+    // caption sob a coluna de texto principal, nunca uma coluna nova.
+    var clienteCellHTML = pedido.clienteNome +
+      (pedido.pedidoOrigemNumero ? '<span class="pv-cell-vinculo text-body-xs">Vinculado ao Pedido ' + pedido.pedidoOrigemNumero + '</span>' : '');
     return (
       '<tr class="tr" id="pv-row-' + pedido.numero + '" data-numero="' + pedido.numero + '" data-search="' + searchText + '" data-data="' + pedido.data + '" data-valor="' + pedido.valorLiquido + '">' +
         '<td class="td">' + formatDate(pedido.data) + '</td>' +
-        '<td class="td">' + pedido.clienteNome + '</td>' +
+        '<td class="td">' + clienteCellHTML + '</td>' +
         '<td class="td"><span class="badge" data-status="' + tipoBadge.status + '">' + tipoBadge.label + '</span></td>' +
         '<td class="td">' + pedido.produtoNome + '</td>' +
         '<td class="td">' + pedido.quantidade + ' ' + (pedido.produtoUnidadeLegado || '') + '</td>' +
@@ -570,7 +576,7 @@
     return (
       '<div class="card pv-mobile-card" data-row-id="' + row.id + '">' +
         '<div class="pv-mobile-card-header">' +
-          '<span class="pv-mobile-card-numero text-subtitle-s">' + cellText(row.children[1]) + '</span>' +
+          '<span class="pv-mobile-card-numero text-subtitle-s">' + row.children[1].innerHTML + '</span>' +
           '<span>' + row.children[2].innerHTML + '</span>' +
         '</div>' +
         '<dl class="pv-mobile-card-fields">' +

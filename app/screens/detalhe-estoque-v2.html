@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhes do estoque de vendas — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/page-estoque.css" />
+  <link rel="stylesheet" href="../shared/page-detalhe-estoque.css" />
+  <link rel="stylesheet" href="../shared/page-estoque-v2.css" />
+  <link rel="stylesheet" href="../shared/page-detalhe-estoque-v2.css" />
+</head>
+<body>
+
+  <div class="estoque-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Parceiros</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item is-active" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="false" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Vendas · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Vendas</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configurações</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
+                </button>
+
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — DETALHES (ESTOQUE DE VENDAS, V2) ══════════════════ -->
+      <main class="app-main">
+        <div class="detalhe-estoque-page">
+
+          <div class="detalhe-estoque-header">
+            <a href="estoque-v2.html" class="detalhe-estoque-back" id="detalhe-back">
+              <i data-lucide="arrow-left" width="18" height="18"></i>
+              Voltar
+            </a>
+            <div class="detalhe-estoque-title-row">
+              <div class="detalhe-estoque-title-block">
+                <h1 class="detalhe-estoque-title text-heading-6" id="detalhe-titulo">—</h1>
+                <span class="badge" data-status="info"><span class="badgeDot"></span>Estoque de vendas</span>
+              </div>
+              <div class="detalhev2-header-actions">
+                <button type="button" class="btn primary hasLeft" id="acao-registrar-entrada-btn">
+                  <span class="icon"><i data-lucide="plus-circle" width="16" height="16"></i></span>
+                  Registrar entrada
+                </button>
+                <button type="button" class="btn secondary iconOnly" id="acao-mais-btn" aria-label="Mais ações">
+                  <i data-lucide="more-vertical" width="18" height="18"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Popover de ações (Atualizar preço/Ajustar estoque) — mesma técnica
+               `position:fixed` já usada no popover "more" da listagem de Vendas. -->
+          <div class="estoquev2-actions-popover" id="detalhe-actions-popover" hidden>
+            <button type="button" class="option" id="acao-atualizar-preco-btn"><i data-lucide="tag" width="16" height="16"></i>Atualizar preço</button>
+            <button type="button" class="option" id="acao-ajustar-estoque-btn"><i data-lucide="sliders-horizontal" width="16" height="16"></i>Ajustar estoque</button>
+          </div>
+
+          <div id="detalhe-not-found" class="detalhe-estoque-not-found" hidden>
+            <i data-lucide="search-x" width="28" height="28"></i>
+            <p class="text-14-regular">Registro não encontrado.</p>
+            <a href="estoque-v2.html" class="btn secondary">Voltar para Estoque</a>
+          </div>
+
+          <div id="detalhe-content">
+
+            <!-- ══════════════ Resumo do estoque ══════════════
+                 Mesmo padrão visual de KPI já usado em Estoque/Caixa/Contas a Pagar/Receber
+                 (`.estoque-summary-card`/`.ctp-summary-card` etc.) — cards próprios por
+                 indicador, sem título de seção próprio (mesmo padrão dessas telas: o
+                 título de cada card já nomeia o indicador). -->
+            <div class="detalhev2-summary-row">
+              <div class="card detalhev2-summary-card">
+                <div class="cardHeader">
+                  <div class="detalhev2-summary-title-row">
+                    <span class="detalhev2-summary-icon"><i data-lucide="package" width="14" height="14"></i></span>
+                    <h3 class="title">Saldo total</h3>
+                  </div>
+                </div>
+                <div class="detalhev2-summary-body">
+                  <span class="detalhev2-summary-value" id="rd-saldo-total">—</span>
+                </div>
+              </div>
+              <div class="card detalhev2-summary-card" id="rd-indicador-2-item" hidden>
+                <div class="cardHeader">
+                  <div class="detalhev2-summary-title-row">
+                    <span class="detalhev2-summary-icon"><i data-lucide="repeat" width="14" height="14"></i></span>
+                    <h3 class="title" id="rd-indicador-2-label">—</h3>
+                  </div>
+                </div>
+                <div class="detalhev2-summary-body">
+                  <span class="detalhev2-summary-value" id="rd-indicador-2-value">—</span>
+                </div>
+              </div>
+              <div class="card detalhev2-summary-card">
+                <div class="cardHeader">
+                  <div class="detalhev2-summary-title-row">
+                    <span class="detalhev2-summary-icon"><i data-lucide="tag" width="14" height="14"></i></span>
+                    <h3 class="title">Preço atual</h3>
+                  </div>
+                </div>
+                <div class="detalhev2-summary-body">
+                  <span class="detalhev2-summary-value" id="rd-preco-atual">—</span>
+                </div>
+              </div>
+              <div class="card detalhev2-summary-card">
+                <div class="cardHeader">
+                  <div class="detalhev2-summary-title-row">
+                    <span class="detalhev2-summary-icon"><i data-lucide="wallet" width="14" height="14"></i></span>
+                    <h3 class="title">Valor estimado</h3>
+                  </div>
+                </div>
+                <div class="detalhev2-summary-body">
+                  <span class="detalhev2-summary-value" id="rd-valor-estimado">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ══════════════ Estoque por depósito ══════════════ -->
+            <section class="card detalhe-estoque-section">
+              <div class="cardHeader">
+                <h2 class="title">Estoque por depósito</h2>
+              </div>
+              <div class="detalhev2-depositos-grid" id="rd-depositos-grid"></div>
+            </section>
+
+            <!-- ══════════════ Histórico de movimentações ══════════════ -->
+            <section class="card detalhe-estoque-section">
+              <div class="cardHeader">
+                <h2 class="title">Histórico de movimentações</h2>
+              </div>
+              <ol class="detalhe-estoque-timeline" id="historico-timeline"></ol>
+            </section>
+
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- ══════════════════ Modal: Atualizar preço (réplica de estoque-v2.html) ══════════════════ -->
+  <div class="overlay" id="preco-dialog-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="preco-dialog-title">
+      <div class="header">
+        <h2 class="title" id="preco-dialog-title">Atualizar preço — <span id="preco-produto-nome">—</span></h2>
+        <button type="button" class="closeBtn" id="preco-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="estoque-modal-grid">
+          <div class="wrapper" id="preco-atual-field">
+            <label class="label" id="preco-atual-label">Preço atual</label>
+            <div class="inputWrap">
+              <input class="input" type="text" id="preco-atual-input" disabled readonly />
+            </div>
+          </div>
+
+          <div class="wrapper" id="preco-novo-field">
+            <label class="label" id="preco-novo-label">Novo preço</label>
+            <div class="inputWrap hasLeft estoquev2-currency-wrap">
+              <span class="iconLeft estoquev2-currency-prefix">R$</span>
+              <input class="input" type="text" inputmode="decimal" id="preco-novo-input" placeholder="0,00" aria-describedby="preco-novo-error" />
+            </div>
+            <span class="errorText" id="preco-novo-error">
+              <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+              Informe o novo preço.
+            </span>
+          </div>
+
+          <div class="wrapper" id="preco-base-field" hidden>
+            <label class="label" id="preco-base-label">Preço por kg</label>
+            <div class="inputWrap">
+              <input class="input" type="text" id="preco-base-input" disabled readonly />
+            </div>
+          </div>
+
+          <div class="dpRoot" id="preco-data-field">
+            <label class="dpLabel" for="preco-data-trigger">Data</label>
+            <button type="button" class="dpTrigger" id="preco-data-trigger">
+              <span class="dpTriggerIcon"><i data-lucide="calendar" width="16" height="16"></i></span>
+              <span class="dpPlaceholder" id="preco-data-value">Selecionar data</span>
+            </button>
+            <input type="hidden" id="preco-data-input" />
+            <div class="dpPopover" id="preco-data-popover" hidden>
+              <div class="dpCalendarHeader">
+                <button type="button" class="dpNavBtn" data-dp-prev aria-label="Mês anterior">
+                  <i data-lucide="chevron-left" width="16" height="16"></i>
+                </button>
+                <span class="dpCalendarLabel text-body-s" data-dp-label></span>
+                <button type="button" class="dpNavBtn" data-dp-next aria-label="Próximo mês">
+                  <i data-lucide="chevron-right" width="16" height="16"></i>
+                </button>
+              </div>
+              <div class="dpWeekdays">
+                <span class="text-10-medium">D</span><span class="text-10-medium">S</span><span class="text-10-medium">T</span><span class="text-10-medium">Q</span><span class="text-10-medium">Q</span><span class="text-10-medium">S</span><span class="text-10-medium">S</span>
+              </div>
+              <div class="dpGrid" data-dp-grid></div>
+            </div>
+          </div>
+
+          <div class="estoque-modal-span-2 estoquev2-preco-helper">
+            <i data-lucide="info" width="16" height="16"></i>
+            <span>Preço gerencial/mercado. Não altera o histórico de compra.</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondary sm" id="preco-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="preco-confirm">Atualizar preço</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ Modal: Ajustar estoque (réplica de estoque-v2.html) ══════════════════ -->
+  <div class="overlay" id="ajuste-dialog-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="ajuste-dialog-title">
+      <div class="header">
+        <h2 class="title" id="ajuste-dialog-title">Ajustar estoque — <span id="ajuste-produto-nome">—</span></h2>
+        <button type="button" class="closeBtn" id="ajuste-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="estoque-modal-grid">
+          <div class="wrapper estoquev2-dropdown" id="ajuste-deposito-field">
+            <span class="label">Depósito</span>
+            <button type="button" class="trigger" data-dropdown-trigger>
+              <span data-dropdown-value>Selecione</span>
+              <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+            </button>
+            <div class="menu" data-dropdown-menu id="ajuste-deposito-menu"></div>
+          </div>
+
+          <div class="wrapper" id="ajuste-saldo-sistema-field">
+            <label class="label">Saldo no sistema</label>
+            <div class="inputWrap">
+              <input class="input" type="text" id="ajuste-saldo-sistema-input" disabled readonly />
+            </div>
+          </div>
+
+          <div class="wrapper" id="ajuste-saldo-conferido-field">
+            <label class="label" for="ajuste-saldo-conferido-input">Saldo conferido</label>
+            <div class="inputWrap">
+              <input class="input" type="number" inputmode="decimal" min="0" step="1" id="ajuste-saldo-conferido-input" placeholder="0" aria-describedby="ajuste-saldo-conferido-error" />
+            </div>
+            <span class="errorText" id="ajuste-saldo-conferido-error">
+              <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+              Informe o saldo conferido.
+            </span>
+          </div>
+
+          <div class="wrapper" id="ajuste-diferenca-field">
+            <label class="label">Diferença</label>
+            <div class="inputWrap">
+              <input class="input" type="text" id="ajuste-diferenca-input" disabled readonly />
+            </div>
+          </div>
+
+          <div class="wrapper estoque-modal-span-2" id="ajuste-observacao-field">
+            <label class="label" for="ajuste-observacao-input">Motivo/Observação <span class="estoque-modal-optional-tag">(opcional)</span></label>
+            <textarea class="input estoque-modal-textarea" id="ajuste-observacao-input" rows="2" placeholder="Alguma informação adicional sobre este ajuste?"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondary sm" id="ajuste-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="ajuste-confirm">Confirmar ajuste</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/produtos-data.js"></script>
+  <script src="../shared/unidades-medida-data.js"></script>
+  <script src="../shared/locais-data.js"></script>
+  <script src="../shared/date-picker.js"></script>
+  <script src="../shared/estoque-vendas-v2-data.js"></script>
+  <script src="../shared/detalhe-estoque-v2.js"></script>
+</body>
+</html>

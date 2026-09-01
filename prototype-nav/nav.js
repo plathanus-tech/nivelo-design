@@ -84,6 +84,24 @@
     return ref.desktop;
   }
 
+  // Bug real: reabrir uma tela já visitada (ex.: ir pra outra e voltar) às
+  // vezes mostrava uma versão desatualizada do HTML, mesmo com o arquivo já
+  // salvo no disco — o navegador reaproveita o iframe anterior (bfcache/
+  // cache de disco de `file://`) em vez de buscar o arquivo de novo, já que
+  // a URL de destino é idêntica à de uma visita anterior. `bustCache` força
+  // uma URL sempre única (query param com timestamp, preservando o `#hash`
+  // de variante) só na navegação real do iframe principal — nunca no link
+  // "abrir raw" nem nas miniaturas/preview, que não têm esse sintoma
+  // reportado e não precisam pagar o custo de nunca cachear.
+  var LAST_FRAME_SRC = '';
+  function bustCache(url) {
+    var hashIdx = url.indexOf('#');
+    var path = hashIdx === -1 ? url : url.slice(0, hashIdx);
+    var hash = hashIdx === -1 ? '' : url.slice(hashIdx);
+    var sep = path.indexOf('?') === -1 ? '?' : '&';
+    return path + sep + '_pn=' + Date.now() + hash;
+  }
+
   // ---------- Sincronização com navegação real dentro do iframe ----------
   // O cliente clica em links de verdade dentro do protótipo (ex: Sidebar,
   // "Ver detalhes", redirecionamentos de formulário) sem passar pela árvore
@@ -441,11 +459,16 @@
     if (!entry) return;
 
     var src = getSrc(entry.ref, state.device);
-    var currentAttr = els.mainFrame.getAttribute('src') || '';
-    var currentPath = currentAttr.split('#')[0];
+    // Comparado contra o `src` LÓGICO da última navegação (sem o parâmetro
+    // de cache-bust), nunca contra o atributo `src` de verdade do iframe —
+    // esse já vem com `_pn=...` anexado, então comparar direto contra ele
+    // faria `currentPath !== nextPath` SEMPRE (o timestamp muda a cada
+    // navegação), quebrando a detecção de "mesma tela, só a variante mudou".
+    var currentPath = LAST_FRAME_SRC.split('#')[0];
     var nextPath = src.split('#')[0];
+    var bustedSrc = bustCache(src);
 
-    if (currentAttr && currentPath === nextPath) {
+    if (LAST_FRAME_SRC && currentPath === nextPath) {
       // Mesma tela, só a variante (hash) muda: setar `src` de novo com o
       // mesmo caminho é navegação same-document na maioria dos browsers —
       // o iframe não recarrega, então o JS da tela (que só lê
@@ -453,11 +476,12 @@
       // estado. Força um reload de verdade limpando o `src` primeiro.
       els.mainFrame.src = 'about:blank';
       window.requestAnimationFrame(function () {
-        els.mainFrame.src = src;
+        els.mainFrame.src = bustedSrc;
       });
     } else {
-      els.mainFrame.src = src;
+      els.mainFrame.src = bustedSrc;
     }
+    LAST_FRAME_SRC = src;
 
     applySelection(entry);
   }
@@ -569,8 +593,11 @@
       var entry = findEntry(state.screenId);
       if (entry) {
         var newSrc = getSrc(entry.ref, device);
-        var currentSrc = els.mainFrame.getAttribute('src') || '';
-        if (newSrc !== currentSrc) selectScreen(state.screenId);
+        // Comparado contra o `src` lógico (`LAST_FRAME_SRC`), não contra o
+        // atributo real do iframe — este carrega o parâmetro de cache-bust
+        // (`bustCache`), que nunca bateria com `newSrc` mesmo sendo o mesmo
+        // arquivo, forçando um reload desnecessário a cada troca de device.
+        if (newSrc !== LAST_FRAME_SRC) selectScreen(state.screenId);
       }
     }
   }

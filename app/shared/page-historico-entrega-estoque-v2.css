@@ -1,0 +1,56 @@
+/* ══════════════════════════════════════════════════════════
+   HISTÓRICO DE ENTREGAS — Estoque Comprometido (V2). Página própria
+   acessada pela ação "Ver histórico" da aba Comprometido (era "Ver
+   detalhes", ver estoque-v2.js). Reaproveita, sem nenhuma mudança:
+   `.detalhe-estoque-*` (page-detalhe-estoque.css, estrutura de página/
+   timeline) e `.entregav2-kpi-*`/`.estoquev2-tipo-tag` (page-registrar-
+   entrega-estoque-v2.css, mesmo padrão de KPI/tag já usado em Registrar
+   entrega). Aqui só o que é específico desta tela.
+   ══════════════════════════════════════════════════════════ */
+
+/* Mesmo espaçamento padrão entre cards já usado no resto do sistema
+   (`--spacing-lg`, ver `.novo-estoque-page`/`#novo-estoque-form`) — sem
+   isso, o KPI row e o card de histórico ficavam colados. `:not([hidden])`
+   é obrigatório: `#historico-content` some via atributo `hidden` no
+   estado "Compromisso não encontrado", mesmo gotcha hidden+display
+   incondicional já documentado dezenas de vezes neste projeto. */
+#historico-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Título + subtítulo (Cliente), logo abaixo do título pra deixar claro
+   pra quem é o compromisso — a tag "Estoque Comprometido" fica ao lado do
+   nome do cliente, na mesma linha (pedido explícito). */
+.historicov2-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.historicov2-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.historicov2-subtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+/* Destaque do KPI "Total a entregar": só cor/fundo — a tipografia
+   continua no mesmo tamanho dos demais KPIs (pedido explícito de manter
+   o padrão visual do sistema, nada de fonte maior aqui). */
+.historicov2-kpi-card-highlight {
+  background: var(--color-bg-brand);
+  border-color: var(--color-action-primary);
+}
+.historicov2-kpi-value-highlight {
+  color: var(--color-text-brand);
+}
+
+/* `.historicov2-status-text` (Status do KPI, texto colorido sem badge)
+   mudou pra `page-registrar-entrega-estoque-v2.css` — as duas telas usam
+   o mesmo tratamento agora ("Em aberto" visível direto na tela, mesmo
+   padrão nas 2"), e aquele arquivo já é carregado por ambas. */

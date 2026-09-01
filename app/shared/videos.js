@@ -3,26 +3,101 @@
 
   var gridEl = document.getElementById('videos-grid');
   var emptyEl = document.getElementById('videos-empty');
+  var chipRowEl = document.getElementById('videos-chip-row');
+  var chipPrevBtn = document.getElementById('videos-chip-prev');
+  var chipNextBtn = document.getElementById('videos-chip-next');
+
+  var state = { categoria: 'todas' };
 
   // Mesmo padrão de cor+ícone por categoria já usado no Canal de Ideias
   // (CATEGORIA_COR/CATEGORIA_ICONE em canal-ideias.js): ícone sempre
   // reaproveitado do mesmo módulo em outra parte do sistema (Sidebar/Header).
   var CATEGORIA_COR = {
+    'Dashboard': 'warning',
     'Primeiros passos': 'info',
     'Notas Fiscais': 'indigo',
     'Financeiro': 'success',
     'Estoque': 'orange',
     'Caderno de Campo': 'violet',
-    'Assistente IA': 'pink'
+    'Assistente IA': 'pink',
+    'Relatórios': 'indigo',
+    'Outros': 'info'
   };
   var CATEGORIA_ICONE = {
+    'Dashboard': 'layout-dashboard',
     'Primeiros passos': 'flag',
     'Notas Fiscais': 'receipt',
     'Financeiro': 'wallet',
     'Estoque': 'package',
     'Caderno de Campo': 'book-open',
-    'Assistente IA': 'bot'
+    'Assistente IA': 'bot',
+    'Relatórios': 'bar-chart-3',
+    'Outros': 'leaf'
   };
+  var TODAS_ICONE = 'layout-grid';
+
+  // ---------- Chips de categoria (mesma composição exata de
+  // canal-ideias.js's buildChips/updateChipNav/scrollChips/enableDragScroll) ----------
+  function buildChips() {
+    var categorias = window.NiveloVideos.categorias();
+    var items = [{ id: 'todas', label: 'Todas' }].concat(categorias.map(function (c) {
+      return { id: c, label: c };
+    }));
+    chipRowEl.innerHTML = items.map(function (item) {
+      var selected = state.categoria === item.id;
+      var icone = item.id === 'todas' ? TODAS_ICONE : (CATEGORIA_ICONE[item.id] || 'circle');
+      return '<button type="button" class="chip' + (selected ? ' selected' : '') + '" data-categoria="' + escapeHtml(item.id) + '" aria-pressed="' + selected + '"><i data-lucide="' + icone + '" width="14" height="14"></i>' + escapeHtml(item.label) + '</button>';
+    }).join('');
+    if (window.lucide) lucide.createIcons();
+    updateChipNav();
+  }
+
+  function updateChipNav() {
+    var hasOverflow = chipRowEl.scrollWidth > chipRowEl.clientWidth + 1;
+    var atStart = chipRowEl.scrollLeft <= 0;
+    var atEnd = chipRowEl.scrollLeft + chipRowEl.clientWidth >= chipRowEl.scrollWidth - 1;
+    chipPrevBtn.hidden = !hasOverflow || atStart;
+    chipNextBtn.hidden = !hasOverflow || atEnd;
+  }
+
+  function scrollChips(direction) {
+    chipRowEl.scrollBy({ left: direction * chipRowEl.clientWidth * 0.72, behavior: 'smooth' });
+  }
+
+  chipPrevBtn.addEventListener('click', function () { scrollChips(-1); });
+  chipNextBtn.addEventListener('click', function () { scrollChips(1); });
+  chipRowEl.addEventListener('scroll', updateChipNav);
+  window.addEventListener('resize', updateChipNav);
+
+  chipRowEl.addEventListener('click', function (event) {
+    var chip = event.target.closest('[data-categoria]');
+    if (!chip) return;
+    state.categoria = chip.dataset.categoria;
+    buildChips();
+    render();
+  });
+
+  (function enableDragScroll() {
+    var isDown = false;
+    var startX = 0;
+    var startScroll = 0;
+    chipRowEl.addEventListener('mousedown', function (event) {
+      isDown = true;
+      chipRowEl.classList.add('is-dragging');
+      startX = event.pageX;
+      startScroll = chipRowEl.scrollLeft;
+    });
+    window.addEventListener('mouseup', function () {
+      if (!isDown) return;
+      isDown = false;
+      chipRowEl.classList.remove('is-dragging');
+    });
+    window.addEventListener('mousemove', function (event) {
+      if (!isDown) return;
+      event.preventDefault();
+      chipRowEl.scrollLeft = startScroll - (event.pageX - startX);
+    });
+  })();
 
   function escapeHtml(str) {
     return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
@@ -65,7 +140,9 @@
   }
 
   function render() {
-    var videos = window.NiveloVideos.list();
+    var videos = window.NiveloVideos.list().filter(function (video) {
+      return state.categoria === 'todas' || video.categoria === state.categoria;
+    });
 
     if (!videos.length) {
       gridEl.hidden = true;
@@ -93,5 +170,6 @@
     openVideo(card);
   });
 
+  buildChips();
   render();
 })();

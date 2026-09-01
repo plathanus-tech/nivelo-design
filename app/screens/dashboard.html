@@ -66,7 +66,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
                   <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
                   <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
@@ -89,7 +89,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Clientes e fornecedores</span>
+                  <span class="app-nav-label">Parceiros</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -158,9 +158,9 @@
 
             <!-- Configuração (expansível; contém, entre seus subitens, o subgrupo Fiscal) -->
             <div class="app-nav-group" id="group-configuracao">
-              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
                 <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
-                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-label">Configurações</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -171,10 +171,6 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
                   <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
                   <span class="app-nav-label">Cadastro de fazenda</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
-                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Conta Financeira</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
                   <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
@@ -187,6 +183,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
                   <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
                 </button>
 
                 <!-- Fiscal (subgrupo dentro de Configuração) -->
@@ -293,8 +293,9 @@
               <div class="cardHeader">
                 <div class="dash-card-title-row">
                   <span class="dash-card-icon"><i data-lucide="sprout" width="18" height="18"></i></span>
-                  <h2 class="title" id="card-safra-title">Safras</h2>
+                  <h2 class="title" id="card-safra-title">Produção / Colheita</h2>
                 </div>
+                <p class="subtitle">Últimas Safras</p>
               </div>
               <div class="dash-card-body">
                 <div class="dash-headline" data-content>
@@ -304,29 +305,38 @@
                 <div class="dash-stat-list" data-content>
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Soja 2026</span>
-                      <span class="dash-stat-sub text-12-regular">média 62 sc/ha</span>
+                      <div class="dash-stat-name-row">
+                        <span class="dash-stat-label text-16-regular">Soja</span>
+                        <span class="badge dash-stat-safra-tag" data-status="info">Safra 2025/26</span>
+                      </div>
+                      <span class="dash-stat-sub text-12-regular">60 ha · média 62,0 sc/ha</span>
                     </div>
                     <div class="dash-stat-value">
-                      <span class="dash-stat-value-main text-subtitle-m">60 ha</span>
+                      <span class="dash-stat-value-main text-subtitle-m">3.720 sc</span>
                     </div>
                   </div>
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Milho 2025/2026</span>
-                      <span class="dash-stat-sub text-12-regular">média 140 sc/ha</span>
+                      <div class="dash-stat-name-row">
+                        <span class="dash-stat-label text-16-regular">Milho</span>
+                        <span class="badge dash-stat-safra-tag" data-status="info">Safra 2025/26</span>
+                      </div>
+                      <span class="dash-stat-sub text-12-regular">30 ha · média 140,0 sc/ha</span>
                     </div>
                     <div class="dash-stat-value">
-                      <span class="dash-stat-value-main text-subtitle-m">30 ha</span>
+                      <span class="dash-stat-value-main text-subtitle-m">4.200 sc</span>
                     </div>
                   </div>
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Trigo 2026</span>
-                      <span class="dash-stat-sub text-12-regular">média 55 sc/ha</span>
+                      <div class="dash-stat-name-row">
+                        <span class="dash-stat-label text-16-regular">Trigo</span>
+                        <span class="badge dash-stat-safra-tag" data-status="info">Safra 2026</span>
+                      </div>
+                      <span class="dash-stat-sub text-12-regular">10 ha · média 55,0 sc/ha</span>
                     </div>
                     <div class="dash-stat-value">
-                      <span class="dash-stat-value-main text-subtitle-m">10 ha</span>
+                      <span class="dash-stat-value-main text-subtitle-m">550 sc</span>
                     </div>
                   </div>
                 </div>
@@ -460,18 +470,15 @@
                   <span class="dash-card-icon"><i data-lucide="arrow-up-circle" width="18" height="18"></i></span>
                   <h2 class="title" id="card-pagar-title">Contas a pagar</h2>
                 </div>
-                <p class="subtitle dash-card-meta">
-                  <span class="dash-card-meta-value out" id="pagar-meta-value">R$ 99.500,00</span>
-                </p>
               </div>
               <div class="dash-card-body" data-content>
                 <div class="dash-stat-list">
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Em atraso</span>
+                      <span class="dash-stat-label text-16-regular">Vencidas</span>
                     </div>
                     <div class="dash-stat-value">
-                      <span class="dash-stat-value-main text-subtitle-m">R$ 22.000,00</span>
+                      <span class="dash-stat-value-main text-subtitle-m is-vencida">R$ 22.000,00</span>
                     </div>
                   </div>
                   <div class="dash-stat-row">
@@ -490,6 +497,14 @@
                       <span class="dash-stat-value-main text-subtitle-m">R$ 42.100,00</span>
                     </div>
                   </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular" id="pagar-periodo3-label">Out/2026</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 30.800,00</span>
+                    </div>
+                  </div>
                 </div>
                 <a href="#" class="dash-card-footer-link">Ver todas as contas<i data-lucide="arrow-right" width="14" height="14"></i></a>
               </div>
@@ -505,18 +520,15 @@
                   <span class="dash-card-icon"><i data-lucide="arrow-down-circle" width="18" height="18"></i></span>
                   <h2 class="title" id="card-receber-title">Contas a receber</h2>
                 </div>
-                <p class="subtitle dash-card-meta">
-                  <span class="dash-card-meta-value in" id="receber-meta-value">R$ 274.350,00</span>
-                </p>
               </div>
               <div class="dash-card-body" data-content>
                 <div class="dash-stat-list">
                   <div class="dash-stat-row">
                     <div class="dash-stat-main">
-                      <span class="dash-stat-label text-16-regular">Em atraso</span>
+                      <span class="dash-stat-label text-16-regular">Vencidas</span>
                     </div>
                     <div class="dash-stat-value">
-                      <span class="dash-stat-value-main text-subtitle-m">R$ 64.000,00</span>
+                      <span class="dash-stat-value-main text-subtitle-m is-vencida">R$ 64.000,00</span>
                     </div>
                   </div>
                   <div class="dash-stat-row">
@@ -533,6 +545,14 @@
                     </div>
                     <div class="dash-stat-value">
                       <span class="dash-stat-value-main text-subtitle-m">R$ 118.300,00</span>
+                    </div>
+                  </div>
+                  <div class="dash-stat-row">
+                    <div class="dash-stat-main">
+                      <span class="dash-stat-label text-16-regular" id="receber-periodo3-label">Out/2026</span>
+                    </div>
+                    <div class="dash-stat-value">
+                      <span class="dash-stat-value-main text-subtitle-m">R$ 95.200,00</span>
                     </div>
                   </div>
                 </div>
@@ -578,26 +598,31 @@
                     <span class="dash-forecast-label">Seg</span>
                     <i data-lucide="sun" width="22" height="22"></i>
                     <span class="dash-forecast-temps text-12-regular"><strong>29°</strong> 16°</span>
+                    <span class="dash-forecast-rain text-12-regular"><i data-lucide="droplet" width="12" height="12"></i>5%</span>
                   </li>
                   <li class="dash-forecast-day">
                     <span class="dash-forecast-label">Ter</span>
                     <i data-lucide="cloud-sun" width="22" height="22"></i>
                     <span class="dash-forecast-temps text-12-regular"><strong>27°</strong> 15°</span>
+                    <span class="dash-forecast-rain text-12-regular"><i data-lucide="droplet" width="12" height="12"></i>20%</span>
                   </li>
                   <li class="dash-forecast-day">
                     <span class="dash-forecast-label">Qua</span>
                     <i data-lucide="cloud-rain" width="22" height="22"></i>
                     <span class="dash-forecast-temps text-12-regular"><strong>22°</strong> 14°</span>
+                    <span class="dash-forecast-rain text-12-regular"><i data-lucide="droplet" width="12" height="12"></i>80%</span>
                   </li>
                   <li class="dash-forecast-day">
                     <span class="dash-forecast-label">Qui</span>
                     <i data-lucide="cloud-sun" width="22" height="22"></i>
                     <span class="dash-forecast-temps text-12-regular"><strong>25°</strong> 15°</span>
+                    <span class="dash-forecast-rain text-12-regular"><i data-lucide="droplet" width="12" height="12"></i>30%</span>
                   </li>
                   <li class="dash-forecast-day">
                     <span class="dash-forecast-label">Sex</span>
                     <i data-lucide="sun" width="22" height="22"></i>
                     <span class="dash-forecast-temps text-12-regular"><strong>30°</strong> 17°</span>
+                    <span class="dash-forecast-rain text-12-regular"><i data-lucide="droplet" width="12" height="12"></i>5%</span>
                   </li>
                 </ul>
 

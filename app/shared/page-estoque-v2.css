@@ -1,0 +1,235 @@
+/* ══════════════════════════════════════════════════════════
+   ESTOQUE V2 — listagem (aba Vendas redesenhada em cards; abas Compras/
+   Comprometido mantidas essencialmente como V1, cujo CSS (`page-estoque.css`)
+   continua carregado ANTES deste arquivo — aqui só o que é novo/diferente
+   da V2. Grid responsivo em `auto-fill`/`minmax`, mesma técnica já usada em
+   `page-fazendas.css` (lista de tamanho variável).
+   ══════════════════════════════════════════════════════════ */
+
+.estoquev2-dropdown { position: relative; }
+
+/* ── Abas: "Estoque Comprometido" (a mais longa das 3) cortava em telas
+   estreitas — `Tab.module.css`'s `.tab` é `white-space:nowrap` sempre, sem
+   quebra em nenhum breakpoint, e `.list` esconde a própria scrollbar
+   horizontal (`scrollbar-width:none`), então o corte não tinha nenhuma
+   pista visual de que havia mais texto. Fix escopado só a esta tela (nunca
+   o componente `Tab` em si — mudar isso globalmente afetaria toda tela que
+   usa `Tab`, ex. Cadastro/Produtos/Contas a Pagar): permite quebrar em até
+   2 linhas, centralizado, com altura livre. */
+.estoque-tabs .tab {
+  white-space: normal;
+  text-align: center;
+  height: auto;
+  line-height: 1.3;
+}
+.estoque-tabs .list {
+  align-items: stretch;
+}
+
+/* ── Aba Vendas: tabela no desktop (≥768px), cards no mobile ─────────────
+   `.estoquev2-vendas-panel` reaproveita o mesmo container/estado vazio de
+   `.estoque-table-card` (`.estoque-mobile-cards` continua sem uso aqui —
+   Vendas usa seu próprio grid `.estoquev2-vendas-grid`, com o mesmo
+   layout/largura/breakpoint do `.estoque-mobile-card*` genérico das outras
+   2 abas, não um padrão à parte). Mobile-first: grid visível por padrão,
+   tabela só aparece a partir de 768px (mesmo breakpoint responsivo já
+   usado em todas as tabelas do sistema). */
+.estoquev2-vendas-panel .estoque-mobile-cards {
+  display: none;
+}
+.estoquev2-vendas-panel .tableWrap {
+  display: none;
+}
+@media (min-width: 768px) {
+  /* `:not([hidden])` obrigatório: o atributo `hidden` (usado por
+     estoque-v2.js pro estado "Nenhum item encontrado") tem especificidade
+     baixa o suficiente pra perder de qualquer seletor de classe — sem o
+     guard, a tabela reapareceria mesmo com a busca sem resultados (mesmo
+     bug recorrente documentado em CLAUDE.md). */
+  .estoquev2-vendas-panel .tableWrap:not([hidden]) {
+    display: block;
+  }
+  .estoquev2-vendas-panel .estoquev2-vendas-grid {
+    display: none;
+  }
+}
+
+/* Bug real: este grid tinha largura/breakpoint próprios (`auto-fill`,
+   `minmax(260px,1fr)` a partir de 560px) — diferente do padrão de card
+   mobile usado em TODAS as outras tabelas do sistema (`.estoque-mobile-
+   cards`/`.cadastros-mobile-card`/`.produtos-mobile-card`/`.ctp-mobile-
+   card`: 1 coluna full-width, `padding-top:var(--spacing-md)` sem padding
+   lateral, troca pra tabela só em 768px). Corrigido pra ser idêntico —
+   mesmas propriedades, nenhum breakpoint intermediário próprio. */
+.estoquev2-vendas-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+/* Guard obrigatório: `.estoquev2-vendas-grid` declara `display:flex`
+   incondicional acima — sem isso, o atributo `hidden` (usado no estado
+   vazio, ver estoque-v2.js) não some o grid (mesmo bug recorrente
+   documentado em CLAUDE.md, "colisão hidden + display incondicional"). */
+.estoquev2-vendas-grid[hidden] { display: none; }
+
+/* ── Aba Vendas: tabela (desktop) ─────────────────────────────────────────
+   Mesma disciplina de largura por coluna já usada nas demais tabelas do
+   sistema. */
+.estoquev2-vendas-table { table-layout: fixed; }
+.estoquev2-vendas-table .th:nth-child(1) { width: 24%; }  /* Produto */
+.estoquev2-vendas-table .th:nth-child(2) { width: 20%; }  /* Quantidade */
+.estoquev2-vendas-table .th:nth-child(3) { width: 16%; }  /* Preço atual */
+.estoquev2-vendas-table .th:nth-child(4) { width: 16%; }  /* Valor estimado */
+.estoquev2-vendas-table .th:nth-child(5) { width: 170px; } /* Ações (4 ícones) */
+
+.estoquev2-row-qty {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.estoquev2-row-qty-unit {
+  color: var(--color-text-secondary);
+}
+.estoquev2-row-conversao {
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+/* ── Popover de ações (usado na tela de Ver detalhes — Atualizar preço/
+   Ajustar estoque, atrás do botão "mais") ────────────────────────────────
+   Composição própria (sem componente Popover no Storybook), mesma técnica
+   `position:fixed` já usada no popover de Filtros desta mesma tela. */
+.estoquev2-actions-popover {
+  position: fixed;
+  z-index: 60;
+  min-width: 200px;
+  background: var(--color-bg-surface);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* Guard obrigatório (mesmo bug recorrente `hidden`+`display` incondicional
+   documentado em CLAUDE.md): sem isso o popover ficaria sempre visível. */
+.estoquev2-actions-popover[hidden] { display: none; }
+.estoquev2-actions-popover .option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: var(--spacing-sm) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.estoquev2-actions-popover .option:hover {
+  background: var(--color-bg-brand);
+}
+.estoquev2-actions-popover .option svg {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.card.estoquev2-vendas-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.estoquev2-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.estoquev2-card-title {
+  color: var(--color-text-primary);
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 4 ações por card: reaproveita `.cellActions`/`.actionBtn`/`.tip` do Table
+   real (mesmo padrão das linhas de tabela) — aqui só ajusta o wrap pra não
+   estourar a largura do card em telas estreitas. */
+.estoquev2-card-header .cellActions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Quantidade: prioridade #1 de destaque visual (ver rules.md) — maior peso
+   tipográfico do card. */
+.estoquev2-card-qty-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.estoquev2-card-qty {
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+.estoquev2-card-qty-unit {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+.estoquev2-card-conversao {
+  color: var(--color-text-tertiary);
+}
+
+.estoquev2-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  margin: 0;
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.estoquev2-card-fields dt {
+  color: var(--color-text-tertiary);
+  margin: 0 0 2px;
+}
+.estoquev2-card-fields dd {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+
+/* ── Modal "Atualizar preço": prefixo "R$" dentro do input (mesmo padrão
+   visual já usado em campos de moeda do sistema, ver novo-estoque.js) ──── */
+.estoquev2-currency-wrap .estoquev2-currency-prefix {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Modal "Atualizar preço": texto de apoio, sem reaproveitar o componente
+   Feedback (evita a colisão .body/.title × Dialog já documentada em
+   CLAUDE.md) — markup próprio, simples. ──────────────────────────────── */
+.estoquev2-preco-helper {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-brand);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+.estoquev2-preco-helper svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-action-primary);
+}

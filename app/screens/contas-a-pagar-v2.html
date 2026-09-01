@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contas a Pagar (V2) — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/DatePicker/DatePicker.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/FilterPopover/FilterPopover.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tab/Tab.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/period-filter.css" />
+  <link rel="stylesheet" href="../shared/page-contas-a-pagar.css" />
+  <link rel="stylesheet" href="../shared/page-contas-a-pagar-v2.css" />
+</head>
+<body>
+
+  <div class="ctp-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Parceiros</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group is-open" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="true" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem is-active" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Vendas · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Vendas</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configurações</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
+                </button>
+
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — CONTAS A PAGAR (V2) ══════════════════ -->
+      <main class="app-main">
+        <div class="ctp-page">
+
+          <!-- Faixa de versão: mesmo padrão exato já usado em Contas a Receber V2. -->
+          <div class="ctp-version-banner">
+            <span class="badge" data-status="info"><span class="badgeDot"></span>Versão 2 · Descrição, valores e status simplificados, pagamento em página própria</span>
+            <a href="contas-a-pagar.html" class="ctp-version-switch">Ver versão anterior (V1)<i data-lucide="arrow-right" width="14" height="14"></i></a>
+          </div>
+
+          <div class="ctp-header">
+            <div class="ctp-header-text">
+              <h1 class="ctp-title text-heading-6">Contas a Pagar</h1>
+              <p class="ctp-subtitle text-body-s">Acompanhe e gerencie as contas a pagar da sua fazenda.</p>
+            </div>
+            <button type="button" class="btn primary hasLeft" id="new-conta-btn">
+              <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
+              Nova Conta a Pagar
+            </button>
+          </div>
+
+          <!-- KPIs no topo — mesma cópia estrutural da V1, refletem sempre os
+               filtros aplicados (busca+Agrupamento de Filtros+aba). -->
+          <div class="ctp-summary-row">
+            <div class="card ctp-summary-card">
+              <div class="cardHeader">
+                <div class="ctp-summary-title-row">
+                  <span class="ctp-summary-icon"><i data-lucide="wallet" width="18" height="18"></i></span>
+                  <h2 class="title">Total a pagar</h2>
+                </div>
+              </div>
+              <div class="ctp-summary-body">
+                <span class="ctp-summary-value" id="ctp-kpi-total">R$ 0,00</span>
+              </div>
+            </div>
+
+            <div class="card ctp-summary-card">
+              <div class="cardHeader">
+                <div class="ctp-summary-title-row">
+                  <span class="ctp-summary-icon"><i data-lucide="circle-alert" width="18" height="18"></i></span>
+                  <h2 class="title">Vencido</h2>
+                </div>
+              </div>
+              <div class="ctp-summary-body">
+                <span class="ctp-summary-value" id="ctp-kpi-vencido">R$ 0,00</span>
+              </div>
+            </div>
+
+            <div class="card ctp-summary-card">
+              <div class="cardHeader">
+                <div class="ctp-summary-title-row">
+                  <span class="ctp-summary-icon"><i data-lucide="calendar-clock" width="18" height="18"></i></span>
+                  <h2 class="title">Vence hoje</h2>
+                </div>
+              </div>
+              <div class="ctp-summary-body">
+                <span class="ctp-summary-value" id="ctp-kpi-hoje">R$ 0,00</span>
+              </div>
+            </div>
+
+            <div class="card ctp-summary-card">
+              <div class="cardHeader">
+                <div class="ctp-summary-title-row">
+                  <span class="ctp-summary-icon"><i data-lucide="calendar-days" width="18" height="18"></i></span>
+                  <h2 class="title">Próximos vencimentos</h2>
+                </div>
+              </div>
+              <div class="ctp-summary-body">
+                <span class="ctp-summary-value" id="ctp-kpi-proximos">R$ 0,00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Abas: Todas / Em aberto / Pagas — "Em aberto" inclui os títulos
+               'em-aberto' E 'vencida' (ambos ainda devidos), "Pagas" só
+               'paga'. Mesmo componente Tab já usado em Estoque/Natureza da
+               Operação. -->
+          <div class="list ctp-tabs" role="tablist" id="ctp-tablist">
+            <button type="button" role="tab" aria-selected="true" class="tab active" data-tab="todas">Todas</button>
+            <button type="button" role="tab" aria-selected="false" class="tab" data-tab="em-aberto">Em aberto</button>
+            <button type="button" role="tab" aria-selected="false" class="tab" data-tab="pagas">Pagas</button>
+          </div>
+
+          <div class="card ctp-list-card">
+            <div class="ctp-filter-bar">
+              <div class="ctp-filters">
+                <div class="ctp-filter ctp-filter-search">
+                  <div class="wrapper">
+                    <div class="inputWrap hasLeft">
+                      <span class="iconLeft"><i data-lucide="search" width="18" height="18"></i></span>
+                      <input type="text" class="input" id="ctp-search-input" placeholder="Busque por fornecedor, descrição ou nº do documento." />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ctp-filter" id="ctp-filtros-field">
+                  <div class="wrapper" id="ctp-filtros-trigger-root">
+                    <button type="button" class="trigger" id="ctp-filtros-trigger">
+                      <span class="ctp-filtros-icon"><i data-lucide="sliders-horizontal" width="16" height="16"></i></span>
+                      <span>Filtros</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button type="button" class="btn secondary hasLeft" id="ctp-export-btn">
+                <span class="icon"><i data-lucide="download" width="16" height="16"></i></span>
+                Exportar Excel
+              </button>
+            </div>
+
+            <section class="ctp-table-card">
+              <!-- Estado de carregamento (breve, na abertura da tela). -->
+              <div class="ctp-loading" id="ctp-loading-state">
+                <i data-lucide="loader-2" width="24" height="24"></i>
+                <p class="text-body-s">Carregando contas a pagar...</p>
+              </div>
+
+              <div class="tableWrap">
+                <table class="table">
+                  <thead>
+                    <tr class="headerRow" id="ctp-header-row">
+                      <th class="th sortable" data-sort-key="fornecedor" aria-sort="none"><span class="thInner">Fornecedor<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="descricao" aria-sort="none"><span class="thInner">Descrição<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="documento" aria-sort="none"><span class="thInner">Documento / NF<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="vencimento" aria-sort="none"><span class="thInner">Vencimento<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="status" aria-sort="none"><span class="thInner">Status<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="valorOriginal" aria-sort="none"><span class="thInner">Valor original<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="pago" aria-sort="none"><span class="thInner">Pago<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th sortable" data-sort-key="saldo" aria-sort="none"><span class="thInner">Saldo<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      <th class="th">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ctp-tbody"></tbody>
+                </table>
+              </div>
+
+              <div class="ctp-cards" id="ctp-cards"></div>
+
+              <div class="ctp-empty" id="ctp-empty-state" hidden>
+                <i data-lucide="search-x" width="28" height="28"></i>
+                <p class="text-14-regular">Nenhuma conta a pagar encontrada.</p>
+              </div>
+
+              <div class="ctp-empty-global" id="ctp-empty-global" hidden>
+                <span class="ctp-empty-global-icon"><i data-lucide="arrow-up-circle" width="28" height="28"></i></span>
+                <p class="ctp-empty-global-title text-subtitle-s">Você ainda não possui nenhuma conta a pagar.</p>
+                <p class="ctp-empty-global-subtitle text-body-s">Inclua sua primeira conta a pagar para começar a acompanhar seus compromissos financeiros.</p>
+                <button type="button" class="btn primary hasLeft" id="ctp-empty-global-btn">
+                  <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
+                  Nova Conta a Pagar
+                </button>
+              </div>
+
+              <!-- Paginação (10 registros/página). -->
+              <div class="ctp-pagination" id="ctp-pagination" hidden>
+                <span class="ctp-pagination-info text-body-xs" id="ctp-pagination-info"></span>
+                <div class="ctp-pagination-controls">
+                  <button type="button" class="actionBtn" data-page-prev aria-label="Página anterior">
+                    <i data-lucide="chevron-left" width="16" height="16"></i>
+                  </button>
+                  <div class="ctp-pagination-pages" id="ctp-pagination-pages"></div>
+                  <button type="button" class="actionBtn" data-page-next aria-label="Próxima página">
+                    <i data-lucide="chevron-right" width="16" height="16"></i>
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Popover "Filtros": Período (sobre Vencimento) + Situação de
+               Pagamento (integral/parcial/não pago) + Status. Forma de
+               Pagamento e Categoria foram removidos, pedido explícito. -->
+          <div class="ctp-filter-popover" id="ctp-filtros-popover" hidden>
+            <div id="ctp-period-mount"></div>
+
+            <div class="wrapper ctp-dropdown" id="dropdown-situacao">
+              <span class="label">Situação de Pagamento</span>
+              <button type="button" class="trigger" data-dropdown-trigger>
+                <span data-dropdown-value>Todas</span>
+                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="menu" data-dropdown-menu>
+                <div class="option selected" data-value="">Todas</div>
+                <div class="option" data-value="integral">Pago integralmente</div>
+                <div class="option" data-value="parcial">Pago parcialmente</div>
+                <div class="option" data-value="nao-pago">Não pago</div>
+              </div>
+            </div>
+
+            <div class="wrapper ctp-dropdown" id="dropdown-status">
+              <span class="label">Status</span>
+              <button type="button" class="trigger" data-dropdown-trigger>
+                <span data-dropdown-value>Todas</span>
+                <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="menu" data-dropdown-menu>
+                <div class="option selected" data-value="">Todas</div>
+                <div class="option" data-value="em-aberto">Em aberto</div>
+                <div class="option" data-value="vencida">Vencida</div>
+                <div class="option" data-value="paga">Paga</div>
+              </div>
+            </div>
+
+            <div class="ctp-filter-popover-actions">
+              <button type="button" class="btn secondary sm" id="ctp-filtros-limpar">Limpar</button>
+              <button type="button" class="btn primary sm" id="ctp-filtros-aplicar">Aplicar</button>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/period-filter.js"></script>
+  <script src="../shared/categorias-financeiras-data.js"></script>
+  <script src="../shared/contas-pagar-v2-data.js"></script>
+  <script src="../shared/date-picker.js"></script>
+  <script src="../shared/contas-a-pagar-v2.js"></script>
+</body>
+</html>

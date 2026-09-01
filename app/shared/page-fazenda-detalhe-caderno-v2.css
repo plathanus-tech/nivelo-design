@@ -1,0 +1,294 @@
+/* ══════════════════════════════════════════════════════════
+   ENTRADA NA FAZENDA (V2) — Caderno de Campo → Fazenda X. V2 da tela
+   operacional `fazenda-detalhe.html` (V1): remove o card "Safra", mantém
+   "Talhões" na mesma posição e insere KPIs novos logo depois (Custo
+   acumulado/Produção registrada/Produtividade média/Custo médio por
+   hectare/Anotações registradas) — "Cultura atual" é preservada (não fazia
+   parte da lista de remoção pedida) e reposicionada ao final do grid, já
+   que os novos KPIs foram inseridos explicitamente "logo depois de
+   Talhões". A lista de Talhões (antes linhas clicáveis) virou uma tabela de
+   verdade (`.table`/`.tr`/`.td`, mesmo padrão de `.talhoes-cadastro-table-
+   wrap` da tela cadastral) com Cards no mobile — decisão explícita: com a
+   coluna "Última Anotação" + 3 ações por linha, o padrão antigo de "linha
+   inteira clicável" deixaria de ser inequívoco (qual seria a ação do
+   clique?), então a tabela ganhou ações em ícone dedicadas.
+   ══════════════════════════════════════════════════════════ */
+
+.fazenda-detalhe-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+#fazenda-detalhe-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ── Voltar + estado "não encontrada" ─────────────────────────────────────── */
+
+.fazenda-detalhe-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.fazenda-detalhe-back:hover { color: var(--color-text-primary); }
+
+.fazenda-detalhe-not-found {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.fazenda-detalhe-not-found:not([hidden]) { display: flex; }
+.fazenda-detalhe-not-found p { margin: 0; }
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.fazenda-detalhe-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .fazenda-detalhe-title-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.fazenda-detalhe-title-block { display: flex; flex-direction: column; gap: 2px; }
+.fazenda-detalhe-title { color: var(--color-text-primary); margin: 0; }
+
+.fazenda-detalhe-location {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-tertiary);
+}
+.fazenda-detalhe-location svg { flex-shrink: 0; }
+
+.fazenda-detalhe-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+#nova-anotacao-fazenda-btn { flex: 1; justify-content: center; }
+@media (min-width: 640px) {
+  #nova-anotacao-fazenda-btn { flex: none; }
+}
+
+/* ── Toast de sucesso ─────────────────────────────────────────────────────── */
+.fazenda-detalhe-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.fazenda-detalhe-toast-region .alert {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+}
+.fazenda-detalhe-toast { box-shadow: var(--shadow-lg); animation: fazenda-detalhe-toast-in 0.25s ease; }
+.fazenda-detalhe-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.fazenda-detalhe-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0; }
+@keyframes fazenda-detalhe-toast-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Resumo da fazenda (8 indicadores) ────────────────────────────────────
+   Mesma cópia de `.estoque-summary-card`/tamanho fixo (round 55) — cresceu
+   de 4 pra 8 cards (V1 tinha Área/Talhões/Cultura/Safra), então o grid
+   ganhou mais um degrau (3 colunas em telas médias) antes de virar 4. */
+.fazenda-resumo-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 560px) {
+  .fazenda-resumo-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 860px) {
+  .fazenda-resumo-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1200px) {
+  .fazenda-resumo-row { grid-template-columns: repeat(4, 1fr); gap: var(--spacing-lg); }
+}
+
+.card.fazenda-resumo-card {
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.fazenda-resumo-card .cardHeader { padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md); }
+
+.fazenda-resumo-card .title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.fazenda-resumo-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.fazenda-resumo-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-brand);
+}
+
+.fazenda-resumo-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+.fazenda-resumo-value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  overflow-wrap: break-word;
+}
+
+.fazenda-resumo-value.is-secondary-line {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ── Seção Talhões (tabela) ────────────────────────────────────────────── */
+
+.talhoes-section {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.talhoes-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .talhoes-section-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.talhoes-section-title-block { display: flex; flex-direction: column; gap: 2px; }
+.talhoes-section-title { color: var(--color-text-primary); margin: 0; }
+.talhoes-section-description { color: var(--color-text-tertiary); margin: 0; max-width: 560px; }
+
+/* Tabela (desktop/tablet) — mesma cópia visual de Estoque, já usada na tela
+   cadastral de talhões (page-fazenda-detalhe-cadastro.css). */
+.talhoes-table-wrap { display: none; }
+@media (min-width: 768px) {
+  .talhoes-table-wrap:not([hidden]) { display: block; }
+}
+
+.talhoes-table-wrap .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  white-space: normal;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.talhoes-table-wrap .headerRow { border-bottom-color: var(--color-gray-200); }
+
+.talhoes-table-wrap .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.talhoes-table-wrap .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.talhoes-table-wrap .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.talhoes-table-wrap .tr:hover .td { filter: brightness(0.97); }
+
+.talhoes-table-wrap .table { table-layout: fixed; }
+.talhoes-table-wrap .th:nth-child(1), .talhoes-table-wrap .td:nth-child(1) { width: 24%; min-width: 140px; } /* Talhão */
+.talhoes-table-wrap .th:nth-child(2), .talhoes-table-wrap .td:nth-child(2) { width: 18%; } /* Cultura atual */
+.talhoes-table-wrap .th:nth-child(3), .talhoes-table-wrap .td:nth-child(3) { width: 16%; } /* Safra atual */
+.talhoes-table-wrap .th:nth-child(4), .talhoes-table-wrap .td:nth-child(4) { width: 18%; min-width: 140px; } /* Última Anotação */
+.talhoes-table-wrap .th:nth-child(5), .talhoes-table-wrap .td:nth-child(5) { width: 14%; } /* Status */
+.talhoes-table-wrap .th:nth-child(6), .talhoes-table-wrap .td:nth-child(6) { width: 150px; } /* Ações (3 ícones) */
+
+.talhao-ultima-anotacao { display: flex; flex-direction: column; gap: 0; }
+.talhao-ultima-anotacao-sem { color: var(--color-text-tertiary); }
+
+.cellActions { display: flex; align-items: center; gap: var(--spacing-xs); }
+
+/* Cards (mobile) — mesmo padrão de `.talhao-cadastro-card`. */
+.talhoes-mobile-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+@media (min-width: 768px) {
+  .talhoes-mobile-list { display: none; }
+}
+
+.talhao-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.talhao-mobile-card-header { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-sm); }
+.talhao-mobile-card-name { color: var(--color-text-primary); }
+.talhao-mobile-card-fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm) var(--spacing-md); margin: 0; }
+.talhao-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.talhao-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+.talhao-mobile-card-actions { display: flex; justify-content: flex-end; gap: 4px; padding-top: var(--spacing-xs); border-top: var(--border-width-thin) solid var(--color-border-subtle); }
+
+/* ── Estado vazio de Talhões ───────────────────────────────────────────── */
+.talhoes-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.talhoes-empty:not([hidden]) { display: flex; }
+
+.talhoes-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.talhoes-empty-title { color: var(--color-text-primary); margin: 0; }
+.talhoes-empty-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 360px; }
+
+/* ── Modal: Encerrar safra ────────────────────────────────────────────────
+   Mesmo bug de hidden+display incondicional já documentado dezenas de
+   vezes neste projeto: `Dialog.module.css`'s `.overlay` tem `display:flex`
+   sem guard. */
+.overlay[hidden] { display: none; }

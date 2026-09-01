@@ -55,6 +55,16 @@
       if (onChange) onChange(optionEl.dataset.value, optionEl.textContent);
     }
 
+    // Usado só pelo dropdown dependente de Talhão (Origem da entrada,
+    // Vendas) — mesma técnica de `reset()` já usada em
+    // registrar-entrada-estoque-v2.js pro mesmo par Fazenda→Talhão.
+    function reset(placeholder) {
+      root.dataset.value = '';
+      valueEl.textContent = placeholder;
+      valueEl.classList.add('placeholder');
+      Array.prototype.slice.call(menu.querySelectorAll('.option')).forEach(function (o) { o.classList.remove('selected'); });
+    }
+
     trigger.addEventListener('click', function () {
       if (root.classList.contains('open')) close(); else open();
     });
@@ -72,7 +82,7 @@
       if (event.key === 'Escape') close();
     });
 
-    return { selectOption: selectOption, root: root };
+    return { selectOption: selectOption, reset: reset, root: root, trigger: trigger };
   }
 
   // ---------- Catálogo de Produto (centralizado, ver produtos-data.js) ----------
@@ -88,18 +98,21 @@
     return String(text).normalize('NFD').replace(DIACRITICS_RE, '').toLowerCase();
   }
 
-  // ---------- Tipo de estoque (Vendas/Compras/Comprometido) ----------
-  // Dirige quais campos aparecem nas seções "Produto" e "Detalhes do
-  // lançamento" — ver rules.md pra tabela completa de campo × tipo.
+  // ---------- Tipo de estoque (Estoque de Vendas / Estoque de Uso) ----------
+  // Dirige quais campos aparecem na seção "Produto" e se o card "Origem da
+  // entrada" é exibido — ver rules.md pra tabela completa de campo × tipo.
   function todayISO() {
     return new Date().toISOString().slice(0, 10);
   }
 
-  var quantidadeLabel = document.getElementById('quantidade-label');
   var fornecedorField = document.getElementById('fornecedor-field');
-  var destinatarioField = document.getElementById('destinatario-field');
+  var notaDocumentoField = document.getElementById('nota-documento-field');
+  var precoAtualField = document.getElementById('preco-atual-field');
+  var origemEntradaSection = document.getElementById('origem-entrada-section');
   var dataLancamentoField = document.getElementById('data-lancamento-field');
   var dataLancamentoInput = document.getElementById('ne-data-lancamento');
+  var destinatarioField = document.getElementById('destinatario-field');
+  var destinatarioInput = document.getElementById('ne-destinatario');
   var dataEntregaField = document.getElementById('data-entrega-field');
 
   // ---------- Data do registo: padrão oficial de calendário do sistema
@@ -114,21 +127,25 @@
   });
   dataLancamentoPicker.setValue(todayISO());
 
-  var codigoInput = document.getElementById('ne-codigo');
+  // ---------- Data prevista de entrega (só Estoque Comprometido): mesmo
+  // padrão oficial de calendário do sistema (dia único), opcional — nunca
+  // recebe um `setValue()` inicial, fica em "Selecionar data" até o usuário
+  // escolher. ----------
+  var dataEntregaPicker = window.NiveloDatePicker.initDay({
+    rootId: 'data-entrega-field',
+    triggerId: 'data-entrega-trigger',
+    valueId: 'data-entrega-value',
+    hiddenInputId: 'ne-data-entrega',
+    popoverId: 'data-entrega-popover',
+    placeholder: 'Selecionar data'
+  });
+
   var depositoField = document.getElementById('deposito-field');
   var formaEntradaField = document.getElementById('forma-entrada-field');
   var formaEntradaRadios = Array.prototype.slice.call(document.querySelectorAll('input[name="forma-entrada"]'));
   var valorUnitarioField = document.getElementById('valor-unitario-field');
   var produtoXmlBlock = document.getElementById('produto-xml-block');
   var produtoManualBlock = document.getElementById('produto-manual-block');
-
-  var CODIGO_PREFIX = { vendas: 'VND', compras: 'CMP', comprometido: 'CMT' };
-
-  // Preview cosmético (não persiste, mesmo escopo do resto do formulário) —
-  // só pra dar uma noção visual de que o Código é gerado automaticamente.
-  function generateCodigoPreview(tipo) {
-    codigoInput.value = (CODIGO_PREFIX[tipo] || 'EST') + '-XXXX';
-  }
 
   // ---------- Valor unitário: máscara de moeda (R$) ----------
   // Estado sempre em centavos (inteiro) — nunca uma string parseada solta.
@@ -150,6 +167,25 @@
     var digits = valorUnitarioInput.value.replace(/\D/g, '');
     valorUnitarioCentavos = digits ? Number(digits) : 0;
     valorUnitarioInput.value = valorUnitarioCentavos ? formatCentavosBRL(valorUnitarioCentavos) : '';
+  });
+
+  // ---------- Preço atual (Estoque de Vendas): mesma técnica de máscara,
+  // semântica diferente (preço de mercado/gerencial, não custo pago).
+  //
+  // Nota para desenvolvimento: "Valor pago" (Estoque de Uso, campo
+  // `#ne-valor-unitario` acima) representa o preço efetivamente PAGO nesta
+  // entrada — alimenta, numa rodada futura, o histórico de custo/cálculo de
+  // custo médio do produto. "Preço atual" (Estoque de Vendas, campo abaixo)
+  // representa o preço ATUAL/de mercado do produto — mesma lógica gerencial
+  // já usada na precificação real de Vendas. Os dois usam a mesma máscara de
+  // moeda, mas são conceitualmente distintos; nenhum dos dois é enviado a
+  // nenhum módulo real nesta rodada (formulário continua só cosmético). ----------
+  var precoAtualInput = document.getElementById('ne-preco-atual');
+  var precoAtualCentavos = 0;
+  precoAtualInput.addEventListener('input', function () {
+    var digits = precoAtualInput.value.replace(/\D/g, '');
+    precoAtualCentavos = digits ? Number(digits) : 0;
+    precoAtualInput.value = precoAtualCentavos ? formatCentavosBRL(precoAtualCentavos) : '';
   });
 
   // ---------- Fornecedor: combobox (busca em Cadastro de Pessoas e
@@ -237,20 +273,55 @@
     });
   }
 
-  function applyTipo(tipo) {
-    quantidadeLabel.textContent = tipo === 'comprometido' ? 'Quantidade comprometida' : 'Quantidade';
-    fornecedorField.hidden = tipo !== 'compras';
-    valorUnitarioField.hidden = tipo !== 'compras';
-    destinatarioField.hidden = tipo !== 'comprometido';
-    dataLancamentoField.hidden = tipo === 'comprometido';
-    dataEntregaField.hidden = tipo !== 'comprometido';
-    if (destinatarioField.hidden) destinatarioField.classList.remove('error');
-    generateCodigoPreview(tipo);
+  // ---------- Tipo de estoque: cartões de seleção (radio nativo), só 2
+  // opções (vendas/compras — Estoque Comprometido foi removido desta
+  // rodada). Mesma técnica de `.is-selected`+RadioButton já usada em
+  // "Origem da entrada" (registrar-entrada-estoque-v2.js) e "Forma de
+  // entrada" logo abaixo. Valor interno "compras" preservado (não virou
+  // "uso") só pra não quebrar o contrato de hash `estoque.html#tab=compras`
+  // já lido por estoque.js — a mudança é só de rótulo visível
+  // ("Estoque de uso"). ----------
+  var tipoRadios = Array.prototype.slice.call(document.querySelectorAll('input[name="tipo-estoque"]'));
+
+  function currentTipo() {
+    var checked = tipoRadios.filter(function (r) { return r.checked; })[0];
+    return checked ? checked.value : 'vendas';
   }
 
-  var tipoDropdown = initDropdown(document.getElementById('tipo-estoque-field'), function (value) {
-    applyTipo(value);
+  function syncTipoChecked() {
+    tipoRadios.forEach(function (radio) {
+      var cardEl = radio.closest('.novo-estoque-tipo-card');
+      if (cardEl) cardEl.classList.toggle('is-selected', radio.checked);
+    });
+  }
+
+  function applyTipo(tipo) {
+    var isComprometido = tipo === 'comprometido';
+    fornecedorField.hidden = tipo !== 'compras';
+    valorUnitarioField.hidden = tipo !== 'compras';
+    notaDocumentoField.hidden = tipo !== 'compras';
+    precoAtualField.hidden = tipo !== 'vendas';
+    origemEntradaSection.hidden = tipo !== 'vendas';
+    destinatarioField.hidden = !isComprometido;
+    dataEntregaField.hidden = !isComprometido;
+    if (!isComprometido) destinatarioField.classList.remove('error');
+    // `unidadeMedidaField` é declarado mais abaixo neste arquivo (seção
+    // Produto) — a 1ª chamada de `applyTipo('vendas')` acontece ANTES dessa
+    // declaração (hoisting: a var existe, mas ainda `undefined`), por isso o
+    // guard `typeof` aqui, em vez de assumir que já está pronto.
+    if (typeof unidadeMedidaField !== 'undefined' && unidadeMedidaField) {
+      unidadeMedidaField.hidden = isComprometido;
+    }
+  }
+
+  tipoRadios.forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      syncTipoChecked();
+      applyTipo(currentTipo());
+    });
   });
+  syncTipoChecked();
+
   initDropdown(depositoField);
 
   // ---------- Sugestão de Conta a Pagar (só Estoque de Uso) — nunca
@@ -323,58 +394,27 @@
   }
 
   // ---------- Local de estoque: opções vêm do catálogo compartilhado
-  // (window.NiveloLocais, persistido em localStorage) + item fixo "+
-  // Adicionar novo local", que abre um Dialog pequeno pra criar um local
-  // novo, disponível em qualquer Novo registro futuro. ----------
+  // (window.NiveloLocais), restrito aos depósitos pré-cadastrados e ATIVOS
+  // (`d.ativo`) — sem cadastro rápido inline nesta tela (override explícito
+  // do usuário sobre a decisão da rodada anterior, que tinha mantido o
+  // quick-create aqui por classificar esta tela como "V1-equivalente"; agora
+  // esta tela segue a mesma regra das telas V2, ver `depositos.html`). Sem
+  // nenhum depósito ativo, o Dropdown fica sem opções selecionáveis (nem um
+  // placeholder desabilitado que pareça uma opção válida) e um helper text
+  // orienta o usuário a cadastrar um em Configurações. ----------
   var depositoMenu = document.getElementById('deposito-menu');
   var depositoTrigger = depositoField.querySelector('[data-dropdown-trigger]');
-  var depositoValueEl = depositoField.querySelector('[data-dropdown-value]');
+  var depositoEmptyHelper = document.getElementById('deposito-empty-helper');
 
   function renderLocalOptions() {
-    var html = window.NiveloLocais.list().map(function (nome) {
-      return '<div class="option" data-value="' + nome + '">' + nome + '</div>';
+    var ativos = window.NiveloLocais.list().filter(function (local) { return local.ativo; });
+    depositoMenu.innerHTML = ativos.map(function (local) {
+      return '<div class="option" data-value="' + local.nome + '">' + local.nome + '</div>';
     }).join('');
-    html += '<div class="novo-estoque-local-option-create" data-add-local>' +
-      '<i data-lucide="plus" width="14" height="14"></i> Adicionar novo depósito</div>';
-    depositoMenu.innerHTML = html;
-    if (window.lucide) lucide.createIcons();
+    depositoEmptyHelper.hidden = ativos.length > 0;
+    depositoTrigger.disabled = ativos.length === 0;
   }
   renderLocalOptions();
-
-  var novoLocalOverlay = document.getElementById('novo-local-overlay');
-  var novoLocalNomeInput = document.getElementById('novo-local-nome');
-  var novoLocalNomeField = document.getElementById('novo-local-nome-field');
-
-  function openNovoLocalDialog() {
-    depositoField.classList.remove('open');
-    novoLocalNomeInput.value = '';
-    novoLocalNomeField.classList.remove('error');
-    novoLocalOverlay.hidden = false;
-    novoLocalNomeInput.focus();
-  }
-  function closeNovoLocalDialog() {
-    novoLocalOverlay.hidden = true;
-  }
-
-  depositoMenu.addEventListener('click', function (event) {
-    if (event.target.closest('[data-add-local]')) openNovoLocalDialog();
-  });
-  document.getElementById('novo-local-close').addEventListener('click', closeNovoLocalDialog);
-  document.getElementById('novo-local-cancel').addEventListener('click', closeNovoLocalDialog);
-  document.getElementById('novo-local-add').addEventListener('click', function () {
-    var nome = novoLocalNomeInput.value.trim();
-    novoLocalNomeField.classList.toggle('error', !nome);
-    if (!nome) return;
-
-    window.NiveloLocais.add(nome);
-    renderLocalOptions();
-    var addedOption = depositoMenu.querySelector('.option[data-value="' + nome + '"]');
-    if (addedOption) addedOption.classList.add('selected');
-    depositoValueEl.textContent = nome;
-    depositoValueEl.classList.remove('placeholder');
-    depositoField.dataset.value = nome;
-    closeNovoLocalDialog();
-  });
 
   formaEntradaRadios.forEach(function (radio) {
     radio.addEventListener('change', function () {
@@ -396,6 +436,60 @@
   var quickCreatePanel = document.getElementById('produto-quick-create');
   var selectedProduct = null;
 
+  // ---------- Unidade de medida do lançamento (Vendas/Uso): no máximo 2
+  // opções — a sigla própria do produto (`produto.unidadeMedida`) +, quando
+  // existir conversão registrada (`getConversao()`), a unidade base
+  // correspondente. Nunca uma 3ª opção, nunca texto livre. Se o produto não
+  // tem `unidadeMedida` (legado/quick-create anterior a este fix, ou
+  // Calcário/Fungicida — só existem em estoque-uso-v2-data.js), resolve a
+  // sigla a partir do nome legado `unidade` (mesma técnica de
+  // `siglaFromUnidadeNome()` já usada em estoque-v2.js). ----------
+  var LEGACY_UNIDADE_SIGLA = { Saca: 'SC', Kg: 'KG', Litro: 'LT', Unidade: 'UN' };
+
+  function getConversao(sigla) {
+    var u = window.NiveloUnidadesMedida.findBySigla(sigla);
+    if (!u) return null;
+    if (u.unidadeBaseSigla === sigla && u.correspondeA === 1) return null;
+    return u;
+  }
+
+  function resolveSiglaForProduct(product) {
+    if (!product) return null;
+    if (product.unidadeMedida) return product.unidadeMedida;
+    return LEGACY_UNIDADE_SIGLA[product.unidade] || null;
+  }
+
+  var unidadeMedidaField = document.getElementById('unidade-medida-field');
+  var unidadeMedidaTrigger = unidadeMedidaField.querySelector('[data-dropdown-trigger]');
+  var unidadeMedidaValueEl = unidadeMedidaField.querySelector('[data-dropdown-value]');
+  var unidadeMedidaMenu = document.getElementById('unidade-medida-menu');
+  var unidadeMedidaDropdown = initDropdown(unidadeMedidaField);
+
+  function updateUnidadeMedidaOptions() {
+    var sigla = resolveSiglaForProduct(selectedProduct);
+    if (!sigla) {
+      unidadeMedidaTrigger.disabled = true;
+      unidadeMedidaMenu.innerHTML = '';
+      unidadeMedidaField.dataset.value = '';
+      unidadeMedidaValueEl.textContent = 'Selecione um produto';
+      unidadeMedidaValueEl.classList.add('placeholder');
+      return;
+    }
+    var propria = window.NiveloUnidadesMedida.findBySigla(sigla);
+    var options = [{ sigla: sigla, nome: propria ? propria.nome : sigla }];
+    var conversao = getConversao(sigla);
+    if (conversao) {
+      var base = window.NiveloUnidadesMedida.findBySigla(conversao.unidadeBaseSigla);
+      options.push({ sigla: conversao.unidadeBaseSigla, nome: base ? base.nome : conversao.unidadeBaseSigla });
+    }
+    unidadeMedidaMenu.innerHTML = options.map(function (o) {
+      return '<div class="option" data-value="' + o.sigla + '">' + o.nome + ' (' + o.sigla + ')</div>';
+    }).join('');
+    unidadeMedidaTrigger.disabled = false;
+    unidadeMedidaDropdown.selectOption(unidadeMedidaMenu.querySelector('.option'));
+  }
+  updateUnidadeMedidaOptions();
+
   function positionProdutoMenu() {
     var rect = produtoInput.getBoundingClientRect();
     var margin = 8;
@@ -412,12 +506,14 @@
     codigoReferenciaInput.value = product.sku || '';
     produtoField.classList.remove('error');
     closeProdutoMenu();
+    updateUnidadeMedidaOptions();
   }
 
   function clearSelectedProduct() {
     selectedProduct = null;
     unidadeInput.value = '';
     codigoReferenciaInput.value = '';
+    updateUnidadeMedidaOptions();
   }
 
   function renderProdutoMenu(query) {
@@ -515,7 +611,17 @@
     quickCreatePanel.classList.toggle('error', invalid);
     if (invalid) return;
 
-    var product = window.NiveloProdutos.add({ nome: nome, unidade: unidade, sku: novoProdutoSkuInput.value.trim() });
+    // Fix desta rodada: além da unidade legada (nome livre), grava também a
+    // sigla V2 (`unidadeMedida`) correspondente, mapeada a partir da mesma
+    // opção escolhida aqui — sem isso, um produto recém-criado por este
+    // painel nunca teria opções no novo Dropdown de Unidade de medida do
+    // lançamento (fica só com `.unidade`, sem `.unidadeMedida`).
+    var product = window.NiveloProdutos.add({
+      nome: nome,
+      unidade: unidade,
+      unidadeMedida: LEGACY_UNIDADE_SIGLA[unidade] || '',
+      sku: novoProdutoSkuInput.value.trim()
+    });
     selectProduct(product);
     closeQuickCreate();
   });
@@ -603,17 +709,6 @@
     renderXmlReviewRows();
   });
 
-  // ---------- Data prevista de entrega: padrão oficial de calendário do
-  // sistema (dia único), ver app/shared/date-picker.js. ----------
-  window.NiveloDatePicker.initDay({
-    rootId: 'data-entrega-field',
-    triggerId: 'data-entrega-trigger',
-    valueId: 'data-entrega-value',
-    hiddenInputId: 'ne-data-entrega',
-    popoverId: 'data-entrega-popover',
-    placeholder: 'Selecionar data'
-  });
-
   // ---------- Quantidade: erro some ao digitar um valor válido ----------
   var quantidadeField = document.getElementById('quantidade-field');
   var quantidadeInput = document.getElementById('ne-quantidade');
@@ -623,19 +718,125 @@
     }
   });
 
-  // ---------- Destinatário: erro some ao preencher ----------
-  var destinatarioInput = document.getElementById('ne-destinatario');
+  // ---------- Destinatário (só Estoque Comprometido): erro some ao digitar ----------
   destinatarioInput.addEventListener('input', function () {
     if (destinatarioField.classList.contains('error') && destinatarioInput.value.trim()) {
       destinatarioField.classList.remove('error');
     }
   });
 
+  // ---------- Origem da entrada (só Estoque de Vendas) — estrutura/
+  // comportamento copiados verbatim de registrar-entrada-estoque-v2.js
+  // (cartões Produção própria/Colheita × Compra de terceiro, Fazenda→Talhão
+  // dependente, Safra, Fornecedor+dropzone+Preço de compra+Valor total).
+  // Cosmético/validado como o resto do formulário: nunca chama
+  // NiveloEstoqueVendasV2 (mesmo contrato de "sem persistência real" já
+  // documentado no topo do arquivo). ----------
+  var origemInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="ne-origem-entrada"]'));
+  var origemProducaoBlock = document.getElementById('ne-origem-producao-block');
+  var origemCompraBlock = document.getElementById('ne-origem-compra-block');
+  var origemFazendaField = document.getElementById('ne-origem-fazenda-field');
+  var origemFazendaMenu = document.getElementById('ne-origem-fazenda-menu');
+  var origemTalhaoField = document.getElementById('ne-origem-talhao-field');
+  var origemTalhaoMenu = document.getElementById('ne-origem-talhao-menu');
+  var origemSafraField = document.getElementById('ne-origem-safra-field');
+  var origemSafraMenu = document.getElementById('ne-origem-safra-menu');
+  var origemFornecedorField = document.getElementById('ne-origem-fornecedor-field');
+  var origemFornecedorMenu = document.getElementById('ne-origem-fornecedor-menu');
+  var origemArquivoInput = document.getElementById('ne-origem-arquivo-input');
+  var origemArquivoNomeEl = document.getElementById('ne-origem-arquivo-nome');
+  var origemPrecoCompraInput = document.getElementById('ne-origem-preco-compra-input');
+  var origemValorTotalInput = document.getElementById('ne-origem-valor-total-input');
+  var origemPrecoCompraCentavos = 0;
+
+  function currentOrigemEntrada() {
+    var checked = origemInputs.filter(function (i) { return i.checked; })[0];
+    return checked ? checked.value : 'producao';
+  }
+
+  function updateOrigemBlocks() {
+    var origem = currentOrigemEntrada();
+    origemInputs.forEach(function (input) {
+      input.closest('.entradav2-origem-card').classList.toggle('is-selected', input.checked);
+    });
+    var isProducao = origem === 'producao';
+    origemProducaoBlock.hidden = !isProducao;
+    origemCompraBlock.hidden = isProducao;
+    if (isProducao) {
+      origemFornecedorField.classList.remove('error');
+    } else {
+      origemFazendaField.classList.remove('error');
+      origemTalhaoField.classList.remove('error');
+    }
+  }
+  origemInputs.forEach(function (input) { input.addEventListener('change', updateOrigemBlocks); });
+  updateOrigemBlocks();
+
+  origemFazendaMenu.innerHTML = window.NiveloFazendas.list().map(function (f) {
+    return '<div class="option" data-value="' + f.id + '">' + f.nome + '</div>';
+  }).join('');
+
+  function findOrigemFazenda(id) {
+    return window.NiveloFazendas.list().filter(function (f) { return f.id === id; })[0] || null;
+  }
+
+  function populateOrigemTalhoes(fazenda) {
+    var talhoes = fazenda ? fazenda.talhoes : [];
+    origemTalhaoMenu.innerHTML = talhoes.map(function (t) {
+      return '<div class="option" data-value="' + t.id + '">' + t.nome + '</div>';
+    }).join('');
+    origemTalhaoDropdown.trigger.disabled = !fazenda;
+    origemTalhaoDropdown.reset(fazenda ? 'Selecione o talhão' : 'Selecione a fazenda primeiro');
+  }
+
+  var origemTalhaoDropdown = initDropdown(origemTalhaoField, function () {
+    origemTalhaoField.classList.remove('error');
+  });
+  var origemFazendaDropdown = initDropdown(origemFazendaField, function (fazendaId) {
+    origemFazendaField.classList.remove('error');
+    populateOrigemTalhoes(findOrigemFazenda(fazendaId));
+  });
+  populateOrigemTalhoes(null);
+
+  origemSafraMenu.innerHTML = window.NiveloSafras.list().map(function (s) {
+    return '<div class="option" data-value="' + s + '">' + s + '</div>';
+  }).join('');
+  initDropdown(origemSafraField);
+
+  window.NiveloCadastros.findByTipo('fornecedor').forEach(function (c) {
+    var optionEl = document.createElement('div');
+    optionEl.className = 'option';
+    optionEl.dataset.value = c.nome;
+    optionEl.textContent = c.nome;
+    origemFornecedorMenu.appendChild(optionEl);
+  });
+  initDropdown(origemFornecedorField, function () {
+    origemFornecedorField.classList.remove('error');
+  });
+
+  origemArquivoInput.addEventListener('change', function () {
+    var file = origemArquivoInput.files && origemArquivoInput.files[0];
+    origemArquivoNomeEl.textContent = file ? file.name : 'Anexar nota/documento (opcional)';
+  });
+
+  function updateOrigemValorTotal() {
+    var quantidade = Number(quantidadeInput.value) || 0;
+    var preco = origemPrecoCompraCentavos / 100;
+    origemValorTotalInput.value = formatCentavosBRL(Math.round(quantidade * preco * 100));
+  }
+  origemPrecoCompraInput.addEventListener('input', function () {
+    var digits = origemPrecoCompraInput.value.replace(/\D/g, '');
+    origemPrecoCompraCentavos = digits ? Number(digits) : 0;
+    origemPrecoCompraInput.value = origemPrecoCompraCentavos ? formatCentavosBRL(origemPrecoCompraCentavos) : '';
+    updateOrigemValorTotal();
+  });
+  quantidadeInput.addEventListener('input', updateOrigemValorTotal);
+
   // ---------- Validação + envio ----------
   var form = document.getElementById('novo-estoque-form');
 
   function runValidation() {
-    var tipo = document.getElementById('tipo-estoque-field').dataset.value || 'vendas';
+    var tipo = currentTipo();
     var isXml = getFormaEntrada() === 'xml';
 
     if (isXml) {
@@ -651,10 +852,29 @@
     var quantidadeInvalid = !(Number(quantidadeInput.value) > 0);
     quantidadeField.classList.toggle('error', quantidadeInvalid);
 
-    var destinatarioInvalid = tipo === 'comprometido' && !destinatarioInput.value.trim();
-    destinatarioField.classList.toggle('error', destinatarioInvalid);
+    var destinatarioInvalid = false;
+    if (tipo === 'comprometido') {
+      destinatarioInvalid = !destinatarioInput.value.trim();
+      destinatarioField.classList.toggle('error', destinatarioInvalid);
+    }
 
-    return !produtoInvalid && !quantidadeInvalid && !destinatarioInvalid;
+    var origemInvalid = false;
+    if (tipo === 'vendas') {
+      var origem = currentOrigemEntrada();
+      if (origem === 'producao') {
+        var fazendaInvalid = !origemFazendaField.dataset.value;
+        origemFazendaField.classList.toggle('error', fazendaInvalid);
+        var talhaoInvalid = !origemTalhaoField.dataset.value;
+        origemTalhaoField.classList.toggle('error', talhaoInvalid);
+        origemInvalid = fazendaInvalid || talhaoInvalid;
+      } else {
+        var fornecedorInvalid = !origemFornecedorField.dataset.value;
+        origemFornecedorField.classList.toggle('error', fornecedorInvalid);
+        origemInvalid = fornecedorInvalid;
+      }
+    }
+
+    return !produtoInvalid && !quantidadeInvalid && !destinatarioInvalid && !origemInvalid;
   }
 
   var TIPO_TOAST = {
@@ -667,7 +887,7 @@
     event.preventDefault();
 
     if (!runValidation()) {
-      var firstInvalid = form.querySelector('.wrapper.error, .novo-estoque-xml-block.error');
+      var firstInvalid = form.querySelector('.wrapper.error, .novo-estoque-xml-block.error, .entradav2-origem-block .wrapper.error');
       if (firstInvalid) {
         var focusable = firstInvalid.querySelector('input, button');
         if (focusable) focusable.focus();
@@ -675,7 +895,7 @@
       return;
     }
 
-    var tipo = document.getElementById('tipo-estoque-field').dataset.value || 'vendas';
+    var tipo = currentTipo();
     var isXml = getFormaEntrada() === 'xml';
     var message = isXml
       ? (xmlReviewRows.length + (xmlReviewRows.length === 1 ? ' produto importado com sucesso.' : ' produtos importados com sucesso.'))
@@ -754,8 +974,8 @@
   if (xmlDemoState === 'xml-carregando' || xmlDemoState === 'xml-erro' || xmlDemoState === 'xml-pesado') {
     var xmlRadio = document.querySelector('input[name="forma-entrada"][value="xml"]');
     xmlRadio.checked = true;
-    var compraOption = document.querySelector('#tipo-estoque-field .option[data-value="compras"]');
-    if (compraOption) tipoDropdown.selectOption(compraOption);
+    var compraRadio = document.querySelector('input[name="tipo-estoque"][value="compras"]');
+    if (compraRadio) { compraRadio.checked = true; syncTipoChecked(); applyTipo('compras'); }
     syncFormaEntradaChecked();
     refreshFormaEntradaVisibility();
     xmlFileNameEl.textContent = 'nota-fiscal-eletronica.xml';
@@ -770,8 +990,8 @@
   // precisar digitar nada. Só pro prototype-nav, nunca alcançado pela
   // navegação normal do usuário. ----------
   if (xmlDemoState === 'contapagar') {
-    var contapagarOption = document.querySelector('#tipo-estoque-field .option[data-value="compras"]');
-    if (contapagarOption) tipoDropdown.selectOption(contapagarOption);
+    var contapagarRadio = document.querySelector('input[name="tipo-estoque"][value="compras"]');
+    if (contapagarRadio) { contapagarRadio.checked = true; syncTipoChecked(); applyTipo('compras'); }
     var produtoDemo = window.NiveloProdutos.list()[0];
     if (produtoDemo) selectProduct(produtoDemo);
     quantidadeInput.value = '10';

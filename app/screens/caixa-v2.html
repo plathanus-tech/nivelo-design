@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script src="../shared/nav-sync.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caixa — Nivelo</title>
+
+  <link rel="stylesheet" href="../shared/fonts.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/tokens.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/FilterPopover/FilterPopover.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tab/Tab.module.css" />
+  <link rel="stylesheet" href="../shared/page-shell.css" />
+  <link rel="stylesheet" href="../shared/period-filter.css" />
+  <link rel="stylesheet" href="../shared/page-caixa-v2.css" />
+</head>
+<body>
+
+  <div class="caixa-toast-region" id="toast-region" aria-live="polite"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- ══════════════════ HEADER ══════════════════ -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
+          <i data-lucide="menu" width="22" height="22"></i>
+        </button>
+
+        <div class="app-header-brand">
+          <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
+          <span class="app-header-tagline">Sistema de gestão rural</span>
+        </div>
+      </div>
+
+    </header>
+
+    <div class="app-body">
+
+      <div class="app-sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      <!-- ══════════════════ SIDEBAR ══════════════════ -->
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navegação principal">
+        <button type="button" class="app-sidebar-toggle" id="sidebar-toggle-btn" aria-label="Retrair menu" aria-expanded="true">
+          <i class="app-sidebar-toggle-icon" data-lucide="chevron-left" width="16" height="16"></i>
+        </button>
+
+        <nav class="app-sidebar-body">
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Geral</span>
+
+            <button type="button" class="app-nav-item" data-nav="dashboard" data-tooltip="Dashboard">
+              <span class="app-nav-icon"><i data-lucide="layout-dashboard" width="20" height="20"></i></span>
+              <span class="app-nav-label">Dashboard</span>
+            </button>
+
+            <div class="app-nav-group" id="group-assistente-ia">
+              <button type="button" class="app-nav-item" data-group-toggle="group-assistente-ia" aria-expanded="false" data-tooltip="Assistente IA · opções">
+                <span class="app-nav-icon"><i data-lucide="bot" width="20" height="20"></i></span>
+                <span class="app-nav-label">Assistente IA</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
+                  <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
+                  <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Histórico</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="caderno-campo" data-tooltip="Caderno de campo">
+              <span class="app-nav-icon"><i data-lucide="book-open" width="20" height="20"></i></span>
+              <span class="app-nav-label">Caderno de campo</span>
+            </button>
+
+            <div class="app-nav-group" id="group-cadastro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-cadastro" aria-expanded="false" data-tooltip="Cadastros · opções">
+                <span class="app-nav-icon"><i data-lucide="folder-plus" width="20" height="20"></i></span>
+                <span class="app-nav-label">Cadastros</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
+                  <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Parceiros</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
+                  <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Produtos</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="estoque" data-tooltip="Estoque">
+              <span class="app-nav-icon"><i data-lucide="package" width="20" height="20"></i></span>
+              <span class="app-nav-label">Estoque</span>
+            </button>
+
+            <div class="app-nav-group is-open" id="group-financeiro">
+              <button type="button" class="app-nav-item" data-group-toggle="group-financeiro" aria-expanded="true" data-tooltip="Financeiro · opções">
+                <span class="app-nav-icon"><i data-lucide="wallet" width="20" height="20"></i></span>
+                <span class="app-nav-label">Financeiro</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem is-active" data-nav="financeiro-caixa">
+                  <span class="app-nav-icon"><i data-lucide="coins" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Caixa</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-pagar">
+                  <span class="app-nav-icon"><i data-lucide="arrow-up-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a pagar</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-receber">
+                  <span class="app-nav-icon"><i data-lucide="arrow-down-circle" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Contas a receber</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="financeiro-relatorios">
+                  <span class="app-nav-icon"><i data-lucide="bar-chart-3" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Relatórios</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="app-nav-group" id="group-vendas">
+              <button type="button" class="app-nav-item" data-group-toggle="group-vendas" aria-expanded="false" data-tooltip="Vendas · opções">
+                <span class="app-nav-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
+                <span class="app-nav-label">Vendas</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="vendas-pedidos">
+                  <span class="app-nav-icon"><i data-lucide="clipboard-list" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Pedidos de venda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="vendas-nota-fiscal">
+                  <span class="app-nav-icon"><i data-lucide="receipt" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Notas fiscais</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="fiscal-manifesto">
+                  <span class="app-nav-icon"><i data-lucide="truck" width="16" height="16"></i></span>
+                  <span class="app-nav-label">MDF-e (Manifesto)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Gestão</span>
+
+            <div class="app-nav-group" id="group-configuracao">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
+                <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
+                <span class="app-nav-label">Configurações</span>
+                <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+              </button>
+              <div class="app-nav-submenu">
+                <button type="button" class="app-nav-subitem" data-nav="config-minha-conta">
+                  <span class="app-nav-icon"><i data-lucide="user" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Minha conta</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
+                  <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Cadastro de fazenda</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
+                  <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Conta bancária</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-categorias">
+                  <span class="app-nav-icon"><i data-lucide="tags" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Categorias de receitas e despesas</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
+                  <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
+                </button>
+
+                <div class="app-nav-subgroup" id="group-fiscal">
+                  <button type="button" class="app-nav-subitem" data-group-toggle="group-fiscal" aria-expanded="false">
+                    <span class="app-nav-icon"><i data-lucide="file-text" width="16" height="16"></i></span>
+                    <span class="app-nav-label">Fiscal</span>
+                    <span class="app-nav-chevron"><i data-lucide="chevron-down" width="14" height="14"></i></span>
+                  </button>
+                  <div class="app-nav-subsubmenu">
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-natureza">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shuffle" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Natureza da operação</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-certificado">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="shield-check" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Certificado digital</span>
+                    </button>
+                    <button type="button" class="app-nav-subsubitem" data-nav="fiscal-nota-entrada">
+                      <span class="app-nav-icon app-nav-icon-xs"><i data-lucide="file-input" width="14" height="14"></i></span>
+                      <span class="app-nav-label">Nota de entrada</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="app-nav-item" data-nav="canal-ideias" data-tooltip="Canal de ideias">
+              <span class="app-nav-icon"><i data-lucide="lightbulb" width="20" height="20"></i></span>
+              <span class="app-nav-label">Canal de ideias</span>
+            </button>
+
+          </div>
+
+          <div class="app-nav-section">
+            <span class="app-nav-section-title">Suporte</span>
+
+            <button type="button" class="app-nav-item" data-nav="suporte" data-tooltip="Suporte">
+              <span class="app-nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </span>
+              <span class="app-nav-label">Suporte</span>
+            </button>
+
+            <button type="button" class="app-nav-item" data-nav="videos" data-tooltip="Vídeos">
+              <span class="app-nav-icon"><i data-lucide="circle-play" width="20" height="20"></i></span>
+              <span class="app-nav-label">Vídeos</span>
+            </button>
+
+            <button type="button" class="app-nav-item app-nav-item-exit" data-nav="sair" data-tooltip="Sair">
+              <span class="app-nav-icon"><i data-lucide="log-out" width="20" height="20"></i></span>
+              <span class="app-nav-label">Sair</span>
+            </button>
+          </div>
+
+        </nav>
+
+        <div class="app-sidebar-footer">
+          <span class="app-sidebar-version">Versão 1.0.0</span>
+        </div>
+      </aside>
+
+      <!-- ══════════════════ CONTEÚDO PRINCIPAL — CAIXA V2 ══════════════════ -->
+      <main class="app-main">
+        <div class="caixa-page">
+
+          <div class="caixa-header">
+            <div class="caixa-header-text">
+              <h1 class="caixa-title text-heading-6">Caixa</h1>
+              <p class="caixa-subtitle text-body-s">Acompanhe as entradas, saídas e saldos financeiros da sua fazenda.</p>
+            </div>
+            <div class="caixa-header-actions">
+              <button type="button" class="btn secondary iconOnly" id="transferencia-btn" aria-label="Transferência entre contas">
+                <span class="icon"><i data-lucide="arrow-left-right" width="18" height="18"></i></span>
+                <span class="tip text-body-xs top"><span class="arrow"></span>Transferência entre contas</span>
+              </button>
+              <button type="button" class="btn primary hasLeft" id="new-lancamento-btn">
+                <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
+                Incluir lançamento
+              </button>
+            </div>
+          </div>
+
+          <!-- ══════ Resumo (KPIs) — pertence à página Caixa como um todo,
+               fica ACIMA das abas e permanece visível ao alternar entre
+               Consolidado e Contas financeiras (não é conteúdo condicional
+               de nenhuma aba). Mesma aparência exata dos cards de resumo de
+               Estoque (.estoque-summary-row/.estoque-summary-card em
+               page-estoque.css) — cardHeader com ícone+título, valor em
+               destaque abaixo. Reflete só os lançamentos que batem com os
+               filtros atualmente aplicados (busca/categoria/período) na aba
+               Consolidado. ══════ -->
+          <div class="caixa-summary-row">
+            <section class="card caixa-summary-card" aria-labelledby="summary-entradas-title">
+              <div class="cardHeader">
+                <div class="caixa-summary-title-row">
+                  <span class="caixa-summary-icon"><i data-lucide="arrow-down-circle" width="18" height="18"></i></span>
+                  <h2 class="title" id="summary-entradas-title">Total de Entradas</h2>
+                </div>
+              </div>
+              <div class="caixa-summary-body">
+                <span class="caixa-summary-value caixa-valor-entrada" id="caixa-resumo-entradas">R$ 0,00</span>
+              </div>
+            </section>
+            <section class="card caixa-summary-card" aria-labelledby="summary-saidas-title">
+              <div class="cardHeader">
+                <div class="caixa-summary-title-row">
+                  <span class="caixa-summary-icon"><i data-lucide="arrow-up-circle" width="18" height="18"></i></span>
+                  <h2 class="title" id="summary-saidas-title">Total de Saídas</h2>
+                </div>
+              </div>
+              <div class="caixa-summary-body">
+                <span class="caixa-summary-value caixa-valor-saida" id="caixa-resumo-saidas">R$ 0,00</span>
+              </div>
+            </section>
+            <section class="card caixa-summary-card" aria-labelledby="summary-saldo-title">
+              <div class="cardHeader">
+                <div class="caixa-summary-title-row">
+                  <span class="caixa-summary-icon"><i data-lucide="wallet" width="18" height="18"></i></span>
+                  <h2 class="title" id="summary-saldo-title">Saldo Atual</h2>
+                </div>
+              </div>
+              <div class="caixa-summary-body">
+                <span class="caixa-summary-value" id="caixa-resumo-saldo">R$ 0,00</span>
+              </div>
+            </section>
+          </div>
+
+          <!-- ══════ Abas: Consolidado × Contas financeiras ══════
+               Consolidado = o que aconteceu com o dinheiro (extrato de
+               movimentações). Contas financeiras = onde o dinheiro está
+               distribuído hoje (composição do mesmo saldo, nunca um valor
+               adicional/somado a ele) — ver texto de apoio abaixo das abas,
+               que reforça essa distinção pro usuário em cada aba. -->
+          <div class="list" role="tablist" id="caixa-tablist">
+            <button type="button" role="tab" aria-selected="true" class="tab active" data-tab="consolidado">Consolidado</button>
+            <button type="button" role="tab" aria-selected="false" class="tab" data-tab="contas-financeiras">Contas bancárias</button>
+          </div>
+          <p class="caixa-tab-hint text-body-s" id="caixa-tab-hint">Extrato de todas as movimentações: cada entrada e saída registrada no Caixa, com o saldo acumulado após cada lançamento.</p>
+
+          <!-- ══════ Painel: Consolidado ══════ -->
+          <section id="panel-consolidado">
+
+            <div class="card caixa-list-card">
+              <div class="caixa-filter-bar">
+                <div class="caixa-filters">
+                  <div class="caixa-filter caixa-filter-search">
+                    <div class="wrapper">
+                      <div class="inputWrap hasLeft">
+                        <span class="iconLeft"><i data-lucide="search" width="18" height="18"></i></span>
+                        <input type="text" class="input" id="caixa-search-input" placeholder="Busque por descrição, documento ou conta." />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="caixa-filter" id="caixa-filtros-field">
+                    <div class="wrapper" id="caixa-filtros-trigger-root">
+                      <button type="button" class="trigger" id="caixa-filtros-trigger">
+                        <span class="caixa-filtros-icon"><i data-lucide="sliders-horizontal" width="16" height="16"></i></span>
+                        <span>Filtros</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="button" class="btn secondary hasLeft" id="caixa-export-btn">
+                  <span class="icon"><i data-lucide="download" width="16" height="16"></i></span>
+                  Exportar Excel
+                </button>
+              </div>
+
+              <section class="caixa-table-card">
+                <div class="tableWrap">
+                  <table class="table">
+                    <thead>
+                      <tr class="headerRow" id="caixa-header-row">
+                        <th class="th sortable" data-sort-key="data" aria-sort="none"><span class="thInner">Data<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                        <th class="th sortable" data-sort-key="descricao" aria-sort="none"><span class="thInner">Descrição<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                        <th class="th sortable" data-sort-key="documento" aria-sort="none"><span class="thInner">Documento<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                        <th class="th sortable" data-sort-key="conta" aria-sort="none"><span class="thInner">Conta<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                        <th class="th th-right sortable" data-sort-key="entrada" aria-sort="none"><span class="thInner">Entrada<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                        <th class="th th-right sortable" data-sort-key="saida" aria-sort="none"><span class="thInner">Saída<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                        <th class="th th-right sortable" data-sort-key="saldo" aria-sort="none"><span class="thInner">Saldo<span class="sortIcon" data-sort-icon aria-hidden="true"><i data-lucide="chevrons-up-down" width="12" height="12"></i></span></span></th>
+                      </tr>
+                    </thead>
+                    <tbody id="caixa-tbody"></tbody>
+                  </table>
+                </div>
+
+                <div class="caixa-cards" id="caixa-cards"></div>
+
+                <div class="caixa-empty" id="caixa-empty-state" hidden>
+                  <i data-lucide="search-x" width="28" height="28"></i>
+                  <p class="text-14-regular">Nenhum lançamento encontrado.</p>
+                </div>
+
+                <div class="caixa-empty-global" id="caixa-empty-global" hidden>
+                  <span class="caixa-empty-global-icon"><i data-lucide="coins" width="28" height="28"></i></span>
+                  <p class="caixa-empty-global-title text-subtitle-s">Você ainda não possui nenhum lançamento no Caixa.</p>
+                  <p class="caixa-empty-global-subtitle text-body-s">Inclua seu primeiro lançamento para começar a acompanhar suas entradas e saídas.</p>
+                  <button type="button" class="btn primary hasLeft" id="caixa-empty-global-btn">
+                    <span class="icon"><i data-lucide="plus" width="18" height="18"></i></span>
+                    Incluir lançamento
+                  </button>
+                </div>
+
+                <!-- Paginação (10 registros/página) — composição própria a partir
+                     de tokens, mesmo padrão exato já usado em Cadastro. -->
+                <div class="caixa-pagination" id="caixa-pagination" hidden>
+                  <span class="caixa-pagination-info text-body-xs" id="caixa-pagination-info"></span>
+                  <div class="caixa-pagination-controls">
+                    <button type="button" class="actionBtn" data-page-prev aria-label="Página anterior">
+                      <i data-lucide="chevron-left" width="16" height="16"></i>
+                    </button>
+                    <div class="caixa-pagination-pages" id="caixa-pagination-pages"></div>
+                    <button type="button" class="actionBtn" data-page-next aria-label="Próxima página">
+                      <i data-lucide="chevron-right" width="16" height="16"></i>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <!-- Popover "Filtros": Período (seletor de modo, ver
+                 period-filter.js) + Categoria + Conta. -->
+            <div class="caixa-filter-popover" id="caixa-filtros-popover" hidden>
+              <div id="caixa-period-mount"></div>
+
+              <div class="wrapper caixa-dropdown" id="dropdown-categoria">
+                <span class="label">Categoria</span>
+                <button type="button" class="trigger" data-dropdown-trigger>
+                  <span data-dropdown-value>Todas as categorias</span>
+                  <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                </button>
+                <div class="menu" data-dropdown-menu id="caixa-categoria-menu">
+                  <div class="option selected" data-value="">Todas as categorias</div>
+                </div>
+              </div>
+
+              <div class="wrapper caixa-dropdown" id="dropdown-conta">
+                <span class="label">Conta</span>
+                <button type="button" class="trigger" data-dropdown-trigger>
+                  <span data-dropdown-value>Todas as contas</span>
+                  <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                </button>
+                <div class="menu" data-dropdown-menu id="caixa-conta-menu">
+                  <div class="option selected" data-value="">Todas as contas</div>
+                </div>
+              </div>
+
+              <div class="caixa-filter-popover-actions">
+                <button type="button" class="btn secondary sm" id="caixa-filtros-limpar">Limpar</button>
+                <button type="button" class="btn primary sm" id="caixa-filtros-aplicar">Aplicar</button>
+              </div>
+            </div>
+
+          </section>
+
+          <!-- ══════ Painel: Contas financeiras ══════ -->
+          <section id="panel-contas-financeiras" hidden>
+            <div class="card caixa-cf-card">
+              <div class="tableWrap">
+                <table class="table">
+                  <thead>
+                    <tr class="headerRow">
+                      <th class="th">Banco</th>
+                      <th class="th">Conta</th>
+                      <th class="th th-right">Saldo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="caixa-cf-tbody"></tbody>
+                  <tfoot>
+                    <tr class="tr caixa-cf-total-row">
+                      <td class="td" colspan="2">Total (soma de todas as contas)</td>
+                      <td class="td th-right" id="caixa-cf-total-value">R$ 0,00</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <div class="caixa-cf-cards" id="caixa-cf-cards"></div>
+            </div>
+          </section>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Tooltip compartilhado da Sidebar retraída -->
+  <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../shared/interface-principal.js"></script>
+  <script src="../shared/period-filter.js"></script>
+  <script src="../shared/categorias-financeiras-data.js"></script>
+  <script src="../shared/contas-financeiras-data.js"></script>
+  <script src="../shared/contas-bancarias-data.js"></script>
+  <script src="../shared/bancos-catalogo-data.js"></script>
+  <script src="../shared/caixa-data.js"></script>
+  <script src="../shared/caixa-v2.js"></script>
+</body>
+</html>

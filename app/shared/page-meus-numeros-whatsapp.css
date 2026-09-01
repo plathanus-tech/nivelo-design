@@ -1,8 +1,10 @@
 /* ══════════════════════════════════════════════════════════
-   MEUS NÚMEROS DO WHATSAPP — Assistente IA > Meus números. Mobile first.
-   Entidade simples (só o número), listagem em LISTA (não tabela nem
-   cards de tabela — pedido explícito: ícone do WhatsApp + número + lixeira
-   por item), cadastro em modal (mesmo padrão de Conta Financeira, round 60).
+   CONFIGURAR WHATSAPP — Assistente IA > Configurar WhatsApp. Mobile first.
+   Um único número por conta (o próprio produtor conectando o WhatsApp
+   dele mesmo ao Assistente de IA) — campo diretamente na tela, sempre
+   visível/editável, sem precisar de um modal só para consultar o número
+   atual. Conectar/Atualizar e Desconectar abrem modal de confirmação
+   (ver meus-numeros-whatsapp.js).
    ══════════════════════════════════════════════════════════ */
 
 .mnw-page {
@@ -21,96 +23,77 @@
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }
-@media (min-width: 768px) {
-  .mnw-header {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-}
 
 .mnw-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
 .mnw-title { color: var(--color-text-primary); margin: 0; }
 .mnw-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 720px; }
 
-#new-numero-btn { width: 100%; justify-content: center; flex-shrink: 0; }
-@media (min-width: 768px) {
-  #new-numero-btn { width: auto; }
-}
+/* ── Card "Número de WhatsApp" ────────────────────────────────────────────
+   Mesmo `.card`/`.cardHeader`/`.title` genérico (Table.module.css) já
+   reaproveitado em todo o sistema como container de seção. */
 
-/* ── Card + lista ──────────────────────────────────────────────────────── */
-
-.card.mnw-list-card {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-@media (min-width: 768px) {
-  .card.mnw-list-card {
-    background: var(--color-bg-surface);
-    border: var(--border-width-thin) solid var(--color-border-subtle);
-    box-shadow: var(--shadow-sm);
-  }
-}
-
-.mnw-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.mnw-item {
+.mnw-card-title-row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
-}
-.mnw-item:last-child { border-bottom: none; }
-
-.mnw-item-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  background: var(--color-status-success-bg);
-  color: var(--color-status-success-fg);
-}
-
-.mnw-item-numero {
-  flex: 1;
-  color: var(--color-text-primary);
-}
-
-.mnw-item-remove.actionBtn { flex-shrink: 0; }
-
-/* ── Estado vazio ──────────────────────────────────────────────────────── */
-
-.mnw-empty {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-2xl) var(--spacing-lg);
 }
-.mnw-empty:not([hidden]) { display: flex; }
-.mnw-empty-icon {
+.mnw-card-icon {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  margin-bottom: var(--spacing-sm);
-  border-radius: var(--radius-full);
-  background: var(--color-status-success-bg);
+  flex-shrink: 0;
   color: var(--color-status-success-fg);
 }
-.mnw-empty-title { color: var(--color-text-primary); margin: 0; }
-.mnw-empty-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 360px; }
+
+.mnw-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+/* Tag "Conectado" — agora abaixo do título (dentro do `cardHeader`, mesmo
+   card do título), trazendo o número junto ("+55 (47) 99999-0001
+   conectado") em vez de só "Conectado" ao lado do campo — lê como um
+   status do card inteiro, não uma anotação do input. Ainda é uma TAG
+   (não o bloco grande de destaque testado antes, que ficou pesado demais
+   pra um indicador de status), só um pouco maior/mais clara que o badge
+   padrão do Table (`--font-size-sm`/Medium + dot verde). */
+.mnw-status-badge {
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  padding: 5px 12px;
+  margin-top: var(--spacing-xs);
+}
+.mnw-status-badge .mnw-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+/* Table's `.badge` tem `display:inline-flex` incondicional (sem guard de
+   `[hidden]`) — mesmo bug hidden+display já documentado dezenas de vezes
+   neste projeto. */
+.mnw-status-badge[hidden] { display: none; }
+
+.mnw-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.mnw-actions .btn { width: 100%; justify-content: center; }
+/* Idem: Button's `.btn` também tem `display:inline-flex` incondicional —
+   sem isso, "Desconectar" continuaria visível mesmo com `hidden` setado
+   via JS quando não há número conectado. */
+.mnw-actions .btn[hidden] { display: none; }
+@media (min-width: 480px) {
+  .mnw-actions {
+    flex-direction: row;
+  }
+  .mnw-actions .btn { width: auto; }
+}
 
 /* ── Modal: campo Número de WhatsApp ──────────────────────────────────────
    Mesmo padrão de erro "só borda" já usado em Conta Financeira/Fazendas
@@ -119,6 +102,21 @@
 #mnw-numero-field .errorText { display: none; }
 #mnw-numero-field.error .errorText { display: flex; }
 #mnw-numero-field.error .input { border-color: var(--color-action-error); }
+/* Feedback.module.css (carregado nesta tela pro toast) declara `.error`
+   crua (fundo+borda vermelhos) — como o `.wrapper` do Input reaproveita a
+   mesma classe `.error` pra marcar estado de erro, o fundo vermelho vazava
+   sobre o campo inteiro (mesma colisão já documentada em
+   page-cadastro.css/page-nova-fazenda.css). Padrão de erro do sistema é só
+   a borda vermelha (já aplicada acima via `.input`), nunca um fundo
+   cobrindo o `.wrapper`. */
+#mnw-numero-field.error { background: transparent; border-color: transparent; }
+#mnw-numero-field .helperText { margin-top: 2px; }
+
+/* Texto do número dentro do modal de Conectar/Atualizar. */
+.mnw-connect-dialog-numero {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
 
 /* ── Toast de sucesso ─────────────────────────────────────────────────────
    Mesma composição já usada em Conta Financeira (Feedback reaproveitado

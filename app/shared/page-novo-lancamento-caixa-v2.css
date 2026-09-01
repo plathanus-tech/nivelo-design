@@ -1,0 +1,119 @@
+/* ══════════════════════════════════════════════════════════
+   INCLUIR LANÇAMENTO V2 — formulário de criação de lançamentos de Caixa V2.
+   Mobile first. Cópia estrutural de page-novo-lancamento-caixa.css (V1),
+   adaptada pro novo layout de campos (sem Código, Data+Tipo de movimento na
+   1ª linha, Contas financeiras+Valor na 2ª, Categoria+Documento na 3ª) + o
+   aviso de duplicidade e o Resumo financeiro do lançamento, novos nesta
+   versão. V1 não foi tocado.
+   ══════════════════════════════════════════════════════════ */
+
+.nlc-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho ─────────────────────────────────────────────────────────── */
+
+.nlc-header { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.nlc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nlc-back:hover { color: var(--color-text-primary); }
+.nlc-title { color: var(--color-text-primary); margin: 0; }
+.nlc-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 560px; }
+
+/* ── Aviso de duplicidade — Feedback real (`.alert.info`), fica visível o
+   tempo todo (não é um toast). Sem título, só a mensagem — reduz o peso
+   visual pra não competir com título/campos, como pedido. ────────────────── */
+.nlc-duplicidade-alert { align-items: flex-start; }
+.nlc-duplicidade-alert .message { color: inherit; }
+
+/* ── Seções (1 único `.card` do Table pra todo o formulário) ─────────────── */
+
+#nlc-form { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+.nlc-subsection { padding: var(--spacing-lg); }
+.nlc-subsection + .nlc-subsection { border-top: var(--border-width-thin) solid var(--color-border-subtle); }
+
+.nlc-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ── Grid de campos ────────────────────────────────────────────────────── */
+
+.nlc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .nlc-grid { grid-template-columns: 1fr 1fr; }
+  .nlc-span-2 { grid-column: span 2; }
+}
+
+.nlc-dropdown { position: relative; }
+.nlc-optional-tag { font-weight: var(--font-weight-regular); color: var(--color-text-tertiary); }
+
+.nlc-grid input.input { width: 100%; height: 44px; }
+.menu .option { display: block; }
+
+/* Mensagem de erro: mesmo padrão do resto do sistema — `.errorText` só
+   aparece quando `.wrapper`/campo ganha `.error` via JS. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+/* Bug real encontrado ao vivo (herdado da estrutura de V1, corrigido só
+   aqui): `.errorText` (Input.module.css) tem `display:flex` incondicional —
+   dentro de um `.dpRoot` (DatePicker, não `.wrapper`) isso nunca era
+   guardado, então a mensagem de erro da Data ficava sempre visível, mesmo
+   com o campo preenchido. Mesmo padrão de guard já usado pra `.wrapper`. */
+.dpRoot .errorText { display: none; }
+.dpRoot.error .errorText { display: flex; }
+.dpRoot.error .dpTrigger { border-color: var(--color-action-error); }
+
+/* ── Resumo financeiro do lançamento — `dl` de consulta, mesmo padrão de
+   "dados gerais" já usado em outras telas do sistema (grid responsivo,
+   `dt`/`dd`). ──────────────────────────────────────────────────────────── */
+.nlc-resumo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: 0;
+}
+@media (min-width: 640px) {
+  .nlc-resumo-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.nlc-resumo-item dt { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-2xs); }
+.nlc-resumo-item dd { color: var(--color-text-primary); margin: 0; font-weight: var(--font-weight-medium); }
+
+/* ── Ações do formulário ─────────────────────────────────────────────── */
+
+.nlc-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .nlc-actions { flex-direction: row; justify-content: flex-end; }
+  .nlc-actions .btn { min-width: 160px; }
+}

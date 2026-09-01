@@ -27,7 +27,17 @@
      valor,           // number, sempre positivo (o sinal é dado pelo `tipo`,
                       // nunca pelo valor em si)
      banco,           // nome da conta (bancos-data.js)
-     competencia      // 'AAAA-MM' — opcional
+     competencia,     // 'AAAA-MM' — opcional
+     notaFiscalNumero, // opcional — número da NF-e vinculada ao lançamento
+                      // (campo aditivo, 2026-08-31, pra alimentar a coluna
+                      // "Documento" do Caixa V2: mostra "NF-e <número>" quando
+                      // existir. Nenhum lançamento V1 usa este campo.)
+     documento        // opcional — texto livre do campo "Documento" do
+                      // formulário V2 (Incluir Lançamento V2): NF-e/número de
+                      // documento/outra referência digitada pelo usuário.
+                      // Quando presente, tem prioridade sobre
+                      // `notaFiscalNumero` na coluna "Documento" do Caixa V2;
+                      // sem nenhum dos dois, mostra "Extrato".
    }
 
    Sem persistência entre páginas (mesma decisão já documentada em todo o
@@ -48,12 +58,12 @@
     { codigo: 'LC-0001', data: '2026-06-30', historico: 'Manutenção de maquinário agrícola', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-004', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 2800, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-06' },
     { codigo: 'LC-0002', data: '2026-07-01', historico: 'Venda de trigo', pessoaNome: 'Agropecuária Central Ltda', pessoaDocumento: '55.666.777/0001-88', categoriaCodigo: 'CAT-001', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 5400, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
     { codigo: 'LC-0003', data: '2026-07-02', historico: 'Compra de calcário agrícola', pessoaNome: 'Insumos Agrícolas Vale Ltda', pessoaDocumento: '12.345.678/0001-90', categoriaCodigo: 'CAT-003', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 1800, banco: 'Sicredi - Conta Corrente', competencia: '2026-07' },
-    { codigo: 'LC-0004', data: '2026-07-03', historico: 'Venda de soja - safra 2025/26 (1ª remessa)', pessoaNome: 'Cerealista Bom Grão S.A.', pessoaDocumento: '98.765.432/0001-10', categoriaCodigo: 'CAT-001', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 18200, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
+    { codigo: 'LC-0004', data: '2026-07-03', historico: 'Venda de soja - safra 2025/26 (1ª remessa)', pessoaNome: 'Cerealista Bom Grão S.A.', pessoaDocumento: '98.765.432/0001-10', categoriaCodigo: 'CAT-001', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 18200, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07', notaFiscalNumero: '12345' },
     { codigo: 'LC-0005', data: '2026-07-05', historico: 'Compra de fertilizantes NPK', pessoaNome: 'Insumos Agrícolas Vale Ltda', pessoaDocumento: '12.345.678/0001-90', categoriaCodigo: 'CAT-003', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 15800, banco: 'Sicredi - Conta Corrente', competencia: '2026-07' },
     { codigo: 'LC-0006', data: '2026-07-06', historico: 'Venda de milho', pessoaNome: 'Maria Aparecida Souza', pessoaDocumento: '123.456.789-00', categoriaCodigo: 'CAT-002', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 8300, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
     { codigo: 'LC-0007', data: '2026-07-08', historico: 'Abastecimento de tratores', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-004', contaFinanceiraCodigo: 1, tipo: 'saida', valor: 3200, banco: 'Dinheiro em caixa', competencia: '2026-07' },
     { codigo: 'LC-0008', data: '2026-07-09', historico: 'Venda de milho avulsa', pessoaNome: 'Wellington Souza Prado', pessoaDocumento: '901.234.567-09', categoriaCodigo: 'CAT-002', contaFinanceiraCodigo: 3, tipo: 'entrada', valor: 4600, banco: 'Caixa Econômica Federal - Poupança', competencia: '2026-07' },
-    { codigo: 'LC-0009', data: '2026-07-10', historico: 'Venda de milho', pessoaNome: 'Maria Aparecida Souza', pessoaDocumento: '123.456.789-00', categoriaCodigo: 'CAT-002', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 12600, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
+    { codigo: 'LC-0009', data: '2026-07-10', historico: 'Venda de milho', pessoaNome: 'Maria Aparecida Souza', pessoaDocumento: '123.456.789-00', categoriaCodigo: 'CAT-002', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 12600, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07', notaFiscalNumero: '12388' },
     { codigo: 'LC-0010', data: '2026-07-11', historico: 'Combustível para pulverizador', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-004', contaFinanceiraCodigo: 1, tipo: 'saida', valor: 2100, banco: 'Dinheiro em caixa', competencia: '2026-07' },
     { codigo: 'LC-0011', data: '2026-07-12', historico: 'Conta de energia elétrica da sede', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-005', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 1450, banco: 'Sicredi - Conta Corrente', competencia: '2026-07' },
     { codigo: 'LC-0012', data: '2026-07-13', historico: 'Venda de trigo avulsa', pessoaNome: 'Agropecuária Central Ltda', pessoaDocumento: '55.666.777/0001-88', categoriaCodigo: 'CAT-001', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 9800, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
@@ -69,7 +79,7 @@
     { codigo: 'LC-0022', data: '2026-07-27', historico: 'Venda de gado de descarte', pessoaNome: 'Wellington Souza Prado', pessoaDocumento: '901.234.567-09', categoriaCodigo: 'CAT-002', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 3200, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
     { codigo: 'LC-0023', data: '2026-07-28', historico: 'Tarifa de manutenção de conta', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-007', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 120, banco: 'Sicredi - Conta Corrente', competencia: '2026-07' },
     { codigo: 'LC-0024', data: '2026-07-29', historico: 'Combustível para colheitadeira', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-004', contaFinanceiraCodigo: 1, tipo: 'saida', valor: 4800, banco: 'Dinheiro em caixa', competencia: '2026-07' },
-    { codigo: 'LC-0025', data: '2026-07-30', historico: 'Venda de soja - safra 2025/26 (2ª remessa)', pessoaNome: 'Cerealista Bom Grão S.A.', pessoaDocumento: '98.765.432/0001-10', categoriaCodigo: 'CAT-001', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 24000, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
+    { codigo: 'LC-0025', data: '2026-07-30', historico: 'Venda de soja - safra 2025/26 (2ª remessa)', pessoaNome: 'Cerealista Bom Grão S.A.', pessoaDocumento: '98.765.432/0001-10', categoriaCodigo: 'CAT-001', contaFinanceiraCodigo: 2, tipo: 'entrada', valor: 24000, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07', notaFiscalNumero: '12401' },
     { codigo: 'LC-0026', data: '2026-07-31', historico: 'Manutenção de maquinário agrícola', pessoaNome: null, pessoaDocumento: null, categoriaCodigo: 'CAT-004', contaFinanceiraCodigo: 2, tipo: 'saida', valor: 6500, banco: 'Banco do Brasil - Conta Corrente', competencia: '2026-07' },
 
     // Lançamentos fictícios de exercícios anteriores (2024/2025) — adicionados só pra dar
@@ -104,6 +114,22 @@
     return 'LC-' + padded;
   }
 
+  // Saldo atual de uma Conta Financeira específica (soma de entradas menos
+  // saídas de todos os lançamentos vinculados a ela) — usado pelo Caixa V2
+  // (aba "Contas financeiras" e o Resumo financeiro de Incluir Lançamento
+  // V2) e por Transferência entre Contas V2. A soma de saldoPorContaFinanceira()
+  // de TODAS as contas financeiras sempre bate com o saldo consolidado geral
+  // (mesma fonte de dados, só reparticionada por conta).
+  function saldoPorContaFinanceira(codigo) {
+    var codigoNum = Number(codigo);
+    var saldo = 0;
+    LANCAMENTOS.forEach(function (l) {
+      if (l.contaFinanceiraCodigo !== codigoNum) return;
+      saldo += l.tipo === 'entrada' ? l.valor : -l.valor;
+    });
+    return saldo;
+  }
+
   function add(payload) {
     var lancamento = {
       codigo: nextCodigo(),
@@ -116,7 +142,9 @@
       tipo: payload.tipo,
       valor: payload.valor,
       banco: payload.banco,
-      competencia: payload.competencia || null
+      competencia: payload.competencia || null,
+      notaFiscalNumero: payload.notaFiscalNumero || null,
+      documento: payload.documento || null
     };
     LANCAMENTOS.push(lancamento);
     return lancamento;
@@ -126,6 +154,7 @@
     list: list,
     findByCodigo: findByCodigo,
     nextCodigo: nextCodigo,
+    saldoPorContaFinanceira: saldoPorContaFinanceira,
     add: add
   };
 })();

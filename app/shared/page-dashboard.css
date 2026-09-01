@@ -416,23 +416,24 @@
   white-space: nowrap;
 }
 
-/* ── Cabeçalho com total em destaque — Contas a pagar / a receber ─────── */
+/* ── Nome do produto + tag da safra (Produção / Colheita) ─────────────── */
 
-.dash-card-meta {
+.dash-stat-name-row {
   display: flex;
-  align-items: baseline;
-  gap: 4px;
+  align-items: center;
+  gap: var(--spacing-xs);
   flex-wrap: wrap;
 }
 
-.dash-card-meta-value {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
+.dash-stat-safra-tag {
+  white-space: nowrap;
 }
 
-.dash-card-meta-value.out { color: var(--color-text-error); }
-.dash-card-meta-value.in  { color: var(--color-text-success); }
+/* ── Vencidas (Contas a pagar/receber) — sempre em vermelho, nas 2 telas ── */
+
+.dash-stat-value-main.is-vencida {
+  color: var(--color-text-error);
+}
 
 /* ── Clima ─────────────────────────────────────────────────────────────── */
 
@@ -547,11 +548,26 @@
 
 .dash-forecast-temps {
   color: var(--color-text-secondary);
+  /* Mín/Máx sempre na mesma linha, mesmo em larguras de desktop mais
+     estreitas (ex. 1024-1300px) onde as 5 colunas da grid ficam apertadas o
+     suficiente pra quebrar "29° 16°" em 2 linhas sem isso — bug real
+     encontrado ao testar breakpoints intermediários de desktop. */
+  white-space: nowrap;
 }
 
 .dash-forecast-temps strong {
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
+}
+
+/* Probabilidade de chuva por dia — compacta, mesma cor discreta do resto dos
+   dados climáticos secundários (`--color-text-tertiary`), nunca compete com
+   as temperaturas (que já são o dado principal de cada dia). */
+.dash-forecast-rain {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--color-text-tertiary);
 }
 
 /* ── Estados vazios (sem dados cadastrados) ───────────────────────────── */

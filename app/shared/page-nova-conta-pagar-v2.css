@@ -1,0 +1,103 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA CONTA A PAGAR — V2. Carregado JUNTO com page-nova-conta-pagar.css
+   (a base visual/estrutural — `.ncp-*` — é 100% a mesma da V1, pedido
+   explícito de manter o padrão já existente) — este arquivo tem só o
+   DELTA da V2: subtítulo, radio "Condição de pagamento", e o card de
+   Parcelamento (número de parcelas + validação da soma + cards de
+   parcela, mesmo padrão visual já usado em Pedidos de Venda > A prazo,
+   `.npv-parcela-card`).
+   ══════════════════════════════════════════════════════════ */
+
+.ncp-subtitle { color: var(--color-text-tertiary); margin: var(--spacing-2xs) 0 0; }
+
+/* ── Colisão RadioButton×Input/Dropdown, mesmo fix preventivo já
+   documentado dezenas de vezes neste projeto (Estoque/Balancete/Natureza
+   da Operação/Pedidos de Venda/etc) — RadioButton.module.css passou a ser
+   carregado nesta tela só na V2, pro radio "Condição de pagamento". ──── */
+.input:not([type="radio"]) {
+  position: static;
+  opacity: 1;
+  width: 100%;
+  height: 44px;
+}
+#condicao-field .group.horizontal { display: flex; gap: var(--spacing-lg); }
+
+/* Bug real: `Input.module.css`/`Dropdown.module.css`'s `.errorText` tem
+   `display:flex` incondicional — a guarda já existente em page-nova-conta-
+   pagar.css só cobre `.wrapper .errorText`, mas Emissão/Vencimento usam
+   `.dpRoot` (DatePicker), não `.wrapper` — sem esta guarda, as mensagens de
+   erro dos 2 campos de data apareciam desde a abertura do formulário, mesmo
+   sem nenhuma tentativa de salvar. Mesmo padrão de correção já usado em toda
+   a V2 (`#recebimento-dialog-overlay .trigger`, etc.), aqui pro `.dpRoot`. */
+.dpRoot .errorText { display: none; }
+.dpRoot.error .errorText { display: flex; }
+
+/* ── Card de Parcelamento ─────────────────────────────────────────────── */
+.ncp2-parcelamento-card { display: flex; flex-direction: column; }
+
+/* `.card`/`.cardHeader` (Table.module.css) só dá padding ao CABEÇALHO — o
+   corpo precisa do próprio respiro. Em vez de espalhar padding por cada
+   filho direto (frágil: o "último visível" muda conforme número de
+   parcelas/soma bater ou não, causando corte quando o filho que ganhava
+   `padding-bottom` não era de fato o último visível), o corpo inteiro
+   (tudo depois do cardHeader) foi agrupado num único wrapper
+   `.ncp2-parcelamento-body` — ele sempre abraça exatamente o conteúdo que
+   tiver, com padding igual nos 4 lados (esquerda/direita `--spacing-lg`,
+   inferior `--spacing-lg`, superior já resolvido pelo padding-bottom do
+   cardHeader), então nunca sobra nem falta respiro embaixo. */
+.ncp2-parcelamento-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+  min-width: 0;
+}
+
+.ncp2-parcelas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+.ncp2-parcelas:empty { display: none; }
+
+/* Mesmo padrão visual já usado no cadastro de veículos da transportadora
+   (Novo Cadastro) e reaproveitado em Pedidos de Venda pro mesmo propósito
+   — card cinza claro, cabeçalho com o título, campos abaixo. */
+.ncp2-parcela-card {
+  background: var(--color-gray-50);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  min-width: 0;
+}
+.ncp2-parcela-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ncp2-parcela-title { color: var(--color-text-primary); margin: 0; }
+.ncp2-parcela-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 640px) {
+  .ncp2-parcela-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Resumo/validação da soma das parcelas contra o Valor total ────────── */
+.ncp2-parcelas-summary[hidden] { display: none; }
+.ncp2-parcelas-summary { margin-top: var(--spacing-sm); }
+.ncp2-parcelas-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error-fg);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}

@@ -632,3 +632,28 @@
   line-height: var(--line-height-normal);
   margin: 0;
 }
+
+/* ══════════════════════════════════════════════════════════
+   PADRÃO GLOBAL DE ERRO DE CAMPO — `page-shell.css` é carregado por toda
+   tela do produto, então este fix vale pro sistema inteiro de uma vez.
+   Bug real, já documentado várias vezes neste projeto em páginas
+   isoladas (ex.: `page-nova-fazenda.css`, round 37): `Feedback.module.css`
+   declara `.error { background: var(--color-status-error-bg); border-
+   color: ...; }` como classe CRUA de 1 nível — carregado em praticamente
+   toda tela (pro toast de sucesso/`.alert`), essa regra vaza pra QUALQUER
+   elemento que receba a classe `.error` isolada, incluindo o `.wrapper`/
+   `.dpRoot` de campo (Input/Dropdown/DatePicker) que o JS de cada tela
+   alterna via `classList.toggle('error', ...)`. Resultado: o campo inteiro
+   ficava com fundo rosa claro, não só a borda vermelha esperada.
+   O padrão OFICIAL de erro de campo do sistema é só a borda vermelha
+   (`.wrapper.error .input`/`.trigger`, `.dpRoot.error .dpTrigger` — já
+   definidos no componente ou por página) + a mensagem em `.errorText`,
+   nunca um fundo cobrindo o campo. Fix aqui, uma vez, pro sistema
+   inteiro: neutraliza o `background`/`border-color` que `.error` sozinho
+   traria, sem tocar em nenhum outro uso de `.error` (ex.: `.alert.error`,
+   que tem 2 classes e continua intocado). ══════════════════════════════ */
+.wrapper.error,
+.dpRoot.error {
+  background: transparent;
+  border-color: transparent;
+}

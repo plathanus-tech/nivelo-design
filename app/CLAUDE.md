@@ -3726,6 +3726,233 @@ isoladamente fora do navegador; `page-contas-financeiras.css`/`page-contas-banca
 com `max-width:1440px` confirmado; Categorias de receitas e despesas sem mudança de
 comportamento fora do preenchimento de largura.
 
+## Ajustes 2026-08-06 (round 85) — Estoque de Uso ganha tratamento V2 completo (paridade com
+Vendas/Comprometido)
+
+Estoque de Uso (aba "Estoque de Uso" em `estoque-v2.html`) não tinha nenhum tratamento V2 até
+esta rodada — lia direto de `window.NiveloEstoqueCompras` (V1), uma linha por COMPRA (não por
+produto), sem depósito/custo médio/histórico rico. Pedido explícito: dar o mesmo tratamento já
+existente em Vendas (`estoque-vendas-v2-data.js`) e Comprometido
+(`estoque-comprometido-v2-data.js`).
+
+- **Novo módulo `app/shared/estoque-uso-v2-data.js`** (`window.NiveloEstoqueUsoV2` —
+  `list/findByCodigo/registrarEntrada/registrarConsumo/ajustarEstoque`). Códigos NOVOS
+  `USO-00N` (não reaproveitados os `CMP-00N` do V1) — decisão documentada no arquivo: o V1 tinha
+  1 código por COMPRA (14 registros), o V2 tem 1 código por PRODUTO (5 registros agregados, cada
+  um com o histórico das compras antigas dentro) — não há mapeamento 1:1 entre os dois conjuntos.
+  `estoque-compras-data.js` (V1) ficou órfão, mesmo princípio já usado em `bancos-data.js`.
+  `custoMedio` de cada produto seed calculado como média ponderada por quantidade das compras que
+  tinham `valorUnitario` informado (a compra original de Defensivo, CMP-003, nunca teve preço —
+  mantido `null`/excluído do cálculo). 2 consumos de demonstração adicionados ao seed (Adubo/
+  Defensivo), usando Fazenda/Talhão reais de `fazendas-data.js`, pra o histórico da tela de "Ver
+  detalhes" já nascer com pelo menos 1 exemplo de cada tipo.
+- **Tabela da aba Compras** (`estoque-v2.js`'s `renderCompras`): Quantidade agora segue o mesmo
+  padrão visual de Vendas/Comprometido (`.estoquev2-row-qty`/`-qty-unit`/`-conversao`, com linha
+  de conversão quando aplicável via `getConversao()`); colunas novas Custo médio/Valor em estoque;
+  coluna "Unidade" solta removida (sigla já inline com a quantidade). 4 ações por linha/card
+  (Registrar entrada/Registrar consumo/Ver detalhes/Ajustar estoque, mesmo padrão ícone+Tooltip).
+  Cards do mobile ganharam `buildComprasCardHTML` próprio (antes compartilhava
+  `buildQuantidadeCardHTML` com nada, já que Comprometido tem o seu). `EXPORT_CONFIG.compras`
+  atualizado pras novas colunas.
+- **"Ajustar estoque" generalizado**: `ajusteState`/`openAjustarEstoqueModal`/
+  `ajusteConfirmBtn` (antes hardcoded pra `window.NiveloEstoqueVendasV2`) agora aceitam um
+  `modulo` (qual API chamar) + `onAfterAjuste` (callback de re-render) — mesmo modal/markup/
+  lógica reaproveitado por Vendas e por Uso, sem duplicar HTML/JS.
+- **Nova tela: "Registrar entrada — Estoque de Uso"** (`registrar-entrada-estoque-uso-v2.html`
+  + `.js`), estrutura idêntica à de Vendas: tag "Estoque de Uso" no topo (mesmo
+  `.estoquev2-tipo-tag` já usado em Comprometido); Produto (readonly)+Data lado a lado;
+  Fornecedor (`NiveloCadastros.findByTipo('fornecedor')`)+Depósito (`NiveloLocais.list()`) lado
+  a lado; Quantidade com sufixo de unidade + preview de conversão; Preço unitário (máscara R$)+
+  Valor total (readonly, calculado) lado a lado; Nota fiscal/Documento em campo único opcional.
+  Submit chama `registrarEntrada()` (atualiza custo médio via média ponderada, última compra,
+  depósito, histórico) e redireciona com toast, mesmo padrão sessionStorage de sempre.
+  **Vendas' `registrar-entrada-estoque-v2.html` também ganhou a tag "Estoque de Vendas"** (pedido
+  explícito à parte, mesmo visual).
+- **"Registrar consumo" (modal existente em `estoque-v2.html`) estendido**: Fazenda/Talhão
+  (dependente, mesma técnica exata do bloco "Origem da entrada" de Vendas) + Custo (readonly,
+  `custoMedio × quantidade`, recalculado ao vivo a cada tecla). Confirmar chama
+  `registrarConsumo()` (reduz do depósito com maior saldo — simplificação documentada, já que o
+  fluxo não tem campo de depósito de saída) em vez de mutar o registro direto.
+- **Nova tela: "Ver detalhes — Estoque de Uso"** (`detalhe-estoque-uso-v2.html` + `.js`),
+  mesma estrutura de Vendas: tag "Estoque de Uso", 4 KPIs fixos (Saldo total/Custo médio/Valor
+  em estoque/Última compra — tamanho fixo em qualquer largura, regra do round 55), "Estoque por
+  depósito", histórico de movimentações (timeline). Histórico: ENTRADA mostra Fornecedor/Origem
+  + Depósito (Destino/Talhão omitido); CONSUMO mostra Fornecedor/Origem "—" + Destino/Talhão
+  ("Fazenda X · Talhão Y", Depósito omitido — mesma decisão documentada no código: este fluxo
+  não rastreia depósito de saída). Ações no cabeçalho: Registrar entrada (navega)/Registrar
+  consumo (mesmo modal, réplica de markup+lógica)/Ajustar estoque (popover "mais", réplica do
+  padrão de Vendas). `renderCompras`'s ação "ver-detalhes" agora aponta pra esta tela nova só
+  no painel `compras` — Comprometido continua indo pro V1 `detalhe-estoque.html`, intocado.
+- **Bug real corrigido (mais uma ocorrência do padrão `hidden`+`display` incondicional, já
+  documentado dezenas de vezes neste arquivo):** `.detalhev2-header-actions` (bloco de botões do
+  cabeçalho de "Ver detalhes") não tinha guard `[hidden]` — o bloco continuaria visível no estado
+  "Registro não encontrado" mesmo com `hidden` setado via JS, tanto na tela de Vendas (bug
+  pré-existente, nunca notado) quanto na nova de Uso. Corrigido em
+  `page-detalhe-estoque-v2.css` (`.detalhev2-header-actions[hidden]{display:none}`), beneficia as
+  duas telas.
+- **`app/shared/page-estoque-uso-v2.css`** (novo): larguras de coluna da tabela de Compras, cópia
+  do `.estoquev2-tipo-tag` (pra não precisar carregar `page-registrar-entrega-estoque-v2.css`,
+  que traz CSS irrelevante pras 2 telas novas), gap padrão de "Ver detalhes".
+- **`prototype-nav/nav.config.js`:** 2 novas entradas dentro do grupo Estoque V2 já existente
+  (`estoque-detalhe-uso-v2` com variante "não encontrado", `estoque-registrar-entrada-uso-v2`).
+
+Verificado ao vivo (servidor `http-server`, porta 8090): aba "Estoque de Uso" com as novas
+colunas/ações renderizando corretamente (5 produtos agregados, custo médio/valor em estoque
+batendo com o cálculo manual); Registrar entrada salvando e atualizando custo médio via média
+ponderada — confirmado com uma 2ª entrada que o novo custo médio pondera corretamente contra o
+saldo anterior; Registrar consumo com Fazenda/Talhão reais reduzindo a quantidade do depósito de
+maior saldo e mostrando o Custo calculado ao vivo; Ajustar estoque funcionando identicamente ao
+de Vendas (modal reaproveitado, `modulo`/`onAfterAjuste` corretos); Ver detalhes mostrando os 4
+KPIs corretos e histórico populado com Fazenda · Talhão nas linhas de consumo e Fornecedor/
+Depósito nas de entrada; bug do `.detalhev2-header-actions[hidden]` confirmado corrigido nas 2
+telas (Vendas e Uso); nenhum erro de console em nenhuma das 4 telas tocadas/criadas.
+
+## Ajustes 2026-08-31 (round 86) — Caderno de Campo V2: nova versão completa,
+V1 aposentado só pro navegador de protótipo
+
+Pedido grande: construir a V2 do Caderno de Campo, que passa a ser a versão do produto que a
+Sidebar real navega pra sempre a partir de agora. V1 (`caderno-de-campo.html`, `fazenda-
+detalhe.html`, `talhao-detalhe.html`, `nova-anotacao.html`, `caderno-data.js`) foi preservada
+100% intacta — nenhum arquivo tocado, nenhum dado renomeado — e ficou acessível só pelo navegador
+de protótipo, dentro do novo grupo "Caderno de Campo (V1)".
+
+- **Arquivos novos:** `app/shared/caderno-v2-data.js` (`window.NiveloCadernoV2`); `app/screens/
+  caderno-de-campo-v2.html` + `page-caderno-de-campo-v2.css` + `caderno-de-campo-v2.js` (Tela 1,
+  listagem de fazendas); `app/screens/fazenda-detalhe-caderno-v2.html` + `page-fazenda-detalhe-
+  caderno-v2.css` + `fazenda-detalhe-caderno-v2.js` (Tela 2, Entrada na Fazenda, com a Tela 3 —
+  tabela de Talhões — embutida na mesma página, mesma estrutura já usada pelo V1); `app/screens/
+  talhao-detalhe-v2.html` + `page-talhao-detalhe-v2.css` + `talhao-detalhe-v2.js` ("Ver
+  detalhes" de um talhão, ação da tabela de Talhões); `app/screens/nova-anotacao-v2.html` +
+  `page-nova-anotacao-v2.css` + `nova-anotacao-v2.js` (Tela 4, criação de registro).
+- **Novo módulo de dados em vez de estender `caderno-data.js` (V1):** o shape diverge o
+  suficiente (novos tipos de registro com campos próprios, `talhaoId` deixando de ser opcional)
+  pra justificar um módulo próprio, mesmo princípio já usado em outras V2 do sistema (ex.
+  `estoque-vendas-v2-data.js` ao lado de `estoque-compras-data.js`). `caderno-data.js` (V1)
+  continua 100% funcional e intocado.
+- **Decisão de escopo confirmada no código: "Tipo de registro" ganhou um 4º tipo, Colheita,
+  além dos 3 pedidos explicitamente (Anotação/Aplicação de insumo/Despesa manual).** O pedido
+  listou os 3 tipos como "pelo menos estes" (não uma lista fechada), e os KPIs pedidos pra
+  Tela 1/Tela 2 (Produtividade, Produtividade média, Produção registrada) exigem uma fonte de
+  dado de produção/colheita — sem um tipo próprio pra isso, essas métricas nunca teriam nenhum
+  dado real pra agregar. Colheita foi posicionado por último nos 4 cards de seleção (Anotação
+  continua sendo o primeiro, como pedido), com Produto (Grãos)/Quantidade/Unidade (auto).
+- **Regra central, sem exceção: todo registro tem `fazendaId` + `talhaoId`.** Não existe mais
+  nenhum caminho de criação a nível de fazenda (V1 tinha `?fazenda=` sem `?talhao=` como entrada
+  válida) — `nova-anotacao-v2.html` só é alcançável com `?fazenda=&talhao=` na URL (a partir da
+  ação "Nova anotação" da tabela de Talhões ou do cabeçalho de Talhão > Ver detalhes); sem os
+  dois parâmetros válidos, a tela mostra um card de erro ("Nenhum talhão selecionado...") e
+  esconde o `<form>` inteiro (`form.hidden = true`) — verificado ao vivo que o formulário não
+  fica acessível nesse estado.
+- **Fazenda/Talhão/Cultura atual/Safra: sempre contexto não editável.** Os 4 campos são
+  `<input disabled readonly>` (mesmo padrão visual já usado em "Emitente" de Nova Nota Fiscal),
+  nunca dropdowns — Cultura atual/Safra vêm direto de `talhao.cultura`/`talhao.safra`
+  (`fazendas-data.js`), não mais da última anotação do talhão como o V1 fazia (mudança de
+  comportamento deliberada, pedida explicitamente).
+- **Tela 1 (`caderno-de-campo-v2.html`):** cada card de fazenda ganhou **Área total** (já
+  existia em `fazenda.areaHa`, só não era mostrada no card do V1) e um bloco de KPIs substituindo
+  o resumo simples de despesas/vendas/colheitas do V1: **Produtividade** (total unit-aware, nunca
+  soma unidades diferentes — agrupa por sigla e mostra a maior como destaque, o resto como linhas
+  secundárias "+ N un"), **Produtividade média** (total ÷ `areaHa`, "sc/ha"), **Despesa
+  acumulada** (renomeada de "Despesas", mesmo conceito de soma total) e **Despesa média por
+  hectare** (despesa acumulada ÷ `areaHa`). **Decisão documentada no código:** "Despesa
+  acumulada"/"Custo acumulado" somam tanto `despesa-manual.valor` quanto
+  `aplicacao-insumo.custoCalculado` — os dois representam gasto real da operação, mesmo a
+  Aplicação de insumo não sendo literalmente um registro do "tipo Despesa".
+- **Tela 2 (`fazenda-detalhe-caderno-v2.html`):** removido o card "Safra" (pedido explícito).
+  "Talhões" manteve a posição; logo depois entraram, na ordem exata pedida: **Custo acumulado**,
+  **Produção registrada** (unit-aware, mesmas regras da Tela 1), **Produtividade média**,
+  **Custo médio por hectare**, **Anotações registradas** (conta só `tipo==='anotacao'`, não
+  Despesa/Aplicação de insumo, como pedido explicitamente). **"Cultura atual" foi preservada**
+  (não estava na lista de remoção, só "Safra" foi removida) e reposicionada pro final do grid,
+  já que os 5 KPIs novos precisavam entrar logo depois de Talhões — resultando num resumo de 8
+  cards (grid ganhou um degrau extra de 3 colunas antes de virar 4, pra não espremer demais em
+  telas médias).
+- **Tela 3 (tabela de Talhões, embutida na Tela 2):** o V1 usava linhas clicáveis inteiras
+  (`.talhao-row`, sem ações em ícone). Com a coluna nova **Última Anotação**
+  (`dd/mm/aaaa · hh:mm`, do registro mais recente de QUALQUER tipo daquele talhão — não é
+  específico de "anotação") mais as 3 ações pedidas (Nova anotação/Encerrar safra/Ver detalhes),
+  "linha inteira clicável" deixaria de ser inequívoco — decisão explícita de virar uma tabela de
+  verdade (`.table`/`.tr`/`.td`, mesma cópia visual de Estoque já usada em outras tabelas do
+  sistema) com Cards no mobile, ações via `.actionBtn`+`.tip` (mesmo padrão de tooltip fixo já
+  usado em `fazenda-detalhe-cadastro.js`/`produtos.js`).
+- **"Encerrar safra" — decisão de comportamento, documentada explicitamente por não estar
+  pinada no pedido:** é uma ação REAL (não um stub), com confirmação num Dialog explicando o que
+  vai acontecer — limpa `talhao.cultura`/`talhao.safra` (`null`) e volta o `status` pra
+  `'disponivel'`, mesmo espírito de "Alterar status" que o V1 já tinha pra outro propósito. Modal
+  reaproveitado tanto na tabela de Talhões (Tela 2) quanto no cabeçalho de Talhão > Ver detalhes
+  (Tela "talhao-detalhe-v2"), sem duplicar lógica de negócio (cada tela tem sua própria cópia de
+  markup+handler, mesmo princípio de "réplica de página" já documentado em Estoque/Contas a
+  Pagar — as duas telas não compartilham JS entre si).
+- **Nova tela "Ver detalhes" de talhão (`talhao-detalhe-v2.html`):** mirror estrutural de
+  `talhao-detalhe.html` (V1) — indicadores de Área/Cultura/Safra + registros do Caderno (Custo
+  registrado/Produção registrada/Anotações) + lista de registros (mais recente primeiro, ícone
+  por tipo) — adaptado aos 4 tipos de registro do V2 em vez dos 4 do V1 (Despesa/Venda/Colheita/
+  Anotação). Ações no cabeçalho: Nova anotação (fazenda+talhão pré-selecionados) e Encerrar
+  safra (mesmo modal da Tela 2).
+- **Tela 4 (`nova-anotacao-v2.html`):**
+  - **Tipo de registro** renomeado de "Tipo de anotação" (V1), com "Anotação" como 1º card
+    (pedido explícito), seguido de "Aplicação de insumo" (renomeado de "Venda", mudança de
+    comportamento completa — não é mais uma venda comercial, é o registro de um insumo aplicado
+    no talhão) e "Despesa manual".
+  - **Anotação:** Título (novo campo, texto livre) + Descrição (renomeada de "Observação").
+  - **Aplicação de insumo:** Produto via combobox-com-busca (`initProductCombobox`, novo —
+    input de texto + menu filtrado em `position:fixed`, mesmo espírito do combobox de Produto já
+    usado em Estoque/Contas a Pagar, mas construído do zero pra esta tela por não compartilhar
+    JS entre telas) sobre `window.NiveloProdutos.list()`; Quantidade; Unidade sempre auto-
+    preenchida a partir do Produto (`disabled`, nunca escolhida, mesma regra já estabelecida em
+    Estoque); Depósito via `Dropdown` só com `window.NiveloLocais.list()` filtrado por `ativo`
+    (nunca cria um depósito novo inline aqui, ao contrário de outras telas do sistema que
+    permitem isso); Custo calculado (`disabled`, recalculado ao vivo a cada tecla em Produto/
+    Quantidade) via `window.NiveloCadernoV2.getCustoMedioBySku()`, que lê o `custoMedio` real de
+    `window.NiveloEstoqueUsoV2` quando o produto tem entrada ali (fallback `0` caso contrário,
+    documentado no código — nem todo produto do catálogo tem uma compra registrada no Estoque de
+    Uso V2 ainda).
+  - **Despesa manual:** Categoria (`Dropdown` novo, exatamente Serviço/Frete/Outro, como pedido)
+    + Valor (R$, mesma máscara de centavos já usada em todo o sistema) + Observação (opcional) —
+    mantendo os campos de valor/data já existentes no conceito de Despesa do V1.
+  - **Colheita (4º tipo, ver decisão acima):** Produto (`Dropdown`, só `categoria==='Grãos'`,
+    ativos) + Quantidade + Unidade (auto, `disabled`) — pré-seleciona o produto cujo nome bate
+    com `talhao.cultura`, mesma conveniência que o V1 tinha pra Cultura (só um default, o
+    usuário pode trocar livremente).
+  - **Sigla de unidade sempre dinâmica por produto** (`UNIDADE_SIGLA`, mapa Saca→sc/Kg→kg/
+    Litro→L/Unidade→un) — nunca um "sc"/"kg" hardcoded fora desse único ponto, mesmo princípio
+    do card "Estoque de grãos" do Dashboard.
+- **`interface-principal.js`:** `NAV_DESTINATIONS['caderno-campo']` repontado de
+  `'caderno-de-campo.html'` pra `'caderno-de-campo-v2.html'` — essa ÚNICA linha já ativa a V2
+  como destino real do item "Caderno de campo" em toda tela com Sidebar completa, sem precisar
+  de mass-edit nas ~90 telas do sistema (o item de sidebar em si, `data-nav="caderno-campo"`, já
+  existia igual em todas). Nenhuma tela precisou ser editada além desta linha.
+- **`prototype-nav/nav.config.js`:** dentro da "Jornada · Caderno de Campo", o épico antigo
+  virou **"Caderno de Campo (V1)"** (rótulos internos das 4 telas também sufixados "(V1)" pra
+  desambiguar visualmente no navegador) e um novo épico **"Caderno de Campo (V2)"** foi
+  adicionado ANTES dele, com as 4 telas novas + variantes (`#state=empty`, sem talhões, talhão
+  não encontrado, sem talhão pré-selecionado em Nova anotação — demonstra o card de erro).
+- **Guard `hidden`+`display` aplicado preventivamente em todo CSS novo** (`.overlay[hidden]`,
+  `.talhoes-empty:not([hidden])`, `.anotacoes-empty:not([hidden])`, `.nova-anotacao-error-
+  card:not([hidden])`, `.nova-anotacao-subsection[hidden]`, etc.) — nenhum bug desta classe foi
+  necessário corrigir depois, por ter sido guardado desde a criação de cada arquivo, seguindo a
+  regra permanente já documentada dezenas de vezes neste arquivo.
+- **Mesma limitação de sempre, já documentada em todo o protótipo:** `caderno-v2-data.js` usa
+  `sessionStorage` (não `localStorage`) pros registros criados na sessão — sobrevivem à
+  navegação entre as 4 telas da mesma aba, mas não a uma sessão nova, mesmo padrão de
+  `caderno-data.js` (V1) e `fazendas-data.js`.
+
+Verificado ao vivo (servidor `http-server`, porta 8090, preserva query string/hash): fluxo
+completo Tela 1 → card de fazenda (Área total/KPIs corretos) → Tela 2 (sem card Safra, KPIs na
+ordem pedida, tabela de Talhões com Última Anotação + 3 ações) → Nova anotação nos 4 tipos
+(Anotação/Aplicação de insumo — combobox de Produto, Unidade auto "L", Depósito só com opções
+reais, Custo calculado recalculando ao vivo/Despesa manual — Categoria fixa Serviço-Frete-Outro/
+Colheita — Produto pré-selecionado pela cultura do talhão, Unidade auto "sc") → volta pro Talhão
+certo com o registro novo no histórico e o toast de sucesso; validação bloqueando submit sem
+talhão selecionado (formulário genuinamente escondido, não só desabilitado) e por tipo (bordas
+vermelhas nos campos obrigatórios, sem navegar); "Encerrar safra" com confirmação real, limpando
+cultura/safra e voltando o talhão pra "Disponível" (testado na tabela da Tela 2 e no cabeçalho
+da tela "Ver detalhes"); mobile (375px): tabela de Talhões vira Cards sem overflow horizontal
+(`scrollWidth` igual à viewport); navegação real a partir da Sidebar (Dashboard → Caderno de
+campo → V2); V1 (`caderno-de-campo.html` e as demais 3 telas) confirmado intocado e ainda
+funcional, acessível só pelo `prototype-nav`; nenhum erro de console real em nenhuma das 4 telas
+novas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo o sistema).
+
 ## Storybook
 Sempre usar `Storybook-Nivelo/` — nunca `Storybook/`.
 
@@ -4320,10 +4547,12 @@ Desativar (botão vermelho) e o ciclo completo (badge Ativo→Inativo, ícone do
 | Estoque (listagem + Novo registo + Detalhes) | **Done (round 24, 2026-07-27)** — 3 modais de ação reais (saída/consumo/abatimento), página de detalhes nova com histórico/timeline. Ver "Ajustes round 24" acima |
 | Produtos (listagem + cadastro/edição) | **Nova (round 26, 2026-07-28)** — Done. Cadastro central de Produtos, registrado na journey "Jornada · Cadastro" no `prototype-nav`. Ver "Ajustes round 26" acima |
 | Fazendas (Configuração > Cadastro de fazenda) | **Done (rounds 28-37, 2026-07-29)** — listagem em cards (round 28) + Detalhe da fazenda CADASTRAL (`fazenda-detalhe-cadastro.html`, rounds 30-33 — 2 cards de consulta + tabela de talhões padrão + toggle Ativar/Desativar com confirmação) + wizard de **Cadastro de Nova Fazenda** em 3 etapas (`nova-fazenda.html`, rounds 35-37 — Nome/Código/Proprietário/CNPJ obrigatório na Etapa 1; Localização em campos separados + Área total/agricultura com máscara de milhar e validação cruzada na Etapa 2; Talhões opcional na Etapa 3). Cadastro concluído persiste via sessionStorage e redireciona pra `fazendas.html` (fix round 36 — antes ia pro Detalhe e mostrava "não encontrada"), com toast de sucesso lá (também disponível como variante standalone `#state=created`, round 37). Padrão de erro de input (só borda vermelha, nunca fundo) fixado no round 37 e é o padrão oficial desta tela pra próximos ajustes. "+ Nova fazenda"/"Ver fazenda" navegam de verdade; edição da fazenda em si (não a criação) ainda é flash-disable. Registrada na journey "Jornada · Configuração" no `prototype-nav` (épico "Fazendas": Fazendas → Detalhe de Fazenda → Nova fazenda, com 7 variantes de step/state). Ver "Ajustes round 28/30-37" acima |
-| Detalhe da fazenda — operacional (Caderno de Campo) | **Nova (round 29, 2026-07-28; recategorizada round 30)** — Done, mesma tela `fazenda-detalhe.html` do round 29 (Resumo 4 indicadores + lista de Talhões clicável), sem nenhuma mudança de conteúdo. Só a entrada de navegação mudou: agora vive na "Jornada · Caderno de Campo" no `prototype-nav` (não mais em Configuração). Resto da jornada Caderno de Campo (seleção de fazenda/talhão etc.) ainda não existe. Ver "Ajustes round 30" acima |
+| Detalhe da fazenda — operacional (Caderno de Campo) | **V1: Nova (round 29, 2026-07-28; recategorizada round 30).** `fazenda-detalhe.html` preservada 100% intacta, acessível só via "Jornada · Caderno de Campo (V1)" no `prototype-nav` — não é mais o destino real da Sidebar. **V2 (round 86, 2026-08-31): é a versão real do produto agora.** Ver seção própria "Caderno de Campo V2" abaixo e "Ajustes round 86". |
 | Categorias de receitas e despesas (Configuração) | **Nova (round 38, 2026-07-30)** — Done. Listagem (`categorias-financeiras.html`, tabela+Agrupamento de Filtros+Cards mobile, sem paginação) + cadastro/edição (`nova-categoria-financeira.html`, Dados básicos/Configuração do DRE/Configuração do LCDPR/Competência). Exclusão bloqueada (mock `emUso`) quando a categoria já está vinculada a lançamentos. Classificação específica do LCDPR deliberadamente não implementada ainda (estrutura de dado preparada, sem inventar opções). Ver "Ajustes round 38" acima |
 | Notas fiscais (Vendas) | **Nova (round 40, 2026-07-31)** — Done. Central de Notas Fiscais (`notas-fiscais.html`, tabs Saída/Entrada com colunas próprias, busca+Período+Status incl. Rejeitadas) + fluxo de Nova Nota Fiscal (`nova-nota-fiscal.html`, só saída estruturada: Emitente/Destinatário/Itens/Pagamento/Categoria/Transporte/Natureza da operação com CFOP/Observação), com visualização/correção via `?numero=&modo=ver\|corrigir`. Bloqueio de emissão sem Certificado Digital cadastrado (Dialog explicativo, fechável). Certificado Digital continua como tela de configuração não construída (stub de dado); Natureza de Operação/RF402 ganhou tela real no round 51 (ver abaixo). Ver "Ajustes round 40" acima |
-| Caixa (Financeiro) | **Nova (round 43, 2026-07-31)** — Done. Listagem (`caixa.html`, tabela padrão+busca+Agrupamento de Filtros com Período/Categoria+paginação real 10/página+Cards mobile) + fluxo de Incluir Lançamento (`novo-lancamento-caixa.html`: Código auto/Banco/Categoria/Tipo Entrada-Saída-Saldo/Data/Valor/Histórico/Competência opcional/Cliente ou Fornecedor opcional). Sem coluna Ações (não pedida). Banco vem de um stub novo (`bancos-data.js`), antecipando a futura Configuração > Conta bancária. Regras de negócio mais profundas (saldo automático, conciliação) deliberadamente não implementadas, só a estrutura visual/de navegação pedida. Ver "Ajustes round 43" acima |
+| Caixa (Financeiro) | **V1: Nova (round 43, 2026-07-31)** — preservada 100% intacta, acessível só via "Jornada · Financeiro" épico "Caixa (V1)" no `prototype-nav`, não é mais o destino real da Sidebar. **V2 (round 90, 2026-08-31): é a versão real do produto agora.** Ver "Ajustes round 90" abaixo |
+| Contas a Pagar (Financeiro) | **V1: Nova (round 45, 2026-07-31)** — preservada 100% intacta, acessível só via "Jornada · Financeiro" épico "Contas a pagar (V1)" no `prototype-nav`, não é mais o destino real da Sidebar. **V2 (round 91, 2026-08-31): é a versão real do produto agora.** Abas Todas/Em aberto/Pagas, Descrição/Valor original/Pago/Saldo, só 3 status, só a ação Registrar pagamento (página própria com Histórico de Pagamentos em accordion + separação principal×juros×desconto). Ver "Ajustes round 91" abaixo |
+| Contas a Receber (Financeiro) | **V1: Nova (round 65, 2026-08-04)** — segue disponível/intacta em `contas-a-receber.html`. **V2 reescrita por completo (round 92, 2026-08-31), espelhando a arquitetura de Contas a Pagar V2** — é a versão real do produto agora. Abas Todas/Em aberto/Recebidas, Cliente/Descrição/Documento-NF/Vencimento/Status/Valor original/Recebido/Saldo, só 3 status, só a ação Registrar recebimento (página própria com Histórico de recebimentos em accordion + separação principal×juros×desconto, Conta de entrada = Contas Financeiras). Ver "Ajustes round 92" abaixo |
 | Canal de Ideias | **Nova (round 50, 2026-08-03)** — Done. Comunidade de sugestões: feed (`canal-ideias.html`, busca+ordenação+chips de categoria+cards com voto inline), detalhe (`ideia-detalhe.html`, coluna única, sem sidebar de conteúdo, comentários), criação (`nova-ideia.html`, página simples de 3 campos). 3 componentes novos no Storybook (`Avatar`/`Chip`/`VoteButton`). Sem status/aprovação/backlog/priorização, por instrução explícita — só espaço colaborativo. Ver "Ajustes round 50" acima |
 | Contas Bancárias (Configuração > Conta bancária) | **Done (round 56, 2026-08-03; corrigido round 59, 2026-08-04)** — Listagem (`contas-bancarias.html`, busca+ordenação+paginação+Excluir REAL com confirmação) + cadastro/edição (`nova-conta-bancaria.html`, Código auto-increment+Banco (catálogo real)+Descrição+Agência/Conta com máscara+Conta Financeira). "Conta Financeira" referenciava um stand-in (Categorias de receitas e despesas) até o round 59, quando a entidade real (`contas-financeiras.html`) foi construída e o vínculo corrigido. Migrou a fonte do campo Banco de Caixa do stub antigo (`bancos-data.js`) pro catálogo real. Ver "Ajustes round 56/59" acima |
 | Conta Financeira (Configuração > Conta Financeira) | **Nova (round 59, 2026-08-04)** — Done. Listagem (`contas-financeiras.html`, busca por Código/Nome+ordenação (Código como padrão)+paginação+Excluir bloqueado quando vinculada a Caixa/Conta Bancária, com mensagem explicando o motivo) + cadastro/edição (`nova-conta-financeira.html`, só Código auto-increment readonly+Nome único). Usada pra gerar o DRE (preparação de dados, sem tela de relatório ainda) e como novo campo obrigatório em todo lançamento de Caixa. Ver "Ajustes round 59" acima |
@@ -5037,3 +5266,709 @@ clique num item carrega a conversa certa (texto e áudio); envio de texto reconh
 E o fallback de assunto não suportado; player de áudio animando a barra de progresso pela duração
 correta; gravação de voz (start/stop) criando a mensagem e recebendo a resposta padrão; nenhum
 erro de console em nenhum dos 2 fluxos testados.
+
+## Ajustes 2026-08-31 (round 87) — V2 Caderno de Campo: Histórico de Safras do
+Talhão, KPIs novos e "Encerrar safra" fechando o histórico de verdade
+
+Pedido pontual só em `talhao-detalhe-v2.html` (tela "Ver detalhes" de um talhão, Jornada ·
+Caderno de Campo V2, criada no round 86) — nenhuma outra tela V2 nem nenhuma tela V1 foi tocada,
+exceto o `encerrarSafraTalhao` compartilhado descrito abaixo (que também precisou de um ajuste
+mínimo em `fazenda-detalhe-caderno-v2.js`, mesmo botão "Encerrar safra" do round anterior).
+
+- **Cabeçalho:** novo subtítulo `.talhao-detalhe-subtitle` logo abaixo do título, formato
+  "Cultura · Safra 2026/27 · 80 ha" (ou "Sem cultura · 80 ha" quando o talhão não tem plantio
+  ativo) — área sempre presente, cultura/safra condicionados a haver `talhao.cultura`. Não existia
+  nenhum subtítulo ali antes (só a linha separada "🚜 Nome da fazenda" abaixo).
+- **KPIs renomeados:** "Custo registrado" → **"Custo acumulado"**, "Cultura" → **"Cultura
+  atual"** (mesmos nomes já usados em `fazenda-detalhe-caderno-v2.js`, pra manter os dois níveis
+  de KPI com vocabulário consistente).
+- **3 KPIs novos, reaproveitando o MESMO card de KPI já usado nesta tela** (`.talhao-resumo-card`,
+  sem `@media(min-width)` de aumento de fonte, já "mesmo tamanho em qualquer largura" desde a
+  criação, regra do round 55):
+  - **Produtividade** (`total colhido ÷ áreaHa`, ex. "15 kg/ha") e **Custo / hectare**
+    (`custoAcumulado ÷ áreaHa`) e **Custo / [unidade]** (`custoAcumulado ÷ total colhido`, ex.
+    "R$ 48,20/kg") — todos "unit-aware", nunca um "sc" hardcoded fora do único ponto que lê a
+    unidade real do produto colhido (mesmo princípio já usado no card "Produção registrada" desta
+    mesma tela desde o round 86, e no Dashboard).
+  - **Decisão de rótulo, documentada no código:** o pedido usava "Custo / saca" (palavra cheia) no
+    texto do exemplo, mas o valor do mesmo exemplo já abreviava pra "R$ 48,20/sc". Pra não ter
+    dois vocabulários diferentes pra unidade dentro do mesmo card, o rótulo também usa a sigla
+    (`Custo / sc`, `Custo / kg`, `Custo / L`), igual ao valor e igual à Produtividade
+    ("15 kg/ha"). Sem produção registrada, cai no rótulo padrão `Custo / sc` (produto de Grãos
+    mais comum do catálogo) com valor "—".
+  - **Reordenação dos 9 KPIs em 3 linhas de 3, por hierarquia** (status/contexto → produção →
+    custo), pedido explícito: Área/Cultura atual/Safra (linha 1, inalterada) → Produtividade/
+    Produção registrada/Anotações (linha 2) → Custo acumulado/Custo por hectare/Custo por
+    unidade (linha 3, nova).
+- **Nova seção "Histórico de Safras do Talhão"**, posicionada DEPOIS de "Registros do Caderno"
+  (pedido explícito de ordem). Tabela real (`.table`/`.tr`/`.td`, mesma cópia visual de Estoque/
+  Talhões) a partir de 768px, Cards abaixo disso (`.historico-safra-mobile-card`) — mesma
+  arquitetura "Tabela → Cards no mobile" da tabela de Talhões em
+  `fazenda-detalhe-caderno-v2.js`/`page-fazenda-detalhe-caderno-v2.css`, replicada 1:1 (guard
+  `display:none` + `:not([hidden])` no wrap desktop desde a criação, sem precisar corrigir depois).
+  Colunas: Safra | Cultura | Período | Status.
+  - **Status:** badge real (`.badge`/`data-status`), `data-status="success"` pra "Em produção"
+    (mesmo token de "Em produção" do badge de status do talhão no cabeçalho) e `data-status="info"`
+    pra "Encerrada" (mesmo token neutro/fechado já usado em "Disponível" no resto do sistema).
+  - **Período:** "Xm Yd" (meses+dias, ex. "3m 30d"), calculado por `formatPeriodo(dataInicio,
+    dataFim)` (novo helper em `talhao-detalhe-v2.js`, aritmética de calendário com borrow de mês
+    quando o dia final é menor que o inicial). A safra ainda ativa usa `TODAY` como `dataFim`
+    (mesma data de referência fixa `'2026-07-31'` já usada em `contas-pagar-data.js`/`dre.js`/
+    etc., nunca `new Date()` — reexportada por `window.NiveloFazendas.TODAY` pra não duplicar o
+    literal em mais um arquivo).
+- **Decisão de modelo de dados (documentada no código, `fazendas-data.js` e
+  `talhao-detalhe-v2.js`): a safra CORRENTE não é duplicada em `historicoSafras`.** Os campos
+  flat `talhao.cultura`/`talhao.safra` (+ um novo `talhao.safraInicio`, data de início da safra
+  em curso) continuam sendo a ÚNICA fonte de verdade da safra ativa — exatamente como o round 86
+  já deixou (Fazenda/Talhão/Cultura/Safra de `nova-anotacao-v2.html` continuam lendo só daí,
+  nenhuma mudança nesse ponto, verificado ao vivo que a regressão não aconteceu).
+  `talhao.historicoSafras` (array novo) guarda só as safras JÁ ENCERRADAS. A linha "Em produção"
+  da tabela é sintetizada em memória a cada render (`buildHistoricoSafras()`), nunca persistida
+  como um registro próprio — evita a fonte de verdade duplicada/podendo divergir que a alternativa
+  (guardar a safra atual também dentro do array) introduziria.
+  - Seed: cada um dos 17 talhões das 3 fazendas ganhou 1 entrada histórica (`2025/26`, sempre
+    `Encerrada`) mais `safraInicio` pros talhões com cultura ativa no seed (datas plausíveis por
+    cultura: cana em torno de abril, café em torno de abril, grãos anuais em maio/junho).
+- **"Encerrar safra" agora fecha o histórico de verdade, não só limpa os campos flat.** A ação já
+  existia desde o round 86 (2 cópias de UI: tabela de Talhões em `fazenda-detalhe-caderno-v2.js` e
+  o cabeçalho desta tela), mas cada cópia mutava `talhao.cultura`/`safra`/`status` direto, sem
+  registrar nada em `historicoSafras` (que nem existia ainda). Extraído um `encerrarSafraTalhao
+  (fazendaId, talhaoId)` NOVO em `fazendas-data.js` (camada de dados, já importada pelas duas
+  telas) que: empurra `{safra, cultura, dataInicio: talhao.safraInicio, dataFim: TODAY, status:
+  'Encerrada'}` pra `historicoSafras` (só se `talhao.cultura` existir, senão é no-op) e SÓ DEPOIS
+  limpa `cultura`/`safra`/`safraInicio` e volta `status` pra `'disponivel'`. As duas telas
+  chamam essa única função em vez de duplicar a regra de negócio. **Isso não fere a convenção
+  "sem JS compartilhado entre páginas"** do sistema (já documentada dezenas de vezes) — essa
+  convenção é sobre lógica de UI/DOM de cada tela, não sobre mutação de um catálogo de dados
+  central que as duas já importam via `<script>` de qualquer forma.
+  - **Mesma limitação de sempre, sem mudança:** a mutação continua só em memória (não usa
+    `persistEdit`/sessionStorage, igual ao comportamento já existente desde o round 86) — uma
+    navegação real de página (não uma troca de hash) perde o encerramento. Documentado no código,
+    não é uma regressão desta rodada.
+- **Guard `hidden`+`display` aplicado preventivamente em todo CSS novo**
+  (`.historico-safras-table-wrap`/`.historico-safras-mobile-list`/`.historico-safras-empty`,
+  mesmos 3 seletores da tabela de Talhões) — nenhum bug desta classe precisou ser corrigido depois.
+
+Verificado ao vivo (servidor `http-server`, porta 8090): subtítulo do cabeçalho com área em
+talhões de culturas diferentes (Soja/Milho/Cana-de-açúcar); KPIs renomeados e os 3 novos
+corretos, inclusive um talhão cuja colheita é em `kg` (Santa Rita, Talhão 01, Cana-de-açúcar) em
+vez de `sc` (Produtividade "15 kg/ha", "Custo / kg" com o rótulo dinâmico certo) e um talhão sem
+nenhuma colheita registrada (Produtividade/Custo por unidade mostrando "—", Custo/hectare ainda
+calculado normalmente); Histórico de Safras renderizando a safra corrente como "Em produção" e a
+anterior como "Encerrada", Período batendo à mão em pelo menos 2 linhas (ex. 2026-06-01 até TODAY
+2026-07-31 = "1m 30d"; 2025-06-01 até 2026-05-15 = "11m 14d"); tabela real em 1280px, Cards em
+375px sem overflow horizontal (`scrollWidth` igual a `innerWidth`); "Encerrar safra" testado de
+ponta a ponta tanto no cabeçalho desta tela quanto na tabela de Talhões de
+`fazenda-detalhe-caderno-v2.html` (mesma função `encerrarSafraTalhao`), confirmando em ambos:
+toast de sucesso, talhão volta pra "Disponível", subtítulo vira "Sem cultura", e a linha da safra
+que estava "Em produção" passa a aparecer como "Encerrada" com o Período fechado em `TODAY`;
+`nova-anotacao-v2.html` confirmado sem regressão (Fazenda/Talhão/Cultura atual/Safra continuam
+`disabled readonly`); nenhum erro real de console (só os 404 de `/fonts/*.otf` já documentados
+como pré-existentes em todo o sistema).
+
+## Ajustes 2026-08-31 (round 88) — V2 Caderno de Campo: renomes de KPI, ordem/colunas
+da tabela de Talhões, card "Informações do talhão" e confirmação de Depósitos/Locais de Estoque
+
+Continuação direta dos rounds 86/87. Pedido em 4 itens sobre as 4 telas V2 já existentes
+(Caderno de Campo, Entrada na Fazenda, Nova Anotação, Detalhe do Talhão) + confirmação/ajuste
+da jornada Depósitos/Locais de Estoque, que já tinha sido construída por outra sessão em
+paralelo neste mesmo repositório (mencionado nos rounds 86/87 como trabalho concorrente). V1
+não foi tocado em nenhum arquivo.
+
+- **Tela 1 (`caderno-de-campo-v2.html`):** indicador "Produtividade" renomeado pra
+  **"Colheita"** (`caderno-de-campo-v2.js`) — o cálculo em si já era o TOTAL colhido por unidade
+  (unit-aware, `buildProdutividadeHTML`, já existia desde o round 86), só o rótulo estava
+  incorreto (sugeria uma média). Nenhuma lógica de agregação foi tocada. "Produtividade média",
+  "Despesa acumulada" e "Despesa média por hectare" confirmados intactos. "Área total" já
+  aparecia em cada card de fazenda desde o round 86 — confirmado, nenhuma mudança necessária.
+- **Tela 2 (`fazenda-detalhe-caderno-v2.html`):** KPI "Produção registrada" renomeado pra
+  **"Colheita"**. "Custo acumulado"/"Produtividade média"/"Cultura atual" confirmados mantidos
+  (nenhum dos dois fazia parte do pedido de remoção).
+  - **Tabela de Talhões: colunas reordenadas pra exatamente Talhão | Cultura atual | Safra
+    atual | Última Anotação | Status | Ações** (era Talhão | Área (ha) | Cultura | Safra |
+    Status | Última Anotação | Ações desde o round 86/87) — a coluna Área foi removida por
+    completo (não fazia parte da lista de colunas pedida desta vez) e "Cultura"/"Safra" viraram
+    "Cultura atual"/"Safra atual", batendo com o vocabulário já usado no resto do sistema (Nova
+    Anotação/Detalhe do Talhão). "Última Anotação" já vinha depois de Status desde o round 86 —
+    confirmado que precisava mesmo mudar de posição (agora antes de Status, como pedido).
+  - **Ações reordenadas pra Ver detalhes → Nova anotação → Encerrar safra** (era Nova anotação →
+    Encerrar safra → Ver detalhes desde o round 86) — mudança só de ordem de renderização em
+    `buildAcoesHTML()`, nenhum handler/ícone/tooltip alterado.
+  - `page-fazenda-detalhe-caderno-v2.css`: larguras de coluna (`nth-child`) recalculadas pras 6
+    colunas novas (era 7).
+- **Nova Anotação (`nova-anotacao-v2.html`):** revalidado item a item — sem opção de criar
+  anotação direta pra fazenda (form inteiro fica `hidden` sem `?fazenda=&talhao=` válidos, desde
+  o round 86, confirmado intacto); Fazenda/Talhão/Cultura atual/Safra sempre `disabled readonly`
+  (confirmado); "Tipo de anotação"→"Tipo de registro" e "Anotação" como 1ª opção (confirmados,
+  já corretos desde o round 86). **Único ajuste real: rótulo "Safra" → "Safra atual"** (campo
+  continua não editável, só o texto do `<label>` mudou).
+  - **Depósito em Aplicação de insumo, mudança real do pedido:** já estava correto desde o
+    round 86 — `deposito-menu` é populado só por `window.NiveloLocais.list().filter(l =>
+    l.ativo !== false)`, sem nenhum item "+ Adicionar novo depósito" (confirmado lendo
+    `nova-anotacao-v2.js` e inspecionando o `innerHTML` do menu ao vivo). Nenhuma mudança de
+    código foi necessária aqui — o pedido pedia pra "verificar e remover se houver", e não havia.
+- **Detalhe do Talhão (`talhao-detalhe-v2.html`):** mudança mais substancial dos 4 itens.
+  - **Novo card "Informações do talhão"** (`.talhao-info-card`, `dl`/`dt`/`dd` read-only, grid
+    1/2/4 colunas mobile/tablet/desktop — mesmo padrão já usado em outras telas de "dados
+    gerais", ex. LCDPR round 77), posicionado ACIMA do grid de KPIs, logo depois do cabeçalho.
+    Contém exatamente os 4 campos pedidos: Fazenda, Hectares, Cultura atual, Safra atual.
+  - **Removidos do cabeçalho:** o subtítulo "Cultura · Safra · Xx,x ha" (`#talhao-detalhe-
+    subtitle`, adicionado no round 87) e a linha separada "🚜 Nome da fazenda"
+    (`.talhao-detalhe-fazenda`) — as duas duplicavam informação que agora vive só no novo card.
+    CSS morto (`.talhao-detalhe-subtitle`/`.talhao-detalhe-fazenda`) removido de
+    `page-talhao-detalhe-v2.css` junto.
+  - **Removidos do grid de KPI:** os 3 cards redundantes "Área"/"Cultura atual"/"Safra" (1ª
+    linha do grid desde o round 86/87) — ficaram só no novo card. **Os demais KPIs foram
+    mantidos** (Produtividade, Produção registrada, Anotações, Custo acumulado, Custo/hectare,
+    Custo/un) por não serem redundantes com Fazenda/Hectares/Cultura/Safra — release explícito
+    no pedido ("Anotações registradas"/"Custo acumulado"/etc que não sejam redundantes
+    continuam"), documentado como decisão no código (`talhao-detalhe-v2.js`).
+  - **Confirmado, sem necessidade de mudança:** nenhum outro trecho do código lia
+    `resumo-area`/`resumo-cultura`/`resumo-safra` de volta do DOM — todos os cálculos
+    (Produtividade/Custo por hectare/Custo por unidade) já liam `currentTalhao.areaHa`/
+    `.cultura` direto do objeto de dados, nunca do elemento visual removido. `renderResumo()`
+    só escrevia nesses 3 elementos, nunca lia; a remoção não quebrou nenhum cálculo.
+  - Seção Anotações e Histórico de Safras do Talhão (round 87) preservadas sem nenhuma mudança,
+    confirmado ao vivo que a reorganização acima não afetou nenhuma das duas.
+- **Depósitos / Locais de Estoque (`depositos.html`/`novo-deposito.html`):** já construídas por
+  uma sessão paralela seguindo exatamente o spec pedido — auditado item a item, nenhum ajuste
+  de código foi necessário: subtítulo "Locais próprios ou de terceiros usados para armazenar
+  produtos da propriedade." (`depositos.html`); tabela com as colunas Nome/Tipo/Fazenda
+  Vinculada/Uso/Status/Ações; ações Editar (navega pra `novo-deposito.html?nome=`) + Ativar/
+  Desativar (reaproveitando `window.NiveloLocais.toggleAtivo()`, real, com modal de
+  confirmação); botão "Novo depósito" navegando pra `novo-deposito.html`. Formulário com
+  subtítulo "Cadastre um silo, cooperativa ou depósito de produtos.", campos Nome do local/Tipo
+  (Dropdown Silo próprio/Terceiro-cooperativa/Depósito de produtos)/Fazenda vinculada (Dropdown
+  de `window.NiveloFazendas.list()`, help text "Fazendas cadastradas em Configurações >
+  Fazendas e Talhões.")/Uso (Dropdown Produto de venda/Produtos de uso/Ambos)/Status (Dropdown
+  Ativo/Inativo, iniciando em Ativo ao criar — confirmado em `novo-deposito.js`, nunca reseta
+  pra Ativo em modo edição); botões Voltar/Salvar local. Já registradas em `nav.config.js`
+  (épico "Depósitos" dentro da Jornada · Configuração) e com `NAV_DESTINATIONS['config-
+  depositos'] = 'depositos.html'` em `interface-principal.js` — o item de sidebar "Depósitos"
+  (dentro de Configurações, dado que também já existia) já navega de verdade.
+- **Regra cross-cutting confirmada:** nenhuma tela V2 do sistema tem atalho de criação inline
+  de depósito — só o Dropdown de Aplicação de insumo (Nova Anotação V2) e o de Registrar
+  entrada/consumo (Estoque V2, fora do escopo deste pedido) consomem `window.NiveloLocais`,
+  nenhum dos dois com "+ Adicionar novo". Nenhuma tela V1 foi tocada — os atalhos de criação
+  inline que já existiam em telas V1 (ex. `novo-estoque.js`) continuam intocados.
+
+Verificado ao vivo (servidor `http-server`, porta 8090, preserva query string/hash): Tela 1 com
+"Colheita" mostrando o total por unidade (ex. "1.100 sc"/"1.200 kg") e "Área total" presente nos
+3 cards de fazenda; Tela 2 com "Colheita" renomeada e a tabela de Talhões com as 6 colunas na
+ordem exata pedida (Talhão | Cultura atual | Safra atual | Última Anotação | Status | Ações) e
+as 3 ações na ordem Ver detalhes → Nova anotação → Encerrar safra (confirmado lendo o texto
+renderizado da página, não só o HTML-fonte); Nova Anotação com "Safra atual" nos 4 campos de
+contexto não-editáveis e o Dropdown de Depósito confirmado (via `innerHTML` do menu) contendo só
+os 4 locais reais ativos, sem nenhum item de criação; Detalhe do Talhão com o novo card
+"Informações do talhão" acima dos KPIs (Fazenda/Hectares/Cultura atual/Safra atual) e o grid de
+KPI só com os 6 indicadores de desempenho/custo (sem Área/Cultura/Safra duplicados); mobile
+(375px) sem overflow horizontal em nenhuma das 4 telas tocadas (`scrollWidth` igual a
+`innerWidth` em todas); Depósitos/Novo depósito confirmados batendo com o spec sem necessidade
+de alteração de código; nenhum erro real de console em nenhuma das telas (só os 404 de
+`/fonts/*.otf` já documentados como pré-existentes em todo o sistema); V1 (`caderno-de-
+campo.html`/`fazenda-detalhe.html`/`talhao-detalhe.html`/`nova-anotacao.html`/`caderno-
+data.js`) confirmado 100% intocado nesta rodada.
+
+## Ajustes 2026-08-31 (round 89) — Estoque V2 (Uso + Comprometido mobile), Registrar
+Entrega V2, Dashboard (auditoria) e Pedidos de Venda (linha de Remessa)
+
+Continuação em paralelo dos rounds 86-88 (que cobriram Caderno de Campo V2 + Depósitos/Locais
+de Estoque, itens 1-4 de um pedido maior). Este round cobre os itens 5-9 do mesmo pedido, em 4
+telas independentes: Estoque V2, Registrar Entrega V2, Dashboard e Pedidos de Venda. Trabalho
+dividido em 4 sub-tarefas paralelas, cada uma verificada ao vivo com `http-server` antes de
+reportar.
+
+- **Estoque de Uso + Estoque Comprometido mobile (`estoque-v2.html`, item 5-6):** investigação
+  completa (não só leitura de código — inspeção via Browser tool/`getComputedStyle` em 375px e
+  1280px) não reproduziu NENHUM dos sintomas do pedido no estado atual do arquivo: a coluna
+  Unidade da aba "Estoque de Uso" já está presente e sem sobreposição de conteúdo, os ícones de
+  ação da aba Uso já aparecem corretamente no card mobile, o card mobile da aba "Estoque
+  Comprometido" já segue o mesmo padrão estrutural dos demais cards (Vendas/Compras/Uso), e o
+  rótulo da aba "Estoque comprometido" já quebra/exibe sem corte no mobile. Nenhuma mudança de
+  código foi necessária — tratado como confirmação, não como implementação nova. Nenhum arquivo
+  tocado.
+- **Registrar Entrega V2 (`registrar-entrega-estoque-v2.html`, item 7):** 3 mudanças reais.
+  - A tag "Estoque Comprometido" (`.estoquev2-tipo-tag`, já documentada no round 85) foi movida
+    pra ficar ao lado do nome do cliente, e esse bloco (nome+tag) posicionado abaixo do título
+    da tela — novo par de classes `.historicov2-title-block`/`.historicov2-subtitle-row`,
+    reaproveitando o mesmo padrão já usado pela tela irmã `historico-entrega-estoque-v2.html`
+    em vez de inventar um layout próprio.
+  - Status "Em aberto" (antes texto solto) passou a usar o componente real `.badge`/`.badgeDot`,
+    seguindo o mesmo mapa `SITUACAO_BADGE` já usado em `estoque-v2.js` pra badges de situação —
+    não um texto/cor inventados pra esta tela.
+  - Espaçamento entre a linha de KPIs e "Dados da entrega" aumentado de 16px pra 24px
+    (`--spacing-lg`), seguindo a mesma lógica já documentada pra `.mc-panel` (Minha Conta) de
+    dar mais respiro entre blocos de conteúdo distintos.
+  - Arquivos: `registrar-entrega-estoque-v2.html`, `registrar-entrega-estoque-v2.js`,
+    `page-registrar-entrega-estoque-v2.css`.
+- **Dashboard (`dashboard.html`, item 8) — auditoria confirmou que os 4 sub-pedidos já
+  estavam implementados em rounds anteriores, sem nenhuma mudança de código necessária:**
+  - Produção/Colheita (heading "Produção / Colheita", subtítulo "Últimas Safras", quantidade
+    produzida unit-aware nos destaques, linha "X ha · média Y sc/ha" abaixo do produto, tag de
+    safra tipo "Safra 2025/26" via `.badge`) — já presente.
+  - Estoque de grãos em sacas (unit-aware) — já implementado desde o round 49 (2026-08-03),
+    confirmado ainda correto.
+  - Contas a pagar/receber: "Vencidas" (não mais "Em atraso") em vermelho nos dois cards, sem
+    número solto em destaque, período futuro dinâmico ("Out/2026" em vez de "Seguinte",
+    calculado a partir da data de referência que o Dashboard já usa, nunca hardcoded) — já
+    presente.
+  - Clima: probabilidade de chuva por dia nos 5 dias de previsão — já presente.
+  - Nenhum arquivo tocado (`dashboard.html`/`page-dashboard.css`/`dashboard.js` só lidos, não
+    editados).
+- **Pedidos de Venda (`pedidos-de-venda.html`, item 9):** nova linha de exemplo `PV-0004`
+  (`tipo: 'remessa'`) adicionada ao seed de dados, vinculada ao pedido existente `PV-0002` via
+  novo campo `pedidoOrigemNumero`. Renderizada como legenda sob a célula Cliente/Destinatário
+  (`.pv-cell-vinculo`) indicando o vínculo com o pedido pai — reaproveitando literalmente a
+  mesma técnica já usada pra "Parcela N/M" em Contas a Pagar (`.ctp-cell-parcela`, round 45),
+  em vez de inventar um indicador novo (indentação, ícone, etc). Mesmas colunas/estilo de
+  célula da tabela original, sem quebra de alinhamento/responsividade. Dados fictícios, sem
+  nenhuma lógica de negócio nova de fato ligada a remessas. Arquivos: `pedidos-venda-data.js`,
+  `pedidos-de-venda.js`, `page-pedidos-de-venda.css`.
+
+Verificado ao vivo (servidor `http-server`, preserva query string/hash) em cada uma das 4
+telas, em 1280px e 375px: Estoque V2 (Uso e Comprometido) sem nenhum sintoma reproduzido —
+coluna Unidade, ícones de ação mobile, paridade visual do card Comprometido e rótulo da aba
+todos corretos via screenshot/`getComputedStyle`; Registrar Entrega V2 com a tag "Estoque
+Comprometido" ao lado do cliente e abaixo do título, badge real "Em aberto" e espaçamento de
+24px confirmado via `getBoundingClientRect`; Dashboard com os 4 itens (Produção/Colheita,
+Estoque de grãos, Vencidas em vermelho + período dinâmico, chuva %) confirmados presentes e
+corretos sem alteração; Pedidos de Venda com a linha `PV-0004` renderizando a legenda de
+vínculo com `PV-0002` em desktop e mobile, sem overflow horizontal. Nenhum erro real de console
+em nenhuma das 4 telas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo
+o sistema).
+
+## Ajustes 2026-08-31 (round 90) — Caixa V2: nova versão completa (Consolidado +
+Contas financeiras), V1 aposentado só pro navegador de protótipo
+
+Pedido grande: construir a V2 do Caixa, que passa a ser a versão do produto que a Sidebar real
+navega pra sempre a partir de agora. V1 (`caixa.html`, `novo-lancamento-caixa.html`,
+`transferencia-entre-contas.html`) foi preservada 100% intacta — nenhum arquivo tocado, nenhuma
+lógica alterada — e ficou acessível só pelo navegador de protótipo, dentro do novo épico "Caixa
+(V1)".
+
+- **Arquivos novos:** `app/screens/caixa-v2.html` + `page-caixa-v2.css` + `caixa-v2.js` (Tela
+  1, listagem com 2 abas); `app/screens/novo-lancamento-caixa-v2.html` +
+  `page-novo-lancamento-caixa-v2.css` + `novo-lancamento-caixa-v2.js` (Incluir Lançamento);
+  `app/screens/transferencia-entre-contas-v2.html` + `page-transferencia-entre-contas-v2.css` +
+  `transferencia-entre-contas-v2.js` (Transferência entre Contas).
+- **`caixa-data.js` (módulo compartilhado com V1) estendido de forma aditiva, nunca quebrado:**
+  ganhou `saldoPorContaFinanceira(codigo)` (soma entradas menos saídas de todos os lançamentos
+  vinculados a uma Conta Financeira — usada pela aba "Contas financeiras", pelo Resumo
+  financeiro de Incluir Lançamento V2 e pelo Saldo disponível de Transferência V2) e 2 campos
+  novos por lançamento: `notaFiscalNumero` (opcional, 3 lançamentos seed de venda de soja/milho
+  ganharam um número de demonstração) e `documento` (texto livre digitado no formulário V2).
+  Nenhum dos dois é lido por V1.
+- **Abas Consolidado × Contas financeiras (`Tab` real do Storybook, primeira vez usado nesta
+  tela):** texto de apoio abaixo das abas reforça a distinção pedida — Consolidado é "o que
+  aconteceu com o dinheiro" (extrato), Contas financeiras é "onde o dinheiro está distribuído"
+  (composição do MESMO saldo, nunca somado a ele).
+- **Consolidado:** colunas exatas Data/Descrição/Documento/Conta/Entrada/Saída/Saldo — "Histórico"
+  virou "Descrição", "Banco" virou "Conta" (agora mostra o nome da Conta Financeira, não mais o
+  texto livre de banco). Removidas Cliente/Fornecedor/Categoria/Tipo/Valor; Entrada/Saída são 2
+  colunas separadas (cada lançamento preenche só uma, a outra mostra "—"), verde/vermelho via os
+  mesmos tokens semânticos já usados (`--color-status-success-fg`/`-error-fg`). **Saldo é o saldo
+  ACUMULADO linha a linha** (`computeConsolidado()` em `caixa-v2.js`: ordena TODOS os lançamentos
+  cronologicamente asc pra calcular a soma corrida, grava o valor em `_saldoAcumulado` por
+  lançamento, só DEPOIS inverte pra exibir do mais recente pro mais antigo — reordenar por outra
+  coluna não recalcula esse valor, só reordena a lista, mesmo princípio de "saldo é uma foto do
+  momento" já usado no LCDPR). Documento: mostra o texto livre digitado em Incluir Lançamento V2
+  quando existe, senão "NF-e <número>" (campo aditivo `notaFiscalNumero`), senão "Extrato".
+  Filtro "Banco" do V1 virou filtro "Conta" (mesmo mecanismo, populado a partir de
+  `NiveloContasFinanceiras` em vez dos valores de texto livre únicos do dataset). Busca,
+  Agrupamento de Filtros (Período+Conta), ordenação de colunas, paginação (10/página), Cards no
+  mobile e Exportar Excel preservados do V1, adaptados pras novas 7 colunas.
+- **Contas financeiras — decisão de fonte de dados, documentada no código:** o pedido especificou
+  a fonte como `contas-financeiras-data.js` (Código+Nome, o plano de contas de Configuração >
+  Conta Financeira) — só que essa entidade não modela banco/número de conta reais (isso é
+  `contas-bancarias-data.js`, uma entidade diferente, com múltiplas contas bancárias podendo
+  apontar pra uma mesma Conta Financeira). Seguido o pedido literalmente: "Banco" mostra o nome
+  da Conta Financeira; "Conta" mostra um número mascarado SINTÉTICO gerado deterministicamente a
+  partir do código (`maskedContaNumero()`, ex. "•••• 5523") — decisão explícita de não inventar
+  uma 2ª fonte nem misturar com Contas Bancárias. Saldo de cada linha via
+  `NiveloCaixa.saldoPorContaFinanceira()`; linha de Total no rodapé soma todas as 4 linhas.
+  **Confirmado ao vivo que a soma bate exatamente com o Saldo Atual do Consolidado**
+  (R$ 125.941,00 nos dois lugares) — mesma fonte de dados, só reparticionada.
+- **Incluir Lançamento V2:** subtítulo novo ("Registre uma entrada ou saída..."); campo "Código"
+  removido por completo (não era mais um dado real, só um preview cosmético no V1); 1ª linha
+  Data (auto-preenchida com `TODAY='2026-07-31'`, mesma constante fixa de `contas-pagar-data.js`
+  — nunca `new Date()`, usuário pode alterar) + "Tipo de movimento" (renomeado de "Tipo"); 2ª
+  linha "Contas financeiras" (renomeado de "Banco", fonte real `NiveloContasFinanceiras`, help
+  text "Contas cadastradas em Configurações → Contas Financeiras") + Valor; 3ª linha Categoria
+  Financeira + Documento (novo, texto livre opcional); "Histórico" virou "Descrição".
+- **Resumo financeiro do lançamento (novo):** `dl` de conferência com Saldo atual da conta
+  selecionada, Entrada ou Saída (rótulo e valor mudam conforme o Tipo escolhido), Novo saldo
+  estimado (saldo atual ± valor) e Tipo de movimento — `updateResumo()` roda a cada mudança de
+  Conta financeira/Tipo/Valor (dropdown `onChange` + `input` do campo de valor). Confirmado ao
+  vivo: conta com saldo R$ 107.241,00 + Entrada de R$ 100,00 → Novo saldo R$ 107.341,00.
+- **Aviso de duplicidade (novo):** `Feedback` real (`.alert.info`, fica sempre visível, não é um
+  toast) com o texto exato pedido, só a mensagem (sem título), pra não competir visualmente com
+  o resto do formulário.
+- **Nota para desenvolvimento:** comentário HTML (não renderizado) com o texto exato pedido sobre
+  o que acontece ao salvar (movimenta a Conta Financeira, aparece no Caixa/Livro Caixa, aplica
+  classificação/competência da categoria quando configurada pro DRE).
+- **Transferência entre Contas V2:** "Valor" → "Valor da transferência", "Histórico" → "Descrição"
+  (só rótulos, comportamento/fonte de dados — `NiveloContasBancarias` — intactos). Bloco novo
+  "Saldo disponível"/"Novo saldo estimado" (`dl` com fundo `--color-bg-subtle`) aparece só depois
+  da Conta de origem ser escolhida, recalculado a cada mudança de Origem/Valor via
+  `NiveloCaixa.saldoPorContaFinanceira(contaOrigem.contaFinanceiraCodigo)`.
+- **Bug real encontrado e corrigido ao vivo, nas 2 telas de formulário (Incluir Lançamento V2 e
+  Transferência V2), herdado da estrutura de V1 (não visível lá porque nunca tinha sido
+  verificado visualmente, só via leitura de código):** `Input.module.css`'s `.errorText` tem
+  `display:flex` incondicional — o guard existente (`.wrapper .errorText{display:none}`) só
+  cobre campos dentro de `.wrapper` (Input/Dropdown), nunca campos de `DatePicker` (`.dpRoot`,
+  usado pelo campo Data nas 2 telas). Sem o guard, a mensagem de erro da Data ficava SEMPRE
+  visível, mesmo com o campo preenchido — confirmado via `getComputedStyle` (`display:flex`
+  mesmo com `TODAY` já preenchido). Corrigido com o mesmo padrão em `page-novo-lancamento-
+  caixa-v2.css`/`page-transferencia-entre-contas-v2.css`: `.dpRoot .errorText{display:none}` +
+  `.dpRoot.error .errorText{display:flex}`. Fix aplicado só nas 2 telas V2 (V1 não foi tocado).
+- **`interface-principal.js`:** uma linha em `NAV_DESTINATIONS`
+  (`'financeiro-caixa': 'caixa-v2.html'`) ativa a V2 como destino real do item "Caixa" em toda
+  tela com Sidebar completa, sem precisar de mass-edit — o item de sidebar em si já existia
+  igual em todas as telas.
+- **`prototype-nav/nav.config.js`:** dentro da "Jornada · Financeiro", o épico "Caixa" virou
+  **"Caixa (V1)"** (rótulos internos das 3 telas também sufixados "(V1)") e um novo épico
+  **"Caixa V2"** foi adicionado ANTES dele, com as 3 telas novas (Caixa com variante "Aba Contas
+  financeiras", Incluir Lançamento, Transferência entre Contas).
+- **Mesma limitação de sempre, já documentada em todo o protótipo:** sem `localStorage`, um
+  lançamento/transferência criado numa das 2 telas de formulário só existe durante a sessão de
+  JS daquela página — ao redirecionar pra `caixa-v2.html`, o script daquela tela recarrega os
+  dados seed do zero. O toast de sucesso aparece corretamente; a operação em si não persiste na
+  listagem (mesmo comportamento de V1 e da maioria dos módulos do sistema).
+
+Verificado ao vivo (servidor `app-preview`/`http-server`, porta 8090, preserva query string/
+hash): Consolidado com os 30 lançamentos seed (Total de Entradas R$ 200.400,00/Total de Saídas
+R$ 74.459,00/Saldo Atual R$ 125.941,00), saldo acumulado linha a linha conferido manualmente
+(cada linha soma exatamente entrada−saída da anterior), coluna Documento mostrando "NF-e 12401"
+nos lançamentos com número vinculado e "Extrato" nos demais; aba Contas financeiras com as 4
+contas somando R$ 125.941,00 (idêntico ao Saldo Atual do Consolidado); busca ("soja" isolando 7
+linhas) e ordenação (coluna Saldo ascendente confirmada via `dataset.saldo`) funcionando; Cards
+no mobile (375px, tabela `display:none`/cards `display:flex`, sem overflow horizontal) nas duas
+abas; Incluir Lançamento V2 sem o campo Código, Data auto-preenchida com `TODAY`, aviso de
+duplicidade visível, Resumo financeiro recalculando ao vivo (Entrada de R$ 100,00 numa conta com
+R$ 107.241,00 → Novo saldo R$ 107.341,00), submit completo salvando via `NiveloCaixa.add()` e
+redirecionando com toast "Lançamento salvo com sucesso."; Transferência V2 com os rótulos
+renomeados e o bloco Saldo disponível/Novo saldo estimado aparecendo só após escolher a Conta de
+origem e recalculando corretamente (R$ 107.241,00 − R$ 5.000,00 = R$ 102.241,00), submit
+completo criando os 2 lançamentos (saída+entrada) e redirecionando; bug do `.errorText` da Data
+corrigido e confirmado nas 2 telas; nenhum erro real de console em nenhuma das 3 telas (só os
+404 de `/fonts/*.otf` já documentados como pré-existentes em todo o sistema); V1 (`caixa.html`,
+`novo-lancamento-caixa.html`, `transferencia-entre-contas.html`) confirmado intocado.
+
+## Ajustes 2026-08-31 (round 91) — Contas a Pagar V2: abas, Descrição/Pago/Saldo, status
+simplificado, Registrar pagamento como página própria com principal × juros × desconto
+
+Pedido grande: construir a V2 de Contas a Pagar, que passa a ser a versão que a Sidebar real
+navega pra sempre a partir de agora. V1 (`contas-a-pagar.html`, `nova-conta-pagar.html`,
+`detalhe-conta-pagar.html`) foi preservada 100% intacta — nenhum arquivo tocado — e ficou
+acessível só pelo navegador de protótipo, dentro do novo épico "Contas a pagar (V1)". Mesmo
+padrão exato já usado em Contas a Receber V1/V2 e Caixa V1/V2 (faixa de versão com link "Ver
+versão anterior (V1)", épico V2 antes do V1 relabeled no `prototype-nav`).
+
+- **Arquivos novos:** `app/screens/contas-a-pagar-v2.html` + `page-contas-a-pagar-v2.css`
+  (delta sobre `page-contas-a-pagar.css`, mesma técnica de Contas a Receber V2) +
+  `contas-a-pagar-v2.js` (listagem); `app/screens/nova-conta-pagar-v2.html` +
+  `page-nova-conta-pagar-v2.css` (delta sobre `page-nova-conta-pagar.css`) +
+  `nova-conta-pagar-v2.js` (formulário); `app/screens/registrar-pagamento-conta-pagar-v2.html`
+  + `page-registrar-pagamento-conta-pagar-v2.css` + `registrar-pagamento-conta-pagar-v2.js`
+  (nova página própria, não mais modal). Novo módulo de dados
+  `app/shared/contas-pagar-v2-data.js` (`window.NiveloContasPagarV2`), independente de
+  `window.NiveloContasPagar` (V1), mesma convenção de coexistência já usada em
+  `contas-receber-v2-data.js`.
+- **Modelo de dados V2, estrutura nova (não reaproveita o shape da V1):** cada título guarda
+  `valorOriginal` (nunca alterado por pagamento) + `pago` (soma só do PRINCIPAL já pago) +
+  `pagamentos[]` (array de eventos imutáveis, cada um com `valorPago`/`juros`/`desconto`/
+  `totalSaida`/`saldoApos`/`contaFinanceiraCodigo`) — `saldoPrincipal` é sempre DERIVADO
+  (`valorOriginal - pago`), nunca gravado. Só 3 status (`em-aberto`/`vencida`/`paga`, pedido
+  explícito, contra os 5 da V1) — `refreshStatuses()` recalculado a cada `list()`, mesmo
+  princípio de auto-flip pra "vencida" já usado em toda conta a pagar/receber do sistema.
+- **Regra de negócio central, documentada em detalhe no topo do arquivo de dados (pedido
+  explícito, exemplo literal do usuário: "compra de R$ 5.000,00 gera 5 títulos"):** uma conta
+  parcelada é UMA compra/origem que gera N títulos individuais vinculados por
+  `grupoParcelamento` (mesmo mecanismo já usado na V1), cada um pagável separadamente. À vista
+  gera só 1 título. **Separação principal × juros × desconto:** "Valor pago" (informado no
+  pagamento) reduz o principal 1:1; juros/acréscimos NUNCA reduzem o principal; desconto também
+  não reduz o principal nesta modelagem — só entra no cálculo do dinheiro que sai do banco
+  (`totalSaida = valorPago + juros − desconto`, fórmula pedida literalmente). Pagamento parcial
+  nunca encerra a conta (só quando `saldoPrincipal` chega a zero ela vira `paga`). Conta
+  bancária/financeira NUNCA é pedida no cadastro da obrigação — só no momento do pagamento
+  (`registrarPagamento()`), que também gera um lançamento de SAÍDA real em `window.NiveloCaixa`
+  no valor do `totalSaida` (fluxo completo pedido: Caixa/Livro Caixa atualizados de verdade).
+- **Listagem V2:** 3 abas (`Tab` real, primeira vez usado nesta jornada) — "Todas"/"Em
+  aberto"/"Pagas", onde "Em aberto" agrupa `em-aberto` E `vencida` (ambos ainda devidos, decisão
+  documentada no código: as 3 abas cobrem os 3 status sem sobreposição). Tabela: Fornecedor,
+  **Descrição** (era "Histórico" na V1), Nº Documento, Vencimento, Status, **Valor original**,
+  Pago, Saldo, Ações — **só 1 ação** (Registrar pagamento, navega pra página própria em vez de
+  abrir modal; Ver detalhes/Editar/Cancelar removidos por completo, pedido explícito). Filtros
+  de Forma de Pagamento e Categoria removidos do popover (pedido explícito) — restaram só
+  Período/Situação de Pagamento/Status (3 valores). KPIs (Total a pagar/Vencido/Vence hoje/
+  Próximos vencimentos) mantidos, mesma cópia estrutural da V1.
+- **Nova Conta a Pagar V2:** subtítulo "Cadastre uma obrigação à vista ou parcelada." Campo
+  Código e o card "Classificação" inteiro removidos (pedido explícito) — **Forma de Pagamento e
+  Ocorrência (o vocabulário de recorrência semanal/mensal/etc da V1) também saíram do
+  formulário**, já que o pedido não os listou entre os campos da V2 e "Forma de Pagamento" nem
+  faz mais sentido definida na criação, já que o pagamento em si só acontece depois. Único
+  card "Dados da conta": Fornecedor (linha própria) → Data de emissão/lançamento (auto-hoje,
+  editável) + Data de vencimento (obrigatória) → Categoria Financeira (help text "Cadastrada em
+  Configurações → Categorias Financeiras.") + Documento (opcional) → Valor total + Condição de
+  pagamento (RadioButton À vista/Parcelado) → Descrição (linha própria, ocupa a linha
+  inteira). **Atalho "+ Cadastrar novo fornecedor" da V1 não foi replicado** — decisão de
+  escopo, não fazia parte do pedido e adicionaria round-trip de rascunho/sessionStorage sem
+  necessidade pra esta rodada.
+- **Card "Parcelamento" (só quando Condição = Parcelado), estrutura de parcelas copiada
+  literalmente do padrão já usado em Pedidos de Venda > Condição de pagamento > A prazo**
+  (pedido explícito: "estrutura semelhante à utilizada em Pedidos de Venda, mantendo os mesmos
+  campos e padrão de interação"): Número de parcelas → "Valor total"/"Soma das parcelas" (2
+  campos readonly, **sempre visíveis** — diferente de Pedidos de Venda, onde o resumo só
+  aparece quando diverge; aqui o pedido foi explícito em "permitir verificar visualmente se a
+  soma corresponde ao valor total", então o campo Soma fica sempre presente) → N cards de
+  parcela (`.ncp2-parcela-card`, mesmo visual cinza-claro do cadastro de veículos/Pedidos de
+  Venda), cada um com Vencimento (DatePicker, sugestão inicial = vencimento base + N meses) +
+  Valor (editável, sugestão de divisão igual com resto na última parcela). Alerta de divergência
+  (mesmo padrão visual de erro já usado em Pedidos de Venda) só aparece quando a soma diverge do
+  Valor total, e a soma é validada ANTES de permitir salvar (`runValidation()` bloqueia o
+  submit).
+- **Registrar Pagamento virou página própria** (`registrar-pagamento-conta-pagar-v2.html?
+  codigo=`, resolução direta pelo catálogo global, mesma técnica de `detalhe-conta-pagar.js`,
+  sem handoff via sessionStorage), não mais um modal — pedido explícito. Subtítulo: "Permite
+  pagamento total ou parcial e mantém o histórico da conta."
+  - **Accordion "Histórico de Pagamentos"** no topo, recolhido por padrão (pedido explícito de
+    não ocupar espaço quando não consultado) — mesmo padrão exato de accordion já usado em
+    "Filtros" de Balancete/DRE (cabeçalho inteiro clicável, chevron gira, `hidden` no
+    conteúdo), primeira vez reaproveitado fora de um relatório. Colunas: Data/Conta/Valor
+    pago/Juros/Desconto/Total saída/Saldo Após — direto de `titulo.pagamentos[]`, mais recente
+    primeiro.
+  - **Card "Conta" (somente-leitura):** Fornecedor/Descrição/Documento-NF/Valor original/Pago/
+    Saldo principal, grid `dl`/`dt`/`dd` (1 coluna mobile, 3 no desktop).
+  - **Card "Novo Pagamento":** Data (auto-hoje, editável) → Conta de saída (Dropdown de
+    `window.NiveloContasFinanceiras.list()`, pedido explícito — nunca Conta Bancária) + Valor
+    pago → Juros/Acréscimos + Desconto obtido (ambos opcionais) → Total que sai da conta +
+    Saldo principal após este pagamento (2 campos calculados ao vivo a cada tecla, `disabled`).
+  - Botões "Voltar"/"Confirmar pagamento" (mesmo `.ncp-actions` de todo formulário do sistema).
+    Confirmar valida Conta de saída + Valor pago (>0 e ≤ saldo principal), chama
+    `registrarPagamento()`, mostra toast e redireciona pra listagem.
+  - **Card `.card`/`.cardHeader` (Table.module.css) não fornece padding de corpo sozinho** (só
+    o cabeçalho tem padding embutido) — mesmo padrão de fix já aplicado em `fiscal.html` neste
+    mesmo dia: os 3 cards novos desta página (`rpg-historico-content`, `rpg-conta-fields`,
+    `.rpg-pagamento-card .ncp-grid`) ganharam `padding: 0 var(--spacing-lg) var(--spacing-lg)`
+    explícito desde a criação, não como correção posterior.
+- **`interface-principal.js`:** `NAV_DESTINATIONS['financeiro-pagar']` trocado de
+  `'contas-a-pagar.html'` pra `'contas-a-pagar-v2.html'` — ativa a V2 em toda a navegação real
+  do produto de uma vez. **`prototype-nav/nav.config.js`:** novo épico "Contas a pagar (V2)"
+  inserido ANTES do épico V1 (que teve o label ajustado pra "Contas a pagar (V1)" nos 3 lugares,
+  mesmo padrão já usado em Contas a Receber/Relatórios/Caixa), com as 3 telas novas + 2
+  variantes de Registrar pagamento (título parcelado já com pagamento, conta não encontrada).
+- **Mesma limitação de sempre, já documentada em todo o protótipo:** sem `localStorage`, um
+  título criado/pago só existe durante a sessão de JS daquela página — ao navegar pra outra
+  tela, o script daquela página recarrega os dados seed do zero. O toast de sucesso aparece
+  corretamente; a operação em si não persiste na listagem.
+
+Verificado ao vivo (servidor `app-preview`, porta 8090): listagem com os 15 títulos seed (3
+status presentes, incl. "Vencida"); aba "Em aberto" isolando `em-aberto`+`vencida` corretamente,
+aba "Pagas" isolando só CTP-0002/CTP-0009; KPIs recalculando (Total a pagar R$ 50.190,00/Vencido
+R$ 40.240,00 no carregamento); Nova Conta a Pagar V2 com Condição=Parcelado gerando 5 cards de
+parcela com soma R$ 5.000,00 já batendo com o Valor total; editar uma parcela isoladamente
+disparando o alerta de divergência (R$ 100,00 abaixo) corretamente; Registrar Pagamento
+(CTP-0010, saldo R$ 650,00) com Histórico mostrando o pagamento seed exato (R$ 350,00/juros
+R$ 25,00/desconto R$ 10,00/total saída R$ 365,00/saldo após R$ 650,00); Novo Pagamento
+calculando ao vivo (Valor pago R$ 300 + Juros R$ 20 − Desconto R$ 5 = Total saída R$ 315,00;
+Saldo após R$ 350,00) e confirmando com sucesso (toast + redirecionamento, `NiveloCaixa` recebeu
+o lançamento de saída); card "Conta" (CTP-0004) mostrando Fornecedor/Descrição/Documento/Valor
+original/Pago/Saldo principal corretos via `get_page_text`; nenhum erro de console real em
+nenhuma das 3 telas (só os 404 de `/fonts/*.otf` já documentados); V1 (`contas-a-pagar.html`,
+`nova-conta-pagar.html`, `detalhe-conta-pagar.html`) confirmado intocado.
+
+## Ajustes 2026-08-31 (round 92) — Contas a Receber V2: reescrita completa espelhando
+Contas a Pagar V2 (abas, Descrição/Recebido/Saldo, status simplificado, Registrar recebimento
+como página própria com principal × juros × desconto)
+
+Pedido explícito: dar a Contas a Receber V2 o MESMO tratamento/arquitetura que Contas a Pagar V2
+ganhou no round 91 ("seguindo o mesmo padrão visual, estrutural e de usabilidade já utilizado em
+Contas a Pagar"). A V2 anterior (round 65) — que usava Contas Bancárias, múltiplos recebimentos
+por título sem separação principal×juros×desconto, e 5 status — foi **substituída por completo**
+(não incrementada), mesma decisão de reescrita já tomada em Caixa V2 (round 90). V1
+(`contas-a-receber.html`) permanece 100% intacta e acessível pelo `prototype-nav`.
+
+- **`app/shared/contas-receber-v2-data.js` reescrito do zero**, espelhando a arquitetura de
+  `contas-pagar-v2-data.js`: `valorOriginal` (nunca alterado por um recebimento) + `recebido`
+  (soma só do PRINCIPAL) + `recebimentos[]` (eventos imutáveis, cada um com `valorRecebido`/
+  `juros`/`desconto`/`totalEntrada`/`saldoApos`/`contaFinanceiraCodigo`) — `saldoPrincipal`
+  sempre DERIVADO (`valorOriginal - recebido`). Só 3 status (`em-aberto`/`vencida`/`recebida`,
+  pedido explícito, contra os 5 da versão anterior). Mesma separação de regra de negócio já
+  usada em Pagar: "Valor recebido" reduz o principal 1:1; juros NUNCA reduzem o principal;
+  desconto também não reduz o principal — só entra no `totalEntrada = valorRecebido + juros −
+  desconto`. Recebimento parcial nunca encerra a conta. `registrarRecebimento()` gera um
+  lançamento de ENTRADA real em `window.NiveloCaixa` no valor do total que entra na conta.
+  **`addFromNotaFiscal()`/`addFromPedido()` preservados com a mesma assinatura** (chamados por
+  `nova-nota-fiscal.js`/`pedidos-venda-data.js`, guardados atrás de `if (window.NiveloX)` +
+  try/catch — nenhuma mudança necessária nesses 2 arquivos). `add()` mantém a geração automática
+  de parcelas/recorrência já existente na versão anterior (Parcelada divide o valor; Semanal/
+  Quinzenal/Mensal/Semestral/Anual geram 12 lançamentos futuros com valor integral) — não fazia
+  parte do pedido remover essa capacidade, só simplificar status/ações da listagem.
+- **Listagem (`contas-a-receber-v2.html`/`.js`), mirror estrutural exato de Contas a Pagar V2:**
+  3 abas (Todas/Em aberto/Recebidas — "Em aberto" agrupa `em-aberto`+`vencida`); tabela Cliente/
+  Descrição (era "Histórico" → "Descrição", logo após Cliente)/**Documento / NF** (renomeado de
+  "Nº Documento")/Vencimento/Status/Valor original (nova)/Recebido (nova)/Saldo (nova)/Ações;
+  colunas Banco/Data de emissão/Categoria removidas da tabela (continuam no cadastro, só não
+  aparecem mais na listagem, pedido explícito). **Só 1 ação na tabela: Registrar recebimento**
+  (Ver detalhes/Editar/Cancelar removidos — mesma decisão de Contas a Pagar V2). KPIs (Total a
+  receber/Vencido/Vence hoje/Próximos vencimentos) mantidos, mesma cópia estrutural. Popover de
+  Filtros reduzido a Período + Situação de Recebimento (integral/parcial/não recebido) + Status
+  — Categoria (múltipla escolha)/Forma de Recebimento/Banco removidos do popover (mesma poda já
+  aplicada a Pagar).
+- **"Registrar recebimento" virou página própria** (`registrar-recebimento-conta-receber-v2.html?
+  codigo=`, resolução direta pelo catálogo global, mirror exato de `registrar-pagamento-conta-
+  pagar-v2.html/js/css`, só os rótulos trocados: Fornecedor→Cliente, Pago→Já recebido, Conta de
+  saída→Conta de entrada, Valor pago→Valor recebido, Total que sai da conta→Total que entra na
+  conta, Saldo principal após pagamento→Saldo principal após recebimento, Histórico de
+  Pagamentos→Histórico de recebimentos) — não é mais um modal (a versão anterior abria um
+  `Dialog`). Accordion "Histórico de recebimentos" recolhido por padrão (Data/Conta/Valor
+  recebido/Juros/Desconto/Total Entrada/Saldo Após); card "Conta" somente-leitura (Cliente/
+  Descrição/Documento-NF/Valor original/Já recebido/Saldo principal); card "Novo Recebimento"
+  (Data auto-hoje editável; Conta de entrada — **Contas Financeiras cadastradas em Configuração,
+  pedido explícito, nunca Contas Bancárias como a versão anterior usava** — + Valor recebido;
+  Juros + Desconto; Total que entra na conta + Saldo principal após, calculados ao vivo,
+  `disabled`). Confirmar valida Conta de entrada + Valor recebido (>0 e ≤ saldo principal),
+  chama `registrarRecebimento()`, toast e redireciona pra listagem.
+- **`nova-conta-receber-v2.html`/`.js` (formulário de criação) não precisou de reescrita** — o
+  payload que já envia (`clienteCodigo`/`formaRecebimentoCodigo`/`vencimento`/`valor`/
+  `numeroDocumento`/`historico`/`categoriaCodigo`/`ocorrencia`/`numeroParcelas`/
+  `diaVencimento`) já bate 1:1 com o que o novo `add()`/`update()` aceitam — só o rótulo do
+  campo "Nº Documento" foi renomeado pra "Documento / NF" (mesma nomenclatura pedida pro
+  sistema inteiro). O caminho `?modo=editar`/"Cancelar conta" (round 65) ficou órfão — sem
+  status "cancelada" na V2 nova, sem link algum na listagem apontando pra lá — `cancelar()` foi
+  mantido no módulo de dados só como no-op de segurança (evita erro em runtime se alguém
+  acessar a URL direto), mesmo princípio de "função órfã preservada, não removida" já
+  documentado várias vezes neste arquivo (`bancos-data.js`, `contas-pagar-data.js`'s
+  `excluir()`). **`detalhe-conta-receber-v2.html`/`.js` (Ver detalhes, round 65) também ficou
+  órfão** — nenhuma tela aponta mais pra lá (ação "Ver detalhes" saiu da tabela); arquivo
+  preservado intacto, mesma convenção.
+- **"Documento / NF" também aplicado em Contas a Pagar V2** (pedido explícito: usar essa
+  nomenclatura nos dois módulos) — cabeçalho da tabela, rótulo do campo em Nova Conta a Pagar
+  V2, `<dt>` do card "Conta" de Registrar Pagamento (já estava certo lá desde o round 91),
+  legenda do card mobile e cabeçalho do CSV de exportação, todos trocados de "Nº Documento"
+  pra "Documento / NF" em `contas-a-pagar-v2.html`/`nova-conta-pagar-v2.html`/
+  `contas-a-pagar-v2.js`.
+- **`prototype-nav/nav.config.js`:** dentro do épico "Contas a receber (V2)", a variante
+  "Editar" de Nova Conta a Receber e a entrada inteira de "Ver detalhes" (com suas 2 variantes)
+  foram removidas — substituídas por uma nova entrada "Registrar Recebimento (V2)" com
+  variantes "Com histórico de recebimentos"/"Conta não encontrada".
+- **Mesma limitação de sempre, já documentada em todo o protótipo:** sem `localStorage`, uma
+  conta criada/recebida só existe durante a sessão de JS daquela página — ao redirecionar pra
+  `contas-a-receber-v2.html`, o script daquela tela recarrega os dados seed do zero. O toast de
+  sucesso aparece corretamente; a operação em si não persiste na listagem.
+
+Verificado ao vivo (servidor `app-preview`, porta 8090): listagem com os 12 títulos seed (3
+status presentes, incl. "Vencida"/"Recebida"); KPIs corretos no carregamento (Total a receber
+R$ 110.900,00/Vencido R$ 103.150,00); Registrar Recebimento (CTR-0008, saldo R$ 650,00) com
+Histórico mostrando o recebimento seed exato (R$ 350,00/juros R$ 25,00/desconto R$ 10,00/total
+entrada R$ 365,00/saldo após R$ 650,00) via accordion expandido; Novo Recebimento com Conta de
+entrada populada a partir de `NiveloContasFinanceiras` (não bancárias), submit completo
+validando e redirecionando de volta pra listagem com sucesso (`NiveloCaixa` recebendo o
+lançamento de entrada); Nova Conta a Receber V2 carregando sem erro com o novo módulo de dados
+(payload compatível, nenhuma mudança de código necessária ali além do rótulo "Documento / NF");
+nenhum erro de console real em nenhuma das 3 telas tocadas/criadas (só os 404 de
+`/fonts/*.otf` já documentados); V1 (`contas-a-receber.html`) confirmado intocado.
+
+## Ajustes 2026-08-31 (round 93) — Caixa V2: KPIs acima das abas, Contas financeiras
+com banco/conta reais, "Impacto na conta de origem" distinto, texto de duplicidade
+
+5 ajustes pontuais sobre a V2 do Caixa (round 90), sem tocar em nenhum arquivo V1
+(`caixa.html`/`novo-lancamento-caixa.html`/`transferencia-entre-contas.html`).
+
+- **KPIs movidos pra fora do painel Consolidado.** Os 3 cards de resumo (Total de
+  Entradas/Total de Saídas/Saldo Atual) pertenciam ao conteúdo condicional de
+  `#panel-consolidado` desde o round 90 — sumiam ao trocar pra "Contas financeiras". Movidos
+  em `caixa-v2.html` pra um bloco comum entre `.caixa-header` e o `Tab` (`#caixa-tablist`),
+  agora visíveis nas duas abas o tempo todo. Nenhuma mudança de CSS/JS foi necessária (a
+  classe `.caixa-summary-row` não dependia de estar dentro do painel).
+- **Contas financeiras: Banco e Conta agora vêm de dado real, distinto e claro.** Antes
+  (round 90), "Banco" mostrava o nome da própria Conta Financeira (plano de contas) e "Conta"
+  um número mascarado SINTÉTICO — os dois vinham da mesma entidade, o que não separava de
+  verdade "nome do banco" de "nome da conta". `caixa-v2.js`'s `renderContasFinanceiras()`
+  reescrita: cada linha continua sendo 1 Conta Financeira (pra manter a soma batendo com o
+  Saldo Atual do Consolidado, sem contar 2x o mesmo saldo), mas agora resolve a Conta Bancária
+  REAL vinculada (`window.NiveloContasBancarias`, primeira encontrada quando há mais de uma) pra
+  mostrar **Banco = nome real do banco** (catálogo Febraban via `NiveloBancosCatalogo`) e
+  **Conta = nome da Conta Financeira + máscara dos ÚLTIMOS 4 DÍGITOS REAIS** do número de conta
+  bancária (`maskedContaSuffix()`, novo — extrai dígitos com regex e pega os 4 finais, nunca mais
+  um hash sintético), formato "Conta Corrente Operacional · •••• 6541" (exemplo real do seed,
+  bate com o pedido "Conta principal · •••• 4521"). Contas Financeiras sem nenhuma conta
+  bancária vinculada (ex. "Caixa Geral", dinheiro em espécie) mostram "—" no Banco e só o
+  próprio nome na coluna Conta, sem máscara. Saldo negativo em vermelho (`.caixa-valor-saida`)
+  também na aba Contas financeiras — antes só a cor neutra aparecia ali (confirmado ao vivo:
+  "Caixa Geral" com -R$ 13.500,00 em vermelho).
+- **Transferência entre Contas: "Impacto na conta de origem" virou seção própria e
+  reposicionada.** O bloco de conferência (Saldo disponível/Novo saldo estimado) já existia
+  desde o round 90, mas sem nenhum título — corrigido adicionando `<h2 class="tec-subsection-
+  title">Impacto na conta de origem</h2>` (nome deliberadamente diferente de "Resumo financeiro
+  do lançamento", que é exclusivo de Incluir Lançamento V2, evitando qualquer confusão entre as
+  duas telas) + reposicionado pra depois de TODOS os campos do formulário (incl. Descrição, que
+  antes vinha depois do resumo) e antes dos botões de ação, como pedido. Novo bloco CSS
+  `.tec-impacto-subsection` com o guard `[hidden]{display:none}` de sempre (mesmo bug recorrente
+  documentado dezenas de vezes neste arquivo — o elemento já usava `hidden` via JS, só faltava a
+  regra). "Valor" → "Valor da transferência" e "Histórico" → "Descrição" já estavam corretos
+  desde o round 90, confirmado sem mudança necessária.
+- **Texto exato do aviso de duplicidade corrigido em Incluir Lançamento V2:** "Novo Lançamento"
+  → "**Incluir Lançamento**" (nome real do botão/tela) — resto do texto já batia
+  literalmente com o pedido. Confirmado ao vivo em mobile (375px) que o texto não é cortado nem
+  sobreposto (`.alert`/`.body`/`.message` já quebram linha livremente, sem `white-space:nowrap`
+  em nenhum ancestral).
+- **Campo "Classificação" — nada a remover.** Investigado a fundo: não existe (e nunca existiu
+  na V2) um campo de formulário chamado "Classificação" — o que existe é uma SUBSEÇÃO com esse
+  título, contendo 2 campos reais e distintos (Competência opcional + Cliente ou Fornecedor
+  opcional), nenhum dos dois chamado "Classificação" em si. Nenhuma mudança feita — remover a
+  subseção inteira apagaria os 2 campos de contexto do lançamento, o que não foi pedido
+  explicitamente (o pedido falava em "campo", não em "seção").
+
+Verificado ao vivo (servidor `app-preview`, porta 8090): KPIs permanecendo visíveis e com os
+mesmos valores (R$ 200.400,00/R$ 74.459,00/R$ 125.941,00) ao alternar entre as 2 abas, em
+desktop e mobile (375px, cards empilhados acima do Tab); aba Contas financeiras com Banco/Conta/
+Saldo claramente distintos ("Banco do Brasil" / "Conta Corrente Operacional · •••• 6541" /
+R$ 107.241,00), total da coluna Saldo (R$ 125.941,00) batendo exatamente com o Saldo Atual do
+Consolidado, "Caixa Geral" (sem conta bancária vinculada) mostrando "—" no Banco e saldo negativo
+em vermelho, tudo replicado nos Cards do mobile; Transferência entre Contas com "Impacto na conta
+de origem" aparecendo só após escolher a Conta de origem, posicionado depois da Descrição e antes
+dos botões, recalculando ao vivo (R$ 107.241,00 − R$ 50,00 = R$ 107.191,00 testado), sem nenhuma
+duplicação com "Resumo financeiro do lançamento" (tela diferente); texto de duplicidade exato
+("Incluir Lançamento") sem corte em mobile; nenhum erro real de console em nenhuma das 3 telas
+(só os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo o sistema).
+
+## Ajustes 2026-09-01 (round 94) — 5 renomeações/remoções pontuais: Caixa V2, sidebar
+
+5 ajustes de rótulo/remoção, sem tocar em nenhuma lógica/comportamento além do estritamente
+necessário pra cada item.
+
+- **Caixa V2 — aba "Contas financeiras" → "Contas bancárias"** (`caixa-v2.html`): texto do
+  botão da aba (`data-tab="contas-financeiras"` preservado) e o texto de apoio abaixo das abas
+  (`TAB_HINTS['contas-financeiras']` em `caixa-v2.js`, que agora diz "cada conta bancária" em
+  vez de "cada Conta Financeira") trocados — a lógica de agrupamento por Conta Financeira em si
+  não mudou, é só o rótulo visível apontando o usuário pra pensar nisso como "conta bancária".
+- **Incluir Lançamento V2 — label "Contas financeiras" → "Contas bancárias"**
+  (`novo-lancamento-caixa-v2.html`, campo `id="conta-financeira-field"`): label, placeholder
+  ("Selecione a conta bancária") e help text ("Contas cadastradas em Configurações → Contas
+  Bancárias") trocados; mensagem de erro do campo também ajustada. `id`/`name`/lógica JS de
+  leitura do valor intactos — o campo continua tecnicamente a Conta Financeira/
+  `NiveloContasFinanceiras` por trás.
+- **Removido "Conta Financeira" da Sidebar > Configuração:** o `<button data-nav="config-conta-
+  financeira">` (label "Conta Financeira", ícone `banknote`) removido de 92 arquivos
+  `app/screens/*.html` via script Node de mass-edit (regex multi-linha). Linha correspondente
+  removida de `NAV_DESTINATIONS` em `interface-principal.js`. `contas-financeiras.html`/
+  `contas-financeiras.js`/`page-contas-financeiras.css`/`contas-financeiras-data.js`
+  preservados intactos (continuam existindo como módulo de dados consumido por Contas
+  Bancárias/Caixa V2/DRE, e acessíveis pelo `prototype-nav`) — só saíram da navegação real.
+- **Sidebar: grupo "Vendas e fiscal" → "Vendas"** (só o texto visível — tooltip
+  `data-tooltip="Vendas · opções"` e `<span class="app-nav-label">Vendas</span>`, `id="group-
+  vendas"`/`data-group-toggle="group-vendas"` intactos) — mass-edit via script Node
+  (substituição de string exata) em 93 arquivos.
+- **Sidebar: subitem "Clientes e fornecedores" (grupo Cadastro) → "Parceiros"** (só o texto
+  visível, `data-nav="cadastro-pessoas"` intacto, tela de destino `cadastros.html` intacta) —
+  mesmo script de mass-edit, 93 arquivos.
+
+Verificado ao vivo (`http-server`, porta 8090, preserva query string/hash): `dashboard.html`
+com Sidebar mostrando "Vendas" (não "Vendas e fiscal"), "Parceiros" dentro de Cadastro, e
+"Conta Financeira" ausente de Configuração (confirmado via busca de texto na página);
+`caixa-v2.html` com a aba "Contas bancárias"; `novo-lancamento-caixa-v2.html` com o label/
+placeholder/help text "Contas bancárias"/"Selecione a conta bancária"/"Contas cadastradas em
+Configurações → Contas Bancárias"; `grep -rc` confirmando 0 ocorrências restantes de
+"config-conta-financeira"/"Vendas e fiscal"/"Clientes e fornecedores" em `app/screens`; nenhum
+erro de console nas telas verificadas.

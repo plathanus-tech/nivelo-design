@@ -193,8 +193,8 @@
   // de estoque) + item fixo "+ Adicionar novo depósito", que abre o mesmo
   // fluxo de modal já usado lá — reaproveitado, não recriado. ----------
   function renderDepositoOptions() {
-    var html = window.NiveloLocais.list().map(function (nome) {
-      return '<div class="option" data-value="' + nome + '">' + nome + '</div>';
+    var html = window.NiveloLocais.list().map(function (local) {
+      return '<div class="option" data-value="' + local.nome + '">' + local.nome + '</div>';
     }).join('');
     html += '<div class="npv-deposito-create-option" data-add-deposito>' +
       '<i data-lucide="plus" width="14" height="14"></i> Adicionar novo depósito</div>';

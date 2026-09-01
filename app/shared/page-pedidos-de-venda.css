@@ -198,6 +198,11 @@
 .pv-empty-global-title { color: var(--color-text-primary); margin: 0; }
 .pv-empty-global-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 380px; }
 
+/* Remessa vinculada a um pedido de venda: legenda sob a coluna Cliente/
+   Destinatário (tabela e cards), mesma técnica/classe visual já usada pra
+   "Parcela N/M" em Contas a Pagar/Receber (`.ctp-cell-parcela`). */
+.pv-cell-vinculo { display: block; color: var(--color-text-tertiary); }
+
 /* ── Integrações: 3 indicadores circulares (E/C/NF), cada um com tooltip ── */
 .pv-integracoes { display: flex; align-items: center; gap: var(--spacing-2xs); }
 .pv-integracao-dot {

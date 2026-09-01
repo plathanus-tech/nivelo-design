@@ -1,41 +1,42 @@
 /* ══════════════════════════════════════════════════════════
-   window.NiveloWhatsappNumeros — catálogo dos números de WhatsApp
-   autorizados a conversar com o Assistente de IA da conta (Assistente
-   IA > Meus números). Mesma convenção IIFE de contas-financeiras-data.js.
+   window.NiveloWhatsappNumeros — o número de WhatsApp do próprio produtor,
+   conectado ao Assistente de IA (Assistente IA > Configurar WhatsApp).
 
-   Cada registro: {
-     id,          // interno, sequencial
-     numero,      // normalizado: '+55' + DDD + número, só dígitos além do '+'
-                   // (ex.: '+5547999999999') — formato pronto pra integração
-                   // futura com a API do WhatsApp
-     createdAt,
-     updatedAt
-   }
+   Um único número por conta (não mais uma lista) — o próprio produtor
+   configura o WhatsApp que ele mesmo vai usar pra conversar com o
+   Assistente, não uma lista de números de terceiros autorizados.
 
-   Sem persistência entre páginas (mesma decisão de todo o protótipo) — um
-   número adicionado aqui só existe durante a sessão de JS desta página,
-   já que esta tela não navega para nenhum outro lugar. */
+     numero,        // normalizado: '+55' + DDD + número, só dígitos além do
+                     // '+' (ex.: '+5547999999999') — formato pronto pra
+                     // integração futura com a API do WhatsApp; null quando
+                     // nenhum número está conectado
+     connectedAt,    // data da 1ª conexão (null quando desconectado)
+     updatedAt       // data da última conexão/atualização
+
+   Sem persistência entre páginas (mesma decisão de todo o protótipo) — o
+   estado só existe durante a sessão de JS desta página. */
 (function () {
   'use strict';
 
   var TODAY = '2026-08-04';
 
-  var NUMEROS = [
-    { id: 1, numero: '+5547999990001', createdAt: TODAY, updatedAt: TODAY },
-    { id: 2, numero: '+5511988880002', createdAt: TODAY, updatedAt: TODAY }
-  ];
+  // Seed: já nasce conectado, pra demonstrar de cara o estado "Conectado"
+  // (o estado "sem número" é só um clique de Desconectar de distância).
+  var state = {
+    numero: '+5547999990001',
+    connectedAt: TODAY,
+    updatedAt: TODAY
+  };
 
-  function list() {
-    return NUMEROS;
+  function getNumero() {
+    return state.numero;
   }
 
-  function findById(id) {
-    var idNum = Number(id);
-    return NUMEROS.filter(function (n) { return n.id === idNum; })[0] || null;
+  function isConnected() {
+    return !!state.numero;
   }
 
-  // Só dígitos, sem '+' — usado pra comparar duplicidade e pra normalizar
-  // antes de guardar.
+  // Só dígitos, sem '+' — usado pra normalizar antes de guardar.
   function onlyDigits(value) {
     return (value || '').toString().replace(/\D/g, '');
   }
@@ -48,14 +49,6 @@
       digits = digits.slice(2);
     }
     return '+55' + digits;
-  }
-
-  function isNumeroDuplicado(value, excludeId) {
-    var normalized = normalizeNumero(value);
-    return NUMEROS.some(function (n) {
-      if (excludeId != null && n.id === Number(excludeId)) return false;
-      return n.numero === normalized;
-    });
   }
 
   // Exibição: '+55 (47) 99999-9999' — DDI + DDD entre parênteses + número
@@ -74,39 +67,26 @@
     return out;
   }
 
-  function nextId() {
-    var max = 0;
-    NUMEROS.forEach(function (n) { max = Math.max(max, n.id); });
-    return max + 1;
+  function connect(value) {
+    if (!state.connectedAt) state.connectedAt = TODAY;
+    state.numero = normalizeNumero(value);
+    state.updatedAt = TODAY;
+    return state;
   }
 
-  function add(payload) {
-    var registro = {
-      id: nextId(),
-      numero: normalizeNumero(payload.numero),
-      createdAt: TODAY,
-      updatedAt: TODAY
-    };
-    NUMEROS.push(registro);
-    return registro;
-  }
-
-  function remove(id) {
-    var idNum = Number(id);
-    var index = NUMEROS.findIndex(function (n) { return n.id === idNum; });
-    if (index === -1) return false;
-    NUMEROS.splice(index, 1);
-    return true;
+  function disconnect() {
+    state.numero = null;
+    state.connectedAt = null;
+    state.updatedAt = TODAY;
+    return state;
   }
 
   window.NiveloWhatsappNumeros = {
-    list: list,
-    findById: findById,
+    getNumero: getNumero,
+    isConnected: isConnected,
     normalizeNumero: normalizeNumero,
-    isNumeroDuplicado: isNumeroDuplicado,
     formatNumero: formatNumero,
-    nextId: nextId,
-    add: add,
-    remove: remove
+    connect: connect,
+    disconnect: disconnect
   };
 })();

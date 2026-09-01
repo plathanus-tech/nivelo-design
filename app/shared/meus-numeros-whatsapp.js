@@ -30,76 +30,6 @@
     });
   }
 
-  // ---------- Ícone do WhatsApp reaproveitado (mesmo SVG inline já usado
-  // no item "Suporte" da Sidebar — exceção documentada à regra "sem SVG
-  // inline", ver app/CLAUDE.md) ----------
-  var WHATSAPP_ICON_SVG =
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-    '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>' +
-    '</svg>';
-
-  // ---------- Renderização da lista a partir do catálogo central
-  // (window.NiveloWhatsappNumeros) ----------
-  var listEl = document.getElementById('mnw-list');
-  var emptyEl = document.getElementById('mnw-empty');
-
-  function buildItemHTML(registro) {
-    return (
-      '<li class="mnw-item" id="mnw-item-' + registro.id + '" data-id="' + registro.id + '">' +
-        '<span class="mnw-item-icon">' + WHATSAPP_ICON_SVG + '</span>' +
-        '<span class="mnw-item-numero text-body-m">WhatsApp ' + window.NiveloWhatsappNumeros.formatNumero(registro.numero) + '</span>' +
-        '<button type="button" class="actionBtn mnw-item-remove" data-action="remover" aria-label="Remover número">' +
-          '<i data-lucide="trash-2" width="16" height="16"></i>' +
-          '<span class="tip text-body-xs top"><span class="arrow"></span>Remover</span>' +
-        '</button>' +
-      '</li>'
-    );
-  }
-
-  function render() {
-    var registros = window.NiveloWhatsappNumeros.list();
-    listEl.innerHTML = registros.map(buildItemHTML).join('');
-    emptyEl.hidden = registros.length > 0;
-    if (window.lucide) lucide.createIcons();
-  }
-
-  // ---------- Tooltip padrão dos ícones de ação (mesma técnica
-  // position:fixed via JS + reparent pra document.body, já usada em todo
-  // o sistema) ----------
-  function getActionTip(btn) {
-    if (btn.__tip) return btn.__tip;
-    var tip = btn.querySelector('.tip');
-    if (tip) {
-      document.body.appendChild(tip);
-      btn.__tip = tip;
-    }
-    return tip;
-  }
-  function positionActionTooltip(btn) {
-    var tip = getActionTip(btn);
-    if (!tip) return;
-    var rect = btn.getBoundingClientRect();
-    var centerX = rect.left + rect.width / 2;
-    tip.style.position = 'fixed';
-    tip.style.left = centerX + 'px';
-    tip.style.transform = 'translateX(-50%)';
-    tip.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-    tip.style.top = 'auto';
-    tip.style.opacity = '1';
-  }
-  function hideActionTooltip(btn) {
-    var tip = btn.__tip;
-    if (tip) tip.style.opacity = '0';
-  }
-  document.addEventListener('mouseover', function (event) {
-    var btn = event.target.closest('.actionBtn[data-action]');
-    if (btn) positionActionTooltip(btn);
-  });
-  document.addEventListener('mouseout', function (event) {
-    var btn = event.target.closest('.actionBtn[data-action]');
-    if (btn) hideActionTooltip(btn);
-  });
-
   // ---------- Máscara: '+55 (DDD) NNNNN-NNNN' — mesmo raciocínio de
   // formatPhone() (cadastro.js/novo-cadastro.js), com o DDI 55 fixo na
   // frente (WhatsApp sempre com código do país). ----------
@@ -120,12 +50,15 @@
     return digits.length === 10 || digits.length === 11;
   }
 
-  // ---------- Modal: Adicionar número de WhatsApp ----------
-  var formOverlay = document.getElementById('mnw-form-dialog-overlay');
-  var form = document.getElementById('mnw-form');
+  // ---------- Campo do número (direto na tela, sempre editável) ----------
   var numeroInput = document.getElementById('mnw-numero');
   var numeroField = document.getElementById('mnw-numero-field');
   var numeroErrorTextEl = document.getElementById('mnw-numero-error-text');
+  var numeroHelperEl = document.getElementById('mnw-numero-helper');
+  var statusBadge = document.getElementById('mnw-status-badge');
+  var statusBadgeTextEl = document.getElementById('mnw-status-badge-text');
+  var connectBtn = document.getElementById('mnw-connect-btn');
+  var disconnectBtn = document.getElementById('mnw-disconnect-btn');
 
   function setNumeroError(message) {
     numeroErrorTextEl.textContent = message;
@@ -142,17 +75,29 @@
     if (numeroField.classList.contains('error')) clearNumeroError();
   });
 
-  function openFormDialog() {
-    clearNumeroError();
-    numeroInput.value = '+55 ';
-    formOverlay.hidden = false;
-    numeroInput.focus();
-  }
-  function closeFormDialog() {
-    formOverlay.hidden = true;
+  // Reflete o estado atual (conectado/desconectado) no campo, na tag de
+  // status e nos 2 botões de ação — chamado no load e depois de cada
+  // conexão/desconexão.
+  function render() {
+    var conectado = window.NiveloWhatsappNumeros.isConnected();
+    if (conectado) {
+      var numeroFormatado = window.NiveloWhatsappNumeros.formatNumero(window.NiveloWhatsappNumeros.getNumero());
+      numeroInput.value = numeroFormatado;
+      statusBadge.hidden = false;
+      statusBadgeTextEl.textContent = numeroFormatado + ' conectado';
+      numeroHelperEl.hidden = true;
+      connectBtn.textContent = 'Atualizar número';
+      disconnectBtn.hidden = false;
+    } else {
+      numeroInput.value = '+55 ';
+      statusBadge.hidden = true;
+      numeroHelperEl.hidden = false;
+      connectBtn.textContent = 'Conectar';
+      disconnectBtn.hidden = true;
+    }
   }
 
-  function validateForm() {
+  function validateNumero() {
     var numero = numeroInput.value.trim();
     if (!numero || numero === '+55') {
       setNumeroError('Informe o número de WhatsApp.');
@@ -162,17 +107,60 @@
       setNumeroError('Informe um número de WhatsApp válido.');
       return false;
     }
-    if (window.NiveloWhatsappNumeros.isNumeroDuplicado(numero)) {
-      setNumeroError('Este número já está cadastrado.');
-      return false;
-    }
     clearNumeroError();
     return true;
   }
 
+  // ---------- Modal: Conectar / Atualizar número ----------
+  var connectOverlay = document.getElementById('mnw-connect-dialog-overlay');
+  var connectTitle = document.getElementById('mnw-connect-dialog-title');
+  var connectText = document.getElementById('mnw-connect-dialog-text');
+  var connectNumeroEl = document.getElementById('mnw-connect-dialog-numero');
+  var connectConfirmBtn = document.getElementById('mnw-connect-dialog-confirm');
+
+  function openConnectDialog() {
+    var jaConectado = window.NiveloWhatsappNumeros.isConnected();
+    var numeroFormatado = window.NiveloWhatsappNumeros.formatNumero(numeroInput.value.trim());
+    connectNumeroEl.textContent = numeroFormatado;
+    if (jaConectado) {
+      connectTitle.textContent = 'Atualizar número de WhatsApp';
+      connectText.textContent = 'Este número vai substituir o atual conectado ao Assistente de IA. O número anterior deixará de poder conversar com o Assistente:';
+      connectConfirmBtn.textContent = 'Atualizar número';
+    } else {
+      connectTitle.textContent = 'Conectar número de WhatsApp';
+      connectText.textContent = 'Você está prestes a conectar este número para conversar com o Assistente de IA:';
+      connectConfirmBtn.textContent = 'Conectar';
+    }
+    connectOverlay.hidden = false;
+  }
+  function closeConnectDialog() {
+    connectOverlay.hidden = true;
+  }
+
+  connectBtn.addEventListener('click', function () {
+    if (!validateNumero()) return;
+    openConnectDialog();
+  });
+
+  connectConfirmBtn.addEventListener('click', function () {
+    var jaConectado = window.NiveloWhatsappNumeros.isConnected();
+    var registro = window.NiveloWhatsappNumeros.connect(numeroInput.value.trim());
+    simulateWelcomeMessage(registro);
+    closeConnectDialog();
+    render();
+    showSuccessToast(
+      jaConectado ? 'Número de WhatsApp atualizado com sucesso.' : 'Número de WhatsApp conectado com sucesso.',
+      'O número já pode conversar com o Assistente de IA.'
+    );
+  });
+
+  document.getElementById('mnw-connect-dialog-close').addEventListener('click', closeConnectDialog);
+  document.getElementById('mnw-connect-dialog-cancel').addEventListener('click', closeConnectDialog);
+  connectOverlay.addEventListener('click', function (event) { if (event.target === connectOverlay) closeConnectDialog(); });
+
   // Nota de escopo: em produção, o backend dispararia aqui a mensagem de
   // boas-vindas via integração real do WhatsApp, uma única vez, no
-  // instante em que o número é vinculado com sucesso. Este protótipo não
+  // instante em que o número é conectado com sucesso. Este protótipo não
   // tem backend/API — simulado apenas via log, sem nenhuma chamada real.
   function simulateWelcomeMessage(registro) {
     var mensagem =
@@ -186,65 +174,37 @@
     }
   }
 
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
-    if (!validateForm()) return;
+  // ---------- Modal: Desconectar número ----------
+  var disconnectOverlay = document.getElementById('mnw-disconnect-dialog-overlay');
+  var disconnectText = document.getElementById('mnw-disconnect-dialog-text');
+  var disconnectConfirmBtn = document.getElementById('mnw-disconnect-dialog-confirm');
 
-    var registro = window.NiveloWhatsappNumeros.add({ numero: numeroInput.value.trim() });
-    simulateWelcomeMessage(registro);
+  function openDisconnectDialog() {
+    var numeroFormatado = window.NiveloWhatsappNumeros.formatNumero(window.NiveloWhatsappNumeros.getNumero());
+    disconnectText.textContent = 'Ao desconectar, o número ' + numeroFormatado + ' não poderá mais ser utilizado para conversar com o Assistente de IA até que um novo número seja conectado.';
+    disconnectOverlay.hidden = false;
+  }
+  function closeDisconnectDialog() {
+    disconnectOverlay.hidden = true;
+  }
 
-    closeFormDialog();
+  disconnectBtn.addEventListener('click', openDisconnectDialog);
+  document.getElementById('mnw-disconnect-dialog-close').addEventListener('click', closeDisconnectDialog);
+  document.getElementById('mnw-disconnect-dialog-cancel').addEventListener('click', closeDisconnectDialog);
+  disconnectOverlay.addEventListener('click', function (event) { if (event.target === disconnectOverlay) closeDisconnectDialog(); });
+
+  disconnectConfirmBtn.addEventListener('click', function () {
+    window.NiveloWhatsappNumeros.disconnect();
+    closeDisconnectDialog();
+    clearNumeroError();
     render();
-    showSuccessToast('Número de WhatsApp adicionado com sucesso.', 'O número já pode conversar com o Assistente de IA.');
+    showSuccessToast('Número de WhatsApp desconectado.', 'Esse número não pode mais conversar com o Assistente de IA até que um novo número seja conectado.');
   });
 
-  document.getElementById('mnw-form-dialog-close').addEventListener('click', closeFormDialog);
-  document.getElementById('mnw-form-dialog-cancel').addEventListener('click', closeFormDialog);
-  formOverlay.addEventListener('click', function (event) { if (event.target === formOverlay) closeFormDialog(); });
   document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
-    if (!formOverlay.hidden) closeFormDialog();
-    if (!removerOverlay.hidden) closeRemoverDialog();
-  });
-
-  document.getElementById('new-numero-btn').addEventListener('click', openFormDialog);
-  var emptyBtn = document.getElementById('mnw-empty-btn');
-  if (emptyBtn) emptyBtn.addEventListener('click', openFormDialog);
-
-  // ---------- Modal: Remover número de WhatsApp ----------
-  var removerOverlay = document.getElementById('mnw-remover-dialog-overlay');
-  var removerState = { id: null };
-  var removerConfirmBtn = document.getElementById('mnw-remover-dialog-confirm');
-
-  function openRemoverDialog(id) {
-    removerState.id = id;
-    removerOverlay.hidden = false;
-  }
-  function closeRemoverDialog() {
-    removerOverlay.hidden = true;
-    removerState.id = null;
-  }
-
-  document.getElementById('mnw-remover-dialog-close').addEventListener('click', closeRemoverDialog);
-  document.getElementById('mnw-remover-dialog-cancel').addEventListener('click', closeRemoverDialog);
-  removerOverlay.addEventListener('click', function (event) { if (event.target === removerOverlay) closeRemoverDialog(); });
-
-  removerConfirmBtn.addEventListener('click', function () {
-    var id = removerState.id;
-    window.NiveloWhatsappNumeros.remove(id);
-    closeRemoverDialog();
-    render();
-    showSuccessToast('Número removido com sucesso.', 'Este número não pode mais conversar com o Assistente de IA.');
-  });
-
-  // ---------- Ações da lista (delegado em `document`) ----------
-  listEl.addEventListener('click', function (event) {
-    var btn = event.target.closest('.actionBtn[data-action]');
-    if (!btn) return;
-    var item = btn.closest('.mnw-item');
-    if (!item) return;
-    var id = item.dataset.id;
-    if (btn.dataset.action === 'remover') openRemoverDialog(id);
+    if (!connectOverlay.hidden) closeConnectDialog();
+    if (!disconnectOverlay.hidden) closeDisconnectDialog();
   });
 
   render();

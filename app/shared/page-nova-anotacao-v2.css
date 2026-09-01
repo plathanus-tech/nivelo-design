@@ -1,0 +1,211 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA ANOTAÇÃO V2 — Caderno de Campo. Formulário de registro (Anotação/
+   Aplicação de insumo/Despesa manual/Colheita), sempre vinculado a um
+   talhão (sem exceção — não existe mais criação a nível de fazenda, ver
+   app/CLAUDE.md). Fazenda/Talhão/Cultura/Safra são sempre contexto não
+   editável (campos `disabled`), nunca dropdowns escolhíveis nesta tela.
+   Estrutura de página/seção é cópia deliberada de `page-nova-anotacao.css`
+   (V1).
+   ══════════════════════════════════════════════════════════ */
+
+.nova-anotacao-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.overlay[hidden] { display: none; }
+
+.nova-anotacao-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nova-anotacao-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: fit-content;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.nova-anotacao-back:hover { color: var(--color-text-primary); }
+
+.nova-anotacao-title { color: var(--color-text-primary); margin: 0; }
+.nova-anotacao-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 560px; }
+
+/* ── Estado de erro (sem talhão pré-selecionado) ──────────────────────────
+   Mesma composição de "não encontrado"/estado vazio já usada em todo o
+   sistema. */
+.nova-anotacao-error-card {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-status-warning-fg);
+  text-align: center;
+}
+.nova-anotacao-error-card:not([hidden]) { display: flex; }
+.nova-anotacao-error-card p { margin: 0; color: var(--color-text-secondary); max-width: 420px; }
+
+/* ── Seções (1 único `.card`) ──────────────────────────────────────────── */
+
+#nova-anotacao-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.nova-anotacao-subsection {
+  padding: var(--spacing-lg);
+}
+.nova-anotacao-subsection + .nova-anotacao-subsection {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+.nova-anotacao-subsection[hidden] { display: none; }
+
+.nova-anotacao-subsection-title {
+  margin: 0 0 var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+.nova-anotacao-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .nova-anotacao-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .nova-anotacao-span-2 {
+    grid-column: span 2;
+  }
+}
+
+.nova-anotacao-dropdown { position: relative; }
+.nova-anotacao-combobox { position: relative; }
+.nova-anotacao-combobox .menu {
+  position: fixed;
+  display: none;
+}
+.nova-anotacao-combobox.open .menu { display: block; }
+.nova-anotacao-combobox .menu .option { cursor: pointer; }
+.nova-anotacao-combobox .menu .option:hover { background: var(--color-bg-brand); }
+.nova-anotacao-combobox .menu .option-empty {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-tertiary);
+}
+
+/* Mensagem de erro: só borda vermelha, sem fundo cobrindo o campo — padrão
+   final já estabelecido no projeto (ver Nova Fazenda round 37). */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input,
+.wrapper.error .trigger { border-color: var(--color-action-error); }
+
+.nova-anotacao-grid input.input:not([type="radio"]) {
+  width: 100%;
+  height: 44px;
+}
+
+/* Campos de contexto (Fazenda/Talhão/Cultura/Safra/Data e hora), sempre
+   `disabled` — visual levemente diferente do disabled padrão do componente
+   pra reforçar que são só leitura, nunca um campo "quebrado". */
+#fazenda-field .input,
+#talhao-field .input,
+#cultura-field .input,
+#safra-field .input,
+#data-hora-field .input {
+  background: var(--color-gray-50);
+  color: var(--color-text-secondary);
+  cursor: default;
+}
+
+.nova-anotacao-optional-tag {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+}
+
+.nova-anotacao-textarea {
+  width: 100%;
+  height: auto;
+  min-height: 88px;
+  resize: vertical;
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* ── Tipo de registro: 4 cards de seleção visual ──────────────────────── */
+.nova-anotacao-tipo-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 480px) {
+  .nova-anotacao-tipo-group { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 768px) {
+  .nova-anotacao-tipo-group { grid-template-columns: repeat(4, 1fr); }
+}
+
+.nova-anotacao-tipo-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.nova-anotacao-tipo-card:hover { border-color: var(--color-action-primary); }
+.nova-anotacao-tipo-card.is-selected {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+}
+
+.nova-anotacao-tipo-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.nova-anotacao-tipo-icon { display: inline-flex; color: var(--color-text-tertiary); }
+.nova-anotacao-tipo-card.is-selected .nova-anotacao-tipo-icon { color: var(--color-action-primary); }
+.nova-anotacao-tipo-label { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+
+/* ── Ações do rodapé ───────────────────────────────────────────────────── */
+.nova-anotacao-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+}
+@media (min-width: 768px) {
+  .nova-anotacao-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .nova-anotacao-actions .btn { min-width: 160px; }
+}

@@ -17,6 +17,38 @@
 .videos-title { color: var(--color-text-primary); margin: 0; }
 .videos-description { color: var(--color-text-secondary); margin: 0; }
 
+/* ── Chips de categoria — mesmo padrão exato do Canal de Ideias
+   (.ideias-chip-nav/-row/-nav-btn em page-canal-ideias.css): fileira com
+   rolagem horizontal (`.row` vem de Chip.module.css) + setas de navegação
+   só quando há itens fora da área visível (JS mede scrollWidth/clientWidth,
+   nunca fixas) + arrastar com o mouse no desktop (touch já rola de graça). ── */
+.videos-chip-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding-bottom: 2px;
+}
+
+.videos-chip-nav-btn {
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  background: var(--color-bg-surface);
+}
+.videos-chip-nav-btn[hidden] {
+  display: none;
+}
+
+.videos-chip-row {
+  flex: 1;
+  min-width: 0;
+  scroll-behavior: smooth;
+  cursor: grab;
+}
+.videos-chip-row.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
 .videos-grid {
   display: grid;
   grid-template-columns: 1fr;

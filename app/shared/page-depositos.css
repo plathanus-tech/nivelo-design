@@ -1,0 +1,196 @@
+/* ══════════════════════════════════════════════════════════
+   DEPÓSITOS / LOCAIS DE ESTOQUE — Configuração > Depósitos. Mobile first.
+   Mesmos padrões já usados em Categorias/Contas Bancárias/Natureza da
+   Operação: `Table` como Card genérico, busca fundida com a tabela num
+   único `.card`, Cards no mobile, modal de Ativar/Desativar (Dialog sm,
+   Cancelar cinza + Desativar destrutivo/Ativar primário). Sem paginação
+   (dataset pequeno, mesmo precedente de Categorias/Fazendas). Classes
+   próprias `dep-*`.
+   ══════════════════════════════════════════════════════════ */
+
+.dep-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Cabeçalho da página ───────────────────────────────────────────────── */
+
+.dep-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+@media (min-width: 768px) {
+  .dep-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.dep-header-text { display: flex; flex-direction: column; gap: var(--spacing-2xs); }
+.dep-title { color: var(--color-text-primary); margin: 0; }
+.dep-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 560px; }
+
+#new-deposito-btn { width: 100%; justify-content: center; flex-shrink: 0; }
+@media (min-width: 768px) {
+  #new-deposito-btn { width: auto; }
+}
+
+/* ── Busca fundida com a tabela (mesmo padrão final já adotado em
+   Produtos/Cadastro/Estoque/Categorias/Contas Bancárias) ────────────────── */
+.card.dep-list-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .card.dep-list-card {
+    background: var(--color-bg-surface);
+    border: var(--border-width-thin) solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.dep-filter-bar {
+  padding: var(--spacing-md) var(--spacing-md);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-200);
+}
+.dep-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--spacing-md); }
+.dep-filter { width: 100%; }
+@media (min-width: 768px) {
+  .dep-filter-search { flex: 1 1 320px; min-width: 260px; max-width: 420px; }
+}
+.dep-filters .dep-filter-search .input {
+  height: 28px;
+  font-size: var(--font-size-sm);
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  padding-left: 40px;
+}
+
+/* ── Tabela (desktop) / Cards (mobile) ──────────────────────────────────── */
+
+.dep-table-card .tableWrap { display: none; padding-top: 0; }
+.dep-cards { display: flex; flex-direction: column; gap: var(--spacing-md); padding: var(--spacing-md); }
+@media (min-width: 768px) {
+  .dep-table-card .tableWrap { display: block; }
+  .dep-cards { display: none; }
+}
+
+.dep-table-card .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.dep-table-card .headerRow { border-bottom-color: var(--color-gray-200); }
+.dep-table-card .sortIcon { color: var(--color-gray-500); }
+
+.dep-table-card .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.dep-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
+.dep-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.dep-table-card .tr:hover .td { filter: brightness(0.97); }
+.dep-table-card .tr[hidden] { display: none; }
+
+/* Colunas em `%`, Ações em `px` fixo — mesma disciplina de Produtos/
+   Cadastro/Natureza da Operação (soma cabe em 100%, sem rolagem horizontal). */
+.dep-table-card .table { table-layout: fixed; width: 100%; }
+.dep-table-card .th:nth-child(1) { width: 26%; } /* Nome */
+.dep-table-card .th:nth-child(2) { width: 20%; } /* Tipo */
+.dep-table-card .th:nth-child(3) { width: 22%; } /* Fazenda Vinculada */
+.dep-table-card .th:nth-child(4) { width: 16%; } /* Uso */
+.dep-table-card .th:nth-child(5) { width: 14%; } /* Status */
+.dep-table-card .th:nth-child(6) { width: 96px; } /* Ações */
+
+.dep-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: var(--color-text-tertiary);
+}
+.dep-empty:not([hidden]) { display: flex; }
+.dep-empty p { margin: 0; }
+
+.dep-empty-global {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+.dep-empty-global:not([hidden]) { display: flex; }
+.dep-empty-global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-brand);
+  color: var(--color-text-brand);
+}
+.dep-empty-global-title { color: var(--color-text-primary); margin: 0; }
+.dep-empty-global-subtitle { color: var(--color-text-tertiary); margin: 0 0 var(--spacing-sm); max-width: 360px; }
+
+/* ── Cards (mobile) ────────────────────────────────────────────────────── */
+.dep-mobile-card { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-md); }
+.dep-mobile-card-name { color: var(--color-text-primary); }
+.dep-mobile-card-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+}
+.dep-mobile-card-fields dt { color: var(--color-text-tertiary); margin: 0 0 2px; }
+.dep-mobile-card-fields dd { color: var(--color-text-primary); margin: 0; }
+.dep-mobile-card-actions {
+  display: flex;
+  gap: var(--spacing-2xs);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+/* ── Toast de sucesso ─────────────────────────────────────────────────────
+   Mesma composição já usada em Categorias/Contas Bancárias/Natureza da
+   Operação (Feedback reaproveitado como Toast) + fix de colisão
+   Feedback×Table×Dialog (esta tela carrega Dialog.module.css pro modal de
+   Ativar/Desativar). */
+.dep-toast-region {
+  position: fixed;
+  top: calc(var(--shell-header-height) + var(--spacing-lg));
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  pointer-events: none;
+}
+.dep-toast-region .alert { pointer-events: auto; width: 100%; max-width: 480px; }
+.dep-toast { box-shadow: var(--shadow-lg); animation: dep-toast-in 0.25s ease; }
+.dep-toast .body { padding: 0; color: inherit; line-height: inherit; }
+.dep-toast .title { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: inherit; margin: 0 0 var(--spacing-xs); }
+@keyframes dep-toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dialog.module.css's `.overlay` tem `display:flex` sem guard — mesmo bug
+   já documentado dezenas de vezes neste projeto. */
+.overlay[hidden] { display: none; }

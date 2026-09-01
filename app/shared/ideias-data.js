@@ -12,12 +12,17 @@
 window.NiveloIdeias = (function () {
   'use strict';
 
+  // Ordem segue a mesma ordem da Sidebar (seção "Geral"): Dashboard → Assistente
+  // IA → Caderno de campo → Estoque → Financeiro (com Relatórios logo depois,
+  // já que é um subitem de Financeiro na Sidebar) — "Outros" sempre por último,
+  // por ser o catch-all.
   var CATEGORIAS = [
-    { id: 'financeiro', label: 'Financeiro' },
-    { id: 'estoque', label: 'Estoque' },
-    { id: 'caderno-de-campo', label: 'Caderno de campo' },
-    { id: 'relatorios', label: 'Relatórios' },
+    { id: 'dashboard', label: 'Dashboard' },
     { id: 'assistente-ia', label: 'Assistente de IA' },
+    { id: 'caderno-de-campo', label: 'Caderno de campo' },
+    { id: 'estoque', label: 'Estoque' },
+    { id: 'financeiro', label: 'Financeiro' },
+    { id: 'relatorios', label: 'Relatórios' },
     { id: 'outros', label: 'Outros' }
   ];
 

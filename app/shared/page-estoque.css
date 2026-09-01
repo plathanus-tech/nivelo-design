@@ -442,13 +442,24 @@
 #panel-comprometido .table {
   table-layout: fixed;
 }
-#panel-comprometido .th:nth-child(1), #panel-comprometido .td:nth-child(1) { width: 20%; }
-#panel-comprometido .th:nth-child(2), #panel-comprometido .td:nth-child(2) { width: 18%; }
-#panel-comprometido .th:nth-child(3), #panel-comprometido .td:nth-child(3) { width: 14%; }
+#panel-comprometido .th:nth-child(1), #panel-comprometido .td:nth-child(1) { width: 18%; }
+#panel-comprometido .th:nth-child(2), #panel-comprometido .td:nth-child(2) { width: 16%; }
+#panel-comprometido .th:nth-child(3), #panel-comprometido .td:nth-child(3) { width: 16%; }
 #panel-comprometido .th:nth-child(4), #panel-comprometido .td:nth-child(4) { width: 14%; }
 #panel-comprometido .th:nth-child(5), #panel-comprometido .td:nth-child(5) { width: 14%; }
 #panel-comprometido .th:nth-child(6), #panel-comprometido .td:nth-child(6) { width: 12%; }
-#panel-comprometido .th:nth-child(7), #panel-comprometido .td:nth-child(7) { width: 120px; }
+#panel-comprometido .th:nth-child(7), #panel-comprometido .td:nth-child(7) { width: 130px; }
+
+/* Bug real (mesmo já documentado em Categorias/Contas a Pagar): `.th` do
+   Table.module.css tem `height:37px` fixo + `white-space:nowrap` por
+   padrão — o rótulo "Comprometido" (o mais longo do cabeçalho, depois do
+   rename desta rodada) vazava por cima da coluna vizinha. Corrigido
+   deixando o cabeçalho quebrar em até 2 linhas em vez de estourar a
+   largura da coluna. */
+#panel-comprometido .th {
+  height: auto;
+  white-space: normal;
+}
 
 /* ── Tabela (desktop) / Cards (mobile) ─────────────────────────────────────
    Mesmo padrão de Cadastro (ver page-cadastros.css, "Tabela (desktop) /

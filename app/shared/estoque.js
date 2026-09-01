@@ -156,7 +156,7 @@
       var badge = SITUACAO_BADGE[item.situacao];
       return '<tr class="tr">' +
         '<td class="td">' + item.produto + '</td>' +
-        '<td class="td">' + item.destinatario + '</td>' +
+        '<td class="td">' + item.destinatario + '</td>' + /* label da coluna renomeado pra "Cliente" no HTML, dado interno segue "destinatario" */
         '<td class="td">' + formatInt(item.comprometida) + '</td>' +
         '<td class="td">' + formatInt(item.abatida) + '</td>' +
         '<td class="td">' + formatInt(item.pendente) + '</td>' +
@@ -220,7 +220,7 @@
           statusHTML +
         '</div>' +
         '<dl class="estoque-mobile-card-fields">' +
-          '<div><dt class="text-10-regular">Destinatário</dt><dd class="text-12-regular">' + cellText(cells[1]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Cliente</dt><dd class="text-12-regular">' + cellText(cells[1]) + '</dd></div>' +
           '<div><dt class="text-10-regular">Qtd. comprometida</dt><dd class="text-12-regular">' + cellText(cells[2]) + '</dd></div>' +
           '<div><dt class="text-10-regular">Qtd. abatida</dt><dd class="text-12-regular">' + cellText(cells[3]) + '</dd></div>' +
           '<div><dt class="text-10-regular">Qtd. pendente</dt><dd class="text-12-regular">' + cellText(cells[4]) + '</dd></div>' +
@@ -576,7 +576,7 @@
     compras: { filename: 'estoque-de-compras', headers: ['Produto', 'Unidade', 'Quantidade'], cols: ['produto', 'unidade', 'quantidade'] },
     comprometido: {
       filename: 'estoque-comprometido',
-      headers: ['Produto', 'Destinatário', 'Qtd. comprometida', 'Qtd. abatida', 'Qtd. pendente', 'Situação'],
+      headers: ['Produto', 'Cliente', 'Qtd. comprometida', 'Qtd. abatida', 'Qtd. pendente', 'Situação'],
       cols: ['produto', 'destinatario', 'comprometida', 'abatida', 'pendente', function (r) { return SITUACAO_BADGE[r.situacao].label; }]
     }
   };

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Chip/Chip.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-videos.css" />
 </head>
@@ -62,7 +63,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="assistente-numeros">
                   <span class="app-nav-icon"><i data-lucide="smartphone" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Meus números</span>
+                  <span class="app-nav-label">Configurar WhatsApp</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="assistente-nova-conversa">
                   <span class="app-nav-icon"><i data-lucide="history" width="16" height="16"></i></span>
@@ -85,7 +86,7 @@
               <div class="app-nav-submenu">
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-pessoas">
                   <span class="app-nav-icon"><i data-lucide="users" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Clientes e fornecedores</span>
+                  <span class="app-nav-label">Parceiros</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="cadastro-produtos">
                   <span class="app-nav-icon"><i data-lucide="wheat" width="16" height="16"></i></span>
@@ -157,9 +158,9 @@
             <span class="app-nav-section-title">Gestão</span>
 
             <div class="app-nav-group" id="group-configuracao">
-              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configuração · opções">
+              <button type="button" class="app-nav-item" data-group-toggle="group-configuracao" aria-expanded="false" data-tooltip="Configurações · opções">
                 <span class="app-nav-icon"><i data-lucide="settings" width="20" height="20"></i></span>
-                <span class="app-nav-label">Configuração</span>
+                <span class="app-nav-label">Configurações</span>
                 <span class="app-nav-chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
               </button>
               <div class="app-nav-submenu">
@@ -170,10 +171,6 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-fazenda">
                   <span class="app-nav-icon"><i data-lucide="tractor" width="16" height="16"></i></span>
                   <span class="app-nav-label">Cadastro de fazenda</span>
-                </button>
-                <button type="button" class="app-nav-subitem" data-nav="config-conta-financeira">
-                  <span class="app-nav-icon"><i data-lucide="banknote" width="16" height="16"></i></span>
-                  <span class="app-nav-label">Conta Financeira</span>
                 </button>
                 <button type="button" class="app-nav-subitem" data-nav="config-conta-bancaria">
                   <span class="app-nav-icon"><i data-lucide="landmark" width="16" height="16"></i></span>
@@ -186,6 +183,10 @@
                 <button type="button" class="app-nav-subitem" data-nav="config-unidade-medida">
                   <span class="app-nav-icon"><i data-lucide="ruler" width="16" height="16"></i></span>
                   <span class="app-nav-label">Unidade de medida</span>
+                </button>
+                <button type="button" class="app-nav-subitem" data-nav="config-depositos">
+                  <span class="app-nav-icon"><i data-lucide="warehouse" width="16" height="16"></i></span>
+                  <span class="app-nav-label">Depósitos</span>
                 </button>
 
                 <div class="app-nav-subgroup" id="group-fiscal">
@@ -256,6 +257,16 @@
           <div class="videos-header">
             <h1 class="videos-title text-heading-6">Vídeos</h1>
             <p class="videos-description text-body-s">Confira os vídeos disponibilizados para aprender mais sobre o sistema e suas funcionalidades.</p>
+          </div>
+
+          <div class="videos-chip-nav" id="videos-chip-nav">
+            <button type="button" class="actionBtn videos-chip-nav-btn videos-chip-nav-prev" id="videos-chip-prev" aria-label="Ver categorias anteriores" hidden>
+              <i data-lucide="chevron-left" width="16" height="16"></i>
+            </button>
+            <div class="row videos-chip-row" id="videos-chip-row"></div>
+            <button type="button" class="actionBtn videos-chip-nav-btn videos-chip-nav-next" id="videos-chip-next" aria-label="Ver mais categorias" hidden>
+              <i data-lucide="chevron-right" width="16" height="16"></i>
+            </button>
           </div>
 
           <div class="videos-grid" id="videos-grid"></div>

@@ -109,7 +109,17 @@
 }
 
 @media (min-width: 768px) {
-  .novo-estoque-grid {
+  /* Bug real corrigido nesta rodada: `.novo-estoque-grid:not([hidden])`
+     acima tem especificidade (0,2,0) — maior que a regra desta media query
+     sem o mesmo `:not([hidden])` (0,1,0). Como as duas regras se aplicam ao
+     mesmo elemento (a media query só controla SE a regra existe, nunca sua
+     especificidade), a versão de 1 coluna sempre vencia, mesmo em telas
+     largas — o grid de 2 colunas nunca era aplicado de verdade em nenhum
+     formulário que usa `.novo-estoque-grid` (Novo registo de estoque,
+     Registrar entrada V2, etc). Corrigido reafirmando `:not([hidden])`
+     aqui também, empatando a especificidade — a ordem no arquivo (esta
+     regra vem depois) decide corretamente a favor de 2 colunas. */
+  .novo-estoque-grid:not([hidden]) {
     grid-template-columns: 1fr 1fr;
   }
   .novo-estoque-span-2 {
@@ -174,6 +184,69 @@
 .novo-estoque-optional-tag {
   font-weight: var(--font-weight-regular);
   color: var(--color-text-tertiary);
+}
+
+/* ── Tipo de estoque: cartões de seleção (radio nativo) ───────────────────
+   Mesma técnica visual/comportamental de `.entradav2-origem-card`
+   (page-registrar-entrada-estoque-v2.css, carregado nesta tela pro card
+   "Origem da entrada") — réplica com classes próprias (nunca um Dropdown
+   fechado pra este campo). Só 2 opções (Estoque Comprometido removido). ── */
+.novo-estoque-tipo-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+@media (min-width: 480px) {
+  .novo-estoque-tipo-group {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* No desktop, os 3 tipos ficam lado a lado na mesma linha (pedido explícito)
+   — mesmo breakpoint "desktop" já usado no resto deste arquivo (768px). */
+@media (min-width: 768px) {
+  .novo-estoque-tipo-group {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.novo-estoque-tipo-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: var(--border-width-thin) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.novo-estoque-tipo-card:hover {
+  border-color: var(--color-action-primary);
+}
+.novo-estoque-tipo-card.is-selected {
+  border-color: var(--color-action-primary);
+  background: var(--color-bg-brand);
+}
+
+/* Radio nativo escondido (mesmo truque de RadioButton/Checkbox: 1px/opacity:0) */
+.novo-estoque-tipo-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.novo-estoque-tipo-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+.novo-estoque-tipo-card.is-selected .novo-estoque-tipo-icon {
+  color: var(--color-action-primary);
+}
+
+.novo-estoque-tipo-label {
+  color: var(--color-text-primary);
 }
 
 /* ── Produto: combobox (busca + cadastro rápido) ──────────────────────────

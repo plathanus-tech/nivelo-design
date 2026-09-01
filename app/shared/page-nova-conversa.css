@@ -155,9 +155,18 @@
   padding: var(--spacing-md);
   min-height: 0;
 }
+.nc-history-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .nc-history-title {
   color: var(--color-text-tertiary);
   font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+.nc-history-subtitle {
+  color: var(--color-text-tertiary);
   margin: 0;
 }
 .nc-history-list {
