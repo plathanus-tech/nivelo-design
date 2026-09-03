@@ -6785,3 +6785,118 @@ Pedido confirmado: subir pra md.
 Verificado ao vivo: valor em 14px/600 contra 12px/600 do rótulo (desktop), sem quebra de linha
 (120px de coluna, sem precisar alargar); mobile com o valor visivelmente 1 nível maior que o
 rótulo, sem corte/sobreposição; nenhum erro de console.
+
+## Ajustes 2026-09-01 (round 109) — Nova Natureza da Operação: aba IBS/CBS (Reforma
+Tributária) na Configuração Tributária
+
+Pedido grande: adicionar suporte completo a IBS/CBS ao card "Configuração tributária" de
+`nova-natureza-operacao.html`, mantendo os 5 impostos existentes (Simples Nacional/IPI/ISSQN/
+PIS/COFINS) 100% intactos. Pedido explícito de analisar a estrutura atual antes de codar e
+reaproveitar componentes já existentes — feito: `Dropdown` (CST, scroll/overflow já resolvidos
+de fábrica pelo componente), `Dialog` (modal do cClassTrib, `.body{overflow-y:auto}` já dá o
+scroll interno sem crescer indefinidamente), `RadioButton.group` (lista vertical de opções do
+modal) e o padrão `initFixedTooltip()` já usado em Novo Cadastro (info icons).
+
+- **Subtítulo do card parou de mudar por aba** — era mutado via JS a cada troca de aba
+  (`taxSubtitle.textContent = TAX_TAB_SUBTITLE[key]`), removido. Cada aba ganhou seu próprio
+  `<p class="nnop-tax-panel-hint">` fixo dentro do próprio painel (as 5 abas existentes
+  receberam o texto que antes vivia no mapa `TAX_TAB_SUBTITLE`, sem nenhuma mudança de
+  conteúdo); o subtítulo do card virou um texto genérico e fixo: "Configure as regras
+  tributárias desta natureza de operação, organizadas por imposto."
+- **Nova aba "IBS/CBS"** (6ª, depois de COFINS): hint próprio ("Defina o CST, cClassTrib e as
+  alíquotas padrão de IBS e CBS para esta natureza da operação."), CST → cClassTrib → CBS/IBS UF
+  (condicionais) → Outras configurações, nessa ordem.
+- **Novo arquivo `app/shared/ibs-cbs-data.js`** (`window.NiveloIbsCbs`) — fonte centralizada
+  única: `CST_OPTIONS` (16 códigos, exatamente os listados no pedido — a "matriz CST→campos"
+  do pedido tinha 16 linhas, adotada como a lista autoritativa; a menção a "17 CSTs" no
+  checklist do pedido não bateu com nenhuma lista explícita de 17 itens em nenhum lugar do
+  texto, tratada como imprecisão de contagem), `CCLASSTRIB_BY_CST` (todo o dataset de
+  cClassTrib por CST, transcrito verbatim do pedido) e `FIELD_CONFIG_BY_CST` (a matriz
+  CST→campos de CBS/IBS UF). Zero `if/else` espalhado pela tela — `nova-natureza-operacao.js`
+  só lê daqui.
+- **CST**: `Dropdown` populado via JS a partir de `NiveloIbsCbs.getCstOptions()` (menu nasce
+  vazio no HTML, preenchido no boot) — herda de graça o `max-height:240px;overflow-y:auto` e o
+  reposicionamento por `position:fixed` já existentes no `initDropdown()` desta tela, sem
+  nenhuma CSS nova pro scroll/overflow. Ícone de info com tooltip de texto longo.
+- **cClassTrib**: campo não é mais um Dropdown — é um `.trigger` desabilitado até o CST ser
+  escolhido, que abre um modal (`Dialog` `md`) com a lista de cClassTrib **filtrada pelo CST
+  atual** (`RadioButton.group`, cada opção com código em destaque + descrição completa).
+  Cancelar descarta a seleção em andamento; Confirmar aplica e fecha. Trocar o CST **invalida**
+  um cClassTrib incompatível automaticamente (limpa e exige nova escolha) — nunca deixa uma
+  combinação inválida sobreviver.
+- **Seções CBS/IBS UF condicionais por CST**, via `FIELD_CONFIG_BY_CST`: `Alíquota` sempre que
+  aplicável, mais `Redução`/`Diferimento` conforme a matriz do pedido (000/010/221/550/830 só
+  alíquota; 011/200 alíquota+redução; 510 alíquota+diferimento; 515 os três; 400/410/620/800/
+  810/811/820 nenhuma seção). "Outras configurações" (IBS Municipal/IS, badges "Em breve", não
+  configurável) aparece sempre, independente do CST.
+- **Máscara de percentual nova** (`initPercentMask`, `app/shared/nova-natureza-operacao.js`) —
+  não existia nenhum componente/input de percentual editável no sistema (grep exaustivo antes
+  de escrever); modelada no mesmo princípio da máscara de centavos (`formatCentavosBRL`,
+  `novo-estoque.js`): dígitos como estado, formatação `12,34%` a cada tecla.
+  Campos inaplicáveis ao CST atual nunca entram no payload (`buildIbsCbsPayload()`, filtra pela
+  mesma `FIELD_CONFIG_BY_CST` — trocar de CST 000 pra 410 não deixa uma "Alíquota CBS" antiga
+  sobrando no envio).
+- **Tooltips de texto longo**: `Tooltip.module.css` foi adicionado ao `<head>` pela primeira vez
+  nesta tela — seu `.tip{white-space:nowrap}` padrão (pensado pra tooltips curtos de 2-4
+  palavras) não serve pras frases completas deste pedido, então os ícones de info usam
+  `initFixedTooltip()` (copiado de `novo-cadastro.js`, `position:fixed` via JS) + uma classe
+  `.nnop-info-icon .tip{white-space:normal;width:240px}`. **Mesma colisão já documentada
+  dezenas de vezes neste arquivo** (`.wrapper:hover .tip` do Tooltip.module.css dispararia
+  sempre que o mouse estivesse em QUALQUER lugar do campo, já que o ícone de info vive dentro do
+  MESMO `.wrapper` do campo) — neutralizada com `.wrapper .nnop-info-icon .tip{opacity:0}`,
+  mesmo princípio do fix histórico `#code-field .tip{opacity:0}`.
+- **Validação mínima**: IBS/CBS não é obrigatório (mesmo padrão dos outros 5 impostos), mas
+  nunca permite salvar um CST sem o cClassTrib correspondente.
+- **`Dialog.module.css` também adicionado ao `<head>` pela primeira vez nesta tela** (só pro
+  modal do cClassTrib) — ganhou o guard `.overlay[hidden]{display:none}` desde a criação (mesmo
+  bug recorrente documentado dezenas de vezes neste arquivo), não como correção posterior.
+
+**Arquivos alterados:** `app/screens/nova-natureza-operacao.html` (head, tabs, painéis, modal),
+`app/shared/nova-natureza-operacao.js` (subtítulo fixo, CST/cClassTrib/percentual/tooltip,
+prefill/payload), `app/shared/page-nova-natureza-operacao.css` (seções IBS/CBS, tooltip largo,
+guard do overlay). **Arquivo novo:** `app/shared/ibs-cbs-data.js`.
+
+Verificado ao vivo (`http-server`, porta 8091): CST com 16 opções e scroll real (640px de
+conteúdo em 238px visíveis); trocar de aba nunca muda o subtítulo do card; CST 200 revela CBS/
+IBS UF com Redução (sem Diferimento); CST 410 esconde as duas seções por completo; modal do
+cClassTrib filtrado corretamente por CST (52 opções em 200, 27 em 410), Confirmar aplica e
+Cancelar descarta; trocar de CST depois de escolher um cClassTrib limpa a seleção incompatível
+automaticamente; máscara de percentual formatando "1234" → "12,34%" ao vivo; submit bloqueado
+com CST sem cClassTrib (borda vermelha) e liberado ao escolher um, payload final incluindo só
+os campos aplicáveis ao CST (confirmado com CST 410: nenhum campo de CBS/IBS UF no payload);
+mobile (375px): dropdown do CST cabendo na viewport, modal do cClassTrib com rodapé
+Cancelar/Confirmar sempre visível e corpo com scroll próprio; nenhum erro de console real (só
+os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo o sistema); as 5 abas
+existentes (Simples Nacional/IPI/ISSQN/PIS/COFINS) sem nenhuma regressão de campo/validação/
+payload.
+
+## Ajustes 2026-09-01 (round 110) — IBS/CBS: CST/cClassTrib empilhados, cClassTrib com
+ellipsis, texto de "Redução de alíquota" citando produtos essenciais/estratégicos/sensíveis
+
+3 ajustes pontuais sobre a aba IBS/CBS do round 109.
+
+- **CST e cClassTrib sempre em linhas separadas, mesmo em desktop.** Os dois wrappers
+  ganharam `.nnop-span-2` (classe já existente em `page-nova-natureza-operacao.css`,
+  `grid-column:span 2` a partir de 768px) — antes ficavam lado a lado no grid de 2 colunas do
+  desktop, como qualquer outro par de campos da aba.
+- **Bug real corrigido: descrição longa de cClassTrib ultrapassava a caixa do campo.**
+  `#ibscbs-cclasstrib-trigger` é um `.trigger` (flex) sem nenhum tratamento de overflow —
+  descrições de uma frase só cabiam, mas as mais longas (ex. CST 200, ~300 caracteres)
+  vazavam. Corrigido com o padrão clássico de ellipsis em flex: `.nnop-cclasstrib-value` ganhou
+  `min-width:0` (item flex nunca encolhe abaixo do próprio conteúdo sem isso) +
+  `overflow:hidden;text-overflow:ellipsis;white-space:nowrap`. Texto completo nunca é perdido —
+  `setCclasstribValue()` (nova-natureza-operacao.js) grava o texto inteiro em `trigger.title`
+  (tooltip nativo do navegador) além do modal de seleção já mostrar a descrição completa
+  (comportamento que já existia desde o round 109, confirmado intacto).
+- **Texto de "Redução de alíquota CBS"/"Redução de alíquota UF"** atualizado nas duas
+  ocorrências para "Percentual de redução aplicado sobre a alíquota padrão para produtos
+  considerados essenciais, estratégicos ou sensíveis." (era "...para setores e produtos
+  específicos.", texto genérico demais).
+
+Verificado ao vivo: CST e cClassTrib empilhados em 1280px (790px de largura cada, cClassTrib
+começando 90px abaixo do fim do CST) e em 375px; selecionar CST 200 + o cClassTrib mais longo
+do dataset (200002, ~300 caracteres) confirma o texto clipado visualmente
+(`scrollWidth:2182px` vs `clientWidth:741px`, `text-overflow:ellipsis` computado) sem overflow
+de página (`document.documentElement.scrollWidth === innerWidth` em desktop e mobile) e sem
+perda de dado (`textContent`/`title` com os 300 caracteres completos); tooltips de Redução (CBS
+e IBS UF) com o novo texto; nenhuma regressão nos demais campos/abas.

@@ -103,15 +103,7 @@
   // imposto fica visível por vez, mesmo padrão das abas Entrada/Saída da
   // listagem. ----------
   var taxTablist = document.getElementById('nnop-tax-tablist');
-  var taxSubtitle = document.getElementById('nnop-tax-subtitle');
   var taxPanels = Array.prototype.slice.call(document.querySelectorAll('.nnop-tax-panel'));
-  var TAX_TAB_SUBTITLE = {
-    simples: 'Regras do Simples Nacional aplicáveis a esta natureza de operação.',
-    ipi: 'Configurações do Imposto sobre Produtos Industrializados (IPI) para esta natureza de operação.',
-    issqn: 'Configurações do Imposto sobre Serviços (ISSQN) para esta natureza de operação.',
-    pis: 'Configurações da contribuição para o PIS aplicáveis a esta natureza de operação.',
-    cofins: 'Configurações da contribuição para o COFINS aplicáveis a esta natureza de operação.'
-  };
   function selectTaxTab(key) {
     Array.prototype.slice.call(taxTablist.querySelectorAll('.tab')).forEach(function (t) {
       var active = t.dataset.taxTab === key;
@@ -121,7 +113,6 @@
     taxPanels.forEach(function (panel) {
       panel.hidden = panel.dataset.taxPanel !== key;
     });
-    taxSubtitle.textContent = TAX_TAB_SUBTITLE[key] || '';
   }
   taxTablist.addEventListener('click', function (event) {
     var tabBtn = event.target.closest('.tab');
@@ -154,6 +145,206 @@
     form.querySelectorAll('input[name="' + name + '"]').forEach(function (input) {
       input.addEventListener('change', function () { syncRadioChecked(name); });
     });
+  });
+
+  // ---------- IBS/CBS (Reforma Tributária) ----------
+  // Fonte única de dados: window.NiveloIbsCbs (ibs-cbs-data.js) — CST_OPTIONS,
+  // cClassTrib por CST e a matriz de campos visíveis por CST. Nada disso é
+  // duplicado aqui, só lido.
+  var ibsCbs = window.NiveloIbsCbs;
+  var ibscbsState = { cst: '', cclasstrib: '' };
+
+  // Tooltip de texto longo — mesma técnica já usada em novo-cadastro.js
+  // (`initFixedTooltip`), copiada (não compartilhada via import, convenção
+  // do projeto). Necessária porque a regra ambiente `.wrapper:hover .tip`
+  // do Tooltip.module.css dispararia sempre que o mouse estivesse em
+  // QUALQUER parte do campo (ver `.wrapper .nnop-info-icon .tip{opacity:0}`
+  // em page-nova-natureza-operacao.css, que neutraliza essa regra).
+  function initFixedTooltip(trigger) {
+    if (!trigger) return;
+    var tip = trigger.querySelector('.tip');
+    if (!tip) return;
+    function show() {
+      var rect = trigger.getBoundingClientRect();
+      var centerX = rect.left + rect.width / 2;
+      tip.style.position = 'fixed';
+      tip.style.left = centerX + 'px';
+      tip.style.transform = 'translateX(-50%)';
+      tip.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+      tip.style.top = 'auto';
+      tip.style.opacity = '1';
+      var margin = 8;
+      var tipRect = tip.getBoundingClientRect();
+      if (tipRect.left < margin) {
+        tip.style.left = (centerX + (margin - tipRect.left)) + 'px';
+      } else if (tipRect.right > window.innerWidth - margin) {
+        tip.style.left = (centerX - (tipRect.right - (window.innerWidth - margin))) + 'px';
+      }
+    }
+    function hide() { tip.style.opacity = '0'; }
+    trigger.addEventListener('mouseenter', show);
+    trigger.addEventListener('mouseleave', hide);
+    trigger.addEventListener('focus', show);
+    trigger.addEventListener('blur', hide);
+  }
+  Array.prototype.slice.call(document.querySelectorAll('.nnop-info-icon')).forEach(initFixedTooltip);
+
+  // Máscara de percentual — não existe nenhum componente/input de percentual
+  // no sistema ainda (grep exaustivo antes de escrever), modelado no mesmo
+  // princípio da máscara de centavos (formatCentavosBRL, novo-estoque.js):
+  // guarda os dígitos crus como estado, formata pra exibição a cada tecla.
+  function initPercentMask(input) {
+    if (!input) return;
+    function digitsOf(value) { return (value || '').replace(/\D/g, ''); }
+    function format(digits) {
+      digits = digits.replace(/^0+(?=\d)/, '');
+      while (digits.length < 3) digits = '0' + digits;
+      var intPart = String(Number(digits.slice(0, -2)));
+      var decPart = digits.slice(-2);
+      return intPart + ',' + decPart + '%';
+    }
+    input.addEventListener('input', function () {
+      var digits = digitsOf(input.value).slice(0, 6);
+      input.value = digits ? format(digits) : '';
+    });
+    input.addEventListener('blur', function () {
+      if (!input.value) setFieldError(input.closest('.wrapper'), false);
+    });
+  }
+  Array.prototype.slice.call(document.querySelectorAll('.nnop-percent-input')).forEach(initPercentMask);
+  function percentValue(input) {
+    if (!input) return '';
+    return input.value.trim();
+  }
+  function setPercentValue(input, value) {
+    if (!input) return;
+    if (value === '' || value == null) { input.value = ''; return; }
+    var digits = String(value).replace(/[^\d,]/g, '').replace(',', '');
+    input.value = digits ? (function () {
+      while (digits.length < 3) digits = '0' + digits;
+      return String(Number(digits.slice(0, -2))) + ',' + digits.slice(-2) + '%';
+    })() : '';
+  }
+
+  var cstField = document.getElementById('ibscbs-cst-field');
+  var cstMenu = cstField.querySelector('[data-dropdown-menu]');
+  ibsCbs.getCstOptions().forEach(function (opt) {
+    var div = document.createElement('div');
+    div.className = 'option';
+    div.dataset.value = opt.codigo;
+    div.textContent = opt.codigo + ' - ' + opt.descricao;
+    cstMenu.appendChild(div);
+  });
+  var cstDropdown = initDropdown(cstField);
+
+  var cclasstribTrigger = document.getElementById('ibscbs-cclasstrib-trigger');
+  var cclasstribValue = document.getElementById('ibscbs-cclasstrib-value');
+  var cclasstribField = document.getElementById('ibscbs-cclasstrib-field');
+
+  var cbsSection = document.getElementById('ibscbs-cbs-section');
+  var ibsSection = document.getElementById('ibscbs-ibs-section');
+  var CBS_FIELD_ID = { aliquota: 'ibscbs-cbs-aliquota-field', reducao: 'ibscbs-cbs-reducao-field', diferimento: 'ibscbs-cbs-diferimento-field' };
+  var IBS_FIELD_ID = { aliquota: 'ibscbs-ibs-aliquota-field', reducao: 'ibscbs-ibs-reducao-field', diferimento: 'ibscbs-ibs-diferimento-field' };
+
+  function refreshIbsCbsFieldVisibility() {
+    var config = ibsCbs.getFieldConfig(ibscbsState.cst);
+    var hasCbs = config.cbs.length > 0;
+    var hasIbs = config.ibs.length > 0;
+    cbsSection.hidden = !hasCbs;
+    ibsSection.hidden = !hasIbs;
+    Object.keys(CBS_FIELD_ID).forEach(function (key) {
+      document.getElementById(CBS_FIELD_ID[key]).hidden = config.cbs.indexOf(key) === -1;
+    });
+    Object.keys(IBS_FIELD_ID).forEach(function (key) {
+      document.getElementById(IBS_FIELD_ID[key]).hidden = config.ibs.indexOf(key) === -1;
+    });
+  }
+
+  function setCclasstribValue(codigo) {
+    ibscbsState.cclasstrib = codigo || '';
+    if (!codigo) {
+      cclasstribValue.textContent = ibscbsState.cst ? 'Selecione o cClassTrib' : 'Selecione o CST primeiro';
+      cclasstribTrigger.removeAttribute('title');
+      return;
+    }
+    var found = ibsCbs.findCclasstrib(ibscbsState.cst, codigo);
+    var text = found ? (found.codigo + ' - ' + found.descricao) : codigo;
+    cclasstribValue.textContent = text;
+    // O texto some visualmente com ellipsis quando é longo demais pra caber
+    // na caixa (ver .nnop-cclasstrib-value) — o `title` dá o texto completo
+    // via tooltip nativo do navegador, além do modal de seleção (que sempre
+    // mostra a descrição inteira) já cobrir esse caso.
+    cclasstribTrigger.title = text;
+  }
+
+  function onCstChanged(newCst) {
+    ibscbsState.cst = newCst || '';
+    cclasstribTrigger.disabled = !ibscbsState.cst;
+    // Invalida um cClassTrib incompatível: nunca deixa uma combinação
+    // CST+cClassTrib inválida sobreviver a uma troca de CST.
+    if (ibscbsState.cclasstrib && !ibsCbs.findCclasstrib(ibscbsState.cst, ibscbsState.cclasstrib)) {
+      setCclasstribValue('');
+    } else {
+      setCclasstribValue(ibscbsState.cclasstrib);
+    }
+    refreshIbsCbsFieldVisibility();
+  }
+  cstMenu.addEventListener('click', function (event) {
+    if (event.target.closest('.option')) onCstChanged(cstDropdown.getValue());
+  });
+  onCstChanged('');
+
+  // ---------- Modal do cClassTrib ----------
+  var cclasstribOverlay = document.getElementById('cclasstrib-dialog-overlay');
+  var cclasstribOptionsEl = document.getElementById('cclasstrib-options');
+  var cclasstribPendingValue = '';
+
+  function renderCclasstribOptions() {
+    var list = ibsCbs.getCclasstribList(ibscbsState.cst);
+    cclasstribOptionsEl.innerHTML = '';
+    list.forEach(function (item, index) {
+      var id = 'cclasstrib-modal-opt-' + index;
+      var label = document.createElement('label');
+      label.className = 'option';
+      label.innerHTML =
+        '<input type="radio" class="input" name="cclasstrib-modal-option" id="' + id + '" value="' + item.codigo + '" />' +
+        '<span class="circle"><span class="dot"></span></span>' +
+        '<span class="optionLabel"><strong>' + item.codigo + '</strong>' + item.descricao + '</span>';
+      cclasstribOptionsEl.appendChild(label);
+    });
+    var currentInput = cclasstribOptionsEl.querySelector('input[value="' + cclasstribPendingValue + '"]');
+    if (currentInput) currentInput.checked = true;
+    syncCclasstribChecked();
+  }
+  function syncCclasstribChecked() {
+    Array.prototype.slice.call(cclasstribOptionsEl.querySelectorAll('input[type="radio"]')).forEach(function (input) {
+      input.closest('.option').classList.toggle('checked', input.checked);
+    });
+  }
+  cclasstribOptionsEl.addEventListener('change', syncCclasstribChecked);
+
+  function openCclasstribDialog() {
+    if (cclasstribTrigger.disabled) return;
+    cclasstribPendingValue = ibscbsState.cclasstrib;
+    renderCclasstribOptions();
+    cclasstribOverlay.hidden = false;
+  }
+  function closeCclasstribDialog() { cclasstribOverlay.hidden = true; }
+
+  cclasstribTrigger.addEventListener('click', openCclasstribDialog);
+  document.getElementById('cclasstrib-dialog-close').addEventListener('click', closeCclasstribDialog);
+  document.getElementById('cclasstrib-dialog-cancel').addEventListener('click', closeCclasstribDialog);
+  document.getElementById('cclasstrib-dialog-confirm').addEventListener('click', function () {
+    var checked = cclasstribOptionsEl.querySelector('input[type="radio"]:checked');
+    setCclasstribValue(checked ? checked.value : '');
+    setFieldError(cclasstribField, false);
+    closeCclasstribDialog();
+  });
+  cclasstribOverlay.addEventListener('click', function (event) {
+    if (event.target === cclasstribOverlay) closeCclasstribDialog();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !cclasstribOverlay.hidden) closeCclasstribDialog();
   });
 
   // ---------- Padrões pré-configurados ----------
@@ -230,6 +421,16 @@
     var regimeField = document.getElementById('regime-field');
     if (!regimeDropdown.getValue()) { setFieldError(regimeField, true); valid = false; } else setFieldError(regimeField, false);
 
+    // IBS/CBS não é obrigatório (mesmo padrão dos outros 5 impostos), mas
+    // nunca permite salvar um CST sem o cClassTrib correspondente — evita
+    // uma combinação inválida/incompleta.
+    if (ibscbsState.cst && !ibscbsState.cclasstrib) {
+      setFieldError(cclasstribField, true);
+      valid = false;
+    } else {
+      setFieldError(cclasstribField, false);
+    }
+
     return valid;
   }
 
@@ -281,6 +482,17 @@
       document.getElementById('cofins-observacao').value = t.cofins.observacao || '';
       document.getElementById('cofins-info-fisco').value = t.cofins.informacaoFisco || '';
     }
+    if (t.ibsCbs && t.ibsCbs.cst) {
+      cstDropdown.setValue(t.ibsCbs.cst);
+      onCstChanged(cstDropdown.getValue());
+      if (t.ibsCbs.cclasstrib) setCclasstribValue(t.ibsCbs.cclasstrib);
+      setPercentValue(document.getElementById('ibscbs-cbs-aliquota'), t.ibsCbs.cbsAliquota);
+      setPercentValue(document.getElementById('ibscbs-cbs-reducao'), t.ibsCbs.cbsReducao);
+      setPercentValue(document.getElementById('ibscbs-cbs-diferimento'), t.ibsCbs.cbsDiferimento);
+      setPercentValue(document.getElementById('ibscbs-ibs-aliquota'), t.ibsCbs.ibsAliquota);
+      setPercentValue(document.getElementById('ibscbs-ibs-reducao'), t.ibsCbs.ibsReducao);
+      setPercentValue(document.getElementById('ibscbs-ibs-diferimento'), t.ibsCbs.ibsDiferimento);
+    }
   }
 
   if (isEditMode) {
@@ -289,6 +501,23 @@
   } else {
     var prefTipo = params.get('tipo');
     if (prefTipo === 'entrada' || prefTipo === 'saida') tipoDropdown.setValue(prefTipo);
+  }
+
+  // Monta o payload de IBS/CBS só com os campos aplicáveis ao CST selecionado
+  // (nunca deixa um valor de Alíquota/Redução/Diferimento sobrar no payload
+  // quando o CST atual não usa aquele campo — ex.: trocar de CST 000 pra 410
+  // não pode deixar uma "Alíquota CBS" antiga no envio).
+  function buildIbsCbsPayload() {
+    if (!ibscbsState.cst) return null;
+    var config = ibsCbs.getFieldConfig(ibscbsState.cst);
+    var payload = { cst: ibscbsState.cst, cclasstrib: ibscbsState.cclasstrib };
+    if (config.cbs.indexOf('aliquota') !== -1) payload.cbsAliquota = percentValue(document.getElementById('ibscbs-cbs-aliquota'));
+    if (config.cbs.indexOf('reducao') !== -1) payload.cbsReducao = percentValue(document.getElementById('ibscbs-cbs-reducao'));
+    if (config.cbs.indexOf('diferimento') !== -1) payload.cbsDiferimento = percentValue(document.getElementById('ibscbs-cbs-diferimento'));
+    if (config.ibs.indexOf('aliquota') !== -1) payload.ibsAliquota = percentValue(document.getElementById('ibscbs-ibs-aliquota'));
+    if (config.ibs.indexOf('reducao') !== -1) payload.ibsReducao = percentValue(document.getElementById('ibscbs-ibs-reducao'));
+    if (config.ibs.indexOf('diferimento') !== -1) payload.ibsDiferimento = percentValue(document.getElementById('ibscbs-ibs-diferimento'));
+    return payload;
   }
 
   // ---------- Submit ----------
@@ -341,7 +570,8 @@
           base: document.getElementById('cofins-base').value.trim(),
           observacao: document.getElementById('cofins-observacao').value.trim(),
           informacaoFisco: document.getElementById('cofins-info-fisco').value.trim()
-        }
+        },
+        ibsCbs: buildIbsCbsPayload()
       }
     };
 

@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/RadioButton/RadioButton.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tab/Tab.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-nova-natureza-operacao.css" />
 </head>
@@ -425,7 +427,7 @@
                  por vez" sem esse conflito. -->
             <section class="card nnop-tax-card">
               <h2 class="nnop-section-title text-body-xl">Configuração tributária</h2>
-              <p class="nnop-section-hint text-body-s" id="nnop-tax-subtitle">Regras do Simples Nacional aplicáveis a esta natureza de operação.</p>
+              <p class="nnop-section-hint text-body-s" id="nnop-tax-subtitle">Configure as regras tributárias desta natureza de operação, organizadas por imposto.</p>
 
               <div class="list nnop-tax-tabs" role="tablist" id="nnop-tax-tablist">
                 <button type="button" role="tab" aria-selected="true" class="tab active" data-tax-tab="simples">Simples Nacional</button>
@@ -433,12 +435,14 @@
                 <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="issqn">ISSQN</button>
                 <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="pis">PIS</button>
                 <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="cofins">COFINS</button>
+                <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="ibscbs">IBS/CBS</button>
               </div>
 
               <div class="nnop-tax-panels">
 
                 <!-- ── Simples Nacional ── -->
                 <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="simples">
+                    <p class="nnop-tax-panel-hint text-body-s">Regras do Simples Nacional aplicáveis a esta natureza de operação.</p>
                     <div class="nnop-tax-grid">
 
                       <div class="wrapper nnop-dropdown" id="sn-csosn-field">
@@ -503,6 +507,7 @@
 
                 <!-- ── IPI ── -->
                 <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="ipi" hidden>
+                    <p class="nnop-tax-panel-hint text-body-s">Configurações do Imposto sobre Produtos Industrializados (IPI) para esta natureza de operação.</p>
                     <div class="nnop-tax-grid">
 
                       <div class="wrapper nnop-dropdown" id="ipi-codigo-field" data-value="nao-destacar">
@@ -556,6 +561,7 @@
 
                 <!-- ── ISSQN ── -->
                 <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="issqn" hidden>
+                    <p class="nnop-tax-panel-hint text-body-s">Configurações do Imposto sobre Serviços (ISSQN) para esta natureza de operação.</p>
                     <div class="nnop-tax-grid">
 
                       <div class="wrapper nnop-dropdown" id="issqn-cst-field">
@@ -620,6 +626,7 @@
 
                 <!-- ── PIS ── -->
                 <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="pis" hidden>
+                    <p class="nnop-tax-panel-hint text-body-s">Configurações da contribuição para o PIS aplicáveis a esta natureza de operação.</p>
                     <div class="nnop-tax-grid">
 
                       <div class="wrapper" id="pis-cst-field">
@@ -662,6 +669,7 @@
 
                 <!-- ── COFINS ── -->
                 <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="cofins" hidden>
+                    <p class="nnop-tax-panel-hint text-body-s">Configurações da contribuição para o COFINS aplicáveis a esta natureza de operação.</p>
                     <div class="nnop-tax-grid">
 
                       <div class="wrapper" id="cofins-cst-field">
@@ -702,6 +710,166 @@
                     </div>
                 </div>
 
+                <!-- ── IBS/CBS (Reforma Tributária) ── -->
+                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="ibscbs" hidden>
+                    <p class="nnop-tax-panel-hint text-body-s">Defina o CST, cClassTrib e as alíquotas padrão de IBS e CBS para esta natureza da operação.</p>
+                    <div class="nnop-tax-grid">
+
+                      <div class="wrapper nnop-dropdown nnop-span-2" id="ibscbs-cst-field">
+                        <span class="label">Código de Situação Tributária IBS / CBS (CST)
+                          <span class="nnop-info-icon" id="ibscbs-cst-info-trigger" tabindex="0">
+                            <i data-lucide="info" width="14" height="14"></i>
+                            <span class="tip nnop-tooltip-wide text-body-xs top">
+                              <span class="arrow"></span>
+                              Código que identifica o tratamento tributário aplicável à operação em relação ao IBS e à CBS na NF-e ou NFC-e.
+                            </span>
+                          </span>
+                        </span>
+                        <button type="button" class="trigger" data-dropdown-trigger>
+                          <span data-dropdown-value>Selecione o CST</span>
+                          <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                        </button>
+                        <div class="menu" data-dropdown-menu></div>
+                      </div>
+
+                      <div class="wrapper nnop-span-2" id="ibscbs-cclasstrib-field">
+                        <span class="label">Código de Classificação Tributária IBS / CBS (cClassTrib)
+                          <span class="nnop-info-icon" id="ibscbs-cclasstrib-info-trigger" tabindex="0">
+                            <i data-lucide="info" width="14" height="14"></i>
+                            <span class="tip nnop-tooltip-wide text-body-xs top">
+                              <span class="arrow"></span>
+                              Detalha o tratamento tributário previsto na Lei Complementar para o item da nota fiscal.
+                            </span>
+                          </span>
+                        </span>
+                        <button type="button" class="trigger nnop-cclasstrib-trigger" id="ibscbs-cclasstrib-trigger" disabled>
+                          <span id="ibscbs-cclasstrib-value" class="nnop-cclasstrib-value">Selecione o CST primeiro</span>
+                          <span class="chevron"><i data-lucide="chevron-right" width="16" height="16"></i></span>
+                        </button>
+                      </div>
+
+                    </div>
+
+                    <div class="nnop-ibscbs-section" id="ibscbs-cbs-section" hidden>
+                      <h3 class="nnop-subsection-title text-body-md">Contribuição sobre Bens e Serviços (CBS)</h3>
+                      <p class="nnop-section-hint text-body-s">É o tributo de competência Federal, substitui o PIS e COFINS.</p>
+                      <div class="nnop-tax-grid">
+
+                        <div class="wrapper" id="ibscbs-cbs-aliquota-field">
+                          <label class="label" for="ibscbs-cbs-aliquota">Alíquota CBS
+                            <span class="nnop-info-icon" id="ibscbs-cbs-aliquota-info-trigger" tabindex="0">
+                              <i data-lucide="info" width="14" height="14"></i>
+                              <span class="tip nnop-tooltip-wide text-body-xs top">
+                                <span class="arrow"></span>
+                                Percentual utilizado para calcular o valor de CBS devido na operação.
+                              </span>
+                            </span>
+                          </label>
+                          <div class="inputWrap">
+                            <input class="input nnop-percent-input" type="text" inputmode="decimal" id="ibscbs-cbs-aliquota" placeholder="0,00%" />
+                          </div>
+                        </div>
+
+                        <div class="wrapper" id="ibscbs-cbs-reducao-field" hidden>
+                          <label class="label" for="ibscbs-cbs-reducao">Redução de alíquota CBS
+                            <span class="nnop-info-icon" id="ibscbs-cbs-reducao-info-trigger" tabindex="0">
+                              <i data-lucide="info" width="14" height="14"></i>
+                              <span class="tip nnop-tooltip-wide text-body-xs top">
+                                <span class="arrow"></span>
+                                Percentual de redução aplicado sobre a alíquota padrão para produtos considerados essenciais, estratégicos ou sensíveis.
+                              </span>
+                            </span>
+                          </label>
+                          <div class="inputWrap">
+                            <input class="input nnop-percent-input" type="text" inputmode="decimal" id="ibscbs-cbs-reducao" placeholder="0,00%" />
+                          </div>
+                        </div>
+
+                        <div class="wrapper" id="ibscbs-cbs-diferimento-field" hidden>
+                          <label class="label" for="ibscbs-cbs-diferimento">Alíquota de diferimento CBS
+                            <span class="nnop-info-icon" id="ibscbs-cbs-diferimento-info-trigger" tabindex="0">
+                              <i data-lucide="info" width="14" height="14"></i>
+                              <span class="tip nnop-tooltip-wide text-body-xs top">
+                                <span class="arrow"></span>
+                                Percentual da alíquota de CBS cujo pagamento é diferido para uma etapa posterior da cadeia.
+                              </span>
+                            </span>
+                          </label>
+                          <div class="inputWrap">
+                            <input class="input nnop-percent-input" type="text" inputmode="decimal" id="ibscbs-cbs-diferimento" placeholder="0,00%" />
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <div class="nnop-ibscbs-section" id="ibscbs-ibs-section" hidden>
+                      <h3 class="nnop-subsection-title text-body-md">Imposto sobre Bens e Serviços (IBS UF)</h3>
+                      <p class="nnop-section-hint text-body-s">É o tributo de competência Estadual e Municipal, substitui ICMS e ISS.</p>
+                      <div class="nnop-tax-grid">
+
+                        <div class="wrapper" id="ibscbs-ibs-aliquota-field">
+                          <label class="label" for="ibscbs-ibs-aliquota">Alíquota IBS UF
+                            <span class="nnop-info-icon" id="ibscbs-ibs-aliquota-info-trigger" tabindex="0">
+                              <i data-lucide="info" width="14" height="14"></i>
+                              <span class="tip nnop-tooltip-wide text-body-xs top">
+                                <span class="arrow"></span>
+                                Percentual utilizado para calcular o valor de IBS devido na operação.
+                              </span>
+                            </span>
+                          </label>
+                          <div class="inputWrap">
+                            <input class="input nnop-percent-input" type="text" inputmode="decimal" id="ibscbs-ibs-aliquota" placeholder="0,00%" />
+                          </div>
+                        </div>
+
+                        <div class="wrapper" id="ibscbs-ibs-reducao-field" hidden>
+                          <label class="label" for="ibscbs-ibs-reducao">Redução de alíquota UF
+                            <span class="nnop-info-icon" id="ibscbs-ibs-reducao-info-trigger" tabindex="0">
+                              <i data-lucide="info" width="14" height="14"></i>
+                              <span class="tip nnop-tooltip-wide text-body-xs top">
+                                <span class="arrow"></span>
+                                Percentual de redução aplicado sobre a alíquota padrão para produtos considerados essenciais, estratégicos ou sensíveis.
+                              </span>
+                            </span>
+                          </label>
+                          <div class="inputWrap">
+                            <input class="input nnop-percent-input" type="text" inputmode="decimal" id="ibscbs-ibs-reducao" placeholder="0,00%" />
+                          </div>
+                        </div>
+
+                        <div class="wrapper" id="ibscbs-ibs-diferimento-field" hidden>
+                          <label class="label" for="ibscbs-ibs-diferimento">Alíquota de diferimento UF
+                            <span class="nnop-info-icon" id="ibscbs-ibs-diferimento-info-trigger" tabindex="0">
+                              <i data-lucide="info" width="14" height="14"></i>
+                              <span class="tip nnop-tooltip-wide text-body-xs top">
+                                <span class="arrow"></span>
+                                Percentual da alíquota de IBS cujo pagamento é diferido para uma etapa posterior da cadeia.
+                              </span>
+                            </span>
+                          </label>
+                          <div class="inputWrap">
+                            <input class="input nnop-percent-input" type="text" inputmode="decimal" id="ibscbs-ibs-diferimento" placeholder="0,00%" />
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <div class="nnop-ibscbs-section" id="ibscbs-outras-section">
+                      <h3 class="nnop-subsection-title text-body-md">Outras configurações</h3>
+                      <p class="nnop-section-hint text-body-s">As alíquotas de IBS municipal e IS passarão a ser aplicadas a partir de janeiro de 2027 (art. 344, LC 214/2025).</p>
+                      <div class="nnop-ibscbs-embreve-row">
+                        <span class="nnop-ibscbs-embreve-label">Configurações do IBS Municipal</span>
+                        <span class="badge" data-status="info">Em breve</span>
+                      </div>
+                      <div class="nnop-ibscbs-embreve-row">
+                        <span class="nnop-ibscbs-embreve-label">Configurações do IS</span>
+                        <span class="badge" data-status="info">Em breve</span>
+                      </div>
+                    </div>
+                </div>
+
               </div>
             </section>
 
@@ -722,9 +890,30 @@
   <!-- Tooltip compartilhado da Sidebar retraída -->
   <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
 
+  <!-- Modal do cClassTrib — opções filtradas pelo CST selecionado, cada uma com
+       radio+código+descrição completa. Reaproveita Dialog (scroll interno já
+       resolvido pelo `.body{overflow-y:auto}` do componente) + RadioButton
+       (`.group` vertical). -->
+  <div class="overlay" id="cclasstrib-dialog-overlay" hidden>
+    <div class="dialog md" role="dialog" aria-modal="true" aria-labelledby="cclasstrib-dialog-title">
+      <div class="header">
+        <h2 class="title" id="cclasstrib-dialog-title">Código de Classificação Tributária (cClassTrib)</h2>
+        <button type="button" class="closeBtn" id="cclasstrib-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="group nnop-cclasstrib-list" role="radiogroup" aria-label="Código de Classificação Tributária" id="cclasstrib-options"></div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray" id="cclasstrib-dialog-cancel">Cancelar</button>
+        <button type="button" class="btn primary" id="cclasstrib-dialog-confirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
   <script src="../shared/naturezas-operacao-data.js"></script>
+  <script src="../shared/ibs-cbs-data.js"></script>
   <script src="../shared/nova-natureza-operacao.js"></script>
 </body>
 </html>

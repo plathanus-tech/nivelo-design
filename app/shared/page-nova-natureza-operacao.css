@@ -228,6 +228,130 @@
   }
 }
 
+/* Hint por aba (Configuração tributária) — o texto que antes vivia só no
+   subtítulo fixo do card (mutado via JS a cada troca de aba) agora é fixo
+   por aba: cada `.nnop-tax-panel` traz seu próprio contexto, o card em si
+   nunca muda de texto ao trocar de imposto. */
+.nnop-tax-panel-hint {
+  margin: 0 0 var(--spacing-md);
+  color: var(--color-text-tertiary);
+}
+
+/* ── IBS/CBS (Reforma Tributária) ─────────────────────────────────────────
+   Aba nova dentro do mesmo card de Configuração tributária. CST/cClassTrib
+   reaproveitam Dropdown/Dialog reais (scroll/overflow já resolvidos pelos
+   próprios componentes, sem CSS extra); as seções CBS/IBS UF/"Outras
+   configurações" são reveladas/escondidas via `hidden`, conforme o CST. */
+.nnop-ibscbs-section {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: var(--border-width-thin) solid var(--color-border-muted);
+}
+.nnop-ibscbs-section[hidden] { display: none; }
+
+.nnop-subsection-title {
+  margin: 0 0 var(--spacing-2xs);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.nnop-ibscbs-embreve-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 0;
+  border-top: var(--border-width-thin) solid var(--color-border-muted);
+}
+.nnop-ibscbs-embreve-row:first-of-type { border-top: none; }
+.nnop-ibscbs-embreve-label {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+}
+
+/* Ícone de info ao lado do label — reaproveita Tooltip.module.css (`.tip`),
+   mas com `white-space:normal`+`max-width`: os textos deste formulário são
+   frases completas, não as 2-4 palavras dos tooltips curtos já usados no
+   resto do sistema, e o `white-space:nowrap` padrão do componente deixaria
+   o balão comicamente largo/cortado na borda da tela. */
+.nnop-info-icon {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: var(--spacing-2xs);
+  color: var(--color-text-tertiary);
+  cursor: help;
+}
+.nnop-info-icon:hover,
+.nnop-info-icon:focus-visible { color: var(--color-text-brand); }
+.nnop-info-icon .tip {
+  white-space: normal;
+  width: 240px;
+  max-width: 60vw;
+  text-align: left;
+  line-height: var(--line-height-normal);
+}
+/* Neutraliza a regra ambiente `.wrapper:hover .tip`/`.wrapper:focus-within .tip`
+   do Tooltip.module.css: como o ícone de info vive dentro do MESMO `.wrapper`
+   do campo (Input/Dropdown), passar o mouse em QUALQUER parte do campo abriria
+   o balão — mesma colisão já documentada em `#code-field .tip{opacity:0}`
+   (Novo Cadastro). A visibilidade real é 100% controlada via JS
+   (`initFixedTooltip`, `style.opacity` inline sempre vence). */
+.wrapper .nnop-info-icon .tip { opacity: 0; }
+
+/* Campo de cClassTrib (não é um Dropdown — abre o modal de seleção) usa o
+   mesmo `.trigger` do Dropdown pra ficar visualmente idêntico aos outros
+   campos da aba. Desabilitado até o CST ser escolhido.
+
+   Descrições de cClassTrib variam de uma frase curta a um parágrafo inteiro
+   (ex.: os itens do CST 200) — sem truncar, o texto ultrapassava a caixa do
+   `.trigger` (Dropdown.module.css não previa conteúdo tão longo). Corrigido
+   com o padrão clássico de ellipsis em flex: o texto span precisa de
+   `min-width:0` (senão um item flex nunca encolhe abaixo do próprio
+   conteúdo) + `overflow:hidden`/`text-overflow:ellipsis`/`white-space:
+   nowrap`. O texto completo nunca é perdido — populado também em `title`
+   (tooltip nativo do navegador) e sempre disponível por completo no modal
+   de seleção, que é quem detém a descrição inteira. */
+#ibscbs-cclasstrib-trigger[disabled] {
+  cursor: not-allowed;
+}
+.nnop-cclasstrib-trigger {
+  min-width: 0;
+}
+.nnop-cclasstrib-value {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* Modal de cClassTrib: lista de opções (RadioButton `.group` vertical),
+   código em destaque + descrição completa abaixo, quebrando livremente
+   (a`.optionLabel` do componente é inline por padrão — aqui precisa
+   acomodar frases longas). */
+.nnop-cclasstrib-list .option {
+  align-items: flex-start;
+}
+.nnop-cclasstrib-list .optionLabel {
+  display: block;
+  white-space: normal;
+  line-height: var(--line-height-normal);
+}
+.nnop-cclasstrib-list .optionLabel strong {
+  display: block;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2xs);
+}
+
+/* Guard hidden+display incondicional — mesmo bug recorrente documentado
+   dezenas de vezes no sistema (Dialog.module.css's `.overlay{display:flex}`
+   sem guarda). */
+.overlay[hidden] { display: none; }
+
 /* ── Ações do formulário ─────────────────────────────────────────────── */
 
 .nnop-actions {
