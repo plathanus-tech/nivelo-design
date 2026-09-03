@@ -160,8 +160,52 @@
 
   document.getElementById('na-fazenda').value = fazenda.nome;
   document.getElementById('na-talhao').value = talhao.nome;
-  document.getElementById('na-cultura').value = talhao.cultura || 'Sem cultura';
-  document.getElementById('na-safra').value = talhao.safra || '—';
+
+  // ---------- Cultura atual / Safra atual ----------
+  // Talhão "Em produção" já tem cultura/safra definidas — os 2 campos ficam
+  // desabilitados, só mostrando o valor corrente (mesmo comportamento de
+  // sempre). Talhão "Disponível" não tem nenhuma cultura/safra ativa ainda
+  // — os 2 campos viram Dropdowns de verdade, habilitados, pra o usuário
+  // escolher o contexto ANTES de registrar a anotação (pedido explícito:
+  // nunca ficarem bloqueados/pré-preenchidos de um jeito que impeça a
+  // seleção). A escolha feita aqui vale só pra este registro (`registro.
+  // cultura`/`registro.safra`) — não altera o talhão em si; iniciar a safra
+  // de verdade é uma ação própria ("Iniciar safra", Tela 2/3).
+  var culturaField = document.getElementById('cultura-field');
+  var safraField = document.getElementById('safra-field');
+  var isTalhaoDisponivel = talhao.status === 'disponivel';
+
+  function setDropdownDisplay(root, text) {
+    var valueEl = root.querySelector('[data-dropdown-value]');
+    valueEl.textContent = text;
+    valueEl.classList.remove('placeholder');
+    root.dataset.value = text;
+  }
+
+  var culturaDropdown = initDropdown(culturaField, function () {
+    culturaField.classList.remove('error');
+  });
+  var safraDropdown = initDropdown(safraField, function () {
+    safraField.classList.remove('error');
+  });
+
+  var culturaTrigger = document.getElementById('na-cultura-trigger');
+  var safraTrigger = document.getElementById('na-safra-trigger');
+
+  if (isTalhaoDisponivel) {
+    var PRODUTOS_GRAOS_CULTURA = window.NiveloProdutos.list().filter(function (p) { return p.categoria === 'Grãos' && p.status === 'ativo'; });
+    culturaField.querySelector('[data-dropdown-menu]').innerHTML = PRODUTOS_GRAOS_CULTURA.map(function (p) {
+      return '<div class="option" data-value="' + p.nome + '">' + p.nome + '</div>';
+    }).join('');
+    safraField.querySelector('[data-dropdown-menu]').innerHTML = (window.NiveloSafras ? window.NiveloSafras.list() : []).map(function (s) {
+      return '<div class="option" data-value="' + s + '">' + s + '</div>';
+    }).join('');
+    culturaTrigger.disabled = false;
+    safraTrigger.disabled = false;
+  } else {
+    setDropdownDisplay(culturaField, talhao.cultura || 'Sem cultura');
+    setDropdownDisplay(safraField, talhao.safra || '—');
+  }
 
   var origemUrl = 'talhao-detalhe-v2.html#fazenda=' + fazendaId + '&talhao=' + talhaoId;
   document.getElementById('nova-anotacao-back').href = origemUrl;
@@ -328,6 +372,11 @@
       if (condition) isValid = false;
     }
 
+    if (isTalhaoDisponivel) {
+      markInvalid(culturaField, !culturaField.dataset.value);
+      markInvalid(safraField, !safraField.dataset.value);
+    }
+
     if (tipo === 'anotacao') {
       markInvalid(descricaoField, !descricaoInput.value.trim());
     } else if (tipo === 'aplicacao-insumo') {
@@ -347,8 +396,8 @@
       fazendaId: fazendaId,
       talhaoId: talhaoId,
       tipo: tipo,
-      cultura: talhao.cultura || null,
-      safra: talhao.safra || null,
+      cultura: (isTalhaoDisponivel ? culturaField.dataset.value : talhao.cultura) || null,
+      safra: (isTalhaoDisponivel ? safraField.dataset.value : talhao.safra) || null,
       dataHora: dataHoraISO
     };
 

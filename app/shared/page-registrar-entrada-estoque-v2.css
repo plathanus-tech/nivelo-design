@@ -51,64 +51,6 @@
 }
 .entradav2-qty-preview[hidden] { display: none; }
 
-/* ── Origem da entrada: cards de seleção visual (mesma composição de
-   `.nova-anotacao-tipo-card`, ver page-nova-anotacao.css) — réplica com
-   classes próprias desta tela. ────────────────────────────────────────── */
-.entradav2-origem-group {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-}
-@media (min-width: 480px) {
-  .entradav2-origem-group {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.entradav2-origem-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  border: var(--border-width-thin) solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
-}
-.entradav2-origem-card:hover {
-  border-color: var(--color-action-primary);
-}
-.entradav2-origem-card.is-selected {
-  border-color: var(--color-action-primary);
-  background: var(--color-bg-brand);
-}
-
-/* Radio nativo escondido (mesmo truque de RadioButton/Checkbox: 1px/opacity:0) */
-.entradav2-origem-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-}
-
-.entradav2-origem-icon {
-  display: inline-flex;
-  flex-shrink: 0;
-  color: var(--color-text-tertiary);
-}
-.entradav2-origem-card.is-selected .entradav2-origem-icon {
-  color: var(--color-action-primary);
-}
-
-.entradav2-origem-label {
-  color: var(--color-text-primary);
-}
-
-/* ── Compra de terceiro: dropzone (mesmo visual do XML de novo-estoque) ─── */
-.entradav2-dropzone { margin-top: 0; }
-
 /* ── Preço de compra: prefixo "R$" dentro do input (mesmo padrão de
    `estoquev2-currency-wrap`, cópia própria desta tela). ──────────────────── */
 .entradav2-currency-wrap .entradav2-currency-prefix {

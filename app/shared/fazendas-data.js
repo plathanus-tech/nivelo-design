@@ -12,9 +12,13 @@
 // mostrado tanto no card da Listagem quanto no indicador "Talhões" do Resumo
 // operacional é sempre `talhoes.length` — uma única fonte pra esse número,
 // sem contagem duplicada. Por isso os valores de área de cada talhão de uma
-// fazenda somam exatamente a área total dela (`areaHa`). `status` pode ser
-// `'em-producao'`, `'disponivel'` ou `'em-pousio'` — usado só pela tela
-// OPERACIONAL (`fazenda-detalhe.js`), sobre o estágio da lavoura.
+// fazenda somam exatamente a área total dela (`areaHa`). `status` só pode
+// ser `'em-producao'` ou `'disponivel'` (2 valores, decisão explícita — o
+// 3º valor histórico `'em-pousio'`/"Em pouso" foi removido do vocabulário
+// do Caderno de Campo; nenhum talhão seed usa mais esse valor) — usado pela
+// tela OPERACIONAL (`fazenda-detalhe.js`, V1) e pelo Caderno de Campo V2
+// (`fazenda-detalhe-caderno-v2.js`/`talhao-detalhe-v2.js`), sobre o estágio
+// da lavoura.
 //
 // `ativo` (boolean) é um campo DIFERENTE e independente de `status`: é o
 // estado de ativação/desativação do talhão, usado só pela tela CADASTRAL
@@ -54,7 +58,7 @@ window.NiveloFazendas = (function () {
         { id: 't2', codigo: '002', nome: 'Talhão 02', areaHa: 24, cultura: 'Milho', safra: '2026/27', safraInicio: '2026-05-20', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-15', dataFim: '2026-05-01', status: 'Encerrada' } ] },
         { id: 't3', codigo: '003', nome: 'Talhão 03', areaHa: 12, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Trigo', dataInicio: '2025-06-10', dataFim: '2026-06-20', status: 'Encerrada' } ] },
         { id: 't4', codigo: '004', nome: 'Talhão 04', areaHa: 15, cultura: 'Soja', safra: '2026/27', safraInicio: '2026-06-05', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Soja', dataInicio: '2025-06-05', dataFim: '2026-05-25', status: 'Encerrada' } ] },
-        { id: 't5', codigo: '005', nome: 'Talhão 05', areaHa: 10, cultura: null, safra: null, safraInicio: null, status: 'em-pousio', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-01', dataFim: '2026-04-15', status: 'Encerrada' } ] },
+        { id: 't5', codigo: '005', nome: 'Talhão 05', areaHa: 10, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-01', dataFim: '2026-04-15', status: 'Encerrada' } ] },
         { id: 't6', codigo: '006', nome: 'Talhão 06', areaHa: 20, cultura: 'Milho', safra: '2026/27', safraInicio: '2026-05-25', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Milho', dataInicio: '2025-05-20', dataFim: '2026-05-10', status: 'Encerrada' } ] },
         { id: 't7', codigo: '007', nome: 'Talhão 07', areaHa: 14, cultura: 'Soja', safra: '2026/27', safraInicio: '2026-06-10', status: 'em-producao', ativo: true, historicoSafras: [ { safra: '2025/26', cultura: 'Soja', dataInicio: '2025-06-08', dataFim: '2026-05-30', status: 'Encerrada' } ] },
         { id: 't8', codigo: '008', nome: 'Talhão 08', areaHa: 12, cultura: null, safra: null, safraInicio: null, status: 'disponivel', ativo: false, historicoSafras: [ { safra: '2025/26', cultura: 'Café', dataInicio: '2025-06-15', dataFim: '2026-06-01', status: 'Encerrada' } ] }
@@ -254,5 +258,25 @@ window.NiveloFazendas = (function () {
     return talhao;
   }
 
-  return { list: list, findById: findById, add: add, update: update, encerrarSafraTalhao: encerrarSafraTalhao, TODAY: TODAY };
+  // Inverso de `encerrarSafraTalhao` — usado pela ação "Iniciar safra" (só
+  // disponível quando `status === 'disponivel'`, ver fazenda-detalhe-caderno-
+  // v2.js/talhao-detalhe-v2.js): grava Cultura/Safra escolhidas no modal e
+  // marca o talhão como "Em produção", com `safraInicio = TODAY`. Mesma
+  // limitação de sempre (mutação só em memória, sem persistência real).
+  function iniciarSafraTalhao(fazendaId, talhaoId, cultura, safra) {
+    var fazenda = findById(fazendaId);
+    var talhao = fazenda && fazenda.talhoes.filter(function (t) { return t.id === talhaoId; })[0];
+    if (!talhao) return null;
+    talhao.cultura = cultura;
+    talhao.safra = safra;
+    talhao.safraInicio = TODAY;
+    talhao.status = 'em-producao';
+    return talhao;
+  }
+
+  return {
+    list: list, findById: findById, add: add, update: update,
+    encerrarSafraTalhao: encerrarSafraTalhao, iniciarSafraTalhao: iniciarSafraTalhao,
+    TODAY: TODAY
+  };
 })();

@@ -275,8 +275,22 @@
 .talhoes-empty-title { color: var(--color-text-primary); margin: 0; }
 .talhoes-empty-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 360px; }
 
-/* ── Modal: Encerrar safra ────────────────────────────────────────────────
+/* ── Modal: Encerrar safra / Iniciar safra ───────────────────────────────
    Mesmo bug de hidden+display incondicional já documentado dezenas de
    vezes neste projeto: `Dialog.module.css`'s `.overlay` tem `display:flex`
    sem guard. */
 .overlay[hidden] { display: none; }
+
+/* Corpo do modal "Iniciar safra" — Dialog.module.css's `.body` não define
+   `display:flex`/`gap` (só padding+scroll), então os 2 campos de Dropdown
+   colavam um no outro sem respiro. */
+.fazenda-detalhe-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.fazenda-detalhe-modal-body > p { margin: 0; }
+
+/* Erro dos campos de Cultura/Safra do modal "Iniciar safra" — mesmo padrão
+   "só borda" já usado no resto do sistema, nunca um fundo cobrindo o campo. */
+.wrapper.error .trigger { border-color: var(--color-action-error); }

@@ -187,10 +187,8 @@
 }
 
 /* ── Tipo de estoque: cartões de seleção (radio nativo) ───────────────────
-   Mesma técnica visual/comportamental de `.entradav2-origem-card`
-   (page-registrar-entrada-estoque-v2.css, carregado nesta tela pro card
-   "Origem da entrada") — réplica com classes próprias (nunca um Dropdown
-   fechado pra este campo). Só 2 opções (Estoque Comprometido removido). ── */
+   Réplica com classes próprias (nunca um Dropdown fechado pra este campo).
+   Só 2 opções (Estoque Comprometido removido). ── */
 .novo-estoque-tipo-group {
   display: grid;
   grid-template-columns: 1fr;

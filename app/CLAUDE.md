@@ -6900,3 +6900,97 @@ do dataset (200002, ~300 caracteres) confirma o texto clipado visualmente
 de página (`document.documentElement.scrollWidth === innerWidth` em desktop e mobile) e sem
 perda de dado (`textContent`/`title` com os 300 caracteres completos); tooltips de Redução (CBS
 e IBS UF) com o novo texto; nenhuma regressão nos demais campos/abas.
+
+## Ajustes 2026-09-01 (round 111) — Caderno de Campo (talhão só 2 status + Iniciar
+safra), Estoque (voltar sempre pra V2 + remoção de "Origem da entrada" em 2 telas),
+Contas a Pagar/Receber V2 (tabela 100% da largura), Nova Natureza da Operação
+(IBS/CBS 1ª aba + Observação/Informação ao Fisco)
+
+Pedido grande em 6 partes, cada uma isolada às telas explicitamente citadas.
+
+**1. Talhões — só 2 status (Em produção/Disponível), "Iniciar safra" novo.**
+`fazendas-data.js`: `status: 'em-pousio'` removido do vocabulário (único talhão que usava,
+São João/Talhão 05, migrado pra `'disponivel'`); nova função `iniciarSafraTalhao(fazendaId,
+talhaoId, cultura, safra)` (inverso de `encerrarSafraTalhao` — grava Cultura/Safra escolhidas
+e marca `status:'em-producao'`/`safraInicio:TODAY`). `fazenda-detalhe-caderno-v2.js` (tabela de
+Talhões) e `talhao-detalhe-v2.js` (botão do cabeçalho): `STATUS_TALHAO` reduzido a 2 chaves; a
+ação de safra agora alterna entre "Iniciar safra" (`flag`, talhão Disponível) e "Encerrar
+safra" (`flag-off`, talhão Em produção) — nunca as duas ao mesmo tempo. Ícone recriado via
+`innerHTML` a cada troca (mesmo padrão já documentado pra Lucide, `estoque.js` round 18) já que
+`lucide.createIcons()` substitui `<i>` por `<svg>` na primeira renderização. Novo modal
+"Iniciar safra" (Dialog `sm`, Cultura atual + Safra atual via Dropdown, obrigatórios só aqui)
+adicionado nas 2 telas, réplica de markup+lógica (convenção do projeto: sem JS compartilhado
+entre páginas).
+- **Nova anotação em talhão Disponível:** os campos Cultura atual/Safra atual (antes sempre
+  `<input disabled readonly>`) viraram Dropdowns reais — desabilitados e mostrando o valor
+  corrente quando o talhão já está "Em produção" (comportamento intocado), habilitados e vazios
+  (placeholder, sem pré-seleção) quando o talhão está "Disponível", exigindo escolha antes de
+  salvar (validação nova, só nesse cenário). A escolha vale só para aquele registro
+  (`registro.cultura`/`registro.safra`) — não altera o talhão em si; "iniciar a safra de
+  verdade" continua sendo a ação própria do item acima.
+
+**2. Estoque — "voltar" sempre pra V2.** Bug real: `novo-estoque.html` (tela de "Novo
+registro de estoque", compartilhada por V1 e V2 desde sempre) tinha "Voltar"/"Cancelar" e o
+redirect pós-salvamento hardcoded pra `estoque.html` (V1) — quem chegava vindo do Estoque V2
+(`estoque-v2.js`'s "Novo lançamento") sempre voltava pra V1. Corrigido com `?from=v2`
+(`estoque-v2.js` passa o parâmetro; `novo-estoque.js` lê e resolve `ESTOQUE_LISTAGEM_URL` uma
+vez, usada nos 2 links + no redirect). Mesmo padrão aplicado por precaução em
+`detalhe-estoque.html`/`.js` (Comprometido "Ver detalhes", via `#codigo=X&from=v2`) — na
+prática esse caminho está órfão hoje (Comprometido usa "Ver histórico" →
+`historico-entrega-estoque-v2.html`, que já linkava certo pra V2), mas o fix não custa nada e
+cobre o cenário caso esse botão volte a ser usado.
+
+**3. Novo registro de estoque — "Origem da entrada" removida por completo.** Seção inteira
+(2 cards de seleção Produção própria/Compra de terceiro + Fazenda/Talhão/Safra/Fornecedor/
+dropzone/Preço de compra/Valor total, só aparecia na aba Vendas) removida de `novo-estoque.html`
++ toda a lógica correspondente de `novo-estoque.js` (~140 linhas: `origemInputs`/
+`updateOrigemBlocks`/dropdowns de Fazenda-Talhão-Safra-Fornecedor/dropzone/máscara de preço) —
+nunca era persistida de verdade (`NiveloEstoqueVendasV2` nem chegava a ser importado por essa
+tela), então a remoção não tira nenhum dado real do registro. `runValidation()`/submit
+limpos das referências a `origemInvalid`. `page-registrar-entrada-estoque-v2.css` (só
+reaproveitada por esta tela pra esse card) removida do `<head>`.
+
+**4. Estoque de Vendas > Registrar entrada — mesma seção removida.**
+`registrar-entrada-estoque-v2.html`/`.js`: mesmo bloco "Origem da entrada" (cards Produção
+própria/Compra de terceiro + Fazenda/Talhão/Safra/Fornecedor/dropzone/Preço de compra/Valor
+total) removido — aqui também nunca alimentava `registrarEntrada()` de verdade (o payload só
+usa `data`/`deposito`/`quantidade`/`destino`, confirmado lendo `estoque-vendas-v2-data.js`).
+Scripts órfãos (`cadastros-data.js`/`fazendas-data.js`/`safras-data.js`, só usados por essa
+seção) removidos do `<head>`; regras CSS `.entradav2-origem-*`/`.entradav2-dropzone` removidas
+de `page-registrar-entrada-estoque-v2.css` (compartilhado com `registrar-entrada-estoque-uso-
+v2.html`, que nunca usou essas classes — confirmado antes de mexer; `.entradav2-currency-wrap`
+mantida, ainda usada lá).
+
+**5. Contas a Pagar/Receber V2 — tabela sem espaço morto à direita.** Bug real: a base
+(`page-contas-a-pagar.css`/`page-contas-a-receber.css`, compartilhada com V1) sempre usou
+`.table{width:<px fixo>}` (pensada pra rolar horizontalmente mesmo em telas largas) — a V2 tem
+1 coluna de Ações a menos e mais estreita (96px vs 170/120px na V1), então a tabela ficava
+visivelmente mais estreita que o card em viewports largos. Corrigido só nos deltas da V2
+(`page-contas-a-pagar-v2.css`/`page-contas-a-receber-v2.css`, nunca na base — V1 preservada
+intacta): `.table{width:100%;min-width:1236px}` (Pagar) / `min-width:1226px` (Receber) — soma
+exata das 9 colunas de cada tabela. Mantém o scroll horizontal em telas estreitas
+(`.tableWrap` já tem `overflow-x:auto` de fábrica).
+
+**6. Nova Natureza da Operação — IBS/CBS 1ª aba + Observação/Informação ao Fisco.**
+Ordem das abas: IBS/CBS → Simples Nacional → IPI → ISSQN → PIS → COFINS (era o inverso,
+IBS/CBS por último desde o round 109) — vira também a aba ativa por padrão (mesmo princípio de
+"primeira aba = aba padrão" já usado nas 5 anteriores). Painel de IBS/CBS ganhou os mesmos 2
+campos opcionais que as outras 5 abas já tinham desde sempre (Observação + Informação ao
+Fisco, `nnop-span-2`, mesmo padrão visual/comportamental) — nunca obrigatórios,
+`buildIbsCbsPayload()`/`prefill()` estendidos pra incluí-los, sem nenhuma validação nova.
+
+Verificado ao vivo (`http-server`, porta 8091): talhão Disponível → "Iniciar safra" (ícone
+`flag`) → modal valida Cultura/Safra vazios (borda vermelha) → confirmar com ambos
+selecionados muda o talhão pra "Em produção" nas 2 telas (tabela de Talhões e cabeçalho de Ver
+detalhes); Nova Anotação num talhão Disponível com Cultura/Safra habilitados e populados,
+bloqueando submit vazio e salvando o registro com os valores escolhidos; "Novo lançamento" do
+Estoque V2 → Novo registro de estoque com Voltar/Cancelar/redirect-pós-salvar todos apontando
+pra `estoque-v2.html` (confirmado via submit real, sem passar por V1) e sem a seção "Origem da
+entrada"; "Registrar entrada" (Estoque de Vendas V2) sem "Origem da entrada", submit completo
+funcionando; Contas a Pagar/Receber V2 com a tabela ocupando 100% do card em 1920px (sem
+espaço morto) e ainda rolando horizontalmente em janelas mais estreitas que o `min-width`; V1
+de Contas a Pagar confirmada intacta (`width` fixo, sem a mudança); Nova Natureza da Operação
+com IBS/CBS como 1ª aba/ativa por padrão e os campos Observação/Informação ao Fisco presentes
+e opcionais (submit funciona com ou sem CST selecionado); nenhum erro real de console em
+nenhuma das telas tocadas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em
+todo o sistema).

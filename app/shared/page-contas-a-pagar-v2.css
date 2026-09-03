@@ -34,3 +34,14 @@
    Valor→Valor original/Pago/Saldo reordenadas — larguras idênticas, sem
    mudança visual ali) e reduz só a última. */
 .ctp-table-card .th:nth-child(9) { width: 96px; }
+
+/* ── Tabela preenche 100% do card, nunca sobra espaço morto à direita ────
+   A base (page-contas-a-pagar.css) usa `width` fixo em px (pensado pra
+   sempre rolar horizontalmente, mesmo em telas largas) — na V2, com 1 coluna
+   de Ações a menos (96px em vez de 170px), a tabela ficava visivelmente mais
+   estreita que o card em viewports largos, sobrando uma faixa vazia à
+   direita. `width:100%` (a soma das colunas em `min-width` já garante que
+   nada quebra/comprime abaixo desse ponto — o `.tableWrap` já tem
+   `overflow-x:auto` de fábrica, então continua rolando normalmente em telas
+   estreitas). */
+.ctp-table-card .table { width: 100%; min-width: 1236px; }

@@ -3,6 +3,17 @@
 
   if (window.lucide) lucide.createIcons();
 
+  // Comprometido (Estoque V2) ainda não tem uma tela de detalhe própria —
+  // "Ver detalhes" continua indo pra este V1 (`estoque-v2.js`, decisão
+  // documentada em app/CLAUDE.md), navegando com `#codigo=X&from=v2`. Sem
+  // isso, "Voltar"/"Voltar para Estoque" sempre apontavam pra `estoque.html`
+  // (V1) mesmo vindo do V2 — bug real corrigido nesta rodada.
+  var vindoDoV2 = /from=v2/.test(location.hash);
+  var ESTOQUE_LISTAGEM_URL = vindoDoV2 ? 'estoque-v2.html' : 'estoque.html';
+  Array.prototype.slice.call(document.querySelectorAll('a[href="estoque.html"]')).forEach(function (a) {
+    a.href = ESTOQUE_LISTAGEM_URL;
+  });
+
   function formatInt(n) {
     return n.toLocaleString('pt-BR');
   }

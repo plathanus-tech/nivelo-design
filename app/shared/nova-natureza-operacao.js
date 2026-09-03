@@ -492,6 +492,8 @@
       setPercentValue(document.getElementById('ibscbs-ibs-aliquota'), t.ibsCbs.ibsAliquota);
       setPercentValue(document.getElementById('ibscbs-ibs-reducao'), t.ibsCbs.ibsReducao);
       setPercentValue(document.getElementById('ibscbs-ibs-diferimento'), t.ibsCbs.ibsDiferimento);
+      document.getElementById('ibscbs-observacao').value = t.ibsCbs.observacao || '';
+      document.getElementById('ibscbs-info-fisco').value = t.ibsCbs.informacaoFisco || '';
     }
   }
 
@@ -517,6 +519,8 @@
     if (config.ibs.indexOf('aliquota') !== -1) payload.ibsAliquota = percentValue(document.getElementById('ibscbs-ibs-aliquota'));
     if (config.ibs.indexOf('reducao') !== -1) payload.ibsReducao = percentValue(document.getElementById('ibscbs-ibs-reducao'));
     if (config.ibs.indexOf('diferimento') !== -1) payload.ibsDiferimento = percentValue(document.getElementById('ibscbs-ibs-diferimento'));
+    payload.observacao = document.getElementById('ibscbs-observacao').value.trim();
+    payload.informacaoFisco = document.getElementById('ibscbs-info-fisco').value.trim();
     return payload;
   }
 

@@ -3,10 +3,11 @@
 
   if (window.lucide) lucide.createIcons();
 
+  // Só 2 status (decisão explícita — "Em pouso" foi removido do vocabulário
+  // do Caderno de Campo, nenhum talhão do seed usa mais esse valor).
   var STATUS_TALHAO = {
     'em-producao': { status: 'success', label: 'Em produção' },
-    'disponivel': { status: 'info', label: 'Disponível' },
-    'em-pousio': { status: 'warning', label: 'Em pouso' }
+    'disponivel': { status: 'info', label: 'Disponível' }
   };
 
   var currentFazenda = null;
@@ -128,12 +129,22 @@
   }
 
   // ---------- Talhões (tabela + cards) ----------
-  function buildAcoesHTML(fazendaId, talhaoId) {
+  // Ação de safra alterna entre "Iniciar safra" (talhão Disponível, sem
+  // cultura ativa) e "Encerrar safra" (talhão Em produção) — nunca as duas
+  // ao mesmo tempo, já que só existem esses 2 status.
+  function buildSafraActionHTML(t, fazendaId) {
+    if (t.status === 'disponivel') {
+      return '<button type="button" class="actionBtn" data-action="iniciar-safra" data-fazenda="' + fazendaId + '" data-talhao="' + t.id + '" aria-label="Iniciar safra"><i data-lucide="flag" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Iniciar safra</span></button>';
+    }
+    return '<button type="button" class="actionBtn" data-action="encerrar-safra" data-fazenda="' + fazendaId + '" data-talhao="' + t.id + '" aria-label="Encerrar safra"><i data-lucide="flag-off" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Encerrar safra</span></button>';
+  }
+
+  function buildAcoesHTML(t, fazendaId) {
     return (
       '<div class="cellActions">' +
-        '<button type="button" class="actionBtn" data-action="ver-detalhes" data-fazenda="' + fazendaId + '" data-talhao="' + talhaoId + '" aria-label="Ver detalhes"><i data-lucide="eye" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ver detalhes</span></button>' +
-        '<button type="button" class="actionBtn" data-action="nova-anotacao" data-fazenda="' + fazendaId + '" data-talhao="' + talhaoId + '" aria-label="Nova anotação"><i data-lucide="plus" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Nova anotação</span></button>' +
-        '<button type="button" class="actionBtn" data-action="encerrar-safra" data-fazenda="' + fazendaId + '" data-talhao="' + talhaoId + '" aria-label="Encerrar safra"><i data-lucide="flag-off" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Encerrar safra</span></button>' +
+        '<button type="button" class="actionBtn" data-action="ver-detalhes" data-fazenda="' + fazendaId + '" data-talhao="' + t.id + '" aria-label="Ver detalhes"><i data-lucide="eye" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Ver detalhes</span></button>' +
+        '<button type="button" class="actionBtn" data-action="nova-anotacao" data-fazenda="' + fazendaId + '" data-talhao="' + t.id + '" aria-label="Nova anotação"><i data-lucide="plus" width="16" height="16"></i><span class="tip text-body-xs top"><span class="arrow"></span>Nova anotação</span></button>' +
+        buildSafraActionHTML(t, fazendaId) +
       '</div>'
     );
   }
@@ -153,7 +164,7 @@
         '<td class="td">' + (t.safra || '—') + '</td>' +
         '<td class="td">' + ultimaAnotacaoHTML(fazendaId, t.id) + '</td>' +
         '<td class="td"><span class="badge" data-status="' + badge.status + '"><span class="badgeDot"></span>' + badge.label + '</span></td>' +
-        '<td class="td">' + buildAcoesHTML(fazendaId, t.id) + '</td>' +
+        '<td class="td">' + buildAcoesHTML(t, fazendaId) + '</td>' +
       '</tr>'
     );
   }
@@ -171,7 +182,7 @@
           '<div><dt>Safra atual</dt><dd>' + (t.safra || '—') + '</dd></div>' +
           '<div><dt>Última anotação</dt><dd>' + (window.NiveloCadernoV2.lastRecordByTalhao(fazendaId, t.id) ? formatDataHora(window.NiveloCadernoV2.lastRecordByTalhao(fazendaId, t.id).dataHora) : '—') + '</dd></div>' +
         '</dl>' +
-        '<div class="talhao-mobile-card-actions">' + buildAcoesHTML(fazendaId, t.id) + '</div>' +
+        '<div class="talhao-mobile-card-actions">' + buildAcoesHTML(t, fazendaId) + '</div>' +
       '</div>'
     );
   }
@@ -235,6 +246,102 @@
     showSuccessToast('Safra encerrada com sucesso.');
   });
 
+  // ---------- Modal: Iniciar safra (só quando o talhão está Disponível) ----------
+  // Dropdown genérico mínimo, mesmo padrão de novo-cadastro.js/nova-anotacao.js
+  // (position:fixed via JS, escapa de overflow do Dialog).
+  function initDropdown(root) {
+    var trigger = root.querySelector('[data-dropdown-trigger]');
+    var valueEl = root.querySelector('[data-dropdown-value]');
+    var menu = root.querySelector('[data-dropdown-menu]');
+    function positionMenu() {
+      var rect = trigger.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      menu.style.left = rect.left + 'px';
+      menu.style.width = rect.width + 'px';
+      menu.style.top = (rect.bottom + 4) + 'px';
+      menu.style.maxHeight = '200px';
+      menu.style.overflowY = 'auto';
+    }
+    function close() { root.classList.remove('open'); }
+    function open() { root.classList.add('open'); positionMenu(); }
+    trigger.addEventListener('click', function () {
+      if (root.classList.contains('open')) close(); else open();
+    });
+    menu.addEventListener('click', function (event) {
+      var optionEl = event.target.closest('.option');
+      if (!optionEl) return;
+      Array.prototype.slice.call(menu.querySelectorAll('.option')).forEach(function (o) { o.classList.remove('selected'); });
+      optionEl.classList.add('selected');
+      valueEl.textContent = optionEl.textContent;
+      valueEl.classList.remove('placeholder');
+      root.dataset.value = optionEl.dataset.value;
+      close();
+    });
+    document.addEventListener('click', function (event) { if (!root.contains(event.target)) close(); });
+    return {
+      getValue: function () { return root.dataset.value || ''; },
+      reset: function (placeholderText) {
+        delete root.dataset.value;
+        valueEl.textContent = placeholderText;
+        valueEl.classList.add('placeholder');
+        Array.prototype.slice.call(menu.querySelectorAll('.option')).forEach(function (o) { o.classList.remove('selected'); });
+      }
+    };
+  }
+
+  var iniciarOverlay = document.getElementById('iniciar-safra-overlay');
+  var iniciarTarget = null;
+  var iniciarCulturaField = document.getElementById('iniciar-safra-cultura-field');
+  var iniciarSafraField = document.getElementById('iniciar-safra-safra-field');
+  var iniciarCulturaDropdown = initDropdown(iniciarCulturaField);
+  var iniciarSafraDropdown = initDropdown(iniciarSafraField);
+
+  // Mesmo catálogo de Grãos já usado em Colheita (nova-anotacao-v2.js) —
+  // cultura atual do talhão é sempre um produto de venda de categoria Grãos.
+  var PRODUTOS_GRAOS = (window.NiveloProdutos ? window.NiveloProdutos.list() : []).filter(function (p) {
+    return p.categoria === 'Grãos' && p.status === 'ativo';
+  });
+  iniciarCulturaField.querySelector('[data-dropdown-menu]').innerHTML = PRODUTOS_GRAOS.map(function (p) {
+    return '<div class="option" data-value="' + p.nome + '">' + p.nome + '</div>';
+  }).join('');
+  iniciarSafraField.querySelector('[data-dropdown-menu]').innerHTML = (window.NiveloSafras ? window.NiveloSafras.list() : []).map(function (s) {
+    return '<div class="option" data-value="' + s + '">' + s + '</div>';
+  }).join('');
+
+  function openIniciarSafraDialog(fazendaId, talhaoId) {
+    iniciarTarget = { fazendaId: fazendaId, talhaoId: talhaoId };
+    iniciarCulturaField.classList.remove('error');
+    iniciarSafraField.classList.remove('error');
+    iniciarCulturaDropdown.reset('Selecione a cultura');
+    iniciarSafraDropdown.reset('Selecione a safra');
+    iniciarOverlay.hidden = false;
+  }
+  function closeIniciarSafraDialog() {
+    iniciarOverlay.hidden = true;
+    iniciarTarget = null;
+  }
+  document.getElementById('iniciar-safra-close').addEventListener('click', closeIniciarSafraDialog);
+  document.getElementById('iniciar-safra-cancel').addEventListener('click', closeIniciarSafraDialog);
+  iniciarOverlay.addEventListener('click', function (event) {
+    if (event.target === iniciarOverlay) closeIniciarSafraDialog();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !iniciarOverlay.hidden) closeIniciarSafraDialog();
+  });
+  document.getElementById('iniciar-safra-confirm').addEventListener('click', function () {
+    if (!iniciarTarget) return;
+    var cultura = iniciarCulturaDropdown.getValue();
+    var safra = iniciarSafraDropdown.getValue();
+    var valid = true;
+    if (!cultura) { iniciarCulturaField.classList.add('error'); valid = false; }
+    if (!safra) { iniciarSafraField.classList.add('error'); valid = false; }
+    if (!valid) return;
+    window.NiveloFazendas.iniciarSafraTalhao(iniciarTarget.fazendaId, iniciarTarget.talhaoId, cultura, safra);
+    closeIniciarSafraDialog();
+    renderAll();
+    showSuccessToast('Safra iniciada com sucesso.');
+  });
+
   // ---------- Ações da tabela/cards (delegadas) ----------
   document.addEventListener('click', function (event) {
     var btn = event.target.closest('.actionBtn[data-action]');
@@ -247,6 +354,8 @@
       window.location.href = 'nova-anotacao-v2.html?fazenda=' + encodeURIComponent(fazendaId) + '&talhao=' + encodeURIComponent(talhaoId);
     } else if (action === 'encerrar-safra') {
       openEncerrarSafraDialog(fazendaId, talhaoId);
+    } else if (action === 'iniciar-safra') {
+      openIniciarSafraDialog(fazendaId, talhaoId);
     } else if (action === 'ver-detalhes') {
       window.location.href = 'talhao-detalhe-v2.html#fazenda=' + fazendaId + '&talhao=' + talhaoId;
     }

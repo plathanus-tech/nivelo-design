@@ -430,18 +430,18 @@
               <p class="nnop-section-hint text-body-s" id="nnop-tax-subtitle">Configure as regras tributárias desta natureza de operação, organizadas por imposto.</p>
 
               <div class="list nnop-tax-tabs" role="tablist" id="nnop-tax-tablist">
-                <button type="button" role="tab" aria-selected="true" class="tab active" data-tax-tab="simples">Simples Nacional</button>
+                <button type="button" role="tab" aria-selected="true" class="tab active" data-tax-tab="ibscbs">IBS/CBS</button>
+                <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="simples">Simples Nacional</button>
                 <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="ipi">IPI</button>
                 <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="issqn">ISSQN</button>
                 <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="pis">PIS</button>
                 <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="cofins">COFINS</button>
-                <button type="button" role="tab" aria-selected="false" class="tab" data-tax-tab="ibscbs">IBS/CBS</button>
               </div>
 
               <div class="nnop-tax-panels">
 
                 <!-- ── Simples Nacional ── -->
-                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="simples">
+                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="simples" hidden>
                     <p class="nnop-tax-panel-hint text-body-s">Regras do Simples Nacional aplicáveis a esta natureza de operação.</p>
                     <div class="nnop-tax-grid">
 
@@ -711,7 +711,7 @@
                 </div>
 
                 <!-- ── IBS/CBS (Reforma Tributária) ── -->
-                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="ibscbs" hidden>
+                <div class="panel nnop-tax-panel" role="tabpanel" data-tax-panel="ibscbs">
                     <p class="nnop-tax-panel-hint text-body-s">Defina o CST, cClassTrib e as alíquotas padrão de IBS e CBS para esta natureza da operação.</p>
                     <div class="nnop-tax-grid">
 
@@ -853,6 +853,25 @@
                           </div>
                         </div>
 
+                      </div>
+                    </div>
+
+                    <div class="nnop-ibscbs-section" id="ibscbs-complementares-section">
+                      <h3 class="nnop-subsection-title text-body-md">Informações complementares</h3>
+                      <div class="nnop-tax-grid">
+                        <div class="wrapper nnop-span-2" id="ibscbs-observacao-field">
+                          <label class="label" for="ibscbs-observacao">Observação <span class="nnop-optional-tag">(opcional)</span></label>
+                          <div class="inputWrap">
+                            <textarea class="input nnop-textarea" id="ibscbs-observacao" rows="2"></textarea>
+                          </div>
+                        </div>
+
+                        <div class="wrapper nnop-span-2" id="ibscbs-info-fisco-field">
+                          <label class="label" for="ibscbs-info-fisco">Informação ao Fisco <span class="nnop-optional-tag">(opcional)</span></label>
+                          <div class="inputWrap">
+                            <textarea class="input nnop-textarea" id="ibscbs-info-fisco" rows="2"></textarea>
+                          </div>
+                        </div>
                       </div>
                     </div>
 

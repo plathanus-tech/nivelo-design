@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/tokens/typography.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Button/Button.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Tooltip/Tooltip.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Feedback/Feedback.module.css" />
@@ -390,6 +392,41 @@
     </div>
   </div>
 
+  <!-- Modal: Iniciar safra do talhão (só quando Disponível) -->
+  <div class="overlay" id="iniciar-safra-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="iniciar-safra-title">
+      <div class="header">
+        <h2 class="title" id="iniciar-safra-title">Iniciar safra</h2>
+        <button class="closeBtn" id="iniciar-safra-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body fazenda-detalhe-modal-body">
+        <p class="text-body-s">Informe a cultura e a safra que serão plantadas neste talhão.</p>
+
+        <div class="wrapper" id="iniciar-safra-cultura-field">
+          <span class="label">Cultura atual</span>
+          <button type="button" class="trigger" data-dropdown-trigger>
+            <span data-dropdown-value class="placeholder">Selecione a cultura</span>
+            <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+          </button>
+          <div class="menu" data-dropdown-menu></div>
+        </div>
+
+        <div class="wrapper" id="iniciar-safra-safra-field">
+          <span class="label">Safra atual</span>
+          <button type="button" class="trigger" data-dropdown-trigger>
+            <span data-dropdown-value class="placeholder">Selecione a safra</span>
+            <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+          </button>
+          <div class="menu" data-dropdown-menu></div>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondaryGray sm" id="iniciar-safra-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="iniciar-safra-confirm">Iniciar safra</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Tooltip compartilhado da Sidebar retraída -->
   <div class="app-tooltip text-12-regular" id="app-tooltip" role="tooltip"></div>
 
@@ -399,6 +436,7 @@
   <script src="../shared/produtos-data.js"></script>
   <script src="../shared/unidades-medida-data.js"></script>
   <script src="../shared/estoque-uso-v2-data.js"></script>
+  <script src="../shared/safras-data.js"></script>
   <script src="../shared/caderno-v2-data.js"></script>
   <script src="../shared/fazenda-detalhe-caderno-v2.js"></script>
 </body>

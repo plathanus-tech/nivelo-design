@@ -6,9 +6,6 @@
   function formatNum(n) {
     return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
-  function formatCurrency(n) {
-    return 'R$ ' + Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
   function todayISO() {
     return new Date().toISOString().slice(0, 10);
   }
@@ -150,129 +147,8 @@
   quantidadeInput.addEventListener('input', function () {
     quantidadeField.classList.remove('error');
     updateQtyPreview();
-    if (currentOrigem() === 'compra') updateValorTotal();
   });
   updateQtyPreview();
-
-  // ---------- Origem da entrada: cards de seleção (mesma técnica de
-  // Tipo de anotação em nova-anotacao.js — radio nativo + classe .is-selected
-  // no <label> pai) ----------
-  var origemInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="origem-entrada"]'));
-  var origemProducaoBlock = document.getElementById('origem-producao-block');
-  var origemCompraBlock = document.getElementById('origem-compra-block');
-
-  function currentOrigem() {
-    var checked = origemInputs.filter(function (i) { return i.checked; })[0];
-    return checked ? checked.value : 'producao';
-  }
-
-  function updateOrigemBlocks() {
-    var origem = currentOrigem();
-    origemInputs.forEach(function (input) {
-      input.closest('.entradav2-origem-card').classList.toggle('is-selected', input.checked);
-    });
-    var isProducao = origem === 'producao';
-    origemProducaoBlock.hidden = !isProducao;
-    origemCompraBlock.hidden = isProducao;
-    if (isProducao) {
-      document.getElementById('entrada-fornecedor-field').classList.remove('error');
-    } else {
-      document.getElementById('entrada-fazenda-field').classList.remove('error');
-      document.getElementById('entrada-talhao-field').classList.remove('error');
-    }
-  }
-  origemInputs.forEach(function (input) { input.addEventListener('change', updateOrigemBlocks); });
-  updateOrigemBlocks();
-
-  // ---------- Fazenda / Talhão (dependente) ----------
-  var fazendaField = document.getElementById('entrada-fazenda-field');
-  var fazendaMenu = document.getElementById('entrada-fazenda-menu');
-  var talhaoField = document.getElementById('entrada-talhao-field');
-  var talhaoMenu = document.getElementById('entrada-talhao-menu');
-
-  var fazendas = window.NiveloFazendas.list();
-  fazendaMenu.innerHTML = fazendas.map(function (f) {
-    return '<div class="option" data-value="' + f.id + '">' + f.nome + '</div>';
-  }).join('');
-
-  function findFazenda(id) {
-    return fazendas.filter(function (f) { return f.id === id; })[0] || null;
-  }
-
-  function populateTalhoes(fazenda) {
-    var talhoes = fazenda ? fazenda.talhoes : [];
-    talhaoMenu.innerHTML = talhoes.map(function (t) {
-      return '<div class="option" data-value="' + t.id + '">' + t.nome + '</div>';
-    }).join('');
-    talhaoDropdown.trigger.disabled = !fazenda;
-    talhaoDropdown.reset(fazenda ? 'Selecione o talhão' : 'Selecione a fazenda primeiro');
-  }
-
-  var talhaoDropdown = initDropdown(talhaoField, function () {
-    talhaoField.classList.remove('error');
-  });
-  var fazendaDropdown = initDropdown(fazendaField, function (fazendaId) {
-    fazendaField.classList.remove('error');
-    populateTalhoes(findFazenda(fazendaId));
-  });
-  populateTalhoes(null);
-
-  // ---------- Safra (+ "adicionar nova safra" inline) ----------
-  var safraField = document.getElementById('entrada-safra-field');
-  var safraMenu = document.getElementById('entrada-safra-menu');
-  function renderSafraOptions() {
-    safraMenu.innerHTML = window.NiveloSafras.list().map(function (s) {
-      return '<div class="option" data-value="' + s + '">' + s + '</div>';
-    }).join('');
-  }
-  renderSafraOptions();
-  var safraDropdown = initDropdown(safraField);
-
-  // ---------- Fornecedor ----------
-  var fornecedorField = document.getElementById('entrada-fornecedor-field');
-  var fornecedorMenu = document.getElementById('entrada-fornecedor-menu');
-  window.NiveloCadastros.findByTipo('fornecedor').forEach(function (c) {
-    var optionEl = document.createElement('div');
-    optionEl.className = 'option';
-    optionEl.dataset.value = c.nome;
-    optionEl.textContent = c.nome;
-    fornecedorMenu.appendChild(optionEl);
-  });
-  var fornecedorDropdown = initDropdown(fornecedorField, function () {
-    fornecedorField.classList.remove('error');
-  });
-
-  // ---------- Documento (dropzone mockada, mesmo padrão visual do XML de
-  // novo-estoque.js — sem parsing real) ----------
-  var arquivoInput = document.getElementById('entrada-arquivo-input');
-  var arquivoNomeEl = document.getElementById('entrada-arquivo-nome');
-  arquivoInput.addEventListener('change', function () {
-    var file = arquivoInput.files && arquivoInput.files[0];
-    arquivoNomeEl.textContent = file ? file.name : 'Anexar nota/documento (opcional)';
-  });
-
-  // ---------- Preço de compra (máscara R$) + Valor total ----------
-  var unidadeCatalogoInfo = window.NiveloUnidadesMedida.findBySigla(produto.unidadeMedidaSigla);
-  document.getElementById('entrada-preco-compra-label').textContent =
-    'Preço de compra por ' + ((unidadeCatalogoInfo && unidadeCatalogoInfo.nome.toLowerCase()) || produto.unidadeMedidaSigla.toLowerCase());
-
-  var precoCompraCentavos = 0;
-  var precoCompraInput = document.getElementById('entrada-preco-compra-input');
-  var valorTotalInput = document.getElementById('entrada-valor-total-input');
-  function formatCentavosBRL(centavos) {
-    return (centavos / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-  precoCompraInput.addEventListener('input', function () {
-    var digits = precoCompraInput.value.replace(/\D/g, '');
-    precoCompraCentavos = digits ? Number(digits) : 0;
-    precoCompraInput.value = precoCompraCentavos ? formatCentavosBRL(precoCompraCentavos) : '';
-    updateValorTotal();
-  });
-  function updateValorTotal() {
-    var quantidade = Number(quantidadeInput.value) || 0;
-    var preco = precoCompraCentavos / 100;
-    valorTotalInput.value = formatCurrency(quantidade * preco);
-  }
 
   // ---------- Submit ----------
   document.getElementById('entrada-form').addEventListener('submit', function (event) {
@@ -288,39 +164,8 @@
     depositoField.classList.toggle('error', depositoInvalid);
     if (depositoInvalid) isValid = false;
 
-    var origem = currentOrigem();
-    var origemTexto, destinoTexto, documento;
-
-    if (origem === 'producao') {
-      var fazendaInvalid = !fazendaField.dataset.value;
-      fazendaField.classList.toggle('error', fazendaInvalid);
-      if (fazendaInvalid) isValid = false;
-
-      var talhaoInvalid = !talhaoField.dataset.value;
-      talhaoField.classList.toggle('error', talhaoInvalid);
-      if (talhaoInvalid) isValid = false;
-
-      if (!fazendaInvalid && !talhaoInvalid) {
-        var fazendaSel = findFazenda(fazendaField.dataset.value);
-        var talhaoSel = fazendaSel.talhoes.filter(function (t) { return t.id === talhaoField.dataset.value; })[0];
-        origemTexto = 'Colheita — ' + (talhaoSel ? talhaoSel.nome : '') + ' (' + fazendaSel.nome + ')' + (safraField.dataset.value ? ' · Safra ' + safraField.dataset.value : '');
-      }
-      destinoTexto = depositoField.dataset.value;
-      documento = null;
-    } else {
-      var fornecedorInvalid = !fornecedorField.dataset.value;
-      fornecedorField.classList.toggle('error', fornecedorInvalid);
-      if (fornecedorInvalid) isValid = false;
-
-      origemTexto = 'Compra de terceiro — ' + (fornecedorField.dataset.value || '');
-      destinoTexto = depositoField.dataset.value;
-      var file = arquivoInput.files && arquivoInput.files[0];
-      var docNome = document.getElementById('entrada-documento-input').value.trim();
-      documento = (file || docNome) ? { nome: docNome || file.name, url: 'about:blank' } : null;
-    }
-
     if (!isValid) {
-      var firstError = document.querySelector('.wrapper.error, .entradav2-origem-block .wrapper.error');
+      var firstError = document.querySelector('.wrapper.error');
       if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
@@ -329,9 +174,7 @@
       data: entradaDataInput.value || todayISO(),
       deposito: depositoField.dataset.value,
       quantidade: quantidade,
-      origem: origemTexto,
-      destino: destinoTexto,
-      documento: documento
+      destino: depositoField.dataset.value
     });
 
     var mensagem = formatNum(quantidade) + ' ' + produto.unidadeMedidaSigla.toLowerCase() + ' de ' + produto.produto + ' adicionados ao estoque de vendas.';

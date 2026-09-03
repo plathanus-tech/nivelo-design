@@ -289,17 +289,21 @@
                   </div>
 
                   <div class="wrapper" id="cultura-field">
-                    <label class="label" for="na-cultura">Cultura atual</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="na-cultura" disabled readonly />
-                    </div>
+                    <span class="label">Cultura atual</span>
+                    <button type="button" class="trigger" id="na-cultura-trigger" data-dropdown-trigger disabled>
+                      <span data-dropdown-value class="placeholder">Selecione a cultura</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu></div>
                   </div>
 
                   <div class="wrapper" id="safra-field">
-                    <label class="label" for="na-safra">Safra atual</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="na-safra" disabled readonly />
-                    </div>
+                    <span class="label">Safra atual</span>
+                    <button type="button" class="trigger" id="na-safra-trigger" data-dropdown-trigger disabled>
+                      <span data-dropdown-value class="placeholder">Selecione a safra</span>
+                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                    </button>
+                    <div class="menu" data-dropdown-menu></div>
                   </div>
 
                   <div class="wrapper" id="data-hora-field">
@@ -514,6 +518,7 @@
   <script src="../shared/estoque-uso-v2-data.js"></script>
   <script src="../shared/locais-data.js"></script>
   <script src="../shared/categorias-financeiras-data.js"></script>
+  <script src="../shared/safras-data.js"></script>
   <script src="../shared/caderno-v2-data.js"></script>
   <script src="../shared/nova-anotacao-v2.js"></script>
 </body>

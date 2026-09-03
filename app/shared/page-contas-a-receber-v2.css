@@ -35,3 +35,11 @@
    original/Recebido/Saldo reordenadas — larguras idênticas, sem mudança
    visual ali) e reduz só a última. */
 .ctr-table-card .th:nth-child(9) { width: 96px; }
+
+/* ── Tabela preenche 100% do card, nunca sobra espaço morto à direita ────
+   Mesmo raciocínio/fix exato de page-contas-a-pagar-v2.css: a base usa
+   `width` fixo em px (telas largas sempre rolam), mas a V2 tem 1 coluna de
+   Ações a menos (96px em vez de 170px) — sobrava uma faixa vazia visível à
+   direita do card em viewports largos. `min-width` preserva o scroll
+   horizontal em telas estreitas (`.tableWrap` já tem `overflow-x:auto`). */
+.ctr-table-card .table { width: 100%; min-width: 1226px; }

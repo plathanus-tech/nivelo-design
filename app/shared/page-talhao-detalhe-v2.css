@@ -255,9 +255,18 @@
 .historico-safras-empty-title { color: var(--color-text-primary); margin: 0; }
 .historico-safras-empty-subtitle { color: var(--color-text-tertiary); margin: 0; max-width: 360px; }
 
-/* Modal: Encerrar safra — mesmo bug de hidden+display incondicional já
-   documentado dezenas de vezes neste projeto. */
+/* Modal: Encerrar safra / Iniciar safra — mesmo bug de hidden+display
+   incondicional já documentado dezenas de vezes neste projeto. */
 .overlay[hidden] { display: none; }
+
+.talhao-detalhe-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.talhao-detalhe-modal-body > p { margin: 0; }
+
+.wrapper.error .trigger { border-color: var(--color-action-error); }
 
 .talhao-detalhe-toast-region {
   position: fixed;

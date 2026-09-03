@@ -3,10 +3,11 @@
 
   if (window.lucide) lucide.createIcons();
 
+  // Só 2 status (decisão explícita — "Em pouso" foi removido do vocabulário
+  // do Caderno de Campo, nenhum talhão do seed usa mais esse valor).
   var STATUS_TALHAO = {
     'em-producao': { status: 'success', label: 'Em produção' },
-    'disponivel': { status: 'info', label: 'Disponível' },
-    'em-pousio': { status: 'warning', label: 'Em pouso' }
+    'disponivel': { status: 'info', label: 'Disponível' }
   };
 
   var TIPO_REGISTRO = {
@@ -107,6 +108,17 @@
 
     document.getElementById('talhao-detalhe-back-label').textContent = currentFazenda.nome;
     document.getElementById('talhao-detalhe-back').href = 'fazenda-detalhe-caderno-v2.html#id=' + currentFazenda.id;
+
+    // Ação de safra alterna entre "Iniciar safra" (Disponível) e "Encerrar
+    // safra" (Em produção) — o ícone precisa ser RECRIADO via innerHTML
+    // (não só trocar o data-lucide de um <i> já existente): depois do 1º
+    // `lucide.createIcons()`, o Lucide substitui o <i> por um <svg>, então
+    // um segundo `data-lucide` num elemento que já virou <svg> não faz nada
+    // (mesmo bug/fix já documentado em estoque.js, round 18).
+    var iconName = currentTalhao.status === 'disponivel' ? 'flag' : 'flag-off';
+    document.getElementById('safra-action-icon').innerHTML = '<i data-lucide="' + iconName + '" width="16" height="16"></i>';
+    document.getElementById('safra-action-label').textContent = currentTalhao.status === 'disponivel' ? 'Iniciar safra' : 'Encerrar safra';
+
     if (window.lucide) lucide.createIcons();
   }
 
@@ -293,9 +305,18 @@
     window.location.href = 'nova-anotacao-v2.html?fazenda=' + encodeURIComponent(currentFazenda.id) + '&talhao=' + encodeURIComponent(currentTalhao.id);
   });
 
-  // ---------- Modal: Encerrar safra ----------
+  // ---------- Modal: Encerrar safra / Iniciar safra ----------
+  // Botão único no cabeçalho (`#safra-action-btn`) — o rótulo/ícone mudam
+  // conforme o status (ver renderHeader), e o clique abre o modal certo.
   var encerrarOverlay = document.getElementById('encerrar-safra-overlay');
-  document.getElementById('encerrar-safra-btn').addEventListener('click', function () { encerrarOverlay.hidden = false; });
+  var iniciarOverlay = document.getElementById('iniciar-safra-overlay');
+  document.getElementById('safra-action-btn').addEventListener('click', function () {
+    if (currentTalhao.status === 'disponivel') {
+      openIniciarSafraDialog();
+    } else {
+      encerrarOverlay.hidden = false;
+    }
+  });
   function closeEncerrarSafraDialog() { encerrarOverlay.hidden = true; }
   document.getElementById('encerrar-safra-close').addEventListener('click', closeEncerrarSafraDialog);
   document.getElementById('encerrar-safra-cancel').addEventListener('click', closeEncerrarSafraDialog);
@@ -313,6 +334,93 @@
     closeEncerrarSafraDialog();
     renderAll();
     showSuccessToast('Safra encerrada com sucesso.');
+  });
+
+  // ---------- Modal: Iniciar safra (só quando o talhão está Disponível) ----------
+  // Dropdown genérico mínimo — mesmo padrão de fazenda-detalhe-caderno-v2.js
+  // (position:fixed via JS, escapa de overflow do Dialog).
+  function initDropdown(root) {
+    var trigger = root.querySelector('[data-dropdown-trigger]');
+    var valueEl = root.querySelector('[data-dropdown-value]');
+    var menu = root.querySelector('[data-dropdown-menu]');
+    function positionMenu() {
+      var rect = trigger.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      menu.style.left = rect.left + 'px';
+      menu.style.width = rect.width + 'px';
+      menu.style.top = (rect.bottom + 4) + 'px';
+      menu.style.maxHeight = '200px';
+      menu.style.overflowY = 'auto';
+    }
+    function close() { root.classList.remove('open'); }
+    function open() { root.classList.add('open'); positionMenu(); }
+    trigger.addEventListener('click', function () {
+      if (root.classList.contains('open')) close(); else open();
+    });
+    menu.addEventListener('click', function (event) {
+      var optionEl = event.target.closest('.option');
+      if (!optionEl) return;
+      Array.prototype.slice.call(menu.querySelectorAll('.option')).forEach(function (o) { o.classList.remove('selected'); });
+      optionEl.classList.add('selected');
+      valueEl.textContent = optionEl.textContent;
+      valueEl.classList.remove('placeholder');
+      root.dataset.value = optionEl.dataset.value;
+      close();
+    });
+    document.addEventListener('click', function (event) { if (!root.contains(event.target)) close(); });
+    return {
+      getValue: function () { return root.dataset.value || ''; },
+      reset: function (placeholderText) {
+        delete root.dataset.value;
+        valueEl.textContent = placeholderText;
+        valueEl.classList.add('placeholder');
+        Array.prototype.slice.call(menu.querySelectorAll('.option')).forEach(function (o) { o.classList.remove('selected'); });
+      }
+    };
+  }
+
+  var iniciarCulturaField = document.getElementById('iniciar-safra-cultura-field');
+  var iniciarSafraField = document.getElementById('iniciar-safra-safra-field');
+  var iniciarCulturaDropdown = initDropdown(iniciarCulturaField);
+  var iniciarSafraDropdown = initDropdown(iniciarSafraField);
+
+  var PRODUTOS_GRAOS_SAFRA = (window.NiveloProdutos ? window.NiveloProdutos.list() : []).filter(function (p) {
+    return p.categoria === 'Grãos' && p.status === 'ativo';
+  });
+  iniciarCulturaField.querySelector('[data-dropdown-menu]').innerHTML = PRODUTOS_GRAOS_SAFRA.map(function (p) {
+    return '<div class="option" data-value="' + p.nome + '">' + p.nome + '</div>';
+  }).join('');
+  iniciarSafraField.querySelector('[data-dropdown-menu]').innerHTML = (window.NiveloSafras ? window.NiveloSafras.list() : []).map(function (s) {
+    return '<div class="option" data-value="' + s + '">' + s + '</div>';
+  }).join('');
+
+  function openIniciarSafraDialog() {
+    iniciarCulturaField.classList.remove('error');
+    iniciarSafraField.classList.remove('error');
+    iniciarCulturaDropdown.reset('Selecione a cultura');
+    iniciarSafraDropdown.reset('Selecione a safra');
+    iniciarOverlay.hidden = false;
+  }
+  function closeIniciarSafraDialog() { iniciarOverlay.hidden = true; }
+  document.getElementById('iniciar-safra-close').addEventListener('click', closeIniciarSafraDialog);
+  document.getElementById('iniciar-safra-cancel').addEventListener('click', closeIniciarSafraDialog);
+  iniciarOverlay.addEventListener('click', function (event) {
+    if (event.target === iniciarOverlay) closeIniciarSafraDialog();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !iniciarOverlay.hidden) closeIniciarSafraDialog();
+  });
+  document.getElementById('iniciar-safra-confirm').addEventListener('click', function () {
+    var cultura = iniciarCulturaDropdown.getValue();
+    var safra = iniciarSafraDropdown.getValue();
+    var valid = true;
+    if (!cultura) { iniciarCulturaField.classList.add('error'); valid = false; }
+    if (!safra) { iniciarSafraField.classList.add('error'); valid = false; }
+    if (!valid) return;
+    window.NiveloFazendas.iniciarSafraTalhao(currentFazenda.id, currentTalhao.id, cultura, safra);
+    closeIniciarSafraDialog();
+    renderAll();
+    showSuccessToast('Safra iniciada com sucesso.');
   });
 
   // ---------- Toast de sucesso ----------

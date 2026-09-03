@@ -256,6 +256,14 @@
   color: var(--color-text-primary);
 }
 
+/* "Informações complementares" — mesmo espaçamento entre título e conteúdo
+   já usado em "Produto e estoque" (Novo Pedido de Venda, `.npv-card{gap:
+   var(--spacing-md)}` entre `.cardHeader` e `.npv-grid`) — só esta seção,
+   as demais (CBS/IBS UF/Outras configurações) mantêm o espaçamento padrão. */
+#ibscbs-complementares-section .nnop-subsection-title {
+  margin-bottom: var(--spacing-md);
+}
+
 .nnop-ibscbs-embreve-row {
   display: flex;
   align-items: center;

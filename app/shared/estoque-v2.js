@@ -997,7 +997,11 @@
 
   // ---------- Ações ----------
   document.getElementById('new-estoque-btn').addEventListener('click', function () {
-    window.location.href = 'novo-estoque.html';
+    // `?from=v2` avisa novo-estoque.html (tela compartilhada com o V1) que a
+    // origem foi o Estoque V2 — sem isso, "Voltar"/"Cancelar" e o redirect
+    // pós-salvamento daquela tela sempre apontavam pra `estoque.html` (V1),
+    // mesmo quem chegou vindo do V2 (bug real corrigido nesta rodada).
+    window.location.href = 'novo-estoque.html?from=v2';
   });
 
   function flashDisabled(btn) {
@@ -1064,7 +1068,7 @@
       try {
         sessionStorage.setItem('nivelo.estoque.detalhe', JSON.stringify({ tipo: panelKey, record: record }));
       } catch (e) {}
-      window.location.href = 'detalhe-estoque.html#codigo=' + record.codigo;
+      window.location.href = 'detalhe-estoque.html#codigo=' + record.codigo + '&from=v2';
       return;
     }
     if (action === 'registrar-entrada-uso' && record) {

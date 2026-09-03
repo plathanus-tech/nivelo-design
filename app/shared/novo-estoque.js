@@ -3,6 +3,18 @@
 
   if (window.lucide) lucide.createIcons();
 
+  // Tela compartilhada entre V1 (`estoque.html`) e V2 (`estoque-v2.html`) —
+  // `estoque-v2.js`'s "Novo lançamento" navega com `?from=v2`, garantindo
+  // que "Voltar"/"Cancelar" e o redirect pós-salvamento voltem pra V2, nunca
+  // pra V1 (bug real corrigido: os 2 links e o redirect eram sempre
+  // hardcoded pra `estoque.html`, mesmo vindo do V2).
+  var vindoDoV2 = new URLSearchParams(location.search).get('from') === 'v2';
+  var ESTOQUE_LISTAGEM_URL = vindoDoV2 ? 'estoque-v2.html' : 'estoque.html';
+  var backTopLink = document.getElementById('novo-estoque-back-top');
+  var cancelLink = document.getElementById('novo-estoque-cancel');
+  if (backTopLink) backTopLink.href = ESTOQUE_LISTAGEM_URL;
+  if (cancelLink) cancelLink.href = ESTOQUE_LISTAGEM_URL;
+
   // ---------- Dropdown genérico (mesmo padrão de novo-cadastro.js/
   // estoque.js: wrapper/trigger/menu/option/open, menu em `position:fixed`
   // calculado via JS pra escapar do `overflow:hidden` de `.card`). ----------
@@ -55,9 +67,6 @@
       if (onChange) onChange(optionEl.dataset.value, optionEl.textContent);
     }
 
-    // Usado só pelo dropdown dependente de Talhão (Origem da entrada,
-    // Vendas) — mesma técnica de `reset()` já usada em
-    // registrar-entrada-estoque-v2.js pro mesmo par Fazenda→Talhão.
     function reset(placeholder) {
       root.dataset.value = '';
       valueEl.textContent = placeholder;
@@ -108,7 +117,6 @@
   var fornecedorField = document.getElementById('fornecedor-field');
   var notaDocumentoField = document.getElementById('nota-documento-field');
   var precoAtualField = document.getElementById('preco-atual-field');
-  var origemEntradaSection = document.getElementById('origem-entrada-section');
   var dataLancamentoField = document.getElementById('data-lancamento-field');
   var dataLancamentoInput = document.getElementById('ne-data-lancamento');
   var destinatarioField = document.getElementById('destinatario-field');
@@ -276,11 +284,10 @@
   // ---------- Tipo de estoque: cartões de seleção (radio nativo), só 2
   // opções (vendas/compras — Estoque Comprometido foi removido desta
   // rodada). Mesma técnica de `.is-selected`+RadioButton já usada em
-  // "Origem da entrada" (registrar-entrada-estoque-v2.js) e "Forma de
-  // entrada" logo abaixo. Valor interno "compras" preservado (não virou
-  // "uso") só pra não quebrar o contrato de hash `estoque.html#tab=compras`
-  // já lido por estoque.js — a mudança é só de rótulo visível
-  // ("Estoque de uso"). ----------
+  // "Forma de entrada" logo abaixo. Valor interno "compras" preservado (não
+  // virou "uso") só pra não quebrar o contrato de hash
+  // `estoque.html#tab=compras` já lido por estoque.js — a mudança é só de
+  // rótulo visível ("Estoque de uso"). ----------
   var tipoRadios = Array.prototype.slice.call(document.querySelectorAll('input[name="tipo-estoque"]'));
 
   function currentTipo() {
@@ -301,7 +308,6 @@
     valorUnitarioField.hidden = tipo !== 'compras';
     notaDocumentoField.hidden = tipo !== 'compras';
     precoAtualField.hidden = tipo !== 'vendas';
-    origemEntradaSection.hidden = tipo !== 'vendas';
     destinatarioField.hidden = !isComprometido;
     dataEntregaField.hidden = !isComprometido;
     if (!isComprometido) destinatarioField.classList.remove('error');
@@ -386,7 +392,7 @@
     try {
       sessionStorage.setItem('nivelo.novoestoque.success', message);
     } catch (e) {}
-    window.location.href = 'estoque.html#tab=' + tipo;
+    window.location.href = ESTOQUE_LISTAGEM_URL + '#tab=' + tipo;
   }
 
   function closeContaPagarModal() {
@@ -725,113 +731,6 @@
     }
   });
 
-  // ---------- Origem da entrada (só Estoque de Vendas) — estrutura/
-  // comportamento copiados verbatim de registrar-entrada-estoque-v2.js
-  // (cartões Produção própria/Colheita × Compra de terceiro, Fazenda→Talhão
-  // dependente, Safra, Fornecedor+dropzone+Preço de compra+Valor total).
-  // Cosmético/validado como o resto do formulário: nunca chama
-  // NiveloEstoqueVendasV2 (mesmo contrato de "sem persistência real" já
-  // documentado no topo do arquivo). ----------
-  var origemInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="ne-origem-entrada"]'));
-  var origemProducaoBlock = document.getElementById('ne-origem-producao-block');
-  var origemCompraBlock = document.getElementById('ne-origem-compra-block');
-  var origemFazendaField = document.getElementById('ne-origem-fazenda-field');
-  var origemFazendaMenu = document.getElementById('ne-origem-fazenda-menu');
-  var origemTalhaoField = document.getElementById('ne-origem-talhao-field');
-  var origemTalhaoMenu = document.getElementById('ne-origem-talhao-menu');
-  var origemSafraField = document.getElementById('ne-origem-safra-field');
-  var origemSafraMenu = document.getElementById('ne-origem-safra-menu');
-  var origemFornecedorField = document.getElementById('ne-origem-fornecedor-field');
-  var origemFornecedorMenu = document.getElementById('ne-origem-fornecedor-menu');
-  var origemArquivoInput = document.getElementById('ne-origem-arquivo-input');
-  var origemArquivoNomeEl = document.getElementById('ne-origem-arquivo-nome');
-  var origemPrecoCompraInput = document.getElementById('ne-origem-preco-compra-input');
-  var origemValorTotalInput = document.getElementById('ne-origem-valor-total-input');
-  var origemPrecoCompraCentavos = 0;
-
-  function currentOrigemEntrada() {
-    var checked = origemInputs.filter(function (i) { return i.checked; })[0];
-    return checked ? checked.value : 'producao';
-  }
-
-  function updateOrigemBlocks() {
-    var origem = currentOrigemEntrada();
-    origemInputs.forEach(function (input) {
-      input.closest('.entradav2-origem-card').classList.toggle('is-selected', input.checked);
-    });
-    var isProducao = origem === 'producao';
-    origemProducaoBlock.hidden = !isProducao;
-    origemCompraBlock.hidden = isProducao;
-    if (isProducao) {
-      origemFornecedorField.classList.remove('error');
-    } else {
-      origemFazendaField.classList.remove('error');
-      origemTalhaoField.classList.remove('error');
-    }
-  }
-  origemInputs.forEach(function (input) { input.addEventListener('change', updateOrigemBlocks); });
-  updateOrigemBlocks();
-
-  origemFazendaMenu.innerHTML = window.NiveloFazendas.list().map(function (f) {
-    return '<div class="option" data-value="' + f.id + '">' + f.nome + '</div>';
-  }).join('');
-
-  function findOrigemFazenda(id) {
-    return window.NiveloFazendas.list().filter(function (f) { return f.id === id; })[0] || null;
-  }
-
-  function populateOrigemTalhoes(fazenda) {
-    var talhoes = fazenda ? fazenda.talhoes : [];
-    origemTalhaoMenu.innerHTML = talhoes.map(function (t) {
-      return '<div class="option" data-value="' + t.id + '">' + t.nome + '</div>';
-    }).join('');
-    origemTalhaoDropdown.trigger.disabled = !fazenda;
-    origemTalhaoDropdown.reset(fazenda ? 'Selecione o talhão' : 'Selecione a fazenda primeiro');
-  }
-
-  var origemTalhaoDropdown = initDropdown(origemTalhaoField, function () {
-    origemTalhaoField.classList.remove('error');
-  });
-  var origemFazendaDropdown = initDropdown(origemFazendaField, function (fazendaId) {
-    origemFazendaField.classList.remove('error');
-    populateOrigemTalhoes(findOrigemFazenda(fazendaId));
-  });
-  populateOrigemTalhoes(null);
-
-  origemSafraMenu.innerHTML = window.NiveloSafras.list().map(function (s) {
-    return '<div class="option" data-value="' + s + '">' + s + '</div>';
-  }).join('');
-  initDropdown(origemSafraField);
-
-  window.NiveloCadastros.findByTipo('fornecedor').forEach(function (c) {
-    var optionEl = document.createElement('div');
-    optionEl.className = 'option';
-    optionEl.dataset.value = c.nome;
-    optionEl.textContent = c.nome;
-    origemFornecedorMenu.appendChild(optionEl);
-  });
-  initDropdown(origemFornecedorField, function () {
-    origemFornecedorField.classList.remove('error');
-  });
-
-  origemArquivoInput.addEventListener('change', function () {
-    var file = origemArquivoInput.files && origemArquivoInput.files[0];
-    origemArquivoNomeEl.textContent = file ? file.name : 'Anexar nota/documento (opcional)';
-  });
-
-  function updateOrigemValorTotal() {
-    var quantidade = Number(quantidadeInput.value) || 0;
-    var preco = origemPrecoCompraCentavos / 100;
-    origemValorTotalInput.value = formatCentavosBRL(Math.round(quantidade * preco * 100));
-  }
-  origemPrecoCompraInput.addEventListener('input', function () {
-    var digits = origemPrecoCompraInput.value.replace(/\D/g, '');
-    origemPrecoCompraCentavos = digits ? Number(digits) : 0;
-    origemPrecoCompraInput.value = origemPrecoCompraCentavos ? formatCentavosBRL(origemPrecoCompraCentavos) : '';
-    updateOrigemValorTotal();
-  });
-  quantidadeInput.addEventListener('input', updateOrigemValorTotal);
-
   // ---------- Validação + envio ----------
   var form = document.getElementById('novo-estoque-form');
 
@@ -858,23 +757,7 @@
       destinatarioField.classList.toggle('error', destinatarioInvalid);
     }
 
-    var origemInvalid = false;
-    if (tipo === 'vendas') {
-      var origem = currentOrigemEntrada();
-      if (origem === 'producao') {
-        var fazendaInvalid = !origemFazendaField.dataset.value;
-        origemFazendaField.classList.toggle('error', fazendaInvalid);
-        var talhaoInvalid = !origemTalhaoField.dataset.value;
-        origemTalhaoField.classList.toggle('error', talhaoInvalid);
-        origemInvalid = fazendaInvalid || talhaoInvalid;
-      } else {
-        var fornecedorInvalid = !origemFornecedorField.dataset.value;
-        origemFornecedorField.classList.toggle('error', fornecedorInvalid);
-        origemInvalid = fornecedorInvalid;
-      }
-    }
-
-    return !produtoInvalid && !quantidadeInvalid && !destinatarioInvalid && !origemInvalid;
+    return !produtoInvalid && !quantidadeInvalid && !destinatarioInvalid;
   }
 
   var TIPO_TOAST = {
@@ -887,7 +770,7 @@
     event.preventDefault();
 
     if (!runValidation()) {
-      var firstInvalid = form.querySelector('.wrapper.error, .novo-estoque-xml-block.error, .entradav2-origem-block .wrapper.error');
+      var firstInvalid = form.querySelector('.wrapper.error, .novo-estoque-xml-block.error');
       if (firstInvalid) {
         var focusable = firstInvalid.querySelector('input, button');
         if (focusable) focusable.focus();

@@ -349,108 +349,6 @@
                 </div>
               </div>
 
-              <!-- ══════════════ Card: Origem da entrada ══════════════ -->
-              <div class="novo-estoque-subsection">
-                <h2 class="novo-estoque-subsection-title">Origem da entrada</h2>
-
-                <div class="entradav2-origem-group" role="radiogroup" aria-label="Origem da entrada" id="origem-group">
-                  <label class="entradav2-origem-card is-selected">
-                    <input type="radio" name="origem-entrada" value="producao" class="entradav2-origem-input" checked />
-                    <span class="entradav2-origem-icon"><i data-lucide="wheat" width="20" height="20"></i></span>
-                    <span class="entradav2-origem-label text-body-s">Produção própria / Colheita</span>
-                  </label>
-                  <label class="entradav2-origem-card">
-                    <input type="radio" name="origem-entrada" value="compra" class="entradav2-origem-input" />
-                    <span class="entradav2-origem-icon"><i data-lucide="shopping-cart" width="20" height="20"></i></span>
-                    <span class="entradav2-origem-label text-body-s">Compra de terceiro</span>
-                  </label>
-                </div>
-
-                <!-- Bloco: Produção própria / Colheita -->
-                <div class="novo-estoque-grid entradav2-origem-block" id="origem-producao-block">
-                  <div class="wrapper novo-estoque-dropdown" id="entrada-fazenda-field">
-                    <span class="label">Fazenda</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span class="placeholder" data-dropdown-value>Selecione a fazenda</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="entrada-fazenda-menu"></div>
-                    <span class="errorText" id="entrada-fazenda-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione a fazenda.
-                    </span>
-                  </div>
-
-                  <div class="wrapper novo-estoque-dropdown" id="entrada-talhao-field">
-                    <span class="label">Talhão</span>
-                    <button type="button" class="trigger" data-dropdown-trigger disabled>
-                      <span class="placeholder" data-dropdown-value>Selecione a fazenda primeiro</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="entrada-talhao-menu"></div>
-                    <span class="errorText" id="entrada-talhao-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione o talhão.
-                    </span>
-                  </div>
-
-                  <div class="wrapper novo-estoque-dropdown" id="entrada-safra-field">
-                    <span class="label">Safra</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span class="placeholder" data-dropdown-value>Selecione a safra</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="entrada-safra-menu"></div>
-                  </div>
-                </div>
-
-                <!-- Bloco: Compra de terceiro -->
-                <div class="novo-estoque-grid entradav2-origem-block" id="origem-compra-block" hidden>
-                  <div class="wrapper novo-estoque-dropdown" id="entrada-fornecedor-field">
-                    <span class="label">Fornecedor</span>
-                    <button type="button" class="trigger" data-dropdown-trigger>
-                      <span class="placeholder" data-dropdown-value>Selecione o fornecedor</span>
-                      <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
-                    </button>
-                    <div class="menu" data-dropdown-menu id="entrada-fornecedor-menu"></div>
-                    <span class="errorText" id="entrada-fornecedor-error">
-                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                      Selecione o fornecedor.
-                    </span>
-                  </div>
-
-                  <div class="wrapper" id="entrada-documento-field">
-                    <label class="label" for="entrada-documento-input">Nota/Documento <span class="novo-estoque-optional-tag">(opcional)</span></label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="entrada-documento-input" placeholder="Número da nota/documento" />
-                    </div>
-                  </div>
-
-                  <div class="novo-estoque-span-2 novo-estoque-dropzone entradav2-dropzone">
-                    <input type="file" id="entrada-arquivo-input" class="novo-estoque-dropzone-input" />
-                    <label for="entrada-arquivo-input" class="novo-estoque-dropzone-label">
-                      <i data-lucide="upload" width="20" height="20"></i>
-                      <span id="entrada-arquivo-nome">Anexar nota/documento (opcional)</span>
-                    </label>
-                  </div>
-
-                  <div class="wrapper" id="entrada-preco-compra-field">
-                    <label class="label" id="entrada-preco-compra-label" for="entrada-preco-compra-input">Preço de compra</label>
-                    <div class="inputWrap hasLeft entradav2-currency-wrap">
-                      <span class="iconLeft entradav2-currency-prefix">R$</span>
-                      <input class="input" type="text" inputmode="decimal" id="entrada-preco-compra-input" placeholder="0,00" />
-                    </div>
-                  </div>
-
-                  <div class="wrapper" id="entrada-valor-total-field">
-                    <label class="label">Valor total</label>
-                    <div class="inputWrap">
-                      <input class="input" type="text" id="entrada-valor-total-input" disabled readonly placeholder="R$ 0,00" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </section>
 
             <div class="novo-estoque-actions">
@@ -472,9 +370,6 @@
   <script src="../shared/produtos-data.js"></script>
   <script src="../shared/unidades-medida-data.js"></script>
   <script src="../shared/locais-data.js"></script>
-  <script src="../shared/cadastros-data.js"></script>
-  <script src="../shared/fazendas-data.js"></script>
-  <script src="../shared/safras-data.js"></script>
   <script src="../shared/date-picker.js"></script>
   <script src="../shared/estoque-vendas-v2-data.js"></script>
   <script src="../shared/registrar-entrada-estoque-v2.js"></script>
