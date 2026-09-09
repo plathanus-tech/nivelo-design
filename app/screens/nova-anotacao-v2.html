@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Table/Table.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Input/Input.module.css" />
   <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dropdown/Dropdown.module.css" />
+  <link rel="stylesheet" href="../../Storybook-Nivelo/src/components/Dialog/Dialog.module.css" />
   <link rel="stylesheet" href="../shared/page-shell.css" />
   <link rel="stylesheet" href="../shared/page-nova-anotacao-v2.css" />
 </head>
@@ -289,12 +290,13 @@
                   </div>
 
                   <div class="wrapper" id="cultura-field">
-                    <span class="label">Cultura atual</span>
+                    <span class="label">Cultura/produto atual</span>
                     <button type="button" class="trigger" id="na-cultura-trigger" data-dropdown-trigger disabled>
                       <span data-dropdown-value class="placeholder">Selecione a cultura</span>
                       <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
                     </button>
                     <div class="menu" data-dropdown-menu></div>
+                    <span class="helperText">As opções vêm do cadastro em Cadastro &gt; Produtos de venda.</span>
                   </div>
 
                   <div class="wrapper" id="safra-field">
@@ -505,6 +507,33 @@
         </div>
       </main>
 
+    </div>
+  </div>
+
+  <!-- Modal: Nova safra — mesmo padrão de "Adicionar nova categoria"
+       (Novo Produto). -->
+  <div class="overlay" id="nova-safra-overlay" hidden>
+    <div class="dialog sm" role="dialog" aria-modal="true" aria-labelledby="nova-safra-title">
+      <div class="header">
+        <h2 class="title" id="nova-safra-title">Nova safra</h2>
+        <button class="closeBtn" id="nova-safra-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <div class="body">
+        <div class="wrapper" id="nova-safra-nome-field">
+          <label class="label" for="nova-safra-nome">Safra</label>
+          <div class="inputWrap">
+            <input class="input" type="text" id="nova-safra-nome" placeholder="Ex.: 27/28" />
+          </div>
+          <span class="errorText" id="nova-safra-error">
+            <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+            Informe a safra.
+          </span>
+        </div>
+      </div>
+      <div class="footer">
+        <button type="button" class="btn secondary sm" id="nova-safra-cancel">Cancelar</button>
+        <button type="button" class="btn primary sm" id="nova-safra-add">Adicionar</button>
+      </div>
     </div>
   </div>
 

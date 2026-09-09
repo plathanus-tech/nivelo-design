@@ -185,21 +185,113 @@
   var culturaDropdown = initDropdown(culturaField, function () {
     culturaField.classList.remove('error');
   });
-  var safraDropdown = initDropdown(safraField, function () {
-    safraField.classList.remove('error');
-  });
 
   var culturaTrigger = document.getElementById('na-cultura-trigger');
   var safraTrigger = document.getElementById('na-safra-trigger');
 
-  if (isTalhaoDisponivel) {
-    var PRODUTOS_GRAOS_CULTURA = window.NiveloProdutos.list().filter(function (p) { return p.categoria === 'Grãos' && p.status === 'ativo'; });
-    culturaField.querySelector('[data-dropdown-menu]').innerHTML = PRODUTOS_GRAOS_CULTURA.map(function (p) {
-      return '<div class="option" data-value="' + p.nome + '">' + p.nome + '</div>';
-    }).join('');
-    safraField.querySelector('[data-dropdown-menu]').innerHTML = (window.NiveloSafras ? window.NiveloSafras.list() : []).map(function (s) {
+  // ---------- Safra atual: catálogo compartilhado (window.NiveloSafras) +
+  // item fixo "+ Nova safra" — mesmo padrão exato de "Categoria do Produto"
+  // (novo-produto.js): dropdown com lógica própria (o `initDropdown()`
+  // genérico não tem noção de um item especial de criação). Só fica
+  // interativo quando o talhão está Disponível (mesmo guard de sempre). ----------
+  var safraMenu = safraField.querySelector('[data-dropdown-menu]');
+  var safraValueEl = safraField.querySelector('[data-dropdown-value]');
+
+  function renderSafraAtualOptions() {
+    var html = (window.NiveloSafras ? window.NiveloSafras.list() : []).map(function (s) {
       return '<div class="option" data-value="' + s + '">' + s + '</div>';
     }).join('');
+    html += '<div class="safra-option-create" data-add-safra>' +
+      '<i data-lucide="plus" width="14" height="14"></i> Nova safra</div>';
+    safraMenu.innerHTML = html;
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function selectSafraAtual(nome) {
+    var existing = Array.prototype.slice.call(safraMenu.querySelectorAll('.option'));
+    existing.forEach(function (o) { o.classList.remove('selected'); });
+    var optionEl = safraMenu.querySelector('.option[data-value="' + nome + '"]');
+    if (optionEl) optionEl.classList.add('selected');
+    safraValueEl.textContent = nome;
+    safraValueEl.classList.remove('placeholder');
+    safraField.dataset.value = nome;
+    safraField.classList.remove('error');
+  }
+
+  function positionSafraMenu() {
+    var rect = safraTrigger.getBoundingClientRect();
+    safraMenu.style.position = 'fixed';
+    safraMenu.style.left = rect.left + 'px';
+    safraMenu.style.width = rect.width + 'px';
+    safraMenu.style.top = (rect.bottom + 4) + 'px';
+    safraMenu.style.maxHeight = '240px';
+    safraMenu.style.overflowY = 'auto';
+  }
+  safraTrigger.addEventListener('click', function () {
+    if (safraTrigger.disabled) return;
+    var willOpen = !safraField.classList.contains('open');
+    safraField.classList.toggle('open', willOpen);
+    if (willOpen) positionSafraMenu();
+  });
+  safraMenu.addEventListener('click', function (event) {
+    if (event.target.closest('[data-add-safra]')) {
+      openNovaSafraDialog();
+      return;
+    }
+    var optionEl = event.target.closest('.option');
+    if (optionEl) {
+      selectSafraAtual(optionEl.dataset.value);
+      safraField.classList.remove('open');
+    }
+  });
+  document.addEventListener('click', function (event) {
+    if (!safraField.contains(event.target)) safraField.classList.remove('open');
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') safraField.classList.remove('open');
+  });
+
+  // ---------- Modal: Nova safra — mesmo padrão exato de "Adicionar nova
+  // categoria" (novo-produto.js). ----------
+  var novaSafraOverlay = document.getElementById('nova-safra-overlay');
+  var novaSafraNomeInput = document.getElementById('nova-safra-nome');
+  var novaSafraNomeField = document.getElementById('nova-safra-nome-field');
+
+  function openNovaSafraDialog() {
+    safraField.classList.remove('open');
+    novaSafraNomeInput.value = '';
+    novaSafraNomeField.classList.remove('error');
+    novaSafraOverlay.hidden = false;
+    novaSafraNomeInput.focus();
+  }
+  function closeNovaSafraDialog() {
+    novaSafraOverlay.hidden = true;
+  }
+  document.getElementById('nova-safra-close').addEventListener('click', closeNovaSafraDialog);
+  document.getElementById('nova-safra-cancel').addEventListener('click', closeNovaSafraDialog);
+  novaSafraOverlay.addEventListener('click', function (event) {
+    if (event.target === novaSafraOverlay) closeNovaSafraDialog();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !novaSafraOverlay.hidden) closeNovaSafraDialog();
+  });
+  document.getElementById('nova-safra-add').addEventListener('click', function () {
+    var nome = novaSafraNomeInput.value.trim();
+    novaSafraNomeField.classList.toggle('error', !nome);
+    if (!nome) return;
+
+    window.NiveloSafras.add(nome);
+    renderSafraAtualOptions();
+    selectSafraAtual(nome);
+    closeNovaSafraDialog();
+  });
+
+  if (isTalhaoDisponivel) {
+    var PRODUTOS_VENDA_CULTURA = window.NiveloProdutos.list().filter(function (p) { return p.tipoProduto === 'venda' && p.status === 'ativo'; });
+    culturaField.querySelector('[data-dropdown-menu]').innerHTML = PRODUTOS_VENDA_CULTURA.map(function (p) {
+      return '<div class="option" data-value="' + p.nome + '">' + p.nome + '</div>';
+    }).join('');
+    renderSafraAtualOptions();
     culturaTrigger.disabled = false;
     safraTrigger.disabled = false;
   } else {

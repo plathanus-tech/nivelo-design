@@ -294,26 +294,96 @@
   var iniciarCulturaField = document.getElementById('iniciar-safra-cultura-field');
   var iniciarSafraField = document.getElementById('iniciar-safra-safra-field');
   var iniciarCulturaDropdown = initDropdown(iniciarCulturaField);
-  var iniciarSafraDropdown = initDropdown(iniciarSafraField);
 
-  // Mesmo catálogo de Grãos já usado em Colheita (nova-anotacao-v2.js) —
-  // cultura atual do talhão é sempre um produto de venda de categoria Grãos.
-  var PRODUTOS_GRAOS = (window.NiveloProdutos ? window.NiveloProdutos.list() : []).filter(function (p) {
-    return p.categoria === 'Grãos' && p.status === 'ativo';
+  // Cultura/produto atual: opções vêm do cadastro de Produtos de venda
+  // (Cadastro > Produtos de venda), não de uma categoria específica —
+  // mesmo catálogo/filtro usado em Colheita (nova-anotacao-v2.js).
+  var PRODUTOS_VENDA = (window.NiveloProdutos ? window.NiveloProdutos.list() : []).filter(function (p) {
+    return p.tipoProduto === 'venda' && p.status === 'ativo';
   });
-  iniciarCulturaField.querySelector('[data-dropdown-menu]').innerHTML = PRODUTOS_GRAOS.map(function (p) {
+  iniciarCulturaField.querySelector('[data-dropdown-menu]').innerHTML = PRODUTOS_VENDA.map(function (p) {
     return '<div class="option" data-value="' + p.nome + '">' + p.nome + '</div>';
   }).join('');
-  iniciarSafraField.querySelector('[data-dropdown-menu]').innerHTML = (window.NiveloSafras ? window.NiveloSafras.list() : []).map(function (s) {
-    return '<div class="option" data-value="' + s + '">' + s + '</div>';
-  }).join('');
+
+  // ---------- Safra atual: catálogo compartilhado (window.NiveloSafras) +
+  // item fixo "+ Nova safra" — mesmo padrão exato de "Categoria do Produto"
+  // (novo-produto.js): dropdown com lógica própria (não o `initDropdown()`
+  // genérico, que não tem noção de um item especial de criação). ----------
+  var iniciarSafraMenu = iniciarSafraField.querySelector('[data-dropdown-menu]');
+  var iniciarSafraTrigger = iniciarSafraField.querySelector('[data-dropdown-trigger]');
+  var iniciarSafraValueEl = iniciarSafraField.querySelector('[data-dropdown-value]');
+
+  function renderIniciarSafraOptions() {
+    var html = (window.NiveloSafras ? window.NiveloSafras.list() : []).map(function (s) {
+      return '<div class="option" data-value="' + s + '">' + s + '</div>';
+    }).join('');
+    html += '<div class="safra-option-create" data-add-safra>' +
+      '<i data-lucide="plus" width="14" height="14"></i> Nova safra</div>';
+    iniciarSafraMenu.innerHTML = html;
+    if (window.lucide) lucide.createIcons();
+  }
+  renderIniciarSafraOptions();
+
+  function selectIniciarSafra(nome) {
+    var existing = Array.prototype.slice.call(iniciarSafraMenu.querySelectorAll('.option'));
+    existing.forEach(function (o) { o.classList.remove('selected'); });
+    var optionEl = iniciarSafraMenu.querySelector('.option[data-value="' + nome + '"]');
+    if (optionEl) optionEl.classList.add('selected');
+    iniciarSafraValueEl.textContent = nome;
+    iniciarSafraValueEl.classList.remove('placeholder');
+    iniciarSafraField.dataset.value = nome;
+    iniciarSafraField.classList.remove('error');
+  }
+  function resetIniciarSafra() {
+    delete iniciarSafraField.dataset.value;
+    iniciarSafraValueEl.textContent = 'Selecione a safra';
+    iniciarSafraValueEl.classList.add('placeholder');
+    Array.prototype.slice.call(iniciarSafraMenu.querySelectorAll('.option')).forEach(function (o) { o.classList.remove('selected'); });
+  }
+
+  // Mesmo `position:fixed` calculado via JS do `initDropdown()` local acima
+  // (não o `position:absolute` padrão do componente) — necessário aqui
+  // porque este campo vive dentro de um Dialog (`overflow:hidden`/`.body
+  // {overflow-y:auto}`), diferente do campo Categoria do Produto (Novo
+  // Produto), que vive numa página inteira sem esse risco de corte.
+  function positionIniciarSafraMenu() {
+    var rect = iniciarSafraTrigger.getBoundingClientRect();
+    iniciarSafraMenu.style.position = 'fixed';
+    iniciarSafraMenu.style.left = rect.left + 'px';
+    iniciarSafraMenu.style.width = rect.width + 'px';
+    iniciarSafraMenu.style.top = (rect.bottom + 4) + 'px';
+    iniciarSafraMenu.style.maxHeight = '200px';
+    iniciarSafraMenu.style.overflowY = 'auto';
+  }
+  iniciarSafraTrigger.addEventListener('click', function () {
+    var willOpen = !iniciarSafraField.classList.contains('open');
+    iniciarSafraField.classList.toggle('open', willOpen);
+    if (willOpen) positionIniciarSafraMenu();
+  });
+  iniciarSafraMenu.addEventListener('click', function (event) {
+    if (event.target.closest('[data-add-safra]')) {
+      openNovaSafraDialog();
+      return;
+    }
+    var optionEl = event.target.closest('.option');
+    if (optionEl) {
+      selectIniciarSafra(optionEl.dataset.value);
+      iniciarSafraField.classList.remove('open');
+    }
+  });
+  document.addEventListener('click', function (event) {
+    if (!iniciarSafraField.contains(event.target)) iniciarSafraField.classList.remove('open');
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') iniciarSafraField.classList.remove('open');
+  });
 
   function openIniciarSafraDialog(fazendaId, talhaoId) {
     iniciarTarget = { fazendaId: fazendaId, talhaoId: talhaoId };
     iniciarCulturaField.classList.remove('error');
     iniciarSafraField.classList.remove('error');
     iniciarCulturaDropdown.reset('Selecione a cultura');
-    iniciarSafraDropdown.reset('Selecione a safra');
+    resetIniciarSafra();
     iniciarOverlay.hidden = false;
   }
   function closeIniciarSafraDialog() {
@@ -326,12 +396,17 @@
     if (event.target === iniciarOverlay) closeIniciarSafraDialog();
   });
   document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' && !iniciarOverlay.hidden) closeIniciarSafraDialog();
+    // `&& novaSafraOverlay.hidden`: com "Nova safra" aberto por cima (modal
+    // sobre modal), Escape deve fechar só o de cima — sem essa guarda, os
+    // 2 listeners de Escape reagiam ao mesmo evento e fechavam os dois
+    // modais de uma vez (bug real, pego ao revisar o padrão de modal
+    // aninhado nesta tela).
+    if (event.key === 'Escape' && !iniciarOverlay.hidden && novaSafraOverlay.hidden) closeIniciarSafraDialog();
   });
   document.getElementById('iniciar-safra-confirm').addEventListener('click', function () {
     if (!iniciarTarget) return;
     var cultura = iniciarCulturaDropdown.getValue();
-    var safra = iniciarSafraDropdown.getValue();
+    var safra = iniciarSafraField.dataset.value;
     var valid = true;
     if (!cultura) { iniciarCulturaField.classList.add('error'); valid = false; }
     if (!safra) { iniciarSafraField.classList.add('error'); valid = false; }
@@ -340,6 +415,42 @@
     closeIniciarSafraDialog();
     renderAll();
     showSuccessToast('Safra iniciada com sucesso.');
+  });
+
+  // ---------- Modal: Nova safra — mesmo padrão exato de "Adicionar nova
+  // categoria" (novo-produto.js): campo único, catálogo compartilhado
+  // (window.NiveloSafras, localStorage), recém-criada já selecionada. ----------
+  var novaSafraOverlay = document.getElementById('nova-safra-overlay');
+  var novaSafraNomeInput = document.getElementById('nova-safra-nome');
+  var novaSafraNomeField = document.getElementById('nova-safra-nome-field');
+
+  function openNovaSafraDialog() {
+    iniciarSafraField.classList.remove('open');
+    novaSafraNomeInput.value = '';
+    novaSafraNomeField.classList.remove('error');
+    novaSafraOverlay.hidden = false;
+    novaSafraNomeInput.focus();
+  }
+  function closeNovaSafraDialog() {
+    novaSafraOverlay.hidden = true;
+  }
+  document.getElementById('nova-safra-close').addEventListener('click', closeNovaSafraDialog);
+  document.getElementById('nova-safra-cancel').addEventListener('click', closeNovaSafraDialog);
+  novaSafraOverlay.addEventListener('click', function (event) {
+    if (event.target === novaSafraOverlay) closeNovaSafraDialog();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !novaSafraOverlay.hidden) closeNovaSafraDialog();
+  });
+  document.getElementById('nova-safra-add').addEventListener('click', function () {
+    var nome = novaSafraNomeInput.value.trim();
+    novaSafraNomeField.classList.toggle('error', !nome);
+    if (!nome) return;
+
+    window.NiveloSafras.add(nome);
+    renderIniciarSafraOptions();
+    selectIniciarSafra(nome);
+    closeNovaSafraDialog();
   });
 
   // ---------- Ações da tabela/cards (delegadas) ----------

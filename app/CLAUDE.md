@@ -6994,3 +6994,124 @@ com IBS/CBS como 1ª aba/ativa por padrão e os campos Observação/Informação
 e opcionais (submit funciona com ou sem CST selecionado); nenhum erro real de console em
 nenhuma das telas tocadas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em
 todo o sistema).
+
+## Ajustes 2026-09-09 (round 112) — Caderno de Campo: "Cultura/produto atual" + help text,
+"Nova safra" reaproveitando o padrão de "Categoria do Produto"
+
+Pedido em 4 partes sobre os modais "Iniciar safra" (`fazenda-detalhe-caderno-v2.js`/
+`talhao-detalhe-v2.js`, ambos com cópia própria do modal) e "Nova anotação"
+(`nova-anotacao-v2.js`), fechando 2 lacunas deixadas no round 111.
+
+- **"Cultura atual" → "Cultura/produto atual" + help text**, nos 3 lugares (Iniciar safra nas
+  2 telas + Nova anotação): novo `<span class="helperText">As opções vêm do cadastro em
+  Cadastro &gt; Produtos de venda.</span>` logo abaixo do campo — mesma classe real do
+  componente (`Input.module.css`'s `.helperText`, já usada em outras telas, ex. "Código" em
+  Novo Produto), não inventada. **Fonte dos dados corrigida pra bater com o texto**: o filtro
+  das 3 telas usava `categoria === 'Grãos'` (coincidência: hoje todo produto `tipoProduto:
+  'venda'` também é `categoria:'Grãos'`, então o resultado nunca mudou visualmente) — trocado
+  pra `tipoProduto === 'venda' && status === 'ativo'`, batendo literalmente com "Cadastro >
+  Produtos de venda" citado no help text, e mais correto a longo prazo (um produto de venda
+  fora da categoria Grãos, se um dia existir, também vai aparecer).
+- **Safra atual ganhou "+ Nova safra"**, mesmo padrão visual/comportamental EXATO de "Categoria
+  do Produto" (`novo-produto.js`): dropdown com lógica própria (não o `initDropdown()`
+  genérico das 3 telas, que não tem noção de item de criação) — catálogo real
+  (`window.NiveloSafras.list()`) + item fixo no fim do menu (`.safra-option-create`, cópia
+  exata de `.novo-produto-categoria-option-create`: ícone `plus` + texto, borda superior,
+  hover `--color-bg-brand`). **Única adaptação deliberada ao contexto**: como este campo vive
+  dentro de um Dialog (`overflow:hidden`/`.body{overflow-y:auto}`) nas 2 telas de Iniciar
+  safra, o menu usa `position:fixed` calculado via JS (mesma técnica do `initDropdown()` local
+  já usado pra Cultura no mesmo modal) em vez do `position:absolute` padrão do componente que
+  "Categoria do Produto" usa — lá não há esse risco de corte, por viver numa página inteira,
+  não num modal pequeno.
+- **Modal "Nova safra"**, réplica de markup/comportamento de "Adicionar nova categoria" (Novo
+  Produto): `Dialog sm`, campo único (`Safra`, placeholder "Ex.: 27/28"), Cancelar
+  (`.btn.secondary`)/Adicionar (`.btn.primary`), validação "não vazio" com `.errorText` (guard
+  `.wrapper.error .errorText{display:flex}` adicionado nas 2 telas que ainda não tinham nenhum
+  uso real de `.errorText`, mesmo bug recorrente de `Input.module.css`'s `.errorText{display:
+  flex}` incondicional já documentado dezenas de vezes neste projeto). Confirmar chama
+  `window.NiveloSafras.add(nome)` (catálogo compartilhado, já existia desde o round 42,
+  persistido em `localStorage`), re-renderiza as opções do dropdown e já seleciona a safra
+  recém-criada — mesma sequência exata de `novo-produto.js`'s `nova-categoria-add`.
+  **Modal aberto de dentro de outro modal** (Iniciar safra): ambos são `.overlay{z-index:1000}`
+  do mesmo `Dialog.module.css` — como "Nova safra" vem depois no DOM, empata em z-index e
+  desenha por cima (nenhum z-index customizado foi necessário); confirmado ao vivo sem
+  nenhuma sobreposição errada.
+- **Nova anotação**: mesmo tratamento — Cultura/Safra continuam só habilitados/interativos
+  quando o talhão está "Disponível" (comportamento do round 111 preservado sem mudança), mas
+  agora com o label/help text novos e a Safra ganhando "+ Nova safra" também. `nova-anotacao-
+  v2.html` ganhou `Dialog.module.css` no `<head>` (não carregava antes, precisava só pra esta
+  modal nova).
+
+Verificado ao vivo (`http-server`, porta 8091): label "Cultura/produto atual" + help text
+idênticos nas 3 telas; opções de Cultura vindas de `tipoProduto:'venda'` (Soja/Milho/Trigo/
+Sorgo/Café/Cana-de-açúcar, Feijão cancelado corretamente fora); "+ Nova safra" abrindo o modal
+por cima do "Iniciar safra" já aberto (fazenda-detalhe-caderno-v2 e talhao-detalhe-v2) e do
+formulário de Nova Anotação; validação bloqueando safra vazia; criar "27/28"/"26/27"/"2026" e
+confirmar cada modal aplica a nova safra de verdade (`window.NiveloFazendas.iniciarSafraTalhao`/
+`window.NiveloCadernoV2.add` recebendo o valor certo) e a mesma safra reaparece imediatamente
+em QUALQUER dropdown de Safra do sistema, inclusive depois de navegar pra outra tela (confirma
+persistência via `localStorage`); talhão "Em produção" (Cultura/Safra desabilitados, mostrando
+valor fixo) sem nenhuma regressão; mobile (375px): sem overflow horizontal, modal "Nova safra"
+cabendo dentro da viewport mesmo aninhado sobre "Iniciar safra"; nenhum erro real de console em
+nenhuma das 3 telas (só os 404 de `/fonts/*.otf` já documentados como pré-existentes em todo o
+sistema).
+
+## Ajustes 2026-09-09 (round 113) — Safra: formato abreviado no catálogo semente; bug real
+de Escape em modal-sobre-modal ("Iniciar safra" + "Nova safra")
+
+2 ajustes pontuais sobre o round 112.
+
+- **`safras-data.js`'s `DEFAULT_SAFRAS`** trocado de `['2024/25', '2025/26', '2026/27',
+  '2027/28']` pra `['24/25', '25/26', '26/27', '27/28']` — formato abreviado (no máximo 4
+  dígitos), pedido explícito do usuário. Só afeta o valor SEMENTE do catálogo (primeira vez que
+  `window.NiveloSafras` roda sem nada em `localStorage`) — "Nova safra" continua um campo de
+  texto livre, sem validação de formato, então o usuário sempre pôde digitar qualquer coisa
+  (`2026`, `24/25`, etc.); só o ponto de partida ficou consistente com o formato pedido.
+- **Bug real, achado ao responder a pergunta do usuário ("um modal em cima de outro modal não
+  é um problema?"):** com "Nova safra" aberto por cima de "Iniciar safra" (`fazenda-detalhe-
+  caderno-v2.js`/`talhao-detalhe-v2.js`), os 2 modais tinham cada um seu próprio listener de
+  `Escape` em `document` — um único `keydown` de Escape disparava os DOIS ao mesmo tempo,
+  fechando "Iniciar safra" (perdendo Cultura/Safra já escolhidos) junto com "Nova safra", em vez
+  de fechar só o modal de cima como o usuário esperaria. Corrigido com uma guarda
+  (`&& novaSafraOverlay.hidden`) no listener de Escape de "Iniciar safra": só fecha quando "Nova
+  safra" NÃO está aberto por cima. **O resto do empilhamento não é um problema**: os 2
+  `.overlay` usam o mesmo `z-index:1000` (`Dialog.module.css`), mas como "Nova safra" vem depois
+  no DOM, empata e desenha por cima por ordem de pintura — sem precisar de z-index customizado;
+  cliques no fundo escuro também já funcionavam certo (o clique sempre atinge o overlay de cima,
+  que cobre a tela inteira). Nenhuma mudança de z-index/markup foi necessária, só a guarda no
+  Escape.
+
+Verificado ao vivo (`http-server`, porta 8091, aba nova pra evitar o cache de script já
+documentado neste projeto): `window.NiveloSafras.list()` com `localStorage` limpo retorna
+`["24/25","25/26","26/27","27/28"]`; abrir "Iniciar safra" → "Nova safra" por cima → 1º Escape
+fecha só "Nova safra" (confirmado via `overlay.hidden` dos dois) → 2º Escape fecha "Iniciar
+safra" normalmente; mesmo teste repetido em `talhao-detalhe-v2.html` com o mesmo resultado;
+nenhuma regressão no fluxo completo (cultura+safra+confirmar continua funcionando).
+
+## Ajustes 2026-09-09 (round 114) — Safra: migração de formato pra quem já tinha
+`localStorage` do padrão antigo
+
+Correção sobre o round 113: o usuário reportou que as opções de "Safra atual" continuavam
+aparecendo como "2026/27" em vez de "26/27". Causa raiz real: mudar só `DEFAULT_SAFRAS` (round
+113) só afeta a primeira vez que `window.NiveloSafras` roda sem NADA em `localStorage` —
+`readStored()` sempre prioriza o que já está salvo, então qualquer navegador que já tivesse
+testado/usado o Caderno de Campo antes deste round (inclusive o do usuário, com toda
+probabilidade, dado quantas rodadas anteriores já geraram safras no formato antigo) continuava
+preso ao array salvo com "2024/25" etc., nunca mais tocado pelo valor semente novo.
+
+- **Migração automática, 1 vez, no boot de `safras-data.js`**: `migrateFormat()` percorre o que
+  já está salvo e normaliza só o padrão "ano cheio/ano abreviado" (`/^\d{2}(\d{2})\/(\d{2})$/`,
+  ex. "2024/25" → "24/25") — nunca mexe em "2026" (ano cheio sozinho, formato já válido) nem em
+  qualquer nome já customizado pelo usuário que não bata nesse padrão específico. Deduplica caso
+  a normalização faça 2 entradas colidirem (não deveria acontecer no seed real, mas protege
+  contra o caso). Resultado persistido de volta em `localStorage` na hora, então a correção
+  "gruda" — não precisa rodar de novo a cada carregamento.
+
+Verificado ao vivo (aba nova, `http-server` porta 8091): `localStorage` manualmente setado pro
+formato antigo (`["2024/25","2025/26","2026/27","2027/28","2026"]`) — ao carregar
+`talhao-detalhe-v2.html`, `window.NiveloSafras.list()` retorna
+`["24/25","25/26","26/27","27/28","2026"]` (os 4 primeiros migrados, "2026" preservado
+intacto); `localStorage` já reflete o valor migrado (persistido); dropdown "Safra atual" do
+modal "Iniciar safra" renderizando as opções já corrigidas. Mesma correção vale de graça pra
+`fazenda-detalhe-caderno-v2.html`/`nova-anotacao-v2.html` (mesmo módulo `safras-data.js`
+compartilhado pelas 3 telas).

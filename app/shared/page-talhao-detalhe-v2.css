@@ -268,6 +268,30 @@
 
 .wrapper.error .trigger { border-color: var(--color-action-error); }
 
+/* "+ Nova safra" — item fixo no fim do menu de Safra atual, mesmo padrão
+   visual exato de `.novo-produto-categoria-option-create` (Novo Produto,
+   campo Categoria do Produto). */
+.safra-option-create {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-medium);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+  cursor: pointer;
+}
+.safra-option-create:hover {
+  background: var(--color-bg-brand);
+}
+
+/* Modal "Nova safra" — 1º uso de `.errorText` de verdade nesta tela.
+   `Input.module.css`'s `.errorText{display:flex}` é incondicional — mesmo
+   guard padrão já documentado dezenas de vezes neste projeto. */
+.wrapper .errorText { display: none; }
+.wrapper.error .errorText { display: flex; }
+.wrapper.error .input { border-color: var(--color-action-error); }
+
 .talhao-detalhe-toast-region {
   position: fixed;
   top: calc(var(--shell-header-height) + var(--spacing-lg));
