@@ -275,9 +275,14 @@
 
   function openPlanoDialog() {
     var menu = planoDropdownEl.querySelector('[data-dropdown-menu]');
-    menu.innerHTML = window.NiveloAdminPlanos.list().map(function (p) {
-      return '<div class="option' + (p.id === current.planoId ? ' selected' : '') + '" data-value="' + p.id + '">' + p.nome + '</div>';
-    }).join('');
+    // Mesmo fix de assinantes.js: um plano desativado (ex.: "Fiscal + WhatsApp") só aparece
+    // aqui se for o plano ATUAL deste cliente, pra continuar visível/selecionado sem virar
+    // opção nova de reatribuição.
+    menu.innerHTML = window.NiveloAdminPlanos.list()
+      .filter(function (p) { return p.ativo || p.id === current.planoId; })
+      .map(function (p) {
+        return '<div class="option' + (p.id === current.planoId ? ' selected' : '') + '" data-value="' + p.id + '">' + p.nome + '</div>';
+      }).join('');
     var atual = window.NiveloAdminPlanos.findById(current.planoId);
     planoDropdown.reset(current.planoId, atual ? atual.nome : '');
     planoOverlay.hidden = false;
@@ -476,8 +481,9 @@
     var menu = linkPlanoDropdownEl.querySelector('[data-dropdown-menu]');
     // Em período de teste, nunca houve assinatura paga ativa — nenhum plano precisa ser
     // excluído da seleção (item explícito: não limitar a escolha com base no plano atual).
+    // `p.ativo`: plano desativado nunca pode ser destino de um upgrade novo.
     menu.innerHTML = window.NiveloAdminPlanos.list()
-      .filter(function (p) { return current.situacao === 'teste' || p.id !== current.planoId; })
+      .filter(function (p) { return p.ativo && (current.situacao === 'teste' || p.id !== current.planoId); })
       .map(function (p) { return '<div class="option" data-value="' + p.id + '">' + p.nome + '</div>'; })
       .join('');
     linkPlanoDropdown.reset('', 'Selecione o novo plano anual');

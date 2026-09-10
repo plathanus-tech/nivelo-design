@@ -43,8 +43,8 @@
     });
   }
 
-  // ---------- Ações (Editar + Ativar/Desativar), mesmo ícone+tooltip padrão já usado em
-  // Usuários (ver `admin/shared/usuarios.js`) — Ativar/Desativar sempre exige confirmação
+  // ---------- Ações (Editar + Preços + Ativar/Desativar), mesmo ícone+tooltip padrão já usado
+  // em Usuários (ver `admin/shared/usuarios.js`) — Ativar/Desativar sempre exige confirmação
   // antes de aplicar (ver openToggleAtivoDialog). ----------
   function buildActionsHTML(plano) {
     var toggle = plano.ativo
@@ -56,11 +56,26 @@
           '<i data-lucide="pencil" width="16" height="16"></i>' +
           '<span class="tip text-body-xs top"><span class="arrow"></span>Editar</span>' +
         '</button>' +
+        '<button type="button" class="actionBtn" data-action="precos" data-id="' + plano.id + '" aria-label="Editar preços por hectare">' +
+          '<i data-lucide="dollar-sign" width="16" height="16"></i>' +
+          '<span class="tip text-body-xs top"><span class="arrow"></span>Preços</span>' +
+        '</button>' +
         '<button type="button" class="actionBtn" data-action="' + toggle.action + '" data-id="' + plano.id + '" aria-label="' + toggle.label + ' plano">' +
           '<i data-lucide="' + toggle.icon + '" width="16" height="16"></i>' +
           '<span class="tip text-body-xs top"><span class="arrow"></span>' + toggle.label + '</span>' +
         '</button>' +
       '</div>'
+    );
+  }
+
+  // Faixa de preços (coluna resumida da tabela): menor/maior valor mensal-equivalente entre
+  // as 4 faixas, nunca os 12+ valores individuais — o detalhe completo mora só no modal de
+  // "Preços" (ver openFaixasDialog), pra listagem principal não ficar poluída.
+  function buildFaixaPrecoHTML(plano) {
+    var range = window.NiveloAdminPlanos.faixaRange(plano);
+    return (
+      '<span class="pln-preco-range">' + formatValorMensal(range.min) + ' a ' + formatValorMensal(range.max) + '</span>' +
+      '<span class="pln-preco-note">/mês, conforme hectares</span>'
     );
   }
 
@@ -70,8 +85,7 @@
       '<tr class="tr" id="pln-row-' + plano.id + '" data-id="' + plano.id + '">' +
         '<td class="td">' + plano.nome + '</td>' +
         '<td class="td pln-descricao-cell" title="' + plano.descricao + '">' + plano.descricao + '</td>' +
-        '<td class="td">' + formatValorMensal(plano.valorMensal) + '</td>' +
-        '<td class="td">' + formatValorMensal(plano.valorAnual) + '</td>' +
+        '<td class="td">' + buildFaixaPrecoHTML(plano) + '</td>' +
         '<td class="td"><span class="badge" data-status="' + statusBadge.status + '"><span class="badgeDot"></span>' + statusBadge.label + '</span></td>' +
         '<td class="td">' + plano.assinantesAtivos + '</td>' +
         '<td class="td">' + formatDataBR(plano.ultimaAlteracao) + '</td>' +
@@ -82,6 +96,7 @@
 
   function buildCardHTML(plano) {
     var statusBadge = plano.ativo ? { status: 'success', label: 'Ativo' } : { status: 'warning', label: 'Inativo' };
+    var range = window.NiveloAdminPlanos.faixaRange(plano);
     return (
       '<div class="card pln-mobile-card" data-row-id="pln-row-' + plano.id + '">' +
         '<div class="pln-mobile-card-header">' +
@@ -90,8 +105,7 @@
         '</div>' +
         '<div class="pln-mobile-card-desc text-body-xs">' + plano.descricao + '</div>' +
         '<dl class="pln-mobile-card-fields">' +
-          '<div><dt class="text-10-regular">Valor mensal</dt><dd class="text-12-regular">' + formatValorMensal(plano.valorMensal) + '</dd></div>' +
-          '<div><dt class="text-10-regular">Valor anual</dt><dd class="text-12-regular">' + formatValorMensal(plano.valorAnual) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Faixa de preços</dt><dd class="text-12-regular">' + formatValorMensal(range.min) + ' a ' + formatValorMensal(range.max) + '/mês</dd></div>' +
           '<div><dt class="text-10-regular">Assinantes ativos</dt><dd class="text-12-regular">' + plano.assinantesAtivos + '</dd></div>' +
           '<div><dt class="text-10-regular">Última alteração</dt><dd class="text-12-regular">' + formatDataBR(plano.ultimaAlteracao) + '</dd></div>' +
         '</dl>' +
@@ -211,22 +225,35 @@
   document.addEventListener('click', function (event) {
     var editBtn = event.target.closest('[data-action="editar"]');
     if (editBtn) { openEditDialog(editBtn.dataset.id); return; }
+    var precosBtn = event.target.closest('[data-action="precos"]');
+    if (precosBtn) { openFaixasDialog(precosBtn.dataset.id); return; }
     var toggleBtn = event.target.closest('[data-action="ativar"], [data-action="desativar"]');
     if (toggleBtn) { openToggleAtivoDialog(toggleBtn.dataset.id); return; }
   });
 
-  // ---------- Modal: Editar plano ----------
+  // ---------- Bloqueio de scroll da página enquanto um modal está aberto — a rolagem
+  // acontece só dentro do `.body` do Dialog (já tem `overflow-y:auto` no componente).
+  // Contador pra suportar o caso de 2 modais abertos ao mesmo tempo (confirmação de preço
+  // abre por cima do modal de Preços, sem fechá-lo primeiro). ----------
+  var scrollLockCount = 0;
+  function lockBodyScroll() {
+    if (scrollLockCount === 0) document.body.style.overflow = 'hidden';
+    scrollLockCount++;
+  }
+  function unlockBodyScroll() {
+    scrollLockCount = Math.max(0, scrollLockCount - 1);
+    if (scrollLockCount === 0) document.body.style.overflow = '';
+  }
+
+  // ---------- Modal: Editar plano (descrição/benefícios/status — preço não mora mais aqui,
+  // ver modal de Preços abaixo) ----------
   var editOverlay = document.getElementById('pln-edit-dialog-overlay');
   var editForm = document.getElementById('pln-edit-form');
   var nomeField = document.getElementById('pln-edit-nome');
   var descricaoInput = document.getElementById('pln-edit-descricao');
-  var valorInput = document.getElementById('pln-edit-valor');
-  var valorAnualField = document.getElementById('pln-edit-valor-anual');
   var beneficiosInput = document.getElementById('pln-edit-beneficios');
   var statusField = document.getElementById('pln-edit-status-field');
   var currentPlanoId = null;
-  var originalValorMensal = null;
-  var originalValorAnual = null;
 
   function initDropdown(root) {
     var trigger = root.querySelector('[data-dropdown-trigger]');
@@ -281,49 +308,13 @@
 
   var statusDropdown = initDropdown(statusField);
 
-  // Valor mensal e Valor anual são campos independentes, cada um com sua própria máscara de
-  // moeda — editar um não recalcula o outro (a fórmula de desconto de `planos-data.js` só
-  // sugere o valor anual inicial de cada plano, não trava os dois campos juntos na edição).
-  function attachCurrencyMask(input) {
-    input.addEventListener('input', function () {
-      var digits = input.value.replace(/\D/g, '');
-      var centavos = digits ? Number(digits) : 0;
-      input.value = centavos ? formatCentavosBRL(centavos) : '';
-      input.dataset.centavos = String(centavos);
-    });
-  }
-  attachCurrencyMask(valorInput);
-  attachCurrencyMask(valorAnualField);
-
-  // ---------- Bloqueio de scroll da página enquanto um modal está aberto — a rolagem
-  // acontece só dentro do `.body` do Dialog (já tem `overflow-y:auto` no componente).
-  // Contador pra suportar o caso de 2 modais abertos ao mesmo tempo (confirmação de preço
-  // abre por cima do modal de Editar, sem fechá-lo primeiro). ----------
-  var scrollLockCount = 0;
-  function lockBodyScroll() {
-    if (scrollLockCount === 0) document.body.style.overflow = 'hidden';
-    scrollLockCount++;
-  }
-  function unlockBodyScroll() {
-    scrollLockCount = Math.max(0, scrollLockCount - 1);
-    if (scrollLockCount === 0) document.body.style.overflow = '';
-  }
-
   function openEditDialog(id) {
     var plano = window.NiveloAdminPlanos.findById(id);
     if (!plano) return;
     currentPlanoId = id;
-    originalValorMensal = plano.valorMensal;
-    originalValorAnual = plano.valorAnual;
 
     nomeField.value = plano.nome;
     descricaoInput.value = plano.descricao;
-    var centavos = Math.round(plano.valorMensal * 100);
-    valorInput.value = formatCentavosBRL(centavos);
-    valorInput.dataset.centavos = String(centavos);
-    var centavosAnual = Math.round(plano.valorAnual * 100);
-    valorAnualField.value = formatCentavosBRL(centavosAnual);
-    valorAnualField.dataset.centavos = String(centavosAnual);
     beneficiosInput.value = plano.beneficios.join('\n');
     statusDropdown.setValue(plano.ativo ? 'ativo' : 'inativo', plano.ativo ? 'Ativo' : 'Inativo');
 
@@ -342,49 +333,202 @@
   editOverlay.addEventListener('click', function (event) { if (event.target === editOverlay) closeEditDialog(); });
   document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !editOverlay.hidden) closeEditDialog(); });
 
-  function applyEdit() {
-    var novoValorMensal = Number(valorInput.dataset.centavos || '0') / 100;
-    var novoValorAnual = Number(valorAnualField.dataset.centavos || '0') / 100;
+  editForm.addEventListener('submit', function (event) {
+    event.preventDefault();
     var beneficios = beneficiosInput.value.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
     var plano = window.NiveloAdminPlanos.update(currentPlanoId, {
       descricao: descricaoInput.value.trim(),
-      valorMensal: novoValorMensal,
-      valorAnual: novoValorAnual,
       beneficios: beneficios,
       ativo: statusField.dataset.value === 'ativo'
     });
     closeEditDialog();
     renderAll();
     showSuccessToast('Plano atualizado com sucesso.', '"' + plano.nome + '" foi atualizado.');
-  }
-
-  editForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    var novoValorMensal = Number(valorInput.dataset.centavos || '0') / 100;
-    var novoValorAnual = Number(valorAnualField.dataset.centavos || '0') / 100;
-    if (novoValorMensal !== originalValorMensal || novoValorAnual !== originalValorAnual) {
-      openPriceConfirmDialog();
-      return;
-    }
-    applyEdit();
   });
 
-  // ---------- Confirmação de alteração de preço ----------
-  var priceOverlay = document.getElementById('pln-price-dialog-overlay');
+  // ---------- Modal: Preços por faixa de hectares ----------
+  // Corpo montado dinamicamente porque os campos variam conforme o plano tenha ou não
+  // cobrança mensal (`plano.cobrancaMensal` — só o Fiscal não tem). Cada faixa mostra os 2
+  // únicos valores editáveis (Valor mensal equivalente do anual + Valor da cobrança mensal,
+  // quando existir) com os valores derivados (Total cobrado anualmente/Economia anual) ao
+  // lado, sempre como texto somente-leitura recalculado ao vivo — nunca um campo editável
+  // separado, pra nunca divergir do que está em `planos-data.js` (mesma fonte de verdade).
+  var faixasOverlay = document.getElementById('pln-faixas-dialog-overlay');
+  var faixasTitle = document.getElementById('pln-faixas-dialog-title');
+  var faixasForm = document.getElementById('pln-faixas-form');
+  var faixasList = document.getElementById('pln-faixas-list');
+  var faixasPlanoId = null;
+  var faixasOriginalSnapshot = null;
 
-  function openPriceConfirmDialog() {
+  function centavosFromValor(valor) { return Math.round(valor * 100); }
+
+  function buildFaixaFieldHTML(faixaId, faixaLabel, faixaPrecos, cobrancaMensal) {
+    var anualCentavos = centavosFromValor(faixaPrecos.anualMensal);
+    var html =
+      '<div class="pln-faixa-block" data-faixa="' + faixaId + '">' +
+        '<h3 class="pln-faixa-title text-subtitle-s">' + faixaLabel + '</h3>' +
+        '<div class="pln-faixa-col pln-faixa-col--anual">' +
+          '<span class="pln-faixa-col-label">' + (cobrancaMensal ? 'Anual' : 'Somente anual') + '</span>' +
+          '<div class="wrapper">' +
+            '<label class="label">Valor mensal equivalente</label>' +
+            '<div class="inputWrap">' +
+              '<input class="input pln-faixa-input" type="text" inputmode="numeric" data-field="anualMensal" value="' + formatCentavosBRL(anualCentavos) + '" data-centavos="' + anualCentavos + '" />' +
+            '</div>' +
+          '</div>' +
+          '<p class="pln-faixa-computed">Cobrado anualmente: <strong data-computed="anualTotal">' + formatValorMensal(faixaPrecos.anualTotal) + '</strong></p>' +
+          (cobrancaMensal ? '<p class="pln-faixa-computed pln-faixa-economia">Economia anual: <strong data-computed="economia">' + formatValorMensal(faixaPrecos.economia) + '</strong></p>' : '') +
+        '</div>';
+    if (cobrancaMensal) {
+      var mensalCentavos = centavosFromValor(faixaPrecos.mensal);
+      html +=
+        '<div class="pln-faixa-col pln-faixa-col--mensal">' +
+          '<span class="pln-faixa-col-label">Mensal</span>' +
+          '<div class="wrapper">' +
+            '<label class="label">Valor mensal</label>' +
+            '<div class="inputWrap">' +
+              '<input class="input pln-faixa-input" type="text" inputmode="numeric" data-field="mensal" value="' + formatCentavosBRL(mensalCentavos) + '" data-centavos="' + mensalCentavos + '" />' +
+            '</div>' +
+          '</div>' +
+          '<p class="pln-faixa-computed pln-faixa-mensal-note">Cobrança mensal, sem desconto.</p>' +
+        '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  // Recalcula (ao vivo, sem tocar em `planos-data.js`) os textos derivados de 1 faixa a
+  // partir dos 2 inputs — mesma fórmula de `recalcularFaixa`, só pra preview instantâneo
+  // enquanto o admin digita; a gravação de verdade só acontece no Salvar (`updateFaixa`).
+  function recalcularBlocoNaTela(blockEl, cobrancaMensal) {
+    var anualInput = blockEl.querySelector('[data-field="anualMensal"]');
+    var anualMensal = Number(anualInput.dataset.centavos || '0') / 100;
+    var anualTotal = Math.round(anualMensal * 12 * 100) / 100;
+    blockEl.querySelector('[data-computed="anualTotal"]').textContent = formatValorMensal(anualTotal);
+    if (cobrancaMensal) {
+      var mensalInput = blockEl.querySelector('[data-field="mensal"]');
+      var mensal = Number(mensalInput.dataset.centavos || '0') / 100;
+      var economia = Math.round((mensal * 12 - anualTotal) * 100) / 100;
+      blockEl.querySelector('[data-computed="economia"]').textContent = formatValorMensal(economia);
+    }
+  }
+
+  function attachCurrencyMask(input, onInput) {
+    input.addEventListener('input', function () {
+      var digits = input.value.replace(/\D/g, '');
+      var centavos = digits ? Number(digits) : 0;
+      input.value = centavos ? formatCentavosBRL(centavos) : '';
+      input.dataset.centavos = String(centavos);
+      if (onInput) onInput();
+    });
+  }
+
+  function openFaixasDialog(id) {
+    var plano = window.NiveloAdminPlanos.findById(id);
+    if (!plano) return;
+    faixasPlanoId = id;
+    faixasTitle.textContent = 'Preços por faixa de hectares — ' + plano.nome;
+
+    var faixas = window.NiveloAdminPlanos.listFaixas(id);
+    faixasList.innerHTML = faixas.map(function (faixa) {
+      return buildFaixaFieldHTML(faixa.id, faixa.label, faixa, plano.cobrancaMensal);
+    }).join('');
+
+    // Snapshot pra decidir, no Salvar, se algum valor realmente mudou (só então pede
+    // confirmação — mesmo critério que o modal de Editar plano já usava pro preço antigo).
+    faixasOriginalSnapshot = faixas.map(function (faixa) {
+      return { id: faixa.id, anualMensal: faixa.anualMensal, mensal: faixa.mensal };
+    });
+
+    var blocks = Array.prototype.slice.call(faixasList.querySelectorAll('.pln-faixa-block'));
+    blocks.forEach(function (blockEl) {
+      var recalc = function () { recalcularBlocoNaTela(blockEl, plano.cobrancaMensal); };
+      attachCurrencyMask(blockEl.querySelector('[data-field="anualMensal"]'), recalc);
+      var mensalInput = blockEl.querySelector('[data-field="mensal"]');
+      if (mensalInput) attachCurrencyMask(mensalInput, recalc);
+    });
+
+    faixasOverlay.hidden = false;
+    lockBodyScroll();
+  }
+
+  function closeFaixasDialog() {
+    faixasOverlay.hidden = true;
+    faixasPlanoId = null;
+    faixasOriginalSnapshot = null;
+    unlockBodyScroll();
+  }
+
+  document.getElementById('pln-faixas-dialog-close').addEventListener('click', closeFaixasDialog);
+  document.getElementById('pln-faixas-dialog-cancel').addEventListener('click', closeFaixasDialog);
+  faixasOverlay.addEventListener('click', function (event) { if (event.target === faixasOverlay) closeFaixasDialog(); });
+  document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !faixasOverlay.hidden) closeFaixasDialog(); });
+
+  function coletarFaixasDoFormulario() {
+    var blocks = Array.prototype.slice.call(faixasList.querySelectorAll('.pln-faixa-block'));
+    return blocks.map(function (blockEl) {
+      var anualInput = blockEl.querySelector('[data-field="anualMensal"]');
+      var mensalInput = blockEl.querySelector('[data-field="mensal"]');
+      return {
+        id: blockEl.dataset.faixa,
+        anualMensal: Number(anualInput.dataset.centavos || '0') / 100,
+        mensal: mensalInput ? Number(mensalInput.dataset.centavos || '0') / 100 : null
+      };
+    });
+  }
+
+  function houveMudancaDePreco(novasFaixas) {
+    for (var i = 0; i < novasFaixas.length; i++) {
+      var original = faixasOriginalSnapshot[i];
+      var nova = novasFaixas[i];
+      if (nova.anualMensal !== original.anualMensal) return true;
+      if (original.mensal !== null && nova.mensal !== original.mensal) return true;
+    }
+    return false;
+  }
+
+  function applyFaixas() {
+    var novasFaixas = coletarFaixasDoFormulario();
+    novasFaixas.forEach(function (faixa) {
+      window.NiveloAdminPlanos.updateFaixa(faixasPlanoId, faixa.id, { anualMensal: faixa.anualMensal, mensal: faixa.mensal });
+    });
+    var plano = window.NiveloAdminPlanos.findById(faixasPlanoId);
+    closeFaixasDialog();
+    renderAll();
+    showSuccessToast('Preços atualizados com sucesso.', 'As faixas de hectares de "' + plano.nome + '" foram atualizadas.');
+  }
+
+  faixasForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var novasFaixas = coletarFaixasDoFormulario();
+    if (houveMudancaDePreco(novasFaixas)) {
+      openPriceConfirmDialog(applyFaixas);
+      return;
+    }
+    applyFaixas();
+  });
+
+  // ---------- Confirmação de alteração de preço — reaproveitada pelo modal de Preços (o
+  // modal de Editar plano não mexe mais em valor). `onConfirm` é a ação a aplicar depois da
+  // confirmação, guardada só enquanto o modal estiver aberto. ----------
+  var priceOverlay = document.getElementById('pln-price-dialog-overlay');
+  var pendingPriceConfirm = null;
+
+  function openPriceConfirmDialog(onConfirm) {
+    pendingPriceConfirm = onConfirm;
     priceOverlay.hidden = false;
     lockBodyScroll();
   }
   function closePriceConfirmDialog() {
     priceOverlay.hidden = true;
+    pendingPriceConfirm = null;
     unlockBodyScroll();
   }
   document.getElementById('pln-price-dialog-close').addEventListener('click', closePriceConfirmDialog);
   document.getElementById('pln-price-dialog-cancel').addEventListener('click', closePriceConfirmDialog);
   document.getElementById('pln-price-dialog-confirm').addEventListener('click', function () {
+    var onConfirm = pendingPriceConfirm;
     closePriceConfirmDialog();
-    applyEdit();
+    if (onConfirm) onConfirm();
   });
   priceOverlay.addEventListener('click', function (event) { if (event.target === priceOverlay) closePriceConfirmDialog(); });
   document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !priceOverlay.hidden) closePriceConfirmDialog(); });

@@ -14,6 +14,16 @@ window.NiveloAssinantes = (function () {
   var SITUACAO_LABELS = { teste: 'Em teste', assinante: 'Assinante', suspenso: 'Suspenso', cancelado: 'Cancelado' };
   var ACESSO_LABELS = { ativo: 'Ativo', bloqueado: 'Bloqueado' };
 
+  // Faixa de hectares CONTRATADA — parte da contratação/configuração do plano do cliente,
+  // nunca calculada a partir do uso real (ver `hectaresUtilizados` mais abaixo, que é uma
+  // informação completamente separada). Enum fechado, só os 4 valores pedidos.
+  var FAIXA_HECTARES_LABELS = {
+    'ate-100': 'Até 100 hectares',
+    '101-200': '101 a 200 hectares',
+    '201-300': '201 a 300 hectares',
+    'acima-300': 'Acima de 300 hectares'
+  };
+
   function addDias(iso, dias) {
     var d = new Date(iso + 'T00:00:00');
     d.setDate(d.getDate() + dias);
@@ -43,6 +53,8 @@ window.NiveloAssinantes = (function () {
       email: 'roberto.andrade@fazendaandrade.com.br',
       telefone: '+55 (49) 99911-2233',
       planoId: 'gestao-completa-whatsapp',
+      faixaHectaresId: '101-200',
+      hectaresUtilizados: 87,
       formaContratacao: 'anual',
       situacao: 'assinante',
       acesso: 'ativo',
@@ -67,6 +79,10 @@ window.NiveloAssinantes = (function () {
       email: 'fernanda.lopes@gmail.com',
       telefone: '+55 (11) 98877-4455',
       planoId: 'fiscal',
+      faixaHectaresId: 'ate-100',
+      // Plano Fiscal não tem Caderno de Campo (ver `beneficios` em `planos-data.js`) — não há
+      // hectares pra registrar, então este campo nem é lido por `hectaresUtilizados()` abaixo.
+      hectaresUtilizados: null,
       formaContratacao: 'mensal',
       situacao: 'teste',
       acesso: 'ativo',
@@ -87,7 +103,9 @@ window.NiveloAssinantes = (function () {
       nome: 'Marcelo Henrique Duarte',
       email: 'marcelo.duarte@duartegrupo.com.br',
       telefone: '+55 (67) 99922-6611',
-      planoId: 'fiscal-whatsapp',
+      planoId: 'gestao-completa',
+      faixaHectaresId: 'ate-100',
+      hectaresUtilizados: 45,
       formaContratacao: 'mensal',
       situacao: 'assinante',
       acesso: 'bloqueado',
@@ -99,8 +117,8 @@ window.NiveloAssinantes = (function () {
       ultimoAcesso: '2026-07-28T14:05:00',
       cupom: null,
       pagamentos: [
-        { data: '2026-07-02', valor: 99.00, status: 'pago', descricao: 'Mensalidade — Fiscal + WhatsApp' },
-        { data: '2026-06-02', valor: 99.00, status: 'pago', descricao: 'Mensalidade — Fiscal + WhatsApp' }
+        { data: '2026-07-02', valor: 169.00, status: 'pago', descricao: 'Mensalidade — Gestão Completa' },
+        { data: '2026-06-02', valor: 169.00, status: 'pago', descricao: 'Mensalidade — Gestão Completa' }
       ],
       historico: [
         { data: '2025-11-02T09:00:00', evento: 'assinatura-criada', detalhe: 'Assinatura mensal criada via checkout.', responsavel: 'Sistema' },
@@ -113,6 +131,8 @@ window.NiveloAssinantes = (function () {
       email: 'juliana.camargo@camargoagro.com.br',
       telefone: '+55 (16) 98833-1199',
       planoId: 'gestao-completa',
+      faixaHectaresId: '201-300',
+      hectaresUtilizados: 245,
       formaContratacao: 'mensal',
       situacao: 'suspenso',
       acesso: 'bloqueado',
@@ -139,6 +159,8 @@ window.NiveloAssinantes = (function () {
       email: 'financeiro@bomgrao.com.br',
       telefone: '+55 (44) 3255-8800',
       planoId: 'fiscal',
+      faixaHectaresId: 'ate-100',
+      hectaresUtilizados: null,
       formaContratacao: 'mensal',
       situacao: 'cancelado',
       acesso: 'bloqueado',
@@ -162,7 +184,9 @@ window.NiveloAssinantes = (function () {
       nome: 'Diego Almeida Ferreira',
       email: 'diego.ferreira@ferreiraagropecuaria.com.br',
       telefone: '+55 (62) 99944-7722',
-      planoId: 'fiscal-whatsapp',
+      planoId: 'gestao-completa-whatsapp',
+      faixaHectaresId: 'acima-300',
+      hectaresUtilizados: 340,
       formaContratacao: 'anual',
       situacao: 'assinante',
       acesso: 'ativo',
@@ -174,7 +198,7 @@ window.NiveloAssinantes = (function () {
       ultimoAcesso: '2026-08-10T07:55:00',
       cupom: null,
       pagamentos: [
-        { data: '2026-01-20', valor: 950.40, status: 'pago', descricao: 'Assinatura anual — Fiscal + WhatsApp' }
+        { data: '2026-01-20', valor: 1910.40, status: 'pago', descricao: 'Assinatura anual — Gestão Completa + WhatsApp' }
       ],
       historico: [
         { data: '2026-01-20T09:00:00', evento: 'assinatura-criada', detalhe: 'Assinatura anual criada via checkout.', responsavel: 'Sistema' }
@@ -196,6 +220,36 @@ window.NiveloAssinantes = (function () {
 
   function plano(assinante) {
     return window.NiveloAdminPlanos ? window.NiveloAdminPlanos.findById(assinante.planoId) : null;
+  }
+
+  /* Hectares utilizados: soma dos hectares que o cliente cadastrou no Caderno de Campo —
+     informação de USO real, nunca a faixa contratada (ver `faixaHectaresLabel` abaixo, que é
+     uma informação totalmente separada). Sem backend real integrando `admin/` com `app/`
+     (cada superfície tem seu próprio `shared/`, por convenção do projeto — ver topo deste
+     arquivo e `app/CLAUDE.md`, "Escopo"), o valor é mantido como semente por assinante
+     (`assinante.hectaresUtilizados`), no mesmo espírito de `tokensConsumidos`/`ultimoAcesso`
+     já existentes neste mesmo arquivo — nenhum desses também é "calculado" ao vivo, são a
+     fonte de verdade do mock. Centralizado numa função (não acessado direto pelas telas) pra
+     que uma futura integração real (somando `fazenda.areaHa` de todas as fazendas do cliente
+     no Caderno de Campo) só precise trocar esta implementação, sem tocar em `assinantes.js`/
+     `assinante-detalhe.js`. Nunca `undefined`: cliente sem nada cadastrado retorna 0.
+     Exceção: o plano Fiscal não inclui o Caderno de Campo (ver `beneficios` em
+     `planos-data.js` — só Gestão Completa/Gestão Completa + WhatsApp têm essa
+     funcionalidade), então "0 ha" (tem a funcionalidade, não cadastrou nada ainda) não se
+     aplica a esses assinantes — retorna `null` pra UI exibir "—" (funcionalidade
+     indisponível nesse plano), nunca confundir com "0 ha". */
+  function hectaresUtilizados(assinante) {
+    if (assinante.planoId === 'fiscal') return null;
+    return assinante.hectaresUtilizados || 0;
+  }
+
+  /* Faixa de hectares CONTRATADA — vem da configuração/contratação do plano do cliente
+     (`assinante.faixaHectaresId`), NUNCA calculada a partir de `hectaresUtilizados` (regra de
+     negócio explícita: um cliente pode ter contratado uma faixa maior do que usa hoje, ou
+     estar usando mais do que a faixa contratada prevê — as duas informações são
+     independentes). */
+  function faixaHectaresLabel(assinante) {
+    return FAIXA_HECTARES_LABELS[assinante.faixaHectaresId] || '—';
   }
 
   function diasRestantesTeste(assinante) {
@@ -330,9 +384,12 @@ window.NiveloAssinantes = (function () {
     TODAY: TODAY,
     SITUACAO_LABELS: SITUACAO_LABELS,
     ACESSO_LABELS: ACESSO_LABELS,
+    FAIXA_HECTARES_LABELS: FAIXA_HECTARES_LABELS,
     list: list,
     findById: findById,
     plano: plano,
+    hectaresUtilizados: hectaresUtilizados,
+    faixaHectaresLabel: faixaHectaresLabel,
     diasRestantesTeste: diasRestantesTeste,
     bloquear: bloquear,
     liberar: liberar,

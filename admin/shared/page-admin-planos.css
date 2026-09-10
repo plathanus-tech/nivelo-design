@@ -68,15 +68,14 @@
    rolagem horizontal (`.tableWrap` já tem `overflow-x:auto`, Table.module.css) — Ações (última
    coluna) fica `position:sticky` presa à direita durante o scroll, mesmo padrão exato já usado
    em Categorias de receitas e despesas/Contas a Pagar/Contas a Receber. */
-.pln-table-card .table { table-layout: fixed; width: 100%; min-width: 1220px; }
+.pln-table-card .table { table-layout: fixed; width: 100%; min-width: 1180px; }
 .pln-table-card .th:nth-child(1) { width: auto; }   /* Nome — preenche o resto */
 .pln-table-card .th:nth-child(2) { width: 220px; }  /* Descrição */
-.pln-table-card .th:nth-child(3) { width: 110px; }  /* Valor mensal */
-.pln-table-card .th:nth-child(4) { width: 110px; }  /* Valor anual */
-.pln-table-card .th:nth-child(5) { width: 100px; }  /* Status */
-.pln-table-card .th:nth-child(6) { width: 130px; }  /* Assinantes ativos */
-.pln-table-card .th:nth-child(7) { width: 130px; }  /* Última alteração */
-.pln-table-card .th:nth-child(8) { width: 120px; }  /* Ações */
+.pln-table-card .th:nth-child(3) { width: 170px; }  /* Faixa de preços (menor a maior /mês) */
+.pln-table-card .th:nth-child(4) { width: 100px; }  /* Status */
+.pln-table-card .th:nth-child(5) { width: 130px; }  /* Assinantes ativos */
+.pln-table-card .th:nth-child(6) { width: 130px; }  /* Última alteração */
+.pln-table-card .th:nth-child(7) { width: 150px; }  /* Ações — Editar/Preços/Ativar-Desativar */
 
 .pln-table-card .th:last-child,
 .pln-table-card .td:last-child {
@@ -94,6 +93,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Faixa de preços: resumo de menor-maior valor mensal-equivalente entre as 4 faixas, 2 linhas
+   empilhadas (mesmo padrão visual já usado em Assinantes pra "Plano atual", nome+faixa
+   contratada) — o detalhe completo das 4 faixas só aparece no modal de "Preços". */
+.pln-preco-range { color: var(--color-text-primary); display: block; }
+.pln-preco-note { color: var(--color-text-tertiary); display: block; }
 
 .pln-table-card .tableWrap { overflow-x: auto; }
 
@@ -158,10 +163,11 @@
   min-height: 0;
   overflow: hidden;
 }
-/* Modal em `md` (540px, ver planos.html) — grid de 2 colunas a partir de 768px pra aproveitar
-   a largura extra (Valor mensal/Status lado a lado), mesmo padrão exato já usado em Novo
-   Produto (`.novo-produto-grid`/`.novo-produto-span-2`). Nome/Descrição/Benefícios ocupam as
-   2 colunas (`.pln-span-2`) por serem campos de conteúdo mais longo. */
+/* Modal em `md` (540px, ver planos.html) — grid de 2 colunas a partir de 768px, mesmo padrão
+   exato já usado em Novo Produto (`.novo-produto-grid`/`.novo-produto-span-2`). Todos os campos
+   deste modal ocupam as 2 colunas (`.pln-span-2`) — preço não mora mais aqui (ver modal de
+   Preços por faixa de hectares), então não sobra nenhum par de campos curtos pra ficar lado a
+   lado; a classe `.pln-form-grid` continua existindo só pelo espaçamento vertical consistente. */
 .pln-form-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -171,6 +177,16 @@
 @media (min-width: 768px) {
   .pln-form-grid { grid-template-columns: 1fr 1fr; }
   .pln-span-2 { grid-column: span 2; }
+}
+
+/* Aviso de que o preço mudou de lugar — evita o admin procurar valor mensal/anual neste
+   modal (que só cuida de descrição/benefícios/status agora). */
+.pln-edit-precos-hint {
+  color: var(--color-text-tertiary);
+  background-color: var(--color-bg-subtle);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin: 0;
 }
 /* Labels e valores sempre alinhados à esquerda, mesmo padrão dos demais formulários do
    sistema (nenhum bug conhecido aqui, reforçado defensivamente contra qualquer colisão
@@ -198,6 +214,69 @@
 
 .pln-beneficios-hint {
   color: var(--color-text-tertiary);
+}
+
+/* ---------- Modal: Preços por faixa de hectares ---------- */
+/* Mesmo bug/correção do `#pln-edit-form` acima — este modal também tem um `<form>` entre
+   `.body` e `.footer` (Dialog.module.css), que precisa repassar o contexto flex pro rodapé
+   (Cancelar/Salvar) não ficar cortado pelo `overflow:hidden` do `.dialog`. */
+#pln-faixas-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.pln-faixas-list { display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+/* Cada faixa é um bloco com borda própria — as 4 nunca se confundem entre si, e dentro de
+   cada uma o bloco Anual/Mensal (`.pln-faixa-col`) fica bem separado, sem chance de o admin
+   confundir os 2 tipos de cobrança. */
+.pln-faixa-block {
+  border: var(--border-width-thin) solid var(--color-border-muted);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.pln-faixa-title { color: var(--color-text-primary); margin: 0; }
+
+/* Anual ganha o mesmo painel com leve tonalidade de marca já usado na landing (`--color-bg-
+   brand`) pra puxar o olho primeiro pra ele — Mensal fica sem fundo, deliberadamente mais
+   discreto, mesmo raciocínio visual de "Anual em destaque" já validado na landing page. */
+.pln-faixa-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+.pln-faixa-col--anual { background-color: var(--color-bg-brand); }
+.pln-faixa-col-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+.pln-faixa-col--anual .pln-faixa-col-label { color: var(--color-text-brand); }
+.pln-faixa-col .label { text-align: left; }
+.pln-faixa-col .input { text-align: left; }
+
+.pln-faixa-computed {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+.pln-faixa-computed strong { color: var(--color-text-primary); font-weight: var(--font-weight-semibold); }
+.pln-faixa-economia strong { color: var(--color-status-success-fg); }
+.pln-faixa-mensal-note { color: var(--color-text-tertiary); }
+
+@media (min-width: 640px) {
+  .pln-faixa-block { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
+  .pln-faixa-title { flex: 1 1 100%; }
+  .pln-faixa-col { flex: 1 1 240px; }
 }
 
 /* Guard obrigatório: `.overlay`/`.errorText` (Dialog/Input) têm `display` incondicional. */

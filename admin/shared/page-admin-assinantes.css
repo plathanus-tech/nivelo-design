@@ -108,17 +108,18 @@
 .assn-table-card .tr:nth-child(odd)  .td { background: var(--color-bg-surface); }
 .assn-table-card .tr:nth-child(even) .td { background: var(--color-gray-50); }
 
-.assn-table-card .table { table-layout: fixed; width: 100%; min-width: 1480px; }
+.assn-table-card .table { table-layout: fixed; width: 100%; min-width: 1630px; }
 .assn-table-card .th:nth-child(1)  { width: auto; }   /* Cliente — preenche o resto */
-.assn-table-card .th:nth-child(2)  { width: 160px; }  /* Plano atual */
+.assn-table-card .th:nth-child(2)  { width: 170px; }  /* Plano atual (nome + faixa de hectares) */
 .assn-table-card .th:nth-child(3)  { width: 130px; }  /* Status da assinatura */
 .assn-table-card .th:nth-child(4)  { width: 120px; }  /* Situação do acesso */
 .assn-table-card .th:nth-child(5)  { width: 110px; }  /* Início */
 .assn-table-card .th:nth-child(6)  { width: 120px; }  /* Próximo vencimento */
 .assn-table-card .th:nth-child(7)  { width: 150px; }  /* Situação do teste */
-.assn-table-card .th:nth-child(8)  { width: 130px; }  /* Tokens de IA */
-.assn-table-card .th:nth-child(9)  { width: 150px; }  /* Último acesso */
-.assn-table-card .th:nth-child(10) { width: 140px; }  /* Ações — Visualizar/Bloquear/Mais ações */
+.assn-table-card .th:nth-child(8)  { width: 140px; }  /* Hectares utilizados */
+.assn-table-card .th:nth-child(9)  { width: 130px; }  /* Tokens de IA */
+.assn-table-card .th:nth-child(10) { width: 150px; }  /* Último acesso */
+.assn-table-card .th:nth-child(11) { width: 140px; }  /* Ações — Visualizar/Bloquear/Mais ações */
 
 .assn-table-card .th:last-child,
 .assn-table-card .td:last-child { position: sticky; right: 0; z-index: 2; }
@@ -130,6 +131,15 @@
 .assn-tokens {
   color: var(--color-text-secondary);
 }
+
+.assn-hectares {
+  color: var(--color-text-secondary);
+}
+
+/* Plano atual: nome em destaque + faixa de hectares contratada abaixo (2ª linha), mesmo
+   padrão visual já usado na coluna Cliente (nome + e-mail empilhados). */
+.assn-plano-nome { color: var(--color-text-primary); display: block; }
+.assn-plano-faixa { color: var(--color-text-tertiary); display: block; }
 
 .assn-table-card .tableWrap { overflow-x: auto; }
 

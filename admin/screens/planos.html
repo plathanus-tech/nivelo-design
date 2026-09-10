@@ -132,8 +132,7 @@
                     <tr class="headerRow">
                       <th class="th">Nome do plano</th>
                       <th class="th">Descrição</th>
-                      <th class="th">Valor mensal</th>
-                      <th class="th">Valor anual</th>
+                      <th class="th">Faixa de preços</th>
                       <th class="th">Status</th>
                       <th class="th">Assinantes ativos</th>
                       <th class="th">Última alteração</th>
@@ -181,19 +180,7 @@
               </div>
             </div>
 
-            <div class="wrapper">
-              <label class="label" for="pln-edit-valor">Valor mensal</label>
-              <div class="inputWrap">
-                <input class="input" type="text" id="pln-edit-valor" inputmode="numeric" placeholder="R$ 0,00" />
-              </div>
-            </div>
-
-            <div class="wrapper">
-              <label class="label" for="pln-edit-valor-anual">Valor anual</label>
-              <div class="inputWrap">
-                <input class="input" type="text" id="pln-edit-valor-anual" inputmode="numeric" placeholder="R$ 0,00" />
-              </div>
-            </div>
+            <p class="pln-edit-precos-hint text-body-xs pln-span-2">Os valores de cada faixa de hectares são editados na ação "Preços" da listagem, não aqui.</p>
 
             <div class="wrapper pln-span-2" id="pln-edit-status-field" data-dropdown>
               <label class="label" for="pln-edit-status">Status</label>
@@ -219,6 +206,28 @@
         <div class="footer">
           <button type="button" class="btn secondaryGray sm" id="pln-edit-dialog-cancel">Cancelar</button>
           <button type="submit" class="btn primary sm" id="pln-edit-dialog-save">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Preços por faixa de hectares — corpo (as 4 faixas) montado dinamicamente pelo JS,
+       porque os campos variam conforme o plano tenha ou não cobrança mensal (Fiscal só tem
+       anual). Dialog "lg" (720px) pra caber as 4 faixas sem ficar espremido; `.body` do
+       Dialog já rola por conta própria quando o conteúdo não couber na tela. -->
+  <div class="overlay" id="pln-faixas-dialog-overlay" hidden>
+    <div class="dialog lg" role="dialog" aria-modal="true" aria-labelledby="pln-faixas-dialog-title">
+      <div class="header">
+        <h2 class="title" id="pln-faixas-dialog-title">Preços por faixa de hectares</h2>
+        <button type="button" class="closeBtn" id="pln-faixas-dialog-close" aria-label="Fechar"><i data-lucide="x" width="18" height="18"></i></button>
+      </div>
+      <form id="pln-faixas-form" novalidate>
+        <div class="body">
+          <div class="pln-faixas-list" id="pln-faixas-list"></div>
+        </div>
+        <div class="footer">
+          <button type="button" class="btn secondaryGray sm" id="pln-faixas-dialog-cancel">Cancelar</button>
+          <button type="submit" class="btn primary sm" id="pln-faixas-dialog-save">Salvar</button>
         </div>
       </form>
     </div>

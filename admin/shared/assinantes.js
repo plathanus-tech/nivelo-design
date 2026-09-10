@@ -31,6 +31,8 @@
     return formatDateBR(datePart) + (timePart ? ' às ' + timePart : '');
   }
   function formatTokens(qtd) { return qtd.toLocaleString('pt-BR') + ' tokens'; }
+  // `null` = plano sem Caderno de Campo (Fiscal) — funcionalidade indisponível, nunca "0 ha".
+  function formatHectares(hectares) { return hectares === null ? '—' : hectares + ' ha'; }
   function formatBRL(valor) {
     return 'R$ ' + valor.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+,)/g, '$1.');
   }
@@ -80,6 +82,17 @@
     );
   }
 
+  // Plano atual + faixa de hectares CONTRATADA (empilhados, mesmo padrão de "2 linhas dentro
+  // da mesma célula" já usado na coluna Cliente — nome + e-mail) — nunca a faixa calculada a
+  // partir de "Hectares utilizados" (coluna própria, informação de uso real e independente).
+  function buildPlanoAtualHTML(assinante, plano) {
+    var faixaLabel = window.NiveloAssinantes.faixaHectaresLabel(assinante);
+    return (
+      '<span class="assn-plano-nome text-body-s">' + (plano ? plano.nome : '—') + '</span>' +
+      '<span class="assn-plano-faixa text-body-xs">' + faixaLabel + '</span>'
+    );
+  }
+
   function buildSituacaoTesteHTML(assinante) {
     if (assinante.situacao !== 'teste' || !assinante.trial) return '<span class="assn-tokens">—</span>';
     var dias = window.NiveloAssinantes.diasRestantesTeste(assinante);
@@ -123,12 +136,13 @@
         ' data-periodicidade="' + (assinante.formaContratacao || '') + '" data-teste="' + faixaTeste(assinante) + '"' +
         ' data-search="' + searchText + '">' +
         '<td class="td"><span class="assn-cliente-nome text-body-s">' + assinante.nome + '</span><span class="assn-cliente-email text-body-xs">' + assinante.email + '</span></td>' +
-        '<td class="td">' + (plano ? plano.nome : '—') + '</td>' +
+        '<td class="td">' + buildPlanoAtualHTML(assinante, plano) + '</td>' +
         '<td class="td"><span class="badge" data-status="' + situacaoBadge.status + '"><span class="badgeDot"></span>' + situacaoBadge.label + '</span></td>' +
         '<td class="td"><span class="badge" data-status="' + acessoBadge.status + '"><span class="badgeDot"></span>' + acessoBadge.label + '</span></td>' +
         '<td class="td">' + formatDateBR(assinante.dataInicioAssinatura) + '</td>' +
         '<td class="td">' + formatDateBR(assinante.dataVencimento) + '</td>' +
         '<td class="td">' + buildSituacaoTesteHTML(assinante) + '</td>' +
+        '<td class="td"><span class="assn-hectares">' + formatHectares(window.NiveloAssinantes.hectaresUtilizados(assinante)) + '</span></td>' +
         '<td class="td"><span class="assn-tokens">' + formatTokens(assinante.tokensConsumidos) + '</span></td>' +
         '<td class="td">' + formatDateTimeBR(assinante.ultimoAcesso) + '</td>' +
         '<td class="td tdActions">' + buildActionsHTML(assinante) + '</td>' +
@@ -434,9 +448,14 @@
     if (!assinante) return;
     planoDialogTargetId = id;
     var menu = planoDropdownEl.querySelector('[data-dropdown-menu]');
-    menu.innerHTML = window.NiveloAdminPlanos.list().map(function (p) {
-      return '<div class="option' + (p.id === assinante.planoId ? ' selected' : '') + '" data-value="' + p.id + '">' + p.nome + '</div>';
-    }).join('');
+    // Plano desativado (ex.: "Fiscal + WhatsApp", ver planos-data.js) só continua aparecendo
+    // aqui se for o plano ATUAL deste assinante — pra ele continuar visível/selecionado
+    // corretamente no dropdown, sem virar uma opção nova pra reatribuir a NENHUM outro cliente.
+    menu.innerHTML = window.NiveloAdminPlanos.list()
+      .filter(function (p) { return p.ativo || p.id === assinante.planoId; })
+      .map(function (p) {
+        return '<div class="option' + (p.id === assinante.planoId ? ' selected' : '') + '" data-value="' + p.id + '">' + p.nome + '</div>';
+      }).join('');
     var atual = window.NiveloAdminPlanos.findById(assinante.planoId);
     planoModalDropdown.reset(assinante.planoId, atual ? atual.nome : '');
     planoOverlay.hidden = false;
@@ -552,8 +571,10 @@
     var menu = linkPlanoDropdownEl.querySelector('[data-dropdown-menu]');
     // Em período de teste, nunca houve assinatura paga ativa — nenhum plano precisa ser
     // excluído da seleção (item explícito: não limitar a escolha com base no plano atual).
+    // `p.ativo`: plano desativado (ex.: "Fiscal + WhatsApp") nunca pode ser o DESTINO de um
+    // upgrade novo, mesmo pra quem já está nele hoje.
     menu.innerHTML = window.NiveloAdminPlanos.list()
-      .filter(function (p) { return assinante.situacao === 'teste' || p.id !== assinante.planoId; })
+      .filter(function (p) { return p.ativo && (assinante.situacao === 'teste' || p.id !== assinante.planoId); })
       .map(function (p) { return '<div class="option" data-value="' + p.id + '">' + p.nome + '</div>'; })
       .join('');
     linkPlanoDropdown.reset('', 'Selecione o novo plano anual');
@@ -671,7 +692,9 @@
   function cellText(cell) { return cell.textContent.trim(); }
 
   function buildCardHTML(row) {
-    var actionsHTML = row.children[9].querySelector('.cellActions').innerHTML;
+    var actionsHTML = row.children[10].querySelector('.cellActions').innerHTML;
+    var planoNome = row.children[1].querySelector('.assn-plano-nome').textContent;
+    var planoFaixa = row.children[1].querySelector('.assn-plano-faixa').textContent;
     return (
       '<div class="card assn-mobile-card" data-row-id="' + row.id + '">' +
         '<div class="assn-mobile-card-header">' +
@@ -681,12 +704,13 @@
           '</div>' +
         '</div>' +
         '<dl class="assn-mobile-card-fields">' +
-          '<div><dt class="text-10-regular">Plano</dt><dd class="text-12-regular">' + cellText(row.children[1]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Plano atual</dt><dd class="text-12-regular">' + planoNome + ' · ' + planoFaixa + '</dd></div>' +
           '<div><dt class="text-10-regular">Status</dt><dd class="text-12-regular">' + row.children[2].innerHTML + '</dd></div>' +
           '<div><dt class="text-10-regular">Acesso</dt><dd class="text-12-regular">' + row.children[3].innerHTML + '</dd></div>' +
           '<div><dt class="text-10-regular">Vencimento</dt><dd class="text-12-regular">' + cellText(row.children[5]) + '</dd></div>' +
-          '<div><dt class="text-10-regular">Tokens de IA</dt><dd class="text-12-regular">' + cellText(row.children[7]) + '</dd></div>' +
-          '<div><dt class="text-10-regular">Último acesso</dt><dd class="text-12-regular">' + cellText(row.children[8]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Hectares utilizados</dt><dd class="text-12-regular">' + cellText(row.children[7]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Tokens de IA</dt><dd class="text-12-regular">' + cellText(row.children[8]) + '</dd></div>' +
+          '<div><dt class="text-10-regular">Último acesso</dt><dd class="text-12-regular">' + cellText(row.children[9]) + '</dd></div>' +
         '</dl>' +
         '<div class="cellActions assn-mobile-card-actions">' + actionsHTML + '</div>' +
       '</div>'
