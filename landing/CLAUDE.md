@@ -90,6 +90,75 @@ balanced` com respiro extra (`margin-top` no divisor + `margin-bottom` maior
 na lista) pra não parecer vazio ao lado dos outros 3. Nenhum texto, preço,
 cor ou o seletor Mensal/Anual foram alterados.
 
+## Ajustes 2026-09-10 — Funcionalidades: card WhatsApp
+
+Card "Assistente de IA" da seção Funcionalidades virou "WhatsApp": ícone
+trocado de `bot` (Lucide) pro ícone oficial (`../shared/icons/whatsapp.svg`,
+mesmo padrão de `index.html`/`index-v2.html`, classe `feature-card-icon--
+whatsapp` já existia no CSS mas nunca tinha sido definida em `page-v3.css` —
+bug real corrigido: sem essa regra o ícone caía no fundo azul padrão com o
+glifo branco quase invisível). Fundo do ícone: `var(--color-green-50)`, mesmo
+degrau de tint que `--color-brand-50` usado nos ícones azuis dos outros
+cards. Criado `whatsapp-green.svg` (mesmo path do ícone oficial, só com
+`fill="#25D366"`) porque o SVG original tem `fill="white"` fixo no elemento
+raiz (pensado pra ir sobre fundo verde sólido, como o FAB) — sem variante
+verde própria, não dava pra recolorir com `color`/`currentColor` num `<img>`.
+Outros 7 cards da seção também tiveram o texto interno reescrito (título
+mantido, exceto "Cadastro" → "Cadastros" e "Vendas" → "Vendas e fiscal").
+
+## Ajustes 2026-09-10 — Planos: reestruturação completa (seleção por hectares)
+
+Mudança de fundo na seção `#planos`: a escolha global deixou de ser Mensal/
+Anual (`.pricing-toggle-*`, removido) e passou a ser a faixa de hectares da
+propriedade (`.hectares-toggle-*`, novo, mesmo padrão visual de pílulas do
+toggle anterior — só que com 4 opções que quebram linha no mobile em vez de
+2 lado a lado). Tag "Planos" acima do título removido (`section-tag`
+retirado do header desta seção só). "8 dias grátis em todos os planos"
+virou o `section-sub` da própria seção (era misturado com o texto do toggle
+antigo, "Compare os valores mensal e anual...", que não fazia mais sentido).
+
+**Plano "Fiscal + WhatsApp" removido por completo** (não só desativado): o
+card saiu do HTML, restando só 3 planos (Fiscal, Gestão Completa, Gestão
+Completa + WhatsApp). Referência a ele na FAQ ("Nos planos Fiscal + WhatsApp
+e Gestão Completa + WhatsApp...") também corrigida pra citar só o plano que
+ainda existe. `.pricing-grid` passou de 4 pra 3 colunas no desktop (breakpoint
+900px), `is-mensal`/`pricing-card--balanced`/`pricing-savings-badge` (classes
+só usadas pelo mecanismo antigo) removidas do CSS.
+
+**Fiscal continua só anual** (`.pricing-annual-only`, sem mudança de
+comportamento) — card com 1 preço só. **Gestão Completa e Gestão Completa +
+WhatsApp passaram a mostrar Anual E Mensal ao mesmo tempo dentro do mesmo
+card** (não é mais uma escolha exclusiva via toggle): novo bloco
+`.pricing-billing-block` com rótulo pequeno "Anual"/"Mensal"
+(`.pricing-billing-label`) acima de cada preço. Texto de economia anual
+("R$ X a menos no ano") ganhou classe própria `.pricing-savings-text`, com
+o padrão verde de sucesso (`--color-status-success-bg`/`-fg`) em vez do azul
+de marca usado no resto da seção — deliberado, pra diferenciar "benefício"
+de "informação neutra", consistente nos 2 planos que o exibem.
+
+**Preços centralizados numa única estrutura de dados** (`PRICING_POR_FAIXA`,
+no `<script>` de `index-v3.html`), chave = faixa de hectares (`ate-100`/
+`101-200`/`201-300`/`acima-300`, mesmos ids do admin/`FAIXA_HECTARES_LABELS`),
+cada plano guarda só `anualMensal` (e `mensal`, quando existir) — total anual
+e economia SEMPRE derivados em runtime (`anualMensal * 12`, `mensal * 12 -
+anualTotal`), nunca hardcoded em paralelo, mesmo padrão de
+`calcularValorAnual` já usado em `admin/shared/planos-data.js`. Cada elemento
+de preço no HTML carrega um `data-price-field` (ex.: `completa-anual-mensal`,
+`whatsapp-economia`) que o JS localiza e atualiza via `textContent` ao trocar
+de pílula — sem `[hidden]`/toggle de visibilidade como antes, os valores são
+sempre visíveis, só o número muda.
+
+Verificado ao vivo (`http-server`) nas 4 faixas: valores dos 3 cards batendo
+exatamente com os 4 exemplos do pedido (incluindo o de "101 a 200 hectares"
+citado explicitamente: Fiscal R$ 21,90/R$ 262,80, Gestão Completa
+R$ 159,90/R$ 1.918,80/R$ 600,00 de economia/R$ 209,90 mensal, Gestão Completa
++ WhatsApp R$ 219,90/R$ 2.638,80/R$ 840,00/R$ 289,90 mensal); troca de faixa
+atualiza os 3 cards instantaneamente, sem reload; nenhum vestígio de "Fiscal
++ WhatsApp" na página (grid, FAQ ou em qualquer outro texto); pílulas de
+hectares em 2x2 no mobile (375px), sem overflow horizontal, cards do plano
+com layout Anual/Mensal legível e sem altura excessiva; nenhum erro de
+console novo em nenhuma das duas rodadas.
+
 ## Sections status
 | Section | Status |
 |---|---|
