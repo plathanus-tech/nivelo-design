@@ -93,6 +93,18 @@
 .assndet-fields dt { font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin: 0 0 2px; }
 .assndet-fields dd { color: var(--color-text-primary); font-weight: var(--font-weight-medium); margin: 0; }
 
+/* Plano atual: nome em destaque + faixa de hectares contratada empilhada abaixo (2ª linha),
+   mesmo padrão visual já usado na coluna "Plano atual" da listagem de Assinantes
+   (`.assn-plano-nome`/`.assn-plano-faixa`, `page-admin-assinantes.css`). */
+.assndet-plano-nome { display: block; }
+.assndet-plano-faixa {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
 .assndet-headline {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-medium);

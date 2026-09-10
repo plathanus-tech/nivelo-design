@@ -59,6 +59,10 @@
     return 'R$ ' + valor.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+,)/g, '$1.');
   }
   function formatTokens(qtd) { return qtd.toLocaleString('pt-BR') + ' tokens'; }
+  // `null` = plano sem Caderno de Campo (Fiscal) — funcionalidade indisponível, nunca "0 ha".
+  // Mesmo helper de `assinantes.js` (a listagem), reproduzido aqui porque cada tela do admin
+  // só carrega o próprio `shared/*.js`, sem import cruzado entre arquivos de página.
+  function formatHectares(hectares) { return hectares === null ? '—' : hectares + ' ha'; }
 
   var toastRegion = document.getElementById('toast-region');
   function showSuccessToast(title, message) {
@@ -112,10 +116,16 @@
     document.getElementById('di-telefone').textContent = current.telefone || '—';
     document.getElementById('di-cadastro').textContent = formatDateBR(current.dataCadastro);
     document.getElementById('di-ultimo-acesso').textContent = formatDateTimeBR(current.ultimoAcesso);
+    document.getElementById('di-hectares').textContent = formatHectares(window.NiveloAssinantes.hectaresUtilizados(current));
 
-    // Assinatura
+    // Assinatura — plano atual + faixa de hectares CONTRATADA empilhada abaixo (mesmo padrão
+    // de "2 linhas" já usado na coluna Plano atual da listagem, `assinantes.js`'s
+    // `buildPlanoAtualHTML`) — nunca a faixa calculada a partir de hectares utilizados (dado
+    // de uso real, completamente independente, ver `di-hectares` acima).
     var plano = window.NiveloAssinantes.plano(current);
-    document.getElementById('as-plano').textContent = plano ? plano.nome : '—';
+    document.getElementById('as-plano').innerHTML =
+      '<span class="assndet-plano-nome">' + (plano ? plano.nome : '—') + '</span>' +
+      '<span class="assndet-plano-faixa">' + window.NiveloAssinantes.faixaHectaresLabel(current) + '</span>';
     document.getElementById('as-status').innerHTML = '<span class="badge" data-status="' + situacaoBadge.status + '"><span class="badgeDot"></span>' + situacaoBadge.label + '</span>';
     document.getElementById('as-inicio').textContent = formatDateBR(current.dataInicioAssinatura);
     document.getElementById('as-vencimento').textContent = formatDateBR(current.dataVencimento);
