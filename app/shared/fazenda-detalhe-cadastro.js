@@ -101,7 +101,7 @@
     document.getElementById('dado-nome').textContent = fieldOrDash(fazenda.nome);
     document.getElementById('dado-proprietario').textContent = fieldOrDash(fazenda.proprietario);
     document.getElementById('dado-cnpj').textContent = fieldOrDash(fazenda.cnpj);
-    document.getElementById('dado-ie').textContent = fieldOrDash(fazenda.inscricaoEstadual);
+    document.getElementById('dado-ie').textContent = fieldOrDash((window.NiveloFazendas.listInscricoesEstaduais(fazenda) || []).join(', '));
     document.getElementById('dado-matricula').textContent = fieldOrDash(fazenda.matricula);
     document.getElementById('dado-area-total').textContent = fazenda.areaHa + ' ha';
     document.getElementById('dado-area-agricultura').textContent = fieldOrDash(fazenda.areaAgricultura) + (fazenda.areaAgricultura != null ? ' ha' : '');

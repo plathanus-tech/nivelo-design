@@ -247,3 +247,9 @@
 @media (min-width: 640px) {
   .npv-actions .btn { width: auto; min-width: 160px; }
 }
+
+/* Nome da fazenda ao lado da Inscrição Estadual (opção do dropdown do Emissor). */
+.emissor-ie-farm {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}

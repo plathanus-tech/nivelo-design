@@ -367,7 +367,7 @@
 
   // ---------- Ações da tabela ----------
   function openEditScreen(row) {
-    window.location.href = 'nova-natureza-operacao.html?codigo=' + encodeURIComponent(row.dataset.codigo);
+    window.location.href = 'nova-natureza-operacao-v2.html?codigo=' + encodeURIComponent(row.dataset.codigo);
   }
   function handleRowAction(btn, row) {
     var action = btn.dataset.action;
@@ -381,7 +381,7 @@
   });
 
   document.getElementById('new-natureza-btn').addEventListener('click', function () {
-    window.location.href = 'nova-natureza-operacao.html?tipo=' + encodeURIComponent(state.tipo);
+    window.location.href = 'nova-natureza-operacao-v2.html?tipo=' + encodeURIComponent(state.tipo);
   });
 
   // ---------- Cards (Mobile) ----------

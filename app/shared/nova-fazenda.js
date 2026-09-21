@@ -109,7 +109,6 @@
 
   // ══════════════════ ETAPA 1 — Dados da fazenda ══════════════════
 
-  var codigoInput = document.getElementById('nf-codigo');
   var nomeField = document.getElementById('nf-nome-field');
   var nomeInput = document.getElementById('nf-nome');
   var nomeError = document.getElementById('nf-nome-error');
@@ -122,20 +121,59 @@
   var matriculaField = document.getElementById('nf-matricula-field');
   var matriculaInput = document.getElementById('nf-matricula');
 
-  // Preview cosmético — o código real (zero-padded, sequencial) só é gerado
-  // de verdade dentro de `NiveloFazendas.add()` ao salvar (mesma convenção
-  // de novo-produto.js: o campo aqui só mostra um placeholder plausível).
-  // Em modo edição, mostra o código real (já existe, nunca muda).
-  codigoInput.value = editingFazenda
-    ? editingFazenda.codigo
-    : '0' + String(window.NiveloFazendas.list().length + 1).padStart(3, '0');
-
   if (editingFazenda) {
     nomeInput.value = editingFazenda.nome || '';
     proprietarioInput.value = editingFazenda.proprietario || '';
     cnpjInput.value = editingFazenda.cnpj || '';
-    ieInput.value = editingFazenda.inscricaoEstadual || '';
     matriculaInput.value = editingFazenda.matricula || '';
+  }
+
+  // ── Inscrições Estaduais (uma fazenda pode ter várias) ──
+  // A 1ª usa o campo fixo (#nf-ie, obrigatório); "Nova inscrição da fazenda"
+  // adiciona campos numerados (Inscrição Estadual 2, 3, ...) abaixo dela.
+  var ieExtraList = document.getElementById('nf-ie-extra-list');
+  var ieAddBtn = document.getElementById('nf-ie-add');
+  var ieExtras = [];
+
+  function renumberIeExtras() {
+    ieExtras.forEach(function (item, i) {
+      var n = i + 2;
+      item.label.textContent = 'Inscrição Estadual ' + n;
+      item.label.htmlFor = 'nf-ie-' + n;
+      item.input.id = 'nf-ie-' + n;
+    });
+  }
+
+  function addIeExtra(value) {
+    var n = ieExtras.length + 2;
+    var field = document.createElement('div');
+    field.className = 'wrapper';
+    field.innerHTML =
+      '<label class="label"></label>' +
+      '<div class="inputWrap"><input class="input" type="text" placeholder="Ex.: 123.456.789.112" /></div>';
+    var label = field.querySelector('label');
+    var input = field.querySelector('input');
+    ieExtraList.appendChild(field);
+    ieExtras.push({ field: field, label: label, input: input });
+    renumberIeExtras();
+    if (value) input.value = value;
+    return input;
+  }
+
+  ieAddBtn.addEventListener('click', function () {
+    addIeExtra('').focus();
+  });
+
+  function collectInscricoes() {
+    var list = [ieInput.value.trim()];
+    ieExtras.forEach(function (item) { list.push(item.input.value.trim()); });
+    return list.filter(Boolean);
+  }
+
+  if (editingFazenda) {
+    var savedIes = (window.NiveloFazendas.listInscricoesEstaduais(editingFazenda)) || [];
+    ieInput.value = savedIes[0] || '';
+    savedIes.slice(1).forEach(function (v) { addIeExtra(v); });
   }
 
   // Documento único (CNPJ ou CPF): máscara auto-detectada por tamanho, mesma
@@ -708,7 +746,7 @@
       nome: nomeInput.value.trim(),
       proprietario: proprietarioInput.value.trim() || null,
       cnpj: cnpjInput.value.trim() || null,
-      inscricaoEstadual: ieInput.value.trim() || null,
+      inscricoesEstaduais: collectInscricoes(),
       matricula: matriculaInput.value.trim() || null,
       latitude: latitudeInput.value !== '' ? latitudeInput.value : null,
       longitude: longitudeInput.value !== '' ? longitudeInput.value : null,
@@ -759,7 +797,7 @@
       nome: nomeInput.value.trim(),
       proprietario: proprietarioInput.value.trim() || null,
       cnpj: cnpjInput.value.trim() || null,
-      inscricaoEstadual: ieInput.value.trim() || null,
+      inscricoesEstaduais: collectInscricoes(),
       matricula: matriculaInput.value.trim() || null,
       enderecoCompleto: composeEnderecoCompleto(),
       latitude: latitudeInput.value !== '' ? latitudeInput.value : null,

@@ -160,6 +160,32 @@
     optionEl.textContent = natureza.descricao;
     naturezaMenu.appendChild(optionEl);
   });
+  // Emissor: Nome/CNPJ vêm do próprio emitente (auto, somente leitura); a
+  // Inscrição Estadual é escolhida entre todas as cadastradas nas fazendas.
+  var emissor = window.NiveloEmitente.getEmitente();
+  document.getElementById('nr-emissor-nome').value = emissor.razaoSocial;
+  document.getElementById('nr-emissor-cnpj').value = emissor.documento;
+  var emissorIeMenu = document.getElementById('emissor-ie-menu');
+  var emissorIes = [];
+  window.NiveloFazendas.list().forEach(function (f) {
+    window.NiveloFazendas.listInscricoesEstaduais(f).forEach(function (ie) {
+      if (!emissorIes.some(function (x) { return x.ie === ie; })) emissorIes.push({ ie: ie, fazenda: f.nome });
+    });
+  });
+  emissorIes.forEach(function (ie) {
+    var optionEl = document.createElement('div');
+    optionEl.className = 'option';
+    optionEl.dataset.value = ie.ie;
+    optionEl.textContent = ie.ie;
+    var farmEl = document.createElement('span');
+    farmEl.className = 'emissor-ie-farm';
+    farmEl.textContent = ' · ' + ie.fazenda;
+    optionEl.appendChild(farmEl);
+    emissorIeMenu.appendChild(optionEl);
+  });
+  var emissorIeDropdown = initDropdown(document.getElementById('emissor-ie-field'));
+  if (emissorIes.length === 1) emissorIeDropdown.selectValue(emissorIes[0].ie);
+
   var naturezaDropdown = initDropdown(naturezaField);
 
   // Destinatário: mesmo catálogo de Clientes já usado pelo campo "Cliente"

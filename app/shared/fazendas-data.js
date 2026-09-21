@@ -155,8 +155,25 @@ window.NiveloFazendas = (function () {
     } catch (e) {}
   })();
 
+  // Uma fazenda pode ter mais de uma Inscrição Estadual: `inscricoesEstaduais`
+  // (array) é a fonte de verdade; `inscricaoEstadual` (string, a 1ª do array)
+  // continua existindo só por compatibilidade com telas que leem um único
+  // valor. Normaliza fazendas seed/criadas antigas que só têm a string.
+  function normalizeInscricoes(f) {
+    var arr = Array.isArray(f.inscricoesEstaduais) ? f.inscricoesEstaduais.filter(Boolean) : [];
+    if (!arr.length && f.inscricaoEstadual) arr = [f.inscricaoEstadual];
+    f.inscricoesEstaduais = arr;
+    f.inscricaoEstadual = arr[0] || null;
+    return f;
+  }
+  FAZENDAS.forEach(normalizeInscricoes);
+
   function list() {
     return FAZENDAS;
+  }
+
+  function listInscricoesEstaduais(fazenda) {
+    return fazenda ? normalizeInscricoes(fazenda).inscricoesEstaduais : [];
   }
 
   function findById(id) {
@@ -196,7 +213,7 @@ window.NiveloFazendas = (function () {
       id = baseId + '-' + suffix;
       suffix++;
     }
-    var novaFazenda = Object.assign({ id: id, codigo: nextCodigo() }, farm);
+    var novaFazenda = normalizeInscricoes(Object.assign({ id: id, codigo: nextCodigo() }, farm));
     FAZENDAS.push(novaFazenda);
     persist(novaFazenda);
     return novaFazenda;
@@ -214,6 +231,7 @@ window.NiveloFazendas = (function () {
     var farm = findById(id);
     if (!farm) return null;
     Object.assign(farm, patch, { atualizadoEm: todayISO() });
+    if (patch.inscricoesEstaduais) { farm.inscricaoEstadual = null; normalizeInscricoes(farm); patch.inscricaoEstadual = farm.inscricaoEstadual; }
     persistEdit(id, Object.assign({}, patch, { atualizadoEm: farm.atualizadoEm }));
     return farm;
   }
@@ -275,7 +293,7 @@ window.NiveloFazendas = (function () {
   }
 
   return {
-    list: list, findById: findById, add: add, update: update,
+    list: list, findById: findById, add: add, update: update, listInscricoesEstaduais: listInscricoesEstaduais,
     encerrarSafraTalhao: encerrarSafraTalhao, iniciarSafraTalhao: iniciarSafraTalhao,
     TODAY: TODAY
   };

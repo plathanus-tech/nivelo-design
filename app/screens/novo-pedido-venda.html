@@ -269,6 +269,38 @@
 
           <form id="npv-form" novalidate>
 
+            <!-- ══════════════ Emissor ══════════════ -->
+            <section class="card npv-card">
+              <div class="cardHeader"><h2 class="title">Emissor</h2></div>
+              <div class="npv-grid">
+
+                <div class="wrapper" id="emissor-nome-field">
+                  <label class="label" for="npv-emissor-nome">Nome</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-emissor-nome" disabled readonly />
+                  </div>
+                </div>
+
+                <div class="wrapper" id="emissor-cnpj-field">
+                  <label class="label" for="npv-emissor-cnpj">CNPJ</label>
+                  <div class="inputWrap">
+                    <input class="input" type="text" id="npv-emissor-cnpj" disabled readonly />
+                  </div>
+                </div>
+
+                <div class="wrapper npv-span-2" id="emissor-ie-field">
+                  <span class="label">Inscrição Estadual</span>
+                  <button type="button" class="trigger" data-dropdown-trigger>
+                    <span data-dropdown-value class="placeholder">Selecione a inscrição estadual</span>
+                    <span class="chevron"><i data-lucide="chevron-down" width="16" height="16"></i></span>
+                  </button>
+                  <div class="menu" id="emissor-ie-menu" data-dropdown-menu></div>
+                  <span class="helperText">Inscrições estaduais cadastradas nas fazendas.</span>
+                </div>
+
+              </div>
+            </section>
+
             <!-- ══════════════ Operação ══════════════ -->
             <section class="card npv-card">
               <div class="cardHeader"><h2 class="title">Operação</h2></div>
@@ -627,6 +659,8 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../shared/interface-principal.js"></script>
   <script src="../shared/date-picker.js"></script>
+  <script src="../shared/emitente-data.js"></script>
+  <script src="../shared/fazendas-data.js"></script>
   <script src="../shared/cadastros-data.js"></script>
   <script src="../shared/produtos-data.js"></script>
   <script src="../shared/locais-data.js"></script>

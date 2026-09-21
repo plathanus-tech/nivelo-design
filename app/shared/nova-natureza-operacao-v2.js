@@ -125,9 +125,335 @@
     applyEmitente(emitenteDropdown.getValue(), false);
   });
   applyEmitente('', false);
-  var snCsosnDropdown = initDropdown(document.getElementById('sn-csosn-field'));
+  var icmsTipoDropdown = initDropdown(document.getElementById('icms-tipo-field'));
+  var icmsCsosnDropdown = initDropdown(document.getElementById('icms-csosn-field'));
+  var icmsCstDropdown = initDropdown(document.getElementById('icms-cst-field'));
+  var icmsOrigemDropdown = initDropdown(document.getElementById('icms-origem-field'));
+  var icmsModbcDropdown = initDropdown(document.getElementById('icms-modbc-field'));
+  var icmsDifalDropdown = initDropdown(document.getElementById('icms-difal-field'));
+  var icmsFcpDropdown = initDropdown(document.getElementById('icms-fcp-field'));
+  // O tipo de código controla qual campo de situação tributária aparece;
+  // nunca os dois juntos, e trocar o tipo limpa o código incompatível.
+  function applyIcmsTipo(tipo) {
+    document.getElementById('icms-csosn-field').hidden = tipo !== 'csosn';
+    document.getElementById('icms-cst-field').hidden = tipo !== 'cst';
+    if (tipo !== 'csosn') icmsCsosnDropdown.clear();
+    if (tipo !== 'cst') icmsCstDropdown.clear();
+  }
+  document.getElementById('icms-tipo-field').addEventListener('click', function (event) {
+    if (event.target.closest('.option')) applyIcmsTipo(icmsTipoDropdown.getValue());
+  });
+  applyIcmsTipo('');
   var ipiCodigoDropdown = initDropdown(document.getElementById('ipi-codigo-field'));
-  var issqnCstDropdown = initDropdown(document.getElementById('issqn-cst-field'));
+  var credpresCodigoDropdown = initDropdown(document.getElementById('ibscbs-credpres-codigo-field'));
+  var monofasicaDropdown = initDropdown(document.getElementById('ibscbs-monofasica-field'));
+  var transfCreditoDropdown = initDropdown(document.getElementById('ibscbs-transf-credito-field'));
+
+  // ---------- V2: Inscrições estaduais (multiselect) + Numeração fiscal ----------
+  // As IEs pertencem às Fazendas (fonte única: window.NiveloFazendas) e nunca
+  // são cadastradas aqui. Cada opção é identificada por `fazendaId|IE`, já que
+  // a mesma IE pode aparecer em mais de uma natureza, mas é única por fazenda.
+  var IE_OPTIONS = [];
+  (window.NiveloFazendas ? window.NiveloFazendas.list() : []).forEach(function (fazenda) {
+    window.NiveloFazendas.listInscricoesEstaduais(fazenda).forEach(function (ie) {
+      IE_OPTIONS.push({ key: fazenda.id + '|' + ie, ie: ie, fazenda: fazenda.nome, label: fazenda.nome + ' — ' + ie });
+    });
+  });
+  function findIeOption(key) {
+    for (var i = 0; i < IE_OPTIONS.length; i++) if (IE_OPTIONS[i].key === key) return IE_OPTIONS[i];
+    return null;
+  }
+
+  var numeracao = []; // [{ id, ieKey, serie, ultima, uso }]
+  var numSeq = 0;
+  var USO_LABEL = { 'entrada-saida': 'Entrada e saída', entrada: 'Somente entrada', saida: 'Somente saída' };
+
+  function numForIe(key) { return numeracao.filter(function (n) { return n.ieKey === key; }); }
+
+  var ieField = document.getElementById('ie-field');
+  var ieTrigger = ieField.querySelector('[data-dropdown-trigger]');
+  var ieTagsEl = ieField.querySelector('[data-dropdown-value]');
+  var ieMenu = ieField.querySelector('[data-dropdown-menu]');
+  var ieSelected = []; // chaves, na ordem de seleção
+
+  IE_OPTIONS.forEach(function (opt) {
+    var div = document.createElement('div');
+    div.className = 'option optionCheckbox';
+    div.dataset.value = opt.key;
+    div.innerHTML = '<span class="optionCheck"><i data-lucide="check" width="12" height="12"></i></span>';
+    div.appendChild(document.createTextNode(opt.ie));
+    var farmEl = document.createElement('span');
+    farmEl.className = 'nnop-ie-farm';
+    farmEl.textContent = ' · ' + opt.fazenda;
+    div.appendChild(farmEl);
+    ieMenu.appendChild(div);
+  });
+  if (!IE_OPTIONS.length) {
+    var emptyOpt = document.createElement('div');
+    emptyOpt.className = 'nnop-ie-empty text-body-s';
+    emptyOpt.textContent = 'Nenhuma inscrição estadual cadastrada nas fazendas.';
+    ieMenu.appendChild(emptyOpt);
+  }
+
+  function positionIeMenu() {
+    var rect = ieTrigger.getBoundingClientRect();
+    var spaceBelow = window.innerHeight - rect.bottom - 8;
+    var spaceAbove = rect.top - 8;
+    ieMenu.style.position = 'fixed';
+    ieMenu.style.left = rect.left + 'px';
+    ieMenu.style.width = rect.width + 'px';
+    if (spaceBelow < 160 && spaceAbove > spaceBelow) {
+      ieMenu.style.top = 'auto';
+      ieMenu.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+      ieMenu.style.maxHeight = Math.min(240, spaceAbove) + 'px';
+    } else {
+      ieMenu.style.bottom = 'auto';
+      ieMenu.style.top = (rect.bottom + 4) + 'px';
+      ieMenu.style.maxHeight = Math.min(240, spaceBelow) + 'px';
+    }
+  }
+  function closeIeMenu() {
+    ieField.classList.remove('open');
+    window.removeEventListener('scroll', onIeScroll, true);
+    window.removeEventListener('resize', closeIeMenu);
+  }
+  function onIeScroll(event) { if (!ieMenu.contains(event.target)) closeIeMenu(); }
+  function openIeMenu() {
+    ieField.classList.add('open');
+    positionIeMenu();
+    window.addEventListener('scroll', onIeScroll, true);
+    window.addEventListener('resize', closeIeMenu);
+  }
+
+  function renderIeTags() {
+    Array.prototype.slice.call(ieMenu.querySelectorAll('.option')).forEach(function (o) {
+      o.classList.toggle('selected', ieSelected.indexOf(o.dataset.value) !== -1);
+    });
+    if (!ieSelected.length) {
+      ieTagsEl.classList.add('placeholder');
+      ieTagsEl.textContent = ieTagsEl.dataset.placeholder;
+      return;
+    }
+    ieTagsEl.classList.remove('placeholder');
+    ieTagsEl.innerHTML = ieSelected.map(function (key) {
+      var opt = findIeOption(key);
+      var label = opt ? opt.label : key;
+      var tagText = opt ? opt.ie + ' · ' + opt.fazenda : key;
+      return '<span class="nnop-tag">' + tagText +
+        '<button type="button" class="nnop-tag-remove" data-remove-key="' + key + '" aria-label="Remover ' + label + '"><i data-lucide="x" width="12" height="12"></i></button></span>';
+    }).join('');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function selectedIeAdded(key) {
+    ieSelected.push(key);
+    renderIeTags();
+    renderNumeracao();
+  }
+  function selectedIeRemoved(key) {
+    ieSelected = ieSelected.filter(function (k) { return k !== key; });
+    numeracao = numeracao.filter(function (n) { return n.ieKey !== key; });
+    renderIeTags();
+    renderNumeracao();
+  }
+
+  // Remover uma IE que já tem séries configuradas nunca acontece em silêncio:
+  // abre a confirmação, e só depois de confirmada remove a IE e suas séries.
+  var ieRemoveOverlay = document.getElementById('ie-remove-overlay');
+  var iePendingRemoval = null;
+  function requestIeRemoval(key) {
+    var linked = numForIe(key);
+    if (!linked.length) { selectedIeRemoved(key); return; }
+    var opt = findIeOption(key);
+    iePendingRemoval = key;
+    document.getElementById('ie-remove-text').textContent =
+      'Existem ' + linked.length + (linked.length === 1 ? ' configuração de numeração vinculada' : ' configurações de numeração vinculadas') +
+      ' a ' + (opt ? opt.label : 'esta inscrição') + '. Ao remover a inscrição, ' + (linked.length === 1 ? 'essa configuração também será removida.' : 'essas configurações também serão removidas.');
+    ieRemoveOverlay.hidden = false;
+  }
+  function closeIeRemoveDialog() { ieRemoveOverlay.hidden = true; iePendingRemoval = null; }
+  document.getElementById('ie-remove-close').addEventListener('click', closeIeRemoveDialog);
+  document.getElementById('ie-remove-cancel').addEventListener('click', closeIeRemoveDialog);
+  ieRemoveOverlay.addEventListener('click', function (event) { if (event.target === ieRemoveOverlay) closeIeRemoveDialog(); });
+  document.getElementById('ie-remove-confirm').addEventListener('click', function () {
+    if (iePendingRemoval) selectedIeRemoved(iePendingRemoval);
+    closeIeRemoveDialog();
+  });
+
+  function toggleIe(key) {
+    if (ieSelected.indexOf(key) === -1) selectedIeAdded(key);
+    else requestIeRemoval(key);
+  }
+  ieTrigger.addEventListener('click', function () {
+    if (ieField.classList.contains('open')) closeIeMenu(); else openIeMenu();
+  });
+  ieMenu.addEventListener('click', function (event) {
+    var optionEl = event.target.closest('.option');
+    if (optionEl) toggleIe(optionEl.dataset.value);
+  });
+  ieTagsEl.addEventListener('click', function (event) {
+    var removeBtn = event.target.closest('[data-remove-key]');
+    if (!removeBtn) return;
+    event.stopPropagation();
+    requestIeRemoval(removeBtn.dataset.removeKey);
+  });
+  document.addEventListener('click', function (event) {
+    if (!ieField.contains(event.target)) closeIeMenu();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      closeIeMenu();
+      if (!ieRemoveOverlay.hidden) closeIeRemoveDialog();
+      if (!numOverlay.hidden) closeNumDialog();
+      if (!numRemoveOverlay.hidden) closeNumRemoveDialog();
+    }
+  });
+
+  // ---------- Tabela de Numeração fiscal ----------
+  var numTbody = document.getElementById('num-tbody');
+  var numTableWrap = document.getElementById('num-table-wrap');
+  var numEmpty = document.getElementById('num-empty');
+  var numEmptyText = document.getElementById('num-empty-text');
+  var numAddBtn = document.getElementById('num-add-btn');
+
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+  }
+  function renderNumeracao() {
+    numAddBtn.disabled = !ieSelected.length;
+    numTableWrap.hidden = !numeracao.length;
+    numEmpty.hidden = !!numeracao.length;
+    numEmptyText.textContent = ieSelected.length
+      ? 'Nenhuma série configurada. Use "Adicionar série" para começar.'
+      : 'Selecione ao menos uma inscrição estadual em Dados gerais para configurar a numeração.';
+    numTbody.innerHTML = numeracao.map(function (n) {
+      var opt = findIeOption(n.ieKey);
+      return '<tr class="tr" data-num-id="' + n.id + '">' +
+        '<td class="td">' + escapeHtml(opt ? opt.label : n.ieKey) + '</td>' +
+        '<td class="td">55 – NF-e</td>' +
+        '<td class="td">' + escapeHtml(n.serie) + '</td>' +
+        '<td class="td">' + n.ultima + '</td>' +
+        '<td class="td">' + (n.ultima + 1) + '</td>' +
+        '<td class="td">' + USO_LABEL[n.uso] + '</td>' +
+        '<td class="td"><div class="cellActions">' +
+          '<button type="button" class="actionBtn" data-num-action="editar" aria-label="Editar série"><i data-lucide="pencil" width="16" height="16"></i></button>' +
+          '<button type="button" class="actionBtn" data-num-action="remover" aria-label="Remover série"><i data-lucide="trash-2" width="16" height="16"></i></button>' +
+        '</div></td></tr>';
+    }).join('');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // ---------- Modal: Adicionar/Editar série ----------
+  var numOverlay = document.getElementById('num-dialog-overlay');
+  var numRemoveOverlay = document.getElementById('num-remove-overlay');
+  var numIeField = document.getElementById('num-ie-field');
+  var numIeMenu = numIeField.querySelector('[data-dropdown-menu]');
+  var numIeDropdown = initDropdown(numIeField);
+  var numUsoDropdown = initDropdown(document.getElementById('num-uso-field'));
+  var numSerieInput = document.getElementById('num-serie');
+  var numUltimaInput = document.getElementById('num-ultima');
+  var numProximaInput = document.getElementById('num-proxima');
+  var numEditingId = null;
+  var numPendingRemoveId = null;
+
+  function onlyDigits(input) { input.value = input.value.replace(/\D/g, ''); }
+  function refreshProxima() {
+    numProximaInput.value = numUltimaInput.value === '' ? '' : String(Number(numUltimaInput.value) + 1);
+  }
+  numSerieInput.addEventListener('input', function () { onlyDigits(numSerieInput); document.getElementById('num-serie-field').classList.remove('error'); });
+  numUltimaInput.addEventListener('input', function () { onlyDigits(numUltimaInput); refreshProxima(); document.getElementById('num-ultima-field').classList.remove('error'); });
+
+  function clearNumErrors() {
+    ['num-ie-field', 'num-serie-field', 'num-ultima-field', 'num-uso-field'].forEach(function (id) {
+      document.getElementById(id).classList.remove('error');
+    });
+    document.getElementById('num-serie-error').lastChild.textContent = ' Informe a série.';
+  }
+  function openNumDialog(record) {
+    numEditingId = record ? record.id : null;
+    clearNumErrors();
+    numIeMenu.innerHTML = '';
+    ieSelected.forEach(function (key) {
+      var opt = findIeOption(key);
+      if (!opt) return;
+      var div = document.createElement('div');
+      div.className = 'option';
+      div.dataset.value = opt.key;
+      div.textContent = opt.label;
+      numIeMenu.appendChild(div);
+    });
+    numIeDropdown.clear();
+    numUsoDropdown.clear();
+    numSerieInput.value = record ? record.serie : '';
+    numUltimaInput.value = record ? String(record.ultima) : '';
+    refreshProxima();
+    if (record) { numIeDropdown.setValue(record.ieKey); numUsoDropdown.setValue(record.uso); }
+    document.getElementById('num-dialog-title').textContent = record ? 'Editar série' : 'Adicionar série';
+    document.getElementById('num-dialog-confirm').textContent = record ? 'Salvar série' : 'Adicionar série';
+    numOverlay.hidden = false;
+  }
+  function closeNumDialog() { numOverlay.hidden = true; numEditingId = null; }
+
+  numAddBtn.addEventListener('click', function () { if (!numAddBtn.disabled) openNumDialog(null); });
+  document.getElementById('num-dialog-close').addEventListener('click', closeNumDialog);
+  document.getElementById('num-dialog-cancel').addEventListener('click', closeNumDialog);
+  numOverlay.addEventListener('click', function (event) { if (event.target === numOverlay) closeNumDialog(); });
+
+  document.getElementById('num-dialog-confirm').addEventListener('click', function () {
+    var ieKey = numIeDropdown.getValue();
+    var serie = numSerieInput.value.trim();
+    var ultima = numUltimaInput.value;
+    var uso = numUsoDropdown.getValue();
+    var ok = true;
+    function flag(id, bad) { document.getElementById(id).classList.toggle('error', bad); if (bad) ok = false; }
+    flag('num-ie-field', !ieKey);
+    flag('num-serie-field', !serie);
+    flag('num-ultima-field', ultima === '');
+    flag('num-uso-field', !uso);
+    if (ieKey && serie) {
+      var dup = numeracao.some(function (n) { return n.ieKey === ieKey && n.serie === serie && n.id !== numEditingId; });
+      if (dup) {
+        document.getElementById('num-serie-error').lastChild.textContent = ' Esta série já está configurada para este estabelecimento.';
+        flag('num-serie-field', true);
+      }
+    }
+    if (!ok) return;
+    if (numEditingId) {
+      numeracao.forEach(function (n) {
+        if (n.id === numEditingId) { n.ieKey = ieKey; n.serie = serie; n.ultima = Number(ultima); n.uso = uso; }
+      });
+    } else {
+      numeracao.push({ id: ++numSeq, ieKey: ieKey, serie: serie, ultima: Number(ultima), uso: uso });
+    }
+    renderNumeracao();
+    closeNumDialog();
+  });
+
+  // Editar/remover uma linha da tabela
+  function closeNumRemoveDialog() { numRemoveOverlay.hidden = true; numPendingRemoveId = null; }
+  numTbody.addEventListener('click', function (event) {
+    var btn = event.target.closest('[data-num-action]');
+    if (!btn) return;
+    var id = Number(btn.closest('tr').dataset.numId);
+    var record = numeracao.filter(function (n) { return n.id === id; })[0];
+    if (!record) return;
+    if (btn.dataset.numAction === 'editar') { openNumDialog(record); return; }
+    numPendingRemoveId = id;
+    var opt = findIeOption(record.ieKey);
+    document.getElementById('num-remove-text').textContent =
+      'Deseja remover a série ' + record.serie + ' de ' + (opt ? opt.label : 'este estabelecimento') + '?';
+    numRemoveOverlay.hidden = false;
+  });
+  document.getElementById('num-remove-close').addEventListener('click', closeNumRemoveDialog);
+  document.getElementById('num-remove-cancel').addEventListener('click', closeNumRemoveDialog);
+  numRemoveOverlay.addEventListener('click', function (event) { if (event.target === numRemoveOverlay) closeNumRemoveDialog(); });
+  document.getElementById('num-remove-confirm').addEventListener('click', function () {
+    numeracao = numeracao.filter(function (n) { return n.id !== numPendingRemoveId; });
+    renderNumeracao();
+    closeNumRemoveDialog();
+  });
+  renderIeTags();
+  renderNumeracao();
 
   // ---------- Abas (Configuração tributária) — trocou de Accordion pra Tab
   // (ver nota no HTML/CSS: o `.trigger` do Accordion colidia com o do
@@ -171,7 +497,7 @@
     if (input) input.checked = true;
     syncRadioChecked(name);
   }
-  var RADIO_GROUPS = ['finalizada', 'padrao', 'consumidor-final', 'sn-difal', 'issqn-desconto'];
+  var RADIO_GROUPS = ['finalizada', 'padrao', 'consumidor-final'];
   RADIO_GROUPS.forEach(function (name) {
     syncRadioChecked(name);
     form.querySelectorAll('input[name="' + name + '"]').forEach(function (input) {
@@ -385,31 +711,28 @@
       tipo: 'saida',
       descricao: 'Venda de mercadoria dentro do estado',
       padrao: 'sim',
-      serie: '1',
       emitente: 'pj',
       regime: 'simples',
       consumidorFinal: 'nao',
-      simples: { csosn: '101', cfop: '5102', difal: 'nao' }
+      icms: { csosn: '101', difal: 'nao' }
     },
     remessa: {
       tipo: 'saida',
       descricao: 'Remessa',
       padrao: 'nao',
-      serie: '1',
       emitente: 'pj',
       regime: 'simples',
       consumidorFinal: 'nao',
-      simples: { csosn: '400', cfop: '5905', difal: 'nao' }
+      icms: { csosn: '400', difal: 'nao' }
     },
     devolucao: {
       tipo: 'entrada',
       descricao: 'Devolução de venda',
       padrao: 'nao',
-      serie: '1',
       emitente: 'pj',
       regime: 'simples',
       consumidorFinal: 'nao',
-      simples: { csosn: '202', cfop: '1202', difal: 'nao' }
+      icms: { csosn: '202', difal: 'nao' }
     }
   };
 
@@ -419,14 +742,14 @@
     tipoDropdown.setValue(preset.tipo);
     document.getElementById('nnop-descricao').value = preset.descricao;
     setRadio('padrao', preset.padrao);
-    document.getElementById('nnop-serie').value = preset.serie;
     emitenteDropdown.setValue(preset.emitente);
     applyEmitente(preset.emitente, false);
     regimeDropdown.setValue(preset.regime);
     setRadio('consumidor-final', preset.consumidorFinal);
-    snCsosnDropdown.setValue(preset.simples.csosn);
-    document.getElementById('sn-cfop').value = preset.simples.cfop;
-    setRadio('sn-difal', preset.simples.difal);
+    icmsTipoDropdown.setValue('csosn');
+    applyIcmsTipo('csosn');
+    icmsCsosnDropdown.setValue(preset.icms.csosn);
+    icmsDifalDropdown.setValue(preset.icms.difal);
   }
 
   var presetButtons = Array.prototype.slice.call(document.querySelectorAll('.nnop-preset-btn'));
@@ -451,9 +774,6 @@
     var descricaoInput = document.getElementById('nnop-descricao');
     if (!descricaoInput.value.trim()) { setFieldError(descricaoField, true); valid = false; } else setFieldError(descricaoField, false);
 
-    var serieField = document.getElementById('serie-field');
-    var serieInput = document.getElementById('nnop-serie');
-    if (!serieInput.value.trim()) { setFieldError(serieField, true); valid = false; } else setFieldError(serieField, false);
 
     var emitenteField = document.getElementById('emitente-field');
     if (!emitenteDropdown.getValue()) { setFieldError(emitenteField, true); valid = false; } else setFieldError(emitenteField, false);
@@ -479,7 +799,6 @@
     document.getElementById('nnop-descricao').value = natureza.descricao;
     setRadio('finalizada', natureza.finalizada ? 'sim' : 'nao');
     setRadio('padrao', natureza.padrao ? 'sim' : 'nao');
-    document.getElementById('nnop-serie').value = natureza.serie;
     var LEGACY = { '1': 'simples', '2': 'simples', '3': 'real' };
     var tipoEm = natureza.tipoEmitente || 'pj';
     emitenteDropdown.setValue(tipoEm);
@@ -488,13 +807,33 @@
     setRadio('consumidor-final', natureza.consumidorFinal ? 'sim' : 'nao');
     document.getElementById('nnop-observacao').value = natureza.observacao || '';
 
+    ieSelected = (natureza.inscricoesEstaduais || []).filter(function (key) { return !!findIeOption(key); });
+    numeracao = (natureza.numeracao || [])
+      .filter(function (n) { return ieSelected.indexOf(n.ieKey) !== -1; })
+      .map(function (n) { return { id: ++numSeq, ieKey: n.ieKey, serie: n.serie, ultima: n.ultima, uso: n.uso }; });
+    renderIeTags();
+    renderNumeracao();
+
     var t = natureza.tributacao || {};
-    if (t.simplesNacional) {
-      if (t.simplesNacional.csosn) snCsosnDropdown.setValue(t.simplesNacional.csosn);
-      document.getElementById('sn-cfop').value = t.simplesNacional.cfop || '';
-      setRadio('sn-difal', t.simplesNacional.icmsDifal ? 'sim' : 'nao');
-      document.getElementById('sn-observacao').value = t.simplesNacional.observacao || '';
-      document.getElementById('sn-info-fisco').value = t.simplesNacional.informacaoFisco || '';
+    var ic = t.icms || (t.simplesNacional && {
+      tipoCodigo: 'csosn', codigo: t.simplesNacional.csosn, difal: t.simplesNacional.icmsDifal ? 'sim' : 'nao',
+      observacao: t.simplesNacional.observacao, informacaoFisco: t.simplesNacional.informacaoFisco
+    });
+    if (ic) {
+      if (ic.tipoCodigo) {
+        icmsTipoDropdown.setValue(ic.tipoCodigo);
+        applyIcmsTipo(ic.tipoCodigo);
+        if (ic.codigo) (ic.tipoCodigo === 'csosn' ? icmsCsosnDropdown : icmsCstDropdown).setValue(ic.codigo);
+      }
+      if (ic.origem) icmsOrigemDropdown.setValue(ic.origem);
+      document.getElementById('icms-cbenef').value = ic.cBenef || '';
+      if (ic.modalidadeBc) icmsModbcDropdown.setValue(ic.modalidadeBc);
+      setPercentValue(document.getElementById('icms-reducao-base'), ic.reducaoBase);
+      setPercentValue(document.getElementById('icms-aliquota'), ic.aliquota);
+      if (ic.difal) icmsDifalDropdown.setValue(ic.difal);
+      if (ic.fcp) icmsFcpDropdown.setValue(ic.fcp);
+      document.getElementById('icms-observacao').value = ic.observacao || '';
+      document.getElementById('icms-info-fisco').value = ic.informacaoFisco || '';
     }
     if (t.ipi) {
       ipiCodigoDropdown.setValue(t.ipi.codigo || 'nao-destacar');
@@ -502,14 +841,6 @@
       document.getElementById('ipi-enquadramento').value = t.ipi.codigoEnquadramento || '';
       document.getElementById('ipi-observacao').value = t.ipi.observacao || '';
       document.getElementById('ipi-info-fisco').value = t.ipi.informacaoFisco || '';
-    }
-    if (t.issqn) {
-      if (t.issqn.cst) issqnCstDropdown.setValue(t.issqn.cst);
-      document.getElementById('issqn-aliquota').value = t.issqn.aliquota || '';
-      document.getElementById('issqn-base').value = t.issqn.base || '';
-      setRadio('issqn-desconto', t.issqn.descontarIss ? 'sim' : 'nao');
-      document.getElementById('issqn-observacao').value = t.issqn.observacao || '';
-      document.getElementById('issqn-info-fisco').value = t.issqn.informacaoFisco || '';
     }
     if (t.pis) {
       document.getElementById('pis-cst').value = t.pis.cst || '';
@@ -524,6 +855,16 @@
       document.getElementById('cofins-base').value = t.cofins.base || '';
       document.getElementById('cofins-observacao').value = t.cofins.observacao || '';
       document.getElementById('cofins-info-fisco').value = t.cofins.informacaoFisco || '';
+    }
+    if (t.ibsCbs) {
+      if (t.ibsCbs.credPresCodigo) credpresCodigoDropdown.setValue(t.ibsCbs.credPresCodigo);
+      setPercentValue(document.getElementById('ibscbs-credpres-ibs'), t.ibsCbs.credPresIbs);
+      setPercentValue(document.getElementById('ibscbs-credpres-cbs'), t.ibsCbs.credPresCbs);
+      if (t.ibsCbs.monofasica) monofasicaDropdown.setValue(t.ibsCbs.monofasica);
+      if (t.ibsCbs.transfCredito) transfCreditoDropdown.setValue(t.ibsCbs.transfCredito);
+      setPercentValue(document.getElementById('ibscbs-mun-aliquota'), t.ibsCbs.ibsMunAliquota);
+      setPercentValue(document.getElementById('ibscbs-mun-reducao'), t.ibsCbs.ibsMunReducao);
+      setPercentValue(document.getElementById('ibscbs-mun-efetiva'), t.ibsCbs.ibsMunAliquotaEfetiva);
     }
     if (t.ibsCbs && t.ibsCbs.cst) {
       cstDropdown.setValue(t.ibsCbs.cst);
@@ -553,9 +894,23 @@
   // quando o CST atual não usa aquele campo — ex.: trocar de CST 000 pra 410
   // não pode deixar uma "Alíquota CBS" antiga no envio).
   function buildIbsCbsPayload() {
-    if (!ibscbsState.cst) return null;
+    var mun = {
+      ibsMunAliquota: percentValue(document.getElementById('ibscbs-mun-aliquota')),
+      ibsMunReducao: percentValue(document.getElementById('ibscbs-mun-reducao')),
+      ibsMunAliquotaEfetiva: percentValue(document.getElementById('ibscbs-mun-efetiva'))
+    };
+    var cred = {
+      credPresCodigo: credpresCodigoDropdown.getValue(),
+      credPresIbs: percentValue(document.getElementById('ibscbs-credpres-ibs')),
+      credPresCbs: percentValue(document.getElementById('ibscbs-credpres-cbs')),
+      monofasica: monofasicaDropdown.getValue(),
+      transfCredito: transfCreditoDropdown.getValue()
+    };
+    var hasMun = !!(mun.ibsMunAliquota || mun.ibsMunReducao || mun.ibsMunAliquotaEfetiva ||
+      cred.credPresCodigo || cred.credPresIbs || cred.credPresCbs || cred.monofasica || cred.transfCredito);
+    if (!ibscbsState.cst && !hasMun) return null;
     var config = ibsCbs.getFieldConfig(ibscbsState.cst);
-    var payload = { cst: ibscbsState.cst, cclasstrib: ibscbsState.cclasstrib };
+    var payload = Object.assign({ cst: ibscbsState.cst, cclasstrib: ibscbsState.cclasstrib }, mun, cred);
     if (config.cbs.indexOf('aliquota') !== -1) payload.cbsAliquota = percentValue(document.getElementById('ibscbs-cbs-aliquota'));
     if (config.cbs.indexOf('reducao') !== -1) payload.cbsReducao = percentValue(document.getElementById('ibscbs-cbs-reducao'));
     if (config.cbs.indexOf('diferimento') !== -1) payload.cbsDiferimento = percentValue(document.getElementById('ibscbs-cbs-diferimento'));
@@ -577,19 +932,29 @@
       descricao: document.getElementById('nnop-descricao').value.trim(),
       finalizada: getRadio('finalizada') === 'sim',
       padrao: getRadio('padrao') === 'sim',
-      serie: document.getElementById('nnop-serie').value.trim(),
+      // `serie` continua existindo só como resumo pra listagem (que exibe uma
+      // coluna Série); a fonte de verdade agora é `numeracao`.
+      serie: numeracao.map(function (n) { return n.serie; }).filter(function (s, i, arr) { return arr.indexOf(s) === i; }).join(', '),
+      inscricoesEstaduais: ieSelected.slice(),
+      numeracao: numeracao.map(function (n) { return { ieKey: n.ieKey, modelo: '55', serie: n.serie, ultima: n.ultima, uso: n.uso }; }),
       tipoEmitente: emitenteDropdown.getValue(),
       regimeTributario: regimeDropdown.getValue(),
       codigoRegimeTributario: regimeDropdown.getValue(),
       consumidorFinal: getRadio('consumidor-final') === 'sim',
       observacao: document.getElementById('nnop-observacao').value.trim(),
       tributacao: {
-        simplesNacional: {
-          csosn: snCsosnDropdown.getValue(),
-          cfop: document.getElementById('sn-cfop').value.trim(),
-          icmsDifal: getRadio('sn-difal') === 'sim',
-          observacao: document.getElementById('sn-observacao').value.trim(),
-          informacaoFisco: document.getElementById('sn-info-fisco').value.trim()
+        icms: {
+          tipoCodigo: icmsTipoDropdown.getValue(),
+          codigo: icmsTipoDropdown.getValue() === 'csosn' ? icmsCsosnDropdown.getValue() : (icmsTipoDropdown.getValue() === 'cst' ? icmsCstDropdown.getValue() : ''),
+          origem: icmsOrigemDropdown.getValue(),
+          cBenef: document.getElementById('icms-cbenef').value.trim(),
+          modalidadeBc: icmsModbcDropdown.getValue(),
+          reducaoBase: percentValue(document.getElementById('icms-reducao-base')),
+          aliquota: percentValue(document.getElementById('icms-aliquota')),
+          difal: icmsDifalDropdown.getValue(),
+          fcp: icmsFcpDropdown.getValue(),
+          observacao: document.getElementById('icms-observacao').value.trim(),
+          informacaoFisco: document.getElementById('icms-info-fisco').value.trim()
         },
         ipi: {
           codigo: ipiCodigoDropdown.getValue() || 'nao-destacar',
@@ -597,14 +962,6 @@
           codigoEnquadramento: document.getElementById('ipi-enquadramento').value.trim(),
           observacao: document.getElementById('ipi-observacao').value.trim(),
           informacaoFisco: document.getElementById('ipi-info-fisco').value.trim()
-        },
-        issqn: {
-          cst: issqnCstDropdown.getValue(),
-          aliquota: document.getElementById('issqn-aliquota').value.trim(),
-          base: document.getElementById('issqn-base').value.trim(),
-          descontarIss: getRadio('issqn-desconto') === 'sim',
-          observacao: document.getElementById('issqn-observacao').value.trim(),
-          informacaoFisco: document.getElementById('issqn-info-fisco').value.trim()
         },
         pis: {
           cst: document.getElementById('pis-cst').value.trim(),

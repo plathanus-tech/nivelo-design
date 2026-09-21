@@ -180,3 +180,9 @@ html.dev-notes-on .dev-note { display: block; }
   margin: 0 0 var(--spacing-xs);
 }
 .dev-note-text:last-child { margin-bottom: 0; }
+
+/* Nome da fazenda ao lado da Inscrição Estadual (opção do dropdown do Emissor). */
+.emissor-ie-farm {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}

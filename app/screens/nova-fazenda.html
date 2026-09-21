@@ -310,12 +310,15 @@
                   </span>
                 </div>
 
-                <div class="wrapper" id="nf-codigo-field">
-                  <label class="label" for="nf-codigo">Código</label>
+                <div class="wrapper" id="nf-matricula-field">
+                  <label class="label" for="nf-matricula">Matrícula</label>
                   <div class="inputWrap">
-                    <input class="input" type="text" id="nf-codigo" disabled readonly />
+                    <input class="input" type="text" id="nf-matricula" placeholder="Ex.: 45.678" aria-describedby="nf-matricula-error" />
                   </div>
-                  <span class="helperText">Gerado automaticamente.</span>
+                  <span class="errorText" id="nf-matricula-error">
+                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                    Informe a matrícula.
+                  </span>
                 </div>
 
                 <div class="wrapper" id="nf-proprietario-field">
@@ -341,26 +344,22 @@
                   </span>
                 </div>
 
-                <div class="wrapper" id="nf-ie-field">
-                  <label class="label" for="nf-ie">Inscrição Estadual</label>
-                  <div class="inputWrap">
-                    <input class="input" type="text" id="nf-ie" placeholder="Ex.: 123.456.789.112" aria-describedby="nf-ie-error" />
+                <div class="nova-fazenda-span-2 nf-ie-group" id="nf-ie-group">
+                  <div class="wrapper" id="nf-ie-field">
+                    <label class="label" for="nf-ie">Inscrição Estadual</label>
+                    <div class="inputWrap">
+                      <input class="input" type="text" id="nf-ie" placeholder="Ex.: 123.456.789.112" aria-describedby="nf-ie-error" />
+                    </div>
+                    <span class="errorText" id="nf-ie-error">
+                      <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
+                      Informe a inscrição estadual.
+                    </span>
                   </div>
-                  <span class="errorText" id="nf-ie-error">
-                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                    Informe a inscrição estadual.
-                  </span>
-                </div>
-
-                <div class="wrapper" id="nf-matricula-field">
-                  <label class="label" for="nf-matricula">Matrícula</label>
-                  <div class="inputWrap">
-                    <input class="input" type="text" id="nf-matricula" placeholder="Ex.: 45.678" aria-describedby="nf-matricula-error" />
-                  </div>
-                  <span class="errorText" id="nf-matricula-error">
-                    <i data-lucide="circle-x" width="14" height="14" class="msgIcon"></i>
-                    Informe a matrícula.
-                  </span>
+                  <div class="nf-ie-extra-list" id="nf-ie-extra-list"></div>
+                  <button type="button" class="btn secondary sm hasLeft" id="nf-ie-add">
+                    <i data-lucide="plus" width="16" height="16"></i>
+                    Nova inscrição da fazenda
+                  </button>
                 </div>
 
               </div>

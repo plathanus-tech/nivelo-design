@@ -375,3 +375,6 @@
   }
   .nnop-actions .btn { min-width: 220px; }
 }
+
+/* Opções do Regime tributário escondidas conforme o Tipo de emitente. */
+#regime-field .option[hidden] { display: none; }

@@ -1,0 +1,147 @@
+/* ══════════════════════════════════════════════════════════
+   NOVA NATUREZA DE OPERAÇÃO V2 — delta sobre page-nova-natureza-operacao.css.
+   Só o que é novo: multiselect de Inscrições estaduais (tags, mesmo padrão de
+   Tipo em Novo cadastro) e o card independente de Numeração fiscal (tabela +
+   modal de série). O resto da tela reaproveita a V1 sem alteração.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Inscrições estaduais (multiselect com tags) ─────────────────────────── */
+.nnop-dropdown-multi .trigger {
+  height: auto;
+  min-height: 44px;
+  flex-wrap: wrap;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-2xs) var(--spacing-sm);
+  cursor: default;
+}
+.nnop-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  flex: 1;
+  min-height: 28px;
+  text-align: left;
+}
+.nnop-tags.placeholder { color: var(--color-gray-300); }
+
+.nnop-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--spacing-2xs) 2px var(--spacing-sm);
+  background: var(--color-bg-brand);
+  color: var(--color-action-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  max-width: 100%;
+}
+.nnop-tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: var(--color-action-primary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.nnop-tag-remove:hover { background: color-mix(in srgb, var(--color-action-primary) 15%, transparent); }
+
+/* Opções do menu com checkbox visual (várias marcadas ao mesmo tempo). */
+.menu .option.optionCheckbox { display: flex; align-items: center; gap: var(--spacing-sm); }
+.optionCheck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: var(--border-width-thin) solid var(--color-border-default);
+  border-radius: var(--radius-xs);
+  color: transparent;
+  background: var(--color-bg-surface);
+}
+.optionCheckbox.selected { background: transparent; color: var(--color-text-primary); font-weight: var(--font-weight-regular); }
+.optionCheckbox.selected .optionCheck {
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  color: var(--color-gray-white);
+}
+.nnop-ie-empty {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Numeração fiscal ───────────────────────────────────────────────────── */
+.nnop-num-card { padding: var(--spacing-lg); }
+
+/* Guards hidden+display: `.tableWrap`/`.btn`/`.nnop-num-empty` declaram
+   display próprio e derrotariam o atributo `hidden` (bug recorrente). */
+.nnop-num-table-wrap[hidden],
+.nnop-num-empty[hidden] { display: none; }
+.btn[disabled] { cursor: not-allowed; }
+
+.nnop-num-table { width: 100%; min-width: 760px; }
+.nnop-num-table .th,
+.nnop-num-table .td { white-space: nowrap; }
+.nnop-num-table .td:first-child { white-space: normal; }
+/* Mesmo tratamento das demais tabelas do sistema (Produtos/Estoque/Cadastro):
+   cabeçalho Brand 50 compacto em caixa alta + zebra branco/Gray 50. */
+.nnop-num-table .th {
+  background: var(--color-bg-brand);
+  color: var(--color-gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: 32px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.nnop-num-table .td {
+  height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-color: var(--color-gray-200);
+}
+.nnop-num-table .tr:nth-child(odd) .td { background: var(--color-bg-surface); }
+.nnop-num-table .tr:nth-child(even) .td { background: var(--color-gray-50); }
+.nnop-num-table .tr:hover .td { filter: brightness(0.97); }
+.nnop-num-table-wrap { border: var(--border-width-thin) solid var(--color-gray-200); border-radius: var(--radius-sm); }
+
+.nnop-num-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-lg) var(--spacing-md);
+  border: var(--border-width-thin) dashed var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+.nnop-num-empty p { margin: 0; }
+
+.nnop-num-footer {
+  display: flex;
+  margin-top: var(--spacing-md);
+}
+
+/* ── Modal Adicionar/Editar série ───────────────────────────────────────── */
+.nnop-num-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+@media (min-width: 560px) {
+  .nnop-num-form { grid-template-columns: 1fr 1fr; }
+  .nnop-num-form .nnop-span-2 { grid-column: span 2; }
+}
+.nnop-num-form input.input:not([type="radio"]) { height: 44px; }
+.overlay .footer { gap: var(--spacing-md); flex-wrap: wrap; }
+
+.nnop-ie-farm { font-size: var(--font-size-sm); color: var(--color-text-tertiary); }

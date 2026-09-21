@@ -443,8 +443,16 @@ window.PROTO_NAV_CONFIG = {
               desktop: '../app/screens/naturezas-operacao.html'
             },
             {
+              id: 'nova-natureza-operacao-v2',
+              label: 'Nova Natureza de Operação (V2)',
+              desktop: '../app/screens/nova-natureza-operacao-v2.html',
+              variants: [
+                { id: 'nova-natureza-operacao-v2-editar', label: 'Editar natureza de operação (exemplo)', desktop: '../app/screens/nova-natureza-operacao-v2.html?codigo=NOP-001' }
+              ]
+            },
+            {
               id: 'nova-natureza-operacao',
-              label: 'Nova Natureza de Operação',
+              label: 'Nova Natureza de Operação (V1)',
               desktop: '../app/screens/nova-natureza-operacao.html',
               variants: [
                 { id: 'nova-natureza-operacao-editar', label: 'Editar natureza de operação (exemplo)', desktop: '../app/screens/nova-natureza-operacao.html?codigo=NOP-001' }
