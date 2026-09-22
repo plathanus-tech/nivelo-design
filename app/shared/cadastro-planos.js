@@ -12,6 +12,29 @@
   var termsWrapper = termsCheckbox.closest('.cadastro-terms');
   var submitBtn = document.getElementById('plans-submit');
 
+  // ---------- Rascunho do fluxo (sessionStorage): mesma chave usada em cadastro.js/
+  // cadastro-endereco.js, mantém a escolha já feita ao navegar entre etapas (ex.: voltar). ----------
+  var DRAFT_KEY = 'nivelo.signup.draft';
+
+  function loadDraft() {
+    try {
+      var raw = sessionStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+
+  function saveDraft(patch) {
+    try {
+      var draft = loadDraft();
+      Object.assign(draft, patch);
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch (e) {}
+  }
+
+  function clearDraft() {
+    try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) {}
+  }
+
   // ---------- Seleção de plano (mesmo padrão de estado do RadioButton) ----------
   function selectPlan(value) {
     planCards.forEach(function (card) {
@@ -22,9 +45,23 @@
 
   planRadios.forEach(function (radio) {
     radio.addEventListener('change', function () {
-      if (radio.checked) selectPlan(radio.value);
+      if (radio.checked) {
+        selectPlan(radio.value);
+        saveDraft({ plan: radio.value });
+      }
     });
   });
+
+  // ---------- Restaura o rascunho ao carregar a tela (ex.: usuário voltou de uma
+  // etapa seguinte do fluxo) ----------
+  (function restoreDraft() {
+    var plan = loadDraft().plan;
+    if (!plan) return;
+    var radio = planRadios.filter(function (r) { return r.value === plan; })[0];
+    if (!radio) return;
+    radio.checked = true;
+    selectPlan(plan);
+  })();
 
   function getSelectedPlan() {
     var checked = planRadios.filter(function (radio) { return radio.checked; });
@@ -124,6 +161,7 @@
         sessionStorage.setItem('nivelo.signup.success', '1');
         sessionStorage.setItem('nivelo.signup.plan', PLAN_LABELS[getSelectedPlan()] || '');
       } catch (e) {}
+      clearDraft();
       window.location.href = 'dashboard.html#state=signupsuccess';
     }, 700);
   });

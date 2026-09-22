@@ -22,6 +22,25 @@
   var criteriaItems = Array.prototype.slice.call(document.querySelectorAll('.pwd-criteria-item'));
   var submitBtn = document.getElementById('signup-submit');
 
+  // ---------- Rascunho do fluxo (sessionStorage): mantém os dados já digitados ao
+  // navegar entre as etapas do cadastro (inclusive ao voltar), não só ao avançar. ----------
+  var DRAFT_KEY = 'nivelo.signup.draft';
+
+  function loadDraft() {
+    try {
+      var raw = sessionStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+
+  function saveDraft(patch) {
+    try {
+      var draft = loadDraft();
+      Object.assign(draft, patch);
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch (e) {}
+  }
+
   // ---------- Documento único (CPF ou CNPJ): máscara auto-detectada por
   // tamanho, mesma técnica já usada em login.js/novo-manifesto.js — formata
   // como CPF enquanto tiver até 11 dígitos, vira CNPJ a partir do 12º. ----------
@@ -94,6 +113,7 @@
   cpfInput.addEventListener('input', function () {
     cpfInput.value = formatCpfCnpjAuto(cpfInput.value);
     if (cpfField.classList.contains('error')) setFieldError(cpfField, !isValidCPF_orCNPJ(cpfInput.value));
+    saveDraft({ cpf: cpfInput.value });
   });
   cpfInput.addEventListener('blur', function () {
     if (!cpfInput.value) { setFieldError(cpfField, false); return; }
@@ -118,6 +138,7 @@
   phoneInput.addEventListener('input', function () {
     phoneInput.value = formatPhone(phoneInput.value);
     if (phoneField.classList.contains('error')) setFieldError(phoneField, !isValidPhone(phoneInput.value));
+    saveDraft({ phone: phoneInput.value });
   });
 
   function setFieldError(field, hasError, message, errorTextEl) {
@@ -129,6 +150,7 @@
 
   nameInput.addEventListener('input', function () {
     if (nameField.classList.contains('error') && nameInput.value) setFieldError(nameField, false);
+    saveDraft({ name: nameInput.value });
   });
 
   // ---------- Regras de senha (mesma regra de Criar Nova Senha) ----------
@@ -166,13 +188,17 @@
     checkCriteria(newpassInput.value);
     if (confirmInput.value) {
       var matchOk = passwordsMatch();
+      if (!matchOk) confirmErrorText.textContent = 'As senhas informadas não coincidem.';
       setMismatch(!matchOk);
-      if (matchOk) confirmErrorText.textContent = 'As senhas informadas não coincidem.';
     }
+    saveDraft({ password: newpassInput.value });
   });
 
   confirmInput.addEventListener('input', function () {
-    setMismatch(confirmInput.value.length > 0 && !passwordsMatch());
+    var hasMismatch = confirmInput.value.length > 0 && !passwordsMatch();
+    if (hasMismatch) confirmErrorText.textContent = 'As senhas informadas não coincidem.';
+    setMismatch(hasMismatch);
+    saveDraft({ confirmPassword: confirmInput.value });
   });
 
   // ---------- Mostrar/ocultar senha (2 campos independentes) ----------
@@ -189,6 +215,18 @@
   }
   wireToggle('toggle-signup-password', newpassInput);
   wireToggle('toggle-signup-confirm-password', confirmInput);
+
+  // ---------- Restaura o rascunho ao carregar a tela (ex.: usuário voltou de uma
+  // etapa seguinte do fluxo) ----------
+  (function restoreDraft() {
+    var draft = loadDraft();
+    if (draft.name) nameInput.value = draft.name;
+    if (draft.cpf) cpfInput.value = draft.cpf;
+    if (draft.phone) phoneInput.value = draft.phone;
+    if (draft.password) newpassInput.value = draft.password;
+    if (draft.confirmPassword) confirmInput.value = draft.confirmPassword;
+    if (draft.password) checkCriteria(draft.password);
+  })();
 
   // ---------- Submit ----------
   form.addEventListener('submit', function (event) {
@@ -220,7 +258,11 @@
     } else if (!checkCriteria(newpassInput.value)) {
       hasError = true;
     }
-    if (!confirmInput.value || !passwordsMatch()) {
+    if (!confirmInput.value) {
+      setFieldError(confirmField, true, 'Confirme sua senha.', confirmErrorText);
+      hasError = true;
+    } else if (!passwordsMatch()) {
+      confirmErrorText.textContent = 'As senhas informadas não coincidem.';
       setMismatch(true);
       hasError = true;
     }
@@ -249,6 +291,7 @@
     setFieldError(cpfField, true, 'Informe seu CPF ou CNPJ.', cpfErrorText);
     setFieldError(phoneField, true, 'Informe seu telefone.', phoneErrorText);
     setFieldError(newpassField, true, 'Crie sua senha.', newpassErrorText);
+    setFieldError(confirmField, true, 'Confirme sua senha.', confirmErrorText);
   }
 
   if (state === 'criteriaunmet') {

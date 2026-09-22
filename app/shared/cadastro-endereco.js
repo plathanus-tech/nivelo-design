@@ -6,6 +6,25 @@
   var form = document.getElementById('address-form');
   var submitBtn = document.getElementById('address-submit');
 
+  // ---------- Rascunho do fluxo (sessionStorage): mesma chave usada em cadastro.js,
+  // mantém os dados já digitados ao navegar entre as etapas (inclusive ao voltar). ----------
+  var DRAFT_KEY = 'nivelo.signup.draft';
+
+  function loadDraft() {
+    try {
+      var raw = sessionStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+
+  function saveDraft(patch) {
+    try {
+      var draft = loadDraft();
+      Object.assign(draft, patch);
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch (e) {}
+  }
+
   var REQUIRED_FIELDS = [
     { fieldId: 'cep-field', inputId: 'address-cep', message: 'Informe o CEP.' },
     { fieldId: 'street-field', inputId: 'address-street', message: 'Informe a rua.' },
@@ -83,13 +102,45 @@
     if (digits.length === 8) lookupCEP(digits);
   });
 
+  var complementInput = document.getElementById('address-complement');
+
   REQUIRED_FIELDS.forEach(function (item) {
     item.input.addEventListener('input', function () {
       if (item.field.classList.contains('error') && item.input.value.trim()) {
         setFieldError(item.field, item.input, false);
       }
+      saveDraft({ address: collectAddressDraft() });
     });
   });
+  complementInput.addEventListener('input', function () {
+    saveDraft({ address: collectAddressDraft() });
+  });
+
+  function collectAddressDraft() {
+    return {
+      cep: cepInput.value,
+      street: streetInput.value,
+      number: document.getElementById('address-number').value,
+      complement: complementInput.value,
+      district: districtInput.value,
+      city: cityInput.value,
+      state: stateInput.value
+    };
+  }
+
+  // ---------- Restaura o rascunho ao carregar a tela (ex.: usuário voltou de uma
+  // etapa seguinte do fluxo) ----------
+  (function restoreDraft() {
+    var address = loadDraft().address;
+    if (!address) return;
+    if (address.cep) cepInput.value = address.cep;
+    if (address.street) streetInput.value = address.street;
+    if (address.number) document.getElementById('address-number').value = address.number;
+    if (address.complement) complementInput.value = address.complement;
+    if (address.district) districtInput.value = address.district;
+    if (address.city) cityInput.value = address.city;
+    if (address.state) stateInput.value = address.state;
+  })();
 
   // ---------- Submit ----------
   form.addEventListener('submit', function (event) {
@@ -103,6 +154,8 @@
     });
 
     if (hasError) return;
+
+    saveDraft({ address: collectAddressDraft() });
 
     form.setAttribute('data-state', 'loading');
     submitBtn.disabled = true;
