@@ -79,6 +79,13 @@
       ? (trialDaysRemaining === 1 ? '1 dia restante' : trialDaysRemaining + ' dias restantes')
       : 'Expirado';
   }
+  // Texto curto do mobile (só `dashboard.html`, header com a badge numa linha só).
+  var trialShortTextEl = document.getElementById('dash-trial-short-text');
+  if (trialShortTextEl) {
+    trialShortTextEl.textContent = trialDaysRemaining > 0
+      ? trialDaysRemaining + (trialDaysRemaining === 1 ? ' dia restante' : ' dias restantes')
+      : 'Expirado';
+  }
   // Abaixo de 3 dias restantes a tag muda de azul (padrão, `data-status="info"`
   // já no HTML) pra amarela, reforçando a proximidade do fim do teste — não
   // se aplica no dia 0 (aí o modal de bloqueio já cobre a tela inteira).

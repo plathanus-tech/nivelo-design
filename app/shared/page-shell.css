@@ -657,3 +657,79 @@
   background: transparent;
   border-color: transparent;
 }
+
+/* ══════════════════════════════════════════════════════════
+   TESTE GRATUITO NO HEADER
+   Indicador fixo do Header em TODAS as telas do shell enquanto a conta está em teste
+   gratuito (injetado por `interface-principal.js`, ou já presente no HTML do Dashboard).
+   Desktop: à direita, oposto ao logo (badge em cima, link "Contratar agora" abaixo,
+   alinhado à direita). Mobile: 2ª linha do header, logo abaixo do logo, badge + link
+   lado a lado à esquerda. Cores via componente-padrão de status (info/warning).
+   ══════════════════════════════════════════════════════════ */
+.app-header-trial {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.app-header-trial-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: 2px var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+  background: var(--color-status-info-bg);
+  color: var(--color-status-info-fg);
+}
+.app-header-trial-badge[data-status="warning"] {
+  background: var(--color-status-warning-bg);
+  color: var(--color-status-warning-fg);
+}
+.app-header-trial-badge strong { font-weight: var(--font-weight-bold); }
+.app-header-trial-upgrade {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  height: auto;
+  min-width: 0;
+  color: var(--color-action-primary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.app-header-trial-upgrade:hover { color: var(--color-action-primary-hover); }
+
+/* Texto curto ("Teste gratuito · N dias restantes") só no mobile. */
+.app-header-trial-short { display: none; }
+
+@media (max-width: 767px) {
+  .app-header.has-trial {
+    height: auto;
+    min-height: 0;
+    flex-wrap: wrap;
+    align-content: center;
+    row-gap: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    padding-bottom: var(--spacing-md);
+  }
+  .app-header.has-trial .app-header-trial {
+    flex-basis: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--spacing-sm);
+    margin-left: 0;
+  }
+  .app-header.has-trial .app-header-trial-full { display: none; }
+  .app-header.has-trial .app-header-trial-short { display: inline; }
+  .app-header.has-trial .app-header-trial-badge,
+  .app-header.has-trial .app-header-trial-upgrade { flex-shrink: 0; white-space: nowrap; }
+}

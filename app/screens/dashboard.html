@@ -23,7 +23,7 @@
   <div class="app-shell" id="app-shell">
 
     <!-- ══════════════════ HEADER ══════════════════ -->
-    <header class="app-header">
+    <header class="app-header has-trial">
       <div class="app-header-left">
         <button type="button" class="app-header-hamburger" id="hamburger-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="app-sidebar">
           <i data-lucide="menu" width="22" height="22"></i>
@@ -33,6 +33,17 @@
           <img class="app-header-logo" src="../../NIVELO azul header sistema.svg" alt="Nivelo" />
           <span class="app-header-tagline">Sistema de gestão rural</span>
         </div>
+      </div>
+
+      <div class="app-header-trial">
+        <span class="app-header-trial-badge" id="dash-trial-badge" data-status="info">
+          <i data-lucide="clock" width="14" height="14"></i>
+          <span class="app-header-trial-full">Teste gratuito · Plano <span id="dash-trial-plan-text">Gestão Completa</span> · <strong id="dash-trial-days-text">5 dias restantes</strong></span>
+          <span class="app-header-trial-short">Teste gratuito · <strong id="dash-trial-short-text">5 dias restantes</strong></span>
+        </span>
+        <button type="button" class="app-header-trial-upgrade" id="dash-trial-upgrade-btn">
+          Contratar agora
+        </button>
       </div>
 
     </header>
@@ -265,15 +276,6 @@
           <div class="dashboard-topbar">
             <div class="dashboard-heading-row">
               <h1 class="dashboard-heading text-heading-6">Dashboard</h1>
-              <div class="dash-trial-stack">
-                <span class="badge dash-trial-badge" id="dash-trial-badge" data-status="info">
-                  <i data-lucide="clock" width="14" height="14"></i>
-                  Teste gratuito · Plano <span id="dash-trial-plan-text">Gestão Completa</span> · <strong id="dash-trial-days-text">5 dias restantes</strong>
-                </span>
-                <button type="button" class="dash-trial-upgrade-btn" id="dash-trial-upgrade-btn">
-                  Contratar agora
-                </button>
-              </div>
               <span class="dash-refresh-indicator" id="dashboard-refresh-indicator" aria-hidden="true">
                 <i data-lucide="loader-2" width="16" height="16"></i>
               </span>

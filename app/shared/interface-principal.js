@@ -1,6 +1,34 @@
 (function () {
   'use strict';
 
+  // ---------- Teste gratuito: elemento fixo do Header em todas as telas do shell ----------
+  // O Dashboard já traz esse bloco no próprio HTML (`#dash-trial-badge`, controlado por
+  // `dashboard.js`, que também decide estado/dias); nas demais telas ele é injetado aqui,
+  // com o valor padrão da demonstração (5 dias, plano escolhido no cadastro ou "Gestão
+  // Completa"). Clicar em "Contratar agora" leva ao mesmo fluxo de compra do Dashboard.
+  (function injectTrialIndicator() {
+    var header = document.querySelector('.app-header');
+    if (!header || document.getElementById('dash-trial-badge')) return;
+    var plan = null;
+    try { plan = sessionStorage.getItem('nivelo.signup.plan'); } catch (e) {}
+    var days = 5;
+    var daysText = days + ' dias restantes';
+    var wrap = document.createElement('div');
+    wrap.className = 'app-header-trial';
+    wrap.innerHTML =
+      '<span class="app-header-trial-badge" id="dash-trial-badge" data-status="info">' +
+        '<i data-lucide="clock" width="14" height="14"></i>' +
+        '<span class="app-header-trial-full">Teste gratuito · Plano ' + (plan || 'Gestão Completa') + ' · <strong>' + daysText + '</strong></span>' +
+        '<span class="app-header-trial-short">Teste gratuito · <strong>' + daysText + '</strong></span>' +
+      '</span>' +
+      '<button type="button" class="app-header-trial-upgrade" id="dash-trial-upgrade-btn">Contratar agora</button>';
+    header.appendChild(wrap);
+    header.classList.add('has-trial');
+    wrap.querySelector('.app-header-trial-upgrade').addEventListener('click', function () {
+      window.location.href = 'comprar-plano.html';
+    });
+  })();
+
   if (window.lucide) lucide.createIcons();
 
   var COLLAPSED_KEY = 'nivelo.shell.sidebarCollapsed';

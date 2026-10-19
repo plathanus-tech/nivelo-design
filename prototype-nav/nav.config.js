@@ -140,6 +140,14 @@ window.PROTO_NAV_CONFIG = {
             { id: 'dashboard-success', label: 'Sucesso ao recuperar senha', desktop: '../app/screens/dashboard.html#state=success' },
             { id: 'dashboard-signupsuccess', label: 'Conta criada com sucesso', desktop: '../app/screens/dashboard.html#state=signupsuccess' }
           ]
+        },
+        {
+          id: 'dashboard-v2',
+          label: 'Dashboard V2 (alternativa: teste no corpo da página)',
+          desktop: '../app/screens/dashboard-v2.html',
+          variants: [
+            { id: 'dashboard-v2-trialwarning', label: 'Teste: menos de 3 dias restantes (tag amarela)', desktop: '../app/screens/dashboard-v2.html#state=trialwarning' }
+          ]
         }
       ]
     },
